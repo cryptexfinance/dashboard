@@ -1,0 +1,75 @@
+@font-face {
+  font-family: "Space Mono";
+  src: url("../assets/fonts/SpaceMono-Bold.woff2") format("woff2"),
+    url("../assets/fonts/SpaceMono-Bold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("../assets/fonts/SpaceMono-BoldItalic.woff2") format("woff2"),
+    url("../assets/fonts/SpaceMono-BoldItalic.woff") format("woff");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("../assets/fonts/SpaceMono-Regular.woff2") format("woff2"),
+    url("../assets/fonts/SpaceMono-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("../assets/fonts/SpaceMono-Italic.woff2") format("woff2"),
+    url("../assets/fonts/SpaceMono-Italic.woff") format("woff");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nineteen Ninety Seven";
+  src: url("../assets/fonts/Nineteen-Ninety-Seven.woff2") format("woff2"),
+    url("../assets/fonts/Nineteen-Ninety-Seven.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Erbos Draco 1st NBP";
+  src: url("../assets/fonts/Erbos-Draco-1st-NBP.woff2") format("woff2"),
+    url("../assets/fonts/Erbos-Draco-1st-NBP.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Erbos Draco 1st Open NBP";
+  src: url("../assets/fonts/Erbos-Draco-1st-Open-NBP.woff2") format("woff2"),
+    url("../assets/fonts/Erbos-Draco-1st-Open-NBP.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  font-family: "Space Mono";
+}
+
+h1,
+h2 {
+  font-family: "Nineteen Ninety Seven";
+}
+
+.number {
+  font-family: "Erbos Draco 1st NBP";
+}
