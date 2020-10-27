@@ -2,4 +2,14 @@
 
 .header {
   background-color: $primary;
+  flex-direction: row;
+  justify-content: flex-end;
+
+  .btn {
+    background-color: $primary;
+    width: 15rem;
+    height: 3rem;
+    margin-right: 30px;
+    border-radius: 0;
+  }
 }

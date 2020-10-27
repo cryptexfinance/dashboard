@@ -104,8 +104,7 @@
       "error",
       {
         "trailingComma": "es5",
-        "singleQuote": false,
-        "printWidth": 80
+        "singleQuote": false
       }
     ],
     "jsx-a11y/href-no-hash": "off",
