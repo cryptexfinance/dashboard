@@ -6,7 +6,7 @@ const Welcome = () => (
   <div className="container welcome">
     <div>
       <div>
-        <h2 className="number">$352,328,704,715</h2>
+        <h2 className="number neon-highlight">$352,328,704,715</h2>
         <p>Total Cryptocurrency Market Capitalization</p>
         <div>
           <h2>My Total Balance</h2>
@@ -15,27 +15,31 @@ const Welcome = () => (
           </p>
         </div>
         <div>
-          <h3 className="number">
+          <h3 className="number neon-blue">
             <span>ETH ICON</span>1,220
           </h3>
           <p>ETH Balance</p>
         </div>
         <div>
-          <h3 className="number">
+          <h3 className="number neon-green">
             <span>TCAP ICON</span>4.1
           </h3>
           <p>TCAP Balance</p>
         </div>
       </div>
       <div>
-        <h2 className="number">$35.23</h2>
+        <h2 className="number neon-blue">$35.23</h2>
         <p>Total Cryptocurrency Market Capitalization Token</p>
         <div>
           <h2>Use TCAP</h2>
           <p>Trade TCAP using uniswap or create new supply using a vault</p>
           <div>
-            <Button variant="warning">Trade</Button>
-            <Button variant="primary">Mint</Button>
+            <Button variant="warning" className="neon-highlight">
+              Trade
+            </Button>
+            <Button variant="primary" className="neon-highlight">
+              Mint
+            </Button>
           </div>
         </div>
       </div>
