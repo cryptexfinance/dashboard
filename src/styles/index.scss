@@ -1,6 +1,32 @@
 @import "./colors";
 @import "./fonts";
 
+/* make the customizations */
+$theme-colors: (
+  "primary": $highlight,
+  "secondary": $primary,
+  "success": $green,
+  "info": $blue,
+  "danger": $pink,
+  "warning": $orange,
+  "dark": $dark,
+  "light": $light,
+);
+
+@import "~bootstrap/scss/bootstrap";
+
 p {
-  color: $primary;
+  color: $light;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: $white;
+}
+
+body {
+  background-color: $primary;
 }

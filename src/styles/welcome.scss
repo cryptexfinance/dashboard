@@ -1,0 +1,23 @@
+@import "./colors";
+@import "./fonts";
+
+.welcome {
+  .btn {
+    color: $white;
+    background-color: $primary;
+    font-family: "Nineteen Ninety Seven";
+    border-width: 1px;
+    width: 10rem;
+    height: 3rem;
+    margin-right: 30px;
+
+    &.btn-primary {
+      -webkit-box-shadow: 0px 0px 3px 0px $highlight;
+      box-shadow: 0px 0px 3px 0px $highlight;
+    }
+    &.btn-warning {
+      -webkit-box-shadow: 0px 0px 3px 0px $orange;
+      box-shadow: 0px 0px 3px 0px $orange;
+    }
+  }
+}

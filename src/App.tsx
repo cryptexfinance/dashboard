@@ -1,26 +1,16 @@
 import React from "react";
-import logo from "./logo.svg";
+import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
+import Welcome from "./components/Welcome";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Whatsapp</h1>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => (
+  <div className="">
+    <Sidebar />
+    <div>
+      <Header />
+      <Welcome />
     </div>
-  );
-}
+  </div>
+);
 
 export default App;
