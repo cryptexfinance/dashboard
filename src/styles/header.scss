@@ -1,15 +1,15 @@
 @import "./colors";
 
 .header {
-  background-color: $primary;
+  padding-top: 1.25rem;
   flex-direction: row;
   justify-content: flex-end;
+  padding-right: 3rem;
 
   .btn {
     background-color: $primary;
     width: 15rem;
     height: 3rem;
-    margin-right: 30px;
     border-radius: 0;
   }
 }

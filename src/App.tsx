@@ -1,17 +1,26 @@
 import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Container from "react-bootstrap/esm/Container";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./components/Welcome";
+import Graph from "./components/Graph";
 
 const App = () => (
-  <div className="">
+  <Router>
     <Sidebar />
     <Container fluid className="wrapper">
       <Header />
-      <Welcome />
+      <Switch>
+        <Route path="/" exact>
+          <Welcome />
+        </Route>
+        <Route path="/graph" exact>
+          <Graph />
+        </Route>
+      </Switch>
     </Container>
-  </div>
+  </Router>
 );
 
 export default App;

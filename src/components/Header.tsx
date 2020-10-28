@@ -4,7 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import "../styles/header.scss";
 
 const Header = () => (
-  <Nav className="header mt-4">
+  <Nav className="header">
     <Button variant="pink" className="neon-pink">
       Connect Wallet
     </Button>
