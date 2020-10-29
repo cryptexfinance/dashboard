@@ -25,7 +25,7 @@ const Sidebar = () => (
       </Link>
     </Nav.Item>
     <Nav.Item>
-      <Link to="/dashboard">
+      <Link to="/vault">
         <VaultIcon />
       </Link>
     </Nav.Item>

@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
+import Vault from "./components/Vault";
 
 const App = () => (
   <Router>
@@ -17,6 +18,9 @@ const App = () => (
         </Route>
         <Route path="/graph" exact>
           <Graph />
+        </Route>
+        <Route path="/vault" exact>
+          <Vault />
         </Route>
       </Switch>
     </Container>

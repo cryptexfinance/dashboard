@@ -97,9 +97,19 @@ body {
 //Same width as sidebar
 .wrapper {
   padding-left: 5rem;
+}
+.wrapper::before {
   background-image: url("../assets/images/liquid.png");
   background-repeat: no-repeat;
   background-size: cover;
+  opacity: 0.3;
+  position: absolute;
+  z-index: -1;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  content: "";
 }
 
 body,
