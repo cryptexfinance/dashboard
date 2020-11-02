@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
 import Vault from "./components/Vault";
+import Faucet from "./components/Faucet";
 
 const App = () => (
   <Router>
@@ -21,6 +22,9 @@ const App = () => (
         </Route>
         <Route path="/vault" exact>
           <Vault />
+        </Route>
+        <Route path="/faucet" exact>
+          <Faucet />
         </Route>
       </Switch>
     </Container>

@@ -100,10 +100,17 @@
     .form-card {
       .card {
         min-height: 26rem;
+        padding: 0;
 
         .info {
           border-bottom: 1px solid $dark;
-          padding-bottom: 1rem;
+          padding: 2rem;
+
+          p,
+          h4 {
+            padding-bottom: 0;
+            margin-bottom: 0;
+          }
 
           .amount {
             display: flex;
@@ -120,7 +127,7 @@
       }
 
       form {
-        padding-top: 2rem;
+        padding: 2rem;
 
         label {
           font-family: "Nineteen Ninety Seven";

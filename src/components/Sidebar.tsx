@@ -30,12 +30,12 @@ const Sidebar = () => (
       </Link>
     </Nav.Item>
     <Nav.Item>
-      <Link to="/dashboard">
+      <Link to="/faucet">
         <FaucetIcon />
       </Link>
     </Nav.Item>
     <Nav.Item>
-      <Link to="/dashboard">
+      <Link to="/logout">
         <LogoutIcon />
       </Link>
     </Nav.Item>

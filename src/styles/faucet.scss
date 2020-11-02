@@ -1,0 +1,57 @@
+@import "./colors";
+@import "./fonts";
+
+div.faucet {
+  padding: 1rem 3rem;
+  padding-bottom: 0px;
+
+  .btn {
+    width: 13.4375rem;
+    height: 3.875rem;
+    border-radius: 1px;
+    margin-top: 2rem;
+  }
+
+  .actions {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: 33% auto 33%;
+  }
+
+  .info {
+    border-bottom: 1px solid $dark;
+
+    h4 {
+      padding: 2rem;
+    }
+  }
+
+  form {
+    padding: 2rem;
+
+    label {
+      font-family: "Nineteen Ninety Seven";
+      color: $white;
+    }
+
+    .text-muted {
+      text-align: right;
+      font-size: 1rem;
+    }
+
+    input[type="text"] {
+      border-radius: 1px;
+      background: no-repeat;
+      border-color: $dark;
+      color: $white;
+      height: 3.375rem;
+    }
+
+    .btn {
+      margin-top: 2rem;
+      border-radius: 1px;
+      width: 100%;
+      box-shadow: 0px 6px 25px -6px rgba(241, 36, 255, 0.4);
+    }
+  }
+}
