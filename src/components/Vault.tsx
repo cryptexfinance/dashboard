@@ -18,9 +18,9 @@ const Vault = () => {
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
   const [isCreated, setIsCreated] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
+  const [isApproved] = useState(false);
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0.0");
-  const [tokenBalance, setTokenBalance] = useState("0.0");
+  // const [tokenBalance, setTokenBalance] = useState("0.0");
   const [title, setTitle] = useState("Create Vault");
   const [text, setText] = useState(
     "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
@@ -37,7 +37,7 @@ const Vault = () => {
         const currentCreated = await vaults.wethVault.vaultToUser(address);
         const wethPrice = await oracles.wethOracle.getLatestAnswer();
         const currentWethPrice = ethers.utils.formatEther(wethPrice.mul(10000000000));
-        //TODO: connect to network provider
+        // TODO: connect to network provider
         const provider = await ethers.getDefaultProvider();
         const balance = await provider.getBalance(address);
         const currentBalance = ethers.utils.formatEther(balance);
@@ -54,7 +54,7 @@ const Vault = () => {
       }
     }
     load();
-  }, [isCreated]);
+  }, [isCreated, oracles, signer, vaults]);
   return (
     <div className="vault">
       <div>

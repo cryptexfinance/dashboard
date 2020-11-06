@@ -45,7 +45,7 @@ const Welcome = () => {
       }
     };
     loadAddress();
-  }, [signer, tcapUSDBalance]);
+  }, [signer, tcapUSDBalance, oracles, tcapBalance, tcapPrice, tokens]);
   return (
     <div className="welcome">
       <div>
