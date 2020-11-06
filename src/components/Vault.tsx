@@ -1,30 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
+import ethers from "ethers";
+import NumberFormat from "react-number-format";
+import OraclesContext from "../state/OraclesContext";
+import VaultsContext from "../state/VaultsContext";
+import SignerContext from "../state/SignerContext";
 import "../styles/vault.scss";
 import { ReactComponent as WETHIcon } from "../assets/images/vault/eth.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
 
 const Vault = () => {
-  const [isCreated, setIsCreated] = useState(true);
-  const [isApproved, setIsApproved] = useState(true);
+  const oracles = useContext(OraclesContext);
+  const vaults = useContext(VaultsContext);
+  const signer = useContext(SignerContext);
+  const [isCreated, setIsCreated] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+  const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0.0");
+  const [tokenBalance, setTokenBalance] = useState("0.0");
   const [title, setTitle] = useState("Create Vault");
   const [text, setText] = useState(
     "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
   );
 
+  function toUSD(amount: string, price: string) {
+    return parseFloat(amount) * parseFloat(price);
+  }
+
   useEffect(() => {
-    function load() {
+    async function load() {
+      if (vaults.wethVault && signer.signer && oracles.wethOracle) {
+        const address = await signer.signer.getAddress();
+        const currentCreated = await vaults.wethVault.vaultToUser(address);
+        const wethPrice = await oracles.wethOracle.getLatestAnswer();
+        const currentWethPrice = ethers.utils.formatEther(wethPrice.mul(10000000000));
+        //TODO: connect to network provider
+        const provider = await ethers.getDefaultProvider();
+        const balance = await provider.getBalance(address);
+        const currentBalance = ethers.utils.formatEther(balance);
+        console.log("load -> currentBalance", currentBalance);
+        const usd = toUSD(currentWethPrice, currentBalance);
+        setTokenBalanceUSD(usd.toString());
+        if (currentCreated.toString() !== "0") {
+          setIsCreated(true);
+        }
+      }
       if (isCreated) {
         setText("One last step! Approve your collateral to start minting TCAP tokens.");
         setTitle("Approve Vault");
       }
     }
     load();
-  }, []);
+  }, [isCreated]);
   return (
     <div className="vault">
       <div>
@@ -39,7 +69,16 @@ const Vault = () => {
               <option>WBTC</option>
               <option>DAI</option>
             </select>
-            <p className="number">$0.2320</p>
+            <p className="number">
+              <NumberFormat
+                className="number"
+                value={tokenBalanceUSD}
+                displayType="text"
+                thousandSeparator
+                prefix="$"
+                decimalScale={2}
+              />
+            </p>
           </div>
         </div>
         {isApproved ? (
