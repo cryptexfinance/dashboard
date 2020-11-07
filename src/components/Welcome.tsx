@@ -21,6 +21,7 @@ const Welcome = () => {
   const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
   const [totalPrice, setTotalPrice] = useState("0.0");
   const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const history = useHistory();
@@ -40,12 +41,17 @@ const Welcome = () => {
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         const tcapUSD = parseFloat(tcapBalance) * parseFloat(tcapPrice);
-
         setTcapUSDBalance(tcapUSD.toString());
       }
+      setIsLoading(false);
     };
     loadAddress();
-  }, [signer, tcapUSDBalance, oracles, tcapBalance, tcapPrice, tokens]);
+    // eslint-disable-next-line
+  }, [tcapUSDBalance]);
+
+  if (isLoading) {
+    return <></>;
+  }
   return (
     <div className="welcome">
       <div>

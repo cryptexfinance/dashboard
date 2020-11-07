@@ -39,8 +39,9 @@ const Sidebar = () => {
       </Nav.Item>
       <Nav.Item>
         <Link
-          to="/"
-          onClick={() => {
+          to=""
+          onClick={(event) => {
+            event.preventDefault();
             web3Modal.clearCachedProvider();
             window.location.reload();
           }}

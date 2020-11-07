@@ -119,10 +119,16 @@
         }
 
         svg {
-          margin-top: -5px;
+          // margin-top: -5px;
           vertical-align: top;
           width: 0.8rem;
           filter: brightness(1118%) drop-shadow(0px 0px 5px rgba(6, 52, 255, 0.53));
+
+          &.tcap-neon {
+            margin-top: 0px;
+            filter: none;
+            width: 2rem;
+          }
         }
       }
 

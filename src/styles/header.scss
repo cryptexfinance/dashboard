@@ -6,6 +6,11 @@
   justify-content: flex-end;
   padding-right: 3rem;
 
+  svg {
+    vertical-align: top;
+    height: 1.5rem;
+  }
+
   .btn {
     background-color: $primary;
     width: 15rem;

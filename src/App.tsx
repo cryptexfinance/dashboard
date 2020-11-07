@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { ethers } from "ethers";
 import Container from "react-bootstrap/esm/Container";
@@ -32,54 +32,51 @@ import TCAPToken from "./contracts/TCAP.json";
 const App = () => {
   const signer = useSigner();
   const web3Modal = useContext(Web3ModalContext);
-  const [loading, setloading] = useState(true);
+  const [isLoading, setloading] = useState(true);
   const [, setInvalidNetwork] = useState(false);
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
 
-  const setContracts = useCallback(
-    (currentSigner: ethers.Signer) => {
-      // Set Vaults
-      const currentWETHVault = new ethers.Contract(WETHVault.address, WETHVault.abi, currentSigner);
-      vaults.setCurrentWETHVault(currentWETHVault);
-      const currentDAIVault = new ethers.Contract(DAIVault.address, DAIVault.abi, currentSigner);
-      vaults.setCurrentDAIVault(currentDAIVault);
-      const currentWBTCVault = new ethers.Contract(WBTCVault.address, WBTCVault.abi, currentSigner);
-      vaults.setCurrentWBTCVault(currentWBTCVault);
-      // Set Tokens
-      const currentWETHToken = new ethers.Contract(WETHToken.address, WETHToken.abi, currentSigner);
-      tokens.setCurrentWETHToken(currentWETHToken);
-      const currentDAIToken = new ethers.Contract(DAIToken.address, DAIToken.abi, currentSigner);
-      tokens.setCurrentDAIToken(currentDAIToken);
-      const currentWBTCToken = new ethers.Contract(WBTCToken.address, WBTCToken.abi, currentSigner);
-      tokens.setCurrentWBTCToken(currentWBTCToken);
-      const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
-      tokens.setCurrentTCAPToken(currentTCAPToken);
-      // // Set Oracles
-      const currentWETHOracle = new ethers.Contract(
-        WETHOracle.address,
-        WETHOracle.abi,
-        currentSigner
-      );
-      oracles.setCurrentWETHOracle(currentWETHOracle);
-      const currentDAIOracle = new ethers.Contract(DAIOracle.address, DAIOracle.abi, currentSigner);
-      oracles.setCurrentDAIOracle(currentDAIOracle);
-      const currentWBTCOracle = new ethers.Contract(
-        WBTCOracle.address,
-        WBTCOracle.abi,
-        currentSigner
-      );
-      oracles.setCurrentWBTCOracle(currentWBTCOracle);
-      const currentTCAPOracle = new ethers.Contract(
-        TCAPOracle.address,
-        TCAPOracle.abi,
-        currentSigner
-      );
-      oracles.setCurrentTCAPOracle(currentTCAPOracle);
-    },
-    [oracles, tokens, vaults]
-  );
+  const setContracts = (currentSigner: ethers.Signer) => {
+    // Set Vaults
+    const currentWETHVault = new ethers.Contract(WETHVault.address, WETHVault.abi, currentSigner);
+    vaults.setCurrentWETHVault(currentWETHVault);
+    const currentDAIVault = new ethers.Contract(DAIVault.address, DAIVault.abi, currentSigner);
+    vaults.setCurrentDAIVault(currentDAIVault);
+    const currentWBTCVault = new ethers.Contract(WBTCVault.address, WBTCVault.abi, currentSigner);
+    vaults.setCurrentWBTCVault(currentWBTCVault);
+    // Set Tokens
+    const currentWETHToken = new ethers.Contract(WETHToken.address, WETHToken.abi, currentSigner);
+    tokens.setCurrentWETHToken(currentWETHToken);
+    const currentDAIToken = new ethers.Contract(DAIToken.address, DAIToken.abi, currentSigner);
+    tokens.setCurrentDAIToken(currentDAIToken);
+    const currentWBTCToken = new ethers.Contract(WBTCToken.address, WBTCToken.abi, currentSigner);
+    tokens.setCurrentWBTCToken(currentWBTCToken);
+    const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
+    tokens.setCurrentTCAPToken(currentTCAPToken);
+    // // Set Oracles
+    const currentWETHOracle = new ethers.Contract(
+      WETHOracle.address,
+      WETHOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentWETHOracle(currentWETHOracle);
+    const currentDAIOracle = new ethers.Contract(DAIOracle.address, DAIOracle.abi, currentSigner);
+    oracles.setCurrentDAIOracle(currentDAIOracle);
+    const currentWBTCOracle = new ethers.Contract(
+      WBTCOracle.address,
+      WBTCOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentWBTCOracle(currentWBTCOracle);
+    const currentTCAPOracle = new ethers.Contract(
+      TCAPOracle.address,
+      TCAPOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentTCAPOracle(currentTCAPOracle);
+  };
 
   web3Modal.on("connect", async (networkProvider) => {
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
@@ -116,15 +113,16 @@ const App = () => {
         }
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
-        await setContracts(currentSigner);
+        setContracts(currentSigner);
       }
       setloading(false);
     }
     // Execute the created function directly
     loadProvider();
-  }, [loading, signer, setContracts, web3Modal]);
+    // eslint-disable-next-line
+  }, [web3Modal]);
 
-  if (loading) {
+  if (isLoading) {
     return <>loading</>;
   }
 
