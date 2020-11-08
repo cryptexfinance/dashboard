@@ -3,7 +3,7 @@ import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
-import ethers, { BigNumber } from "ethers";
+import ethers from "ethers";
 import NumberFormat from "react-number-format";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import OraclesContext from "../state/OraclesContext";
@@ -16,20 +16,20 @@ import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
+// TODO: Refactor names
 const Vault = () => {
   const web3Modal = useContext(Web3ModalContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
-  const [isCreated, setIsCreated] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
-  const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
-  const [tokenBalance, setTokenBalance] = useState("0");
+
+  // Actions
   const [title, setTitle] = useState("Create Vault");
   const [text, setText] = useState(
     "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
   );
+  const [isApproved, setIsApproved] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   // Vault Data
@@ -39,15 +39,27 @@ const Vault = () => {
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [collateralPrice, setCollateralPrice] = useState("0");
-  const [selectedVault, setSelectedVault] = useState("ETH");
+  const [selectedVault] = useState("ETH");
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
-  const [selectedVaultId, setSelectedVaultId] = useState("0");
+  const [selectedVaultId] = useState("0");
+
+  // General Data
+
+  const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
+  const [tokenBalance, setTokenBalance] = useState("0");
+  const [tokenBalanceDecimals, setTokenBalanceDecimals] = useState(2);
+  const [tcapPrice, setTcapPrice] = useState("0");
 
   // Inputs
-  const [addCollateral, setAddCollateral] = useState("");
+  const [addCollateralTxt, setAddCollateralTxt] = useState("");
   const [addCollateralUSD, setAddCollateralUSD] = useState("0");
-  const [removeCollateral, setRemoveCollateral] = useState("");
+  const [removeCollateralTxt, setRemoveCollateralTxt] = useState("");
   const [removeCollateralUSD, setRemoveCollateralUSD] = useState("0");
+  const [mintTxt, setMintTxt] = useState("");
+  const [mintUSD, setMintUSD] = useState("0");
+  const [burnTxt, setBurnTxt] = useState("");
+  const [burnUSD, setBurnUSD] = useState("0");
+  const [burnFee, setBurnFee] = useState("0");
 
   function toUSD(amount: string, price: string) {
     return parseFloat(amount) * parseFloat(price);
@@ -55,7 +67,7 @@ const Vault = () => {
 
   // forms
   const onChangeAddCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddCollateral(event.target.value);
+    setAddCollateralTxt(event.target.value);
     let usd = toUSD(collateralPrice, event.target.value);
     if (!usd) {
       usd = 0;
@@ -64,7 +76,7 @@ const Vault = () => {
   };
 
   const onChangeRemoveCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoveCollateral(event.target.value);
+    setRemoveCollateralTxt(event.target.value);
     let usd = toUSD(collateralPrice, event.target.value);
     if (!usd) {
       usd = 0;
@@ -72,66 +84,189 @@ const Vault = () => {
     setRemoveCollateralUSD(usd.toString());
   };
 
-  const stakeCollateral = async () => {
-    const amount = ethers.utils.parseEther(addCollateral);
-    console.log("Vault -> selectedVaultContract", selectedVaultContract);
-    if (selectedVault === "ETH") {
-      const tx = await selectedVaultContract?.addCollateralETH({
-        value: amount,
-      });
+  const onChangeMint = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMintTxt(event.target.value);
+    let usd = toUSD(tcapPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setMintUSD(usd.toString());
+  };
 
-      console.log("Vault -> tx", tx);
+  const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBurnTxt(event.target.value);
+    let usd = toUSD(tcapPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setBurnUSD(usd.toString());
+    if (event.target.value !== "") {
+      const currentBurnFee = await selectedVaultContract?.getFee(
+        ethers.utils.parseEther(event.target.value)
+      );
+      const ethFee = ethers.utils.formatEther(currentBurnFee);
+      setBurnFee(ethFee.toString());
     } else {
-      const tx = await selectedVaultContract?.addCollateral(amount);
-      console.log("Vault -> tx", tx);
+      setBurnFee("0");
     }
   };
 
-  const loadVault = async (vaultId: string, vaultContract: ethers.Contract) => {
-    const ratio = await vaultContract.getVaultRatio(vaultId);
-    const vault = await vaultContract.getVault(vaultId);
-    setVaultDebt(ethers.utils.formatEther(vault[3]));
-    setVaultRatio(ratio.toString());
-    setVaultCollateral(ethers.utils.formatEther(vault[1]));
+  const addCollateral = async () => {
+    const amount = ethers.utils.parseEther(addCollateralTxt);
+    if (selectedVault === "ETH") {
+      await selectedVaultContract?.addCollateralETH({
+        value: amount,
+      });
+    } else {
+      await selectedVaultContract?.addCollateral(amount);
+    }
+  };
+
+  const removeCollateral = async () => {
+    const amount = ethers.utils.parseEther(removeCollateralTxt);
+    if (selectedVault === "ETH") {
+      await selectedVaultContract?.removeCollateralETH(amount);
+    } else {
+      await selectedVaultContract?.addCollateral(amount);
+    }
+  };
+
+  const mintTCAP = async () => {
+    const amount = ethers.utils.parseEther(mintTxt);
+    await selectedVaultContract?.mint(amount);
+  };
+
+  const burnTCAP = async () => {
+    const amount = ethers.utils.parseEther(burnTxt);
+    const fee = ethers.utils.parseEther(burnFee);
+    await selectedVaultContract?.burn(amount, { value: fee });
+  };
+
+  const action = async () => {
+    if (selectedVaultId.toString() === "0") {
+      await selectedVaultContract?.createVault();
+    } else {
+      // Approve Vault
+    }
+  };
+
+  const loadVault = async (vaultType: string) => {
+    if (
+      signer.signer &&
+      oracles.wethOracle &&
+      oracles.daiOracle &&
+      oracles.wbtcOracle &&
+      oracles.tcapOracle &&
+      vaults.wethVault &&
+      vaults.daiVault &&
+      vaults.wbtcVault &&
+      tokens.wethToken &&
+      tokens.daiToken &&
+      tokens.wbtcToken
+    ) {
+      let currentVault;
+      let currentOracle;
+      let currentToken;
+      let balance;
+      switch (vaultType) {
+        case "ETH":
+          currentVault = vaults.wethVault;
+          currentOracle = oracles.wethOracle;
+          currentToken = tokens.wethToken;
+
+          break;
+        case "WETH":
+          currentVault = vaults.wethVault;
+          currentOracle = oracles.wethOracle;
+          currentToken = tokens.wethToken;
+
+          break;
+        case "DAI":
+          currentVault = vaults.daiVault;
+          currentOracle = oracles.daiOracle;
+          currentToken = tokens.daiToken;
+          break;
+        case "WBTC":
+          currentVault = vaults.wbtcVault;
+          currentOracle = oracles.wbtcOracle;
+          currentToken = tokens.wbtcToken;
+          break;
+        default:
+          currentVault = vaults.wethVault;
+          currentOracle = oracles.wethOracle;
+          currentToken = tokens.wethToken;
+          break;
+      }
+
+      // TODO: get network from env
+      const network = "rinkeby";
+      const address = await signer.signer.getAddress();
+      const provider = ethers.getDefaultProvider(network);
+
+      // TODO: Optimize with Graph
+      const vaultId = await currentVault.vaultToUser(address);
+      setSelectedVaultContract(currentVault);
+      if (vaultId.toString() !== "0") {
+        setIsApproved(true);
+
+        if (vaultType === "ETH") {
+          balance = await provider.getBalance(address);
+        } else {
+          balance = await currentToken.balanceOf(address);
+        }
+
+        let currentPrice = await currentOracle.getLatestAnswer();
+        currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
+        setCollateralPrice(currentPrice);
+
+        const currentBalance = ethers.utils.formatEther(balance);
+        if (parseFloat(currentBalance) < 0.09) {
+          setTokenBalanceDecimals(4);
+        }
+        setTokenBalance(currentBalance);
+        let usd = toUSD(currentPrice, currentBalance);
+        setTokenBalanceUSD(usd.toString());
+
+        const ratio = await currentVault.getVaultRatio(vaultId);
+        const vault = await currentVault.getVault(vaultId);
+        const debt = ethers.utils.formatEther(vault[3]);
+
+        setVaultRatio(ratio.toString());
+        const currentCollateral = ethers.utils.formatEther(vault[1]);
+        setVaultCollateral(currentCollateral);
+        usd = toUSD(currentPrice, currentCollateral);
+        setVaultCollateralUSD(usd.toString());
+
+        let currentTCAPPrice = await oracles.tcapOracle.getLatestAnswer();
+        currentTCAPPrice = ethers.utils.formatEther(currentTCAPPrice);
+        setTcapPrice(currentTCAPPrice);
+        setVaultDebt(debt);
+        usd = toUSD(currentTCAPPrice, debt);
+        setVaultDebtUSD(usd.toString());
+      } else {
+        setText(
+          "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
+        );
+        setTitle("Create Vault");
+      }
+    }
   };
 
   useEffect(() => {
     async function load() {
-      if (vaults.wethVault && signer.signer && oracles.wethOracle) {
-        // TODO: get network from env
-        const network = "rinkeby";
-        const address = await signer.signer.getAddress();
-        const currentVault = await vaults.wethVault.vaultToUser(address);
-        const wethPrice = await oracles.wethOracle.getLatestAnswer();
-        const currentWethPrice = ethers.utils.formatEther(wethPrice.mul(10000000000));
-        setCollateralPrice(currentWethPrice);
-        const provider = ethers.getDefaultProvider(network);
-        const balance = await provider.getBalance(address);
-        const currentBalance = ethers.utils.formatEther(balance);
-        setTokenBalance(currentBalance);
-        const usd = toUSD(currentWethPrice, currentBalance);
-        setTokenBalanceUSD(usd.toString());
-        if (currentVault.toString() !== "0") {
-          setIsApproved(true);
-          setSelectedVaultContract(vaults.wethVault);
-          loadVault(currentVault.toString(), vaults.wethVault);
-          // setIsCreated(true);
-          // setText("One last step! Approve your collateral to start minting TCAP tokens.");
-          // setTitle("Approve Vault");
-        }
-      }
       if (!signer.signer) {
         setText(
           "No wallet connected. Please Connect your wallet to Create a Vault and approve your collateral to start minting TCAP tokens."
         );
         setTitle("Connect Wallet");
+      } else {
+        await loadVault("ETH");
       }
-
       setIsLoading(false);
     }
     load();
     // eslint-disable-next-line
-  }, [isCreated, signer.signer]);
+  }, [signer.signer]);
 
   if (isLoading) {
     return <></>;
@@ -201,11 +336,11 @@ const Vault = () => {
                         type="text"
                         placeholder=""
                         className="neon-green"
-                        value={addCollateral}
+                        value={addCollateralTxt}
                         onChange={onChangeAddCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-green" onClick={stakeCollateral}>
+                        <Button className="neon-green" onClick={addCollateral}>
                           +
                         </Button>
                       </InputGroup.Append>
@@ -228,11 +363,13 @@ const Vault = () => {
                         type="text"
                         placeholder=""
                         className="neon-orange"
-                        value={removeCollateral}
+                        value={removeCollateralTxt}
                         onChange={onChangeRemoveCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-orange">-</Button>
+                        <Button className="neon-orange" onClick={removeCollateral}>
+                          -
+                        </Button>
                       </InputGroup.Append>
                     </InputGroup>
                     <Form.Text className="text-muted">
@@ -263,7 +400,7 @@ const Vault = () => {
                           value={tokenBalance}
                           displayType="text"
                           thousandSeparator
-                          decimalScale={2}
+                          decimalScale={tokenBalanceDecimals}
                         />
                       </h4>
                     </div>
@@ -288,7 +425,7 @@ const Vault = () => {
                     <div className="amount">
                       <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>
                     </div>
-                    <p className="number">SAFE</p>
+                    <p className="number neon-blue">SAFE</p>
                   </div>
                 </div>
               </Card>
@@ -326,22 +463,67 @@ const Vault = () => {
                   <Form.Group>
                     <Form.Label>Mint TCAP</Form.Label>
                     <InputGroup>
-                      <Form.Control type="text" placeholder="" className="neon-green" />
+                      <Form.Control
+                        type="text"
+                        placeholder=""
+                        className="neon-green"
+                        value={mintTxt}
+                        onChange={onChangeMint}
+                      />
                       <InputGroup.Append>
-                        <Button className="neon-green">+</Button>
+                        <Button className="neon-green" onClick={mintTCAP}>
+                          +
+                        </Button>
                       </InputGroup.Append>
                     </InputGroup>
-                    <Form.Text className="text-muted">$200</Form.Text>
+                    <Form.Text className="text-muted">
+                      <NumberFormat
+                        className="number"
+                        value={mintUSD}
+                        displayType="text"
+                        thousandSeparator
+                        prefix="$"
+                        decimalScale={2}
+                      />
+                    </Form.Text>
                   </Form.Group>
                   <Form.Group className="remove">
                     <Form.Label>Burn TCAP</Form.Label>
                     <InputGroup>
-                      <Form.Control type="text" placeholder="" className="neon-orange" />
+                      <Form.Control
+                        type="text"
+                        placeholder=""
+                        className="neon-orange"
+                        value={burnTxt}
+                        onChange={onChangeBurn}
+                      />
                       <InputGroup.Append>
-                        <Button className="neon-orange">-</Button>
+                        <Button className="neon-orange" onClick={burnTCAP}>
+                          -
+                        </Button>
                       </InputGroup.Append>
                     </InputGroup>
-                    <Form.Text className="text-muted">$121</Form.Text>
+                    <Form.Text className="text-muted">
+                      <NumberFormat
+                        className="number"
+                        value={burnUSD}
+                        displayType="text"
+                        thousandSeparator
+                        prefix="$"
+                        decimalScale={2}
+                      />
+                    </Form.Text>
+                    <Form.Text className="text-muted burn-fee">
+                      Burn Fee:{" "}
+                      <NumberFormat
+                        className="number neon-pink"
+                        value={burnFee}
+                        displayType="text"
+                        thousandSeparator
+                        decimalScale={4}
+                      />{" "}
+                      ETH
+                    </Form.Text>
                   </Form.Group>
                 </Form>
               </Card>
@@ -361,7 +543,9 @@ const Vault = () => {
                 {title}
               </Button>
             ) : (
-              <Button variant="pink neon-pink">{title}</Button>
+              <Button variant="pink neon-pink" onClick={action}>
+                {title}
+              </Button>
             )}
           </div>
         )}

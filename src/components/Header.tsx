@@ -28,6 +28,7 @@ const Header = () => {
     };
 
     loadAddress();
+    // eslint-disable-next-line
   }, [signer]);
 
   return (

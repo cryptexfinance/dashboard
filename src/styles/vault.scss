@@ -133,7 +133,7 @@
       }
 
       form {
-        padding: 2rem;
+        padding: 2rem 2rem 0rem 2rem;
 
         label {
           font-family: "Nineteen Ninety Seven";
@@ -145,6 +145,17 @@
           font-size: 1rem;
           margin-top: -2.375rem;
           margin-right: 4.375rem;
+        }
+
+        .burn-fee.text-muted {
+          text-align: right;
+          font-size: 1rem;
+          margin-top: 1rem;
+          margin-right: 0;
+          margin-bottom: 0;
+          padding-bottom: 0;
+          font-size: 0.8rem;
+          color: $off-white !important;
         }
 
         input[type="text"] {
