@@ -13,6 +13,8 @@ import SignerContext from "../state/SignerContext";
 import "../styles/vault.scss";
 import { ReactComponent as WETHIcon } from "../assets/images/vault/eth.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
+import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
@@ -30,8 +32,8 @@ const Vault = () => {
     "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
   );
   const [isApproved, setIsApproved] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
+
   // Vault Data
   const [selectedVaultId, setSelectedVaultId] = useState("0");
   const [vaultDebt, setVaultDebt] = useState("0");
@@ -43,8 +45,8 @@ const Vault = () => {
   const [selectedVault, setSelectedVault] = useState("ETH");
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
-  // General Data
 
+  // General Data
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [tokenBalanceDecimals, setTokenBalanceDecimals] = useState(2);
@@ -156,9 +158,7 @@ const Vault = () => {
       // eslint-disable-next-line
       const tx = await selectedVaultContract?.createVault();
     } else {
-      // Approve Vault
       const amount = approveValue;
-      console.log("Vault -> amount", amount);
       // eslint-disable-next-line
       const tx = await selectedCollateralContract?.approve(selectedVaultContract?.address, amount);
     }
@@ -418,7 +418,17 @@ const Vault = () => {
             </div>
             <div className="balance">
               <Card>
-                <ETHIcon className="eth" />
+                {(() => {
+                  switch (selectedVault) {
+                    case "DAI":
+                      return <DAIIcon className="eth" />;
+                    case "WBTC":
+                      return <WBTCIcon className="eth" />;
+                    default:
+                      return <ETHIcon className="eth" />;
+                  }
+                })()}
+
                 <div className="info">
                   <h4>{selectedVault} Balance</h4>
                   <div>
