@@ -1,0 +1,80 @@
+@import "./colors";
+@import "./fonts";
+
+.toast-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: 4rem;
+  padding-right: 3rem;
+  z-index: 1;
+  width: 26.25rem;
+  animation: slideMe 0.1s ease-in;
+
+  h5 {
+    font-size: 1rem;
+  }
+  p {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .toast {
+    border: 1px solid $highlight;
+    border-top: none;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 4px #f124ff, 0px 0px 10px rgba(241, 36, 255, 0.24);
+    border-radius: 4px;
+    background-color: $highlight;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .toast-header {
+    background-color: $highlight;
+    justify-content: flex-end;
+    color: $white;
+    border: none;
+    height: 1.3rem;
+    padding: 0rem 0rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .toast-body {
+    background-color: $primary;
+    border: none;
+    color: white;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    // min-height: 4rem;
+  }
+  .close {
+    color: white;
+    font-family: "Space Mono";
+    font-size: 1.5rem;
+    text-shadow: none;
+    font-weight: lighter;
+    opacity: 1;
+    width: 20px;
+    margin-right: 0.5rem;
+
+    &:focus {
+      outline: 0;
+      box-shadow: 0 0 0 0 rgba(164, 64, 242, 0);
+    }
+  }
+}
+
+@keyframes slideMe {
+  0% {
+    transform: translateX(500px);
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}

@@ -11,12 +11,13 @@ import TokensContext from "../state/TokensContext";
 import VaultsContext from "../state/VaultsContext";
 import SignerContext from "../state/SignerContext";
 import "../styles/vault.scss";
-import { ReactComponent as WETHIcon } from "../assets/images/vault/eth.svg";
+import { ReactComponent as ETHIconSmall } from "../assets/images/vault/eth.svg";
+import { ReactComponent as BTCIconSmall } from "../assets/images/vault/bitcoin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import { ReactComponent as TcapIcon } from "../assets/images/vault/tcap-coin-solid.svg";
 
 // TODO: Refactor names
 const Vault = () => {
@@ -307,7 +308,17 @@ const Vault = () => {
         <h3>The Vault</h3>
         <p>Select your Collateral</p>
         <div className="icon-container">
-          <WETHIcon className="weth" />
+          {(() => {
+            switch (selectedVault) {
+              case "DAI":
+                return <DAIIcon className="eth" />;
+              case "WBTC":
+                return <BTCIconSmall className="btc" />;
+              default:
+                return <ETHIconSmall className="weth" />;
+            }
+          })()}
+
           <div className="select-container">
             <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
               <option value="ETH">ETH</option>
@@ -329,13 +340,84 @@ const Vault = () => {
         </div>
         {isApproved ? (
           <div className="actions-container">
+            <div className="balance">
+              <Card>
+                {(() => {
+                  switch (selectedVault) {
+                    case "DAI":
+                      return <DAIIcon className="eth" />;
+                    case "WBTC":
+                      return <WBTCIcon className="eth" />;
+                    default:
+                      return <ETHIcon className="eth" />;
+                  }
+                })()}
+                <div className="info">
+                  <h4>{selectedVault} Balance</h4>
+                  <div>
+                    <div className="amount">
+                      {(() => {
+                        switch (selectedVault) {
+                          case "DAI":
+                            return <DAIIcon className="eth" />;
+                          case "WBTC":
+                            return <BTCIconSmall className="btc small" />;
+                          default:
+                            return <ETHIconSmall className="small" />;
+                        }
+                      })()}
+                      <h4 className=" ml-2 number neon-highlight">
+                        <NumberFormat
+                          className="number"
+                          value={tokenBalance}
+                          displayType="text"
+                          thousandSeparator
+                          decimalScale={tokenBalanceDecimals}
+                        />
+                      </h4>
+                    </div>
+                    <p className="number">
+                      <NumberFormat
+                        className="number"
+                        value={tokenBalanceUSD}
+                        displayType="text"
+                        thousandSeparator
+                        prefix="$"
+                        decimalScale={2}
+                      />
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              <Card>
+                <RatioIcon className="ratio" />
+                <div className="info">
+                  <h4>Vault Ratio</h4>
+                  <div>
+                    <div className="amount">
+                      <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>
+                    </div>
+                    <p className="number neon-blue">SAFE</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
             <div className="form-card">
               <Card>
                 <div className="info">
                   <h4>Staked Collateral</h4>
                   <div>
                     <div className="amount">
-                      <WETHIcon className="" />
+                      {(() => {
+                        switch (selectedVault) {
+                          case "DAI":
+                            return <DAIIcon className="eth" />;
+                          case "WBTC":
+                            return <BTCIconSmall className="btc" />;
+                          default:
+                            return <ETHIconSmall className="weth" />;
+                        }
+                      })()}
                       <h4 className=" ml-2 number neon-dark-blue">
                         <NumberFormat
                           className="number"
@@ -414,60 +496,6 @@ const Vault = () => {
                     </Form.Text>
                   </Form.Group>
                 </Form>
-              </Card>
-            </div>
-            <div className="balance">
-              <Card>
-                {(() => {
-                  switch (selectedVault) {
-                    case "DAI":
-                      return <DAIIcon className="eth" />;
-                    case "WBTC":
-                      return <WBTCIcon className="eth" />;
-                    default:
-                      return <ETHIcon className="eth" />;
-                  }
-                })()}
-
-                <div className="info">
-                  <h4>{selectedVault} Balance</h4>
-                  <div>
-                    <div className="amount">
-                      <WETHIcon className="small" />
-                      <h4 className=" ml-2 number neon-highlight">
-                        <NumberFormat
-                          className="number"
-                          value={tokenBalance}
-                          displayType="text"
-                          thousandSeparator
-                          decimalScale={tokenBalanceDecimals}
-                        />
-                      </h4>
-                    </div>
-                    <p className="number">
-                      <NumberFormat
-                        className="number"
-                        value={tokenBalanceUSD}
-                        displayType="text"
-                        thousandSeparator
-                        prefix="$"
-                        decimalScale={2}
-                      />
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card>
-                <RatioIcon className="ratio" />
-                <div className="info">
-                  <h4>Vault Ratio</h4>
-                  <div>
-                    <div className="amount">
-                      <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>
-                    </div>
-                    <p className="number neon-blue">SAFE</p>
-                  </div>
-                </div>
               </Card>
             </div>
             <div className="form-card">

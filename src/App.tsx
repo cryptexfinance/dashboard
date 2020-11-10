@@ -28,6 +28,7 @@ import WETHToken from "./contracts/WETH.json";
 import WBTCToken from "./contracts/WBTC.json";
 import DAIToken from "./contracts/DAI.json";
 import TCAPToken from "./contracts/TCAP.json";
+import Toaster from "./components/Toaster";
 
 const App = () => {
   const signer = useSigner();
@@ -135,6 +136,7 @@ const App = () => {
               <Sidebar />
               <Container fluid className="wrapper">
                 <Header />
+                <Toaster />
                 <Switch>
                   <Route path="/" exact>
                     <Welcome />
