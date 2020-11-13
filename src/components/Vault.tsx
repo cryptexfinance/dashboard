@@ -4,6 +4,7 @@ import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import ethers, { BigNumber } from "ethers";
+import { toast } from "react-toastify";
 import NumberFormat from "react-number-format";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import OraclesContext from "../state/OraclesContext";
@@ -17,7 +18,8 @@ import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
-import { ReactComponent as TcapIcon } from "../assets/images/vault/tcap-coin-solid.svg";
+import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import { notifyUser } from "../utils/utils";
 
 // TODO: Refactor names
 const Vault = () => {
@@ -118,16 +120,30 @@ const Vault = () => {
   };
 
   const addCollateral = async () => {
-    const amount = ethers.utils.parseEther(addCollateralTxt);
-    if (selectedVault === "ETH") {
-      // eslint-disable-next-line
-      const tx = await selectedVaultContract?.addCollateralETH({
-        value: amount,
-      });
-    } else {
-      // eslint-disable-next-line
-      const tx = await selectedVaultContract?.addCollateral(amount);
-    }
+    // const amount = ethers.utils.parseEther(addCollateralTxt);
+    // if (selectedVault === "ETH") {
+    //   // eslint-disable-next-line
+    //   const tx = await selectedVaultContract?.addCollateralETH({
+    //     value: amount,
+    //   });
+    //   notifyUser(tx, () => {});
+    // } else {
+    //   // eslint-disable-next-line
+    //   const tx = await selectedVaultContract?.addCollateral(amount);
+    //   notifyUser(tx, () => {});
+    // }
+    const as = (
+      <div className="body">
+        <h5>⏰ Transaction Sent!</h5>
+        <p>Lorem ipsum dolor sit amet, consec tetur adip scing elit</p>
+      </div>
+    );
+    toast(as, {
+      // @ts-ignore
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 10002000,
+      hideProgressBar: true,
+    });
   };
 
   const removeCollateral = async () => {

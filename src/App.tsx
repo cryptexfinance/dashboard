@@ -1,6 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { ethers } from "ethers";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./styles/toast.scss";
 import Container from "react-bootstrap/esm/Container";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -28,7 +31,6 @@ import WETHToken from "./contracts/WETH.json";
 import WBTCToken from "./contracts/WBTC.json";
 import DAIToken from "./contracts/DAI.json";
 import TCAPToken from "./contracts/TCAP.json";
-import Toaster from "./components/Toaster";
 
 const App = () => {
   const signer = useSigner();
@@ -136,7 +138,7 @@ const App = () => {
               <Sidebar />
               <Container fluid className="wrapper">
                 <Header />
-                <Toaster />
+                <ToastContainer />
                 <Switch>
                   <Route path="/" exact>
                     <Welcome />
