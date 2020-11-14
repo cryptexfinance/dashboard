@@ -152,8 +152,8 @@ const Welcome = () => {
               <Row className="">
                 <Col>
                   <Button
-                    variant="warning"
-                    className="neon-orange"
+                    variant="primary"
+                    className="neon-highlight"
                     onClick={() => {
                       window.open("https://app.uniswap.org/#/swap", "_blank");
                     }}
@@ -162,8 +162,8 @@ const Welcome = () => {
                   </Button>
                   {address !== "" ? (
                     <Button
-                      variant="primary"
-                      className="neon-highlight"
+                      variant="success"
+                      className="neon-green"
                       onClick={() => {
                         history.push("/vault");
                       }}

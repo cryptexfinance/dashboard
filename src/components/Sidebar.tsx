@@ -10,6 +10,7 @@ import { ReactComponent as FaucetIcon } from "../assets/images/welcome/faucet.sv
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 
+// TODO: Update sidebar active
 const Sidebar = () => {
   const web3Modal = useContext(Web3ModalContext);
   return (

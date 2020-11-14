@@ -44,6 +44,7 @@ const Faucet = () => {
           <Card>
             <div className="info">
               <h4>Print Tokens</h4>
+              <p>WETH, WBTC, DAI</p>
             </div>
             <Form>
               <Form.Group>

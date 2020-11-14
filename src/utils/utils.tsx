@@ -31,29 +31,32 @@ export const parseUint = (value: string) => {
   return value;
 };
 
-export const notifyUser = async (
-  tx: ethers.ContractTransaction,
-  fn: any = window.location.reload()
-) => {
-  const as = (
+export const sendNotification = async (title: string, body: string, fn: any = () => {}) => {
+  const toastConstant = (
     <div className="body">
-      <h5>⏰ Transaction Submitted! Please wait for confirmation</h5>
-      <p>Lorem ipsum dolor sit amet, consec tetur adip scing elit</p>
+      <h5>{title}</h5>
+      <p>{body}</p>
     </div>
   );
-  toast(as, {
+  toast(toastConstant, {
     // @ts-ignore
     position: toast.POSITION.TOP_RIGHT,
-    autoClose: 10002000,
-  });
-  await tx.wait(1);
-
-  toast("✔️ Transaction Confirmed!", {
-    // @ts-ignore
-    position: toast.POSITION.TOP_RIGHT,
-    autoClose: 10002000,
+    autoClose: 3000,
+    hideProgressBar: true,
     onClose: () => {
       fn();
     },
   });
+};
+
+export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
+  let notificationTitle = "⏰ Transaction Sent!";
+  let notificationBody = "Lorem ipsum dolor sit amet, consec tetur adip scing elit";
+
+  sendNotification(notificationTitle, notificationBody);
+  await tx.wait(1);
+
+  notificationTitle = "✔️ Transaction Confirmed!";
+  notificationBody = "Lorem ipsum dolor sit amet, consec tetur adip scing elit";
+  sendNotification(notificationTitle, notificationBody, fn);
 };

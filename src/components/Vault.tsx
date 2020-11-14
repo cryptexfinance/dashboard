@@ -4,7 +4,6 @@ import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import ethers, { BigNumber } from "ethers";
-import { toast } from "react-toastify";
 import NumberFormat from "react-number-format";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import OraclesContext from "../state/OraclesContext";
@@ -72,114 +71,6 @@ const Vault = () => {
   function toUSD(amount: string, price: string) {
     return parseFloat(amount) * parseFloat(price);
   }
-
-  // forms
-  const onChangeAddCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddCollateralTxt(event.target.value);
-    let usd = toUSD(collateralPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
-    }
-    setAddCollateralUSD(usd.toString());
-  };
-
-  const onChangeRemoveCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoveCollateralTxt(event.target.value);
-    let usd = toUSD(collateralPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
-    }
-    setRemoveCollateralUSD(usd.toString());
-  };
-
-  const onChangeMint = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMintTxt(event.target.value);
-    let usd = toUSD(tcapPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
-    }
-    setMintUSD(usd.toString());
-  };
-
-  const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBurnTxt(event.target.value);
-    let usd = toUSD(tcapPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
-    }
-    setBurnUSD(usd.toString());
-    if (event.target.value !== "") {
-      const currentBurnFee = await selectedVaultContract?.getFee(
-        ethers.utils.parseEther(event.target.value)
-      );
-      const ethFee = ethers.utils.formatEther(currentBurnFee);
-      setBurnFee(ethFee.toString());
-    } else {
-      setBurnFee("0");
-    }
-  };
-
-  const addCollateral = async () => {
-    // const amount = ethers.utils.parseEther(addCollateralTxt);
-    // if (selectedVault === "ETH") {
-    //   // eslint-disable-next-line
-    //   const tx = await selectedVaultContract?.addCollateralETH({
-    //     value: amount,
-    //   });
-    //   notifyUser(tx, () => {});
-    // } else {
-    //   // eslint-disable-next-line
-    //   const tx = await selectedVaultContract?.addCollateral(amount);
-    //   notifyUser(tx, () => {});
-    // }
-    const as = (
-      <div className="body">
-        <h5>⏰ Transaction Sent!</h5>
-        <p>Lorem ipsum dolor sit amet, consec tetur adip scing elit</p>
-      </div>
-    );
-    toast(as, {
-      // @ts-ignore
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: 10002000,
-      hideProgressBar: true,
-    });
-  };
-
-  const removeCollateral = async () => {
-    const amount = ethers.utils.parseEther(removeCollateralTxt);
-    if (selectedVault === "ETH") {
-      // eslint-disable-next-line
-      const tx = await selectedVaultContract?.removeCollateralETH(amount);
-    } else {
-      // eslint-disable-next-line
-      const tx = await selectedVaultContract?.removeCollateral(amount);
-    }
-  };
-
-  const mintTCAP = async () => {
-    const amount = ethers.utils.parseEther(mintTxt);
-    // eslint-disable-next-line
-    const tx = await selectedVaultContract?.mint(amount);
-  };
-
-  const burnTCAP = async () => {
-    const amount = ethers.utils.parseEther(burnTxt);
-    const fee = ethers.utils.parseEther(burnFee);
-    // eslint-disable-next-line
-    const tx = await selectedVaultContract?.burn(amount, { value: fee });
-  };
-
-  const action = async () => {
-    if (selectedVaultId === "0") {
-      // eslint-disable-next-line
-      const tx = await selectedVaultContract?.createVault();
-    } else {
-      const amount = approveValue;
-      // eslint-disable-next-line
-      const tx = await selectedCollateralContract?.approve(selectedVaultContract?.address, amount);
-    }
-  };
 
   const loadVault = async (vaultType: string) => {
     if (
@@ -291,6 +182,104 @@ const Vault = () => {
         setTitle("Create Vault");
         setIsApproved(false);
       }
+    }
+  };
+
+  const refresh = () => {
+    loadVault(selectedVault);
+  };
+
+  // forms
+  const onChangeAddCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddCollateralTxt(event.target.value);
+    let usd = toUSD(collateralPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setAddCollateralUSD(usd.toString());
+  };
+
+  const onChangeRemoveCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRemoveCollateralTxt(event.target.value);
+    let usd = toUSD(collateralPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setRemoveCollateralUSD(usd.toString());
+  };
+
+  const onChangeMint = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMintTxt(event.target.value);
+    let usd = toUSD(tcapPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setMintUSD(usd.toString());
+  };
+
+  const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBurnTxt(event.target.value);
+    let usd = toUSD(tcapPrice, event.target.value);
+    if (!usd) {
+      usd = 0;
+    }
+    setBurnUSD(usd.toString());
+    if (event.target.value !== "") {
+      const currentBurnFee = await selectedVaultContract?.getFee(
+        ethers.utils.parseEther(event.target.value)
+      );
+      const ethFee = ethers.utils.formatEther(currentBurnFee);
+      setBurnFee(ethFee.toString());
+    } else {
+      setBurnFee("0");
+    }
+  };
+
+  const addCollateral = async () => {
+    const amount = ethers.utils.parseEther(addCollateralTxt);
+    if (selectedVault === "ETH") {
+      const tx = await selectedVaultContract?.addCollateralETH({
+        value: amount,
+      });
+      notifyUser(tx, refresh);
+    } else {
+      const tx = await selectedVaultContract?.addCollateral(amount);
+      notifyUser(tx, refresh);
+    }
+  };
+
+  const removeCollateral = async () => {
+    const amount = ethers.utils.parseEther(removeCollateralTxt);
+    if (selectedVault === "ETH") {
+      const tx = await selectedVaultContract?.removeCollateralETH(amount);
+      notifyUser(tx, refresh);
+    } else {
+      const tx = await selectedVaultContract?.removeCollateral(amount);
+      notifyUser(tx, refresh);
+    }
+  };
+
+  const mintTCAP = async () => {
+    const amount = ethers.utils.parseEther(mintTxt);
+    const tx = await selectedVaultContract?.mint(amount);
+    notifyUser(tx, refresh);
+  };
+
+  const burnTCAP = async () => {
+    const amount = ethers.utils.parseEther(burnTxt);
+    const fee = ethers.utils.parseEther(burnFee);
+    const tx = await selectedVaultContract?.burn(amount, { value: fee });
+    notifyUser(tx, refresh);
+  };
+
+  const action = async () => {
+    if (selectedVaultId === "0") {
+      const tx = await selectedVaultContract?.createVault();
+      notifyUser(tx, refresh);
+    } else {
+      const amount = approveValue;
+      const tx = await selectedCollateralContract?.approve(selectedVaultContract?.address, amount);
+      notifyUser(tx, refresh);
     }
   };
 
