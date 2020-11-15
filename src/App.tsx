@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { ethers } from "ethers";
 import { ToastContainer } from "react-toastify";
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import Container from "react-bootstrap/esm/Container";
@@ -32,6 +33,11 @@ import WBTCToken from "./contracts/WBTC.json";
 import DAIToken from "./contracts/DAI.json";
 import TCAPToken from "./contracts/TCAP.json";
 
+const clientOracle = new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap-oracle-graph",
+  cache: new InMemoryCache(),
+});
+
 const App = () => {
   const signer = useSigner();
   const web3Modal = useContext(Web3ModalContext);
@@ -40,6 +46,7 @@ const App = () => {
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
+  const match = useRouteMatch();
 
   const setContracts = (currentSigner: ethers.Signer) => {
     // Set Vaults
@@ -117,6 +124,15 @@ const App = () => {
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
         setContracts(currentSigner);
+      } else {
+        // TODO: get network from env
+        const network = "rinkeby";
+        const provider = ethers.getDefaultProvider(network, {
+          infura: process.env.REACT_APP_INFURA_ID,
+          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+        });
+        const randomSigner = ethers.Wallet.createRandom().connect(provider);
+        setContracts(randomSigner);
       }
       setloading(false);
     }
@@ -134,27 +150,27 @@ const App = () => {
       <tokensContext.Provider value={tokens}>
         <oraclesContext.Provider value={oracles}>
           <vaultsContext.Provider value={vaults}>
-            <Router>
-              <Sidebar />
-              <Container fluid className="wrapper">
-                <Header />
-                <ToastContainer />
-                <Switch>
-                  <Route path="/" exact>
-                    <Welcome />
-                  </Route>
-                  <Route path="/graph" exact>
-                    <Graph />
-                  </Route>
-                  <Route path="/vault" exact>
-                    <Vault />
-                  </Route>
-                  <Route path="/faucet" exact>
-                    <Faucet />
-                  </Route>
-                </Switch>
-              </Container>
-            </Router>
+            <Sidebar />
+            <Container fluid className="wrapper">
+              <Header />
+              <ToastContainer />
+              <Switch>
+                <Route path={`${match.url}/`}>
+                  <ApolloProvider client={clientOracle}>
+                    <Welcome />{" "}
+                  </ApolloProvider>
+                </Route>
+                <Route path={`${match.url}graph`}>
+                  <Graph />
+                </Route>
+                <Route path={`${match.url}vault`}>
+                  <Vault />
+                </Route>
+                <Route path={`${match.url}faucet`}>
+                  <Faucet />
+                </Route>
+              </Switch>
+            </Container>
           </vaultsContext.Provider>
         </oraclesContext.Provider>
       </tokensContext.Provider>

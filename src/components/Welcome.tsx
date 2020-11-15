@@ -3,16 +3,16 @@ import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
-import ethers from "ethers";
+import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
+import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import { makeShortAddress } from "../utils/utils";
 import "../styles/welcome.scss";
-// import { ReactComponent as WethIcon } from "../assets/images/welcome/weth.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
 const Welcome = () => {
@@ -28,6 +28,16 @@ const Welcome = () => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
 
+  const TCAP_PRICESS = gql`
+    query {
+      tcaps(first: 1, orderBy: updatedAt, orderDirection: desc) {
+        tcap
+      }
+    }
+  `;
+
+  const { data } = useQuery(TCAP_PRICESS);
+
   useEffect(() => {
     const loadAddress = async () => {
       if (signer.signer && tokens.tcapToken && oracles.tcapOracle) {
@@ -36,18 +46,21 @@ const Welcome = () => {
         const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
         const tcapString = ethers.utils.formatEther(currentTcapBalance);
         setTcapBalance(tcapString);
-        const currentTotalPrice = await oracles.tcapOracle.getLatestAnswer();
+      }
+      if (data) {
+        const currentTotalPrice = BigNumber.from(await data?.tcaps[0].tcap);
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         const tcapUSD = parseFloat(tcapBalance) * parseFloat(tcapPrice);
         setTcapUSDBalance(tcapUSD.toString());
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
+
     loadAddress();
     // eslint-disable-next-line
-  }, [tcapUSDBalance]);
+  }, [tcapUSDBalance, data]);
 
   if (isLoading) {
     return <></>;

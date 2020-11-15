@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.2.5",
     "@portis/web3": "^2.0.0-beta.59",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -15,6 +16,7 @@
     "authereum": "^0.1.0",
     "bootstrap": "^4.5.3",
     "ethers": "^5.0.19",
+    "graphql": "^15.4.0",
     "node-sass": "^4.14.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",

@@ -31,6 +31,8 @@ export const parseUint = (value: string) => {
   return value;
 };
 
+export const toUSD = (amount: string, price: string) => parseFloat(amount) * parseFloat(price);
+
 export const sendNotification = async (title: string, body: string, fn: any = () => {}) => {
   const toastConstant = (
     <div className="body">

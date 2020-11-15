@@ -5,6 +5,7 @@ import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
+import { useRouteMatch } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import OraclesContext from "../state/OraclesContext";
 import TokensContext from "../state/TokensContext";
@@ -13,12 +14,13 @@ import SignerContext from "../state/SignerContext";
 import "../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../assets/images/vault/eth.svg";
 import { ReactComponent as BTCIconSmall } from "../assets/images/vault/bitcoin.svg";
+import { ReactComponent as DAIIconSmall } from "../assets/images/vault/dai.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
-import { notifyUser } from "../utils/utils";
+import { notifyUser, toUSD } from "../utils/utils";
 
 // TODO: Refactor names
 const Vault = () => {
@@ -27,6 +29,27 @@ const Vault = () => {
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
+
+  let currency = "ETH";
+  const match = useRouteMatch("/vault/:currency");
+  // @ts-ignore
+  switch (match?.params?.currency) {
+    case "eth":
+      currency = "ETH";
+      break;
+    case "weth":
+      currency = "WETH";
+      break;
+    case "dai":
+      currency = "DAI";
+      break;
+    case "wbtc":
+      currency = "WBTC";
+      break;
+    default:
+      currency = "ETH";
+      break;
+  }
 
   // Actions
   const [title, setTitle] = useState("Create Vault");
@@ -44,7 +67,7 @@ const Vault = () => {
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [collateralPrice, setCollateralPrice] = useState("0");
-  const [selectedVault, setSelectedVault] = useState("ETH");
+  const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
 
@@ -67,10 +90,6 @@ const Vault = () => {
 
   // Infinite Approval
   const approveValue = BigNumber.from("1157920892373161954235709850086879078532699");
-
-  function toUSD(amount: string, price: string) {
-    return parseFloat(amount) * parseFloat(price);
-  }
 
   const loadVault = async (vaultType: string) => {
     if (
@@ -121,7 +140,10 @@ const Vault = () => {
       // TODO: get network from env
       const network = "rinkeby";
       const address = await signer.signer.getAddress();
-      const provider = ethers.getDefaultProvider(network);
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
 
       // TODO: Optimize with Graph
       const vaultId = await currentVault.vaultToUser(address);
@@ -296,7 +318,7 @@ const Vault = () => {
         );
         setTitle("Connect Wallet");
       } else {
-        await loadVault("ETH");
+        await loadVault(selectedVault);
       }
       setIsLoading(false);
     }
@@ -316,7 +338,7 @@ const Vault = () => {
           {(() => {
             switch (selectedVault) {
               case "DAI":
-                return <DAIIcon className="eth" />;
+                return <DAIIconSmall className="dai" />;
               case "WBTC":
                 return <BTCIconSmall className="btc" />;
               default:
@@ -364,7 +386,7 @@ const Vault = () => {
                       {(() => {
                         switch (selectedVault) {
                           case "DAI":
-                            return <DAIIcon className="eth" />;
+                            return <DAIIconSmall className="dai small" />;
                           case "WBTC":
                             return <BTCIconSmall className="btc small" />;
                           default:
@@ -416,7 +438,7 @@ const Vault = () => {
                       {(() => {
                         switch (selectedVault) {
                           case "DAI":
-                            return <DAIIcon className="eth" />;
+                            return <DAIIconSmall className="dai" />;
                           case "WBTC":
                             return <BTCIconSmall className="btc" />;
                           default:
