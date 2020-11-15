@@ -21,6 +21,7 @@ import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { notifyUser, toUSD } from "../utils/utils";
+import Loading from "./Loading";
 
 // TODO: Refactor names
 const Vault = () => {
@@ -87,6 +88,7 @@ const Vault = () => {
   const [burnTxt, setBurnTxt] = useState("");
   const [burnUSD, setBurnUSD] = useState("0");
   const [burnFee, setBurnFee] = useState("0");
+  const [vaultStatus, setVaultStatus] = useState("");
 
   // Infinite Approval
   const approveValue = BigNumber.from("1157920892373161954235709850086879078532699");
@@ -142,7 +144,7 @@ const Vault = () => {
       const address = await signer.signer.getAddress();
       const provider = ethers.getDefaultProvider(network, {
         infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+        // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
       });
 
       // TODO: Optimize with Graph
@@ -181,11 +183,18 @@ const Vault = () => {
       setTokenBalanceUSD(usd.toString());
 
       if (vaultId.toString() !== "0") {
-        const ratio = await currentVault.getVaultRatio(vaultId);
+        const ratio: BigNumber = await currentVault.getVaultRatio(vaultId);
         const vault = await currentVault.getVault(vaultId);
         const debt = ethers.utils.formatEther(vault[3]);
 
         setVaultRatio(ratio.toString());
+        if (ratio.gte(200)) {
+          setVaultStatus("safe");
+        } else if (ratio.gte(180)) {
+          setVaultStatus("warning");
+        } else {
+          setVaultStatus("danger");
+        }
         const currentCollateral = ethers.utils.formatEther(vault[1]);
         setVaultCollateral(currentCollateral);
         usd = toUSD(currentPrice, currentCollateral);
@@ -327,8 +336,9 @@ const Vault = () => {
   }, [signer.signer]);
 
   if (isLoading) {
-    return <></>;
+    return <Loading title="Loading" message="Please wait" />;
   }
+
   return (
     <div className="vault">
       <div>
@@ -424,7 +434,7 @@ const Vault = () => {
                     <div className="amount">
                       <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>
                     </div>
-                    <p className="number neon-blue">SAFE</p>
+                    <p className={`number ${vaultStatus}`}>{vaultStatus.toUpperCase()}</p>
                   </div>
                 </div>
               </Card>

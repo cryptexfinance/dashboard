@@ -79,10 +79,12 @@ body {
 .number.neon-highlight {
   text-shadow: 0px 4px 13px $neon-highlight;
 }
-.number.neon-orange {
+.number.neon-orange,
+.danger {
   text-shadow: 0px 4px 13px $orange;
 }
-.number.neon-blue {
+.number.neon-blue,
+.safe {
   text-shadow: 0px 4px 13px rgb(6, 136, 255);
 }
 
@@ -94,7 +96,8 @@ body {
   text-shadow: 0px 4px 13px $green;
 }
 
-.number.neon-yellow {
+.number.neon-yellow,
+.warning {
   text-shadow: 0px 4px 13px $yellow;
 }
 

@@ -32,6 +32,7 @@ import WETHToken from "./contracts/WETH.json";
 import WBTCToken from "./contracts/WBTC.json";
 import DAIToken from "./contracts/DAI.json";
 import TCAPToken from "./contracts/TCAP.json";
+import Loading from "./components/Loading";
 
 const clientOracle = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap-oracle-graph",
@@ -42,7 +43,7 @@ const App = () => {
   const signer = useSigner();
   const web3Modal = useContext(Web3ModalContext);
   const [isLoading, setloading] = useState(true);
-  const [, setInvalidNetwork] = useState(false);
+  const [invalidNetwork, setInvalidNetwork] = useState(false);
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
@@ -89,6 +90,7 @@ const App = () => {
   };
 
   web3Modal.on("connect", async (networkProvider) => {
+    setloading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
     if (
@@ -129,7 +131,7 @@ const App = () => {
         const network = "rinkeby";
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
-          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+          //  alchemy: process.env.REACT_APP_ALCHEMY_KEY,
         });
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         setContracts(randomSigner);
@@ -139,10 +141,32 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal]);
+  }, [web3Modal, isLoading]);
 
   if (isLoading) {
-    return <>loading</>;
+    return (
+      <>
+        <Sidebar />
+        <Container fluid className="wrapper">
+          <Loading title="Loading" message="Please wait" position="total" />
+        </Container>
+      </>
+    );
+  }
+
+  if (invalidNetwork) {
+    return (
+      <>
+        <Sidebar />
+        <Container fluid className="wrapper">
+          <Loading
+            title="Invalid Network"
+            message="Please switch to Rinkeby network"
+            position="total"
+          />
+        </Container>
+      </>
+    );
   }
 
   return (

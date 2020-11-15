@@ -53,12 +53,12 @@ export const sendNotification = async (title: string, body: string, fn: any = ()
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   let notificationTitle = "⏰ Transaction Sent!";
-  let notificationBody = "Lorem ipsum dolor sit amet, consec tetur adip scing elit";
+  let notificationBody = "Please wait for the confirmation, it migh take some seconds";
 
   sendNotification(notificationTitle, notificationBody);
   await tx.wait(1);
 
   notificationTitle = "✔️ Transaction Confirmed!";
-  notificationBody = "Lorem ipsum dolor sit amet, consec tetur adip scing elit";
+  notificationBody = "All set!";
   sendNotification(notificationTitle, notificationBody, fn);
 };

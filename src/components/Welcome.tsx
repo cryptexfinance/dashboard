@@ -14,6 +14,7 @@ import { Web3ModalContext } from "../state/Web3ModalContext";
 import { makeShortAddress } from "../utils/utils";
 import "../styles/welcome.scss";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import Loading from "./Loading";
 
 const Welcome = () => {
   const [address, setAddress] = useState("");
@@ -60,11 +61,12 @@ const Welcome = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [tcapUSDBalance, data]);
+  }, [tcapUSDBalance, data, isLoading, address]);
 
   if (isLoading) {
-    return <></>;
+    return <Loading title="Loading" message="Please wait" />;
   }
+
   return (
     <div className="welcome">
       <div>

@@ -15,6 +15,7 @@ import WETHVault from "../contracts/WETHVaultHandler.json";
 import WBTCVault from "../contracts/BTCVaultHandler.json";
 import DAIVault from "../contracts/DAIVaultHandler.json";
 import { toUSD } from "../utils/utils";
+import Loading from "./Loading";
 
 const Graph = () => {
   const tokens = useContext(TokensContext);
@@ -25,6 +26,8 @@ const Graph = () => {
   const [DAIStake, setDAIStake] = useState("0");
   const [WBTCStake, setWBTCStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
+  const [totalSupply, setTotalSupply] = useState("0.0");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -41,15 +44,8 @@ const Graph = () => {
         setWBTCStake(formatWBTC);
 
         const currentWETHStake = await tokens.wethToken?.balanceOf(WETHVault.address);
-        const network = "rinkeby";
-        const provider = ethers.getDefaultProvider(network, {
-          infura: process.env.REACT_APP_INFURA_ID,
-          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-        });
-        const ethBalance = await provider.getBalance(WETHVault.address);
-        const totalEthStake = ethBalance.add(currentWETHStake);
 
-        const formatETH = ethers.utils.formatEther(totalEthStake);
+        const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
         const ethUSD = ethers.utils.formatEther(
           (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
@@ -61,13 +57,21 @@ const Graph = () => {
           (await oracles.wbtcOracle?.getLatestAnswer()).mul(10000000000)
         );
         const totalUSD =
-          toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatWBTC) + toUSD(wbtcUSD, formatDAI);
+          toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI) + toUSD(wbtcUSD, formatWBTC);
         setTotalStake(totalUSD.toString());
+
+        const currentTotalSupply = await tokens.tcapToken?.totalSupply();
+        setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
       }
+      setLoading(false);
     };
     load();
     // eslint-disable-next-line
   }, []);
+
+  if (loading) {
+    return <Loading title="Loading" message="Please wait" />;
+  }
 
   return (
     <div className="graph">
@@ -87,8 +91,16 @@ const Graph = () => {
         </Card>
         <Card>
           <H24Icon className="h24" />
-          <h4>24hr Volume</h4>
-          <h5 className="number neon-blue">$352,329,704,715</h5>
+          <h4>Total Supply</h4>
+          <h5 className="number neon-blue">
+            <NumberFormat
+              value={totalSupply}
+              displayType="text"
+              thousandSeparator
+              decimalScale={4}
+            />{" "}
+            TCAP
+          </h5>
         </Card>
         <Card>
           <TcapIcon className="tcap" />
