@@ -126,6 +126,9 @@ const App = () => {
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
         setContracts(currentSigner);
+      }
+      if (signer.signer) {
+        setContracts(signer.signer);
       } else {
         // TODO: get network from env
         const network = "rinkeby";
