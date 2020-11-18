@@ -49,6 +49,7 @@
     h5 {
       font-size: 1rem;
     }
+
     p {
       padding-bottom: 0;
       margin-bottom: 0;
@@ -62,6 +63,12 @@
         outline: 0;
         box-shadow: 0 0 0 0 rgba(164, 64, 242, 0);
       }
+    }
+
+    img.toasty {
+      width: 3.3rem;
+      float: left;
+      margin-right: 1rem;
     }
   }
 }
