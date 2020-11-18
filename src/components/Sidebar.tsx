@@ -61,28 +61,6 @@ const Sidebar = () => {
         )}
       </Nav.Item>
       <Nav.Item>
-        {active === "graph" ? (
-          <Link
-            to="/graph"
-            className="active"
-            onClick={() => {
-              setActive("graph");
-            }}
-          >
-            <GraphIcon />
-          </Link>
-        ) : (
-          <Link
-            to="/graph"
-            onClick={() => {
-              setActive("graph");
-            }}
-          >
-            <GraphIcon />
-          </Link>
-        )}
-      </Nav.Item>
-      <Nav.Item>
         {active === "vault" ? (
           <Link
             to="/vault"
@@ -101,6 +79,28 @@ const Sidebar = () => {
             }}
           >
             <VaultIcon />
+          </Link>
+        )}
+      </Nav.Item>
+      <Nav.Item>
+        {active === "graph" ? (
+          <Link
+            to="/graph"
+            className="active"
+            onClick={() => {
+              setActive("graph");
+            }}
+          >
+            <GraphIcon />
+          </Link>
+        ) : (
+          <Link
+            to="/graph"
+            onClick={() => {
+              setActive("graph");
+            }}
+          >
+            <GraphIcon />
           </Link>
         )}
       </Nav.Item>

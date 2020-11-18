@@ -3,6 +3,8 @@ import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch } from "react-router-dom";
@@ -188,7 +190,9 @@ const Vault = () => {
         const debt = ethers.utils.formatEther(vault[3]);
 
         setVaultRatio(ratio.toString());
-        if (ratio.gte(200)) {
+        if (ratio.eq(0)) {
+          setVaultStatus("N/A");
+        } else if (ratio.gte(200)) {
           setVaultStatus("safe");
         } else if (ratio.gte(180)) {
           setVaultStatus("warning");
@@ -277,6 +281,8 @@ const Vault = () => {
       const tx = await selectedVaultContract?.addCollateral(amount);
       notifyUser(tx, refresh);
     }
+    setAddCollateralTxt("");
+    setAddCollateralUSD("0");
   };
 
   const removeCollateral = async () => {
@@ -288,12 +294,16 @@ const Vault = () => {
       const tx = await selectedVaultContract?.removeCollateral(amount);
       notifyUser(tx, refresh);
     }
+    setRemoveCollateralTxt("");
+    setRemoveCollateralUSD("0");
   };
 
   const mintTCAP = async () => {
     const amount = ethers.utils.parseEther(mintTxt);
     const tx = await selectedVaultContract?.mint(amount);
     notifyUser(tx, refresh);
+    setMintTxt("");
+    setMintUSD("0");
   };
 
   const burnTCAP = async () => {
@@ -301,6 +311,9 @@ const Vault = () => {
     const fee = ethers.utils.parseEther(burnFee);
     const tx = await selectedVaultContract?.burn(amount, { value: fee });
     notifyUser(tx, refresh);
+    setBurnTxt("");
+    setBurnUSD("0");
+    setBurnFee("0");
   };
 
   const action = async () => {
@@ -316,6 +329,17 @@ const Vault = () => {
 
   const onChangeVault = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedVault(event.target.value);
+    // Clean form
+    setAddCollateralTxt("");
+    setAddCollateralUSD("0");
+    setRemoveCollateralTxt("");
+    setRemoveCollateralUSD("0");
+    setMintTxt("");
+    setMintUSD("0");
+    setBurnTxt("");
+    setBurnUSD("0");
+    setBurnFee("0");
+    // Load values
     loadVault(event.target.value);
   };
 
@@ -429,7 +453,18 @@ const Vault = () => {
               <Card>
                 <RatioIcon className="ratio" />
                 <div className="info">
-                  <h4>Vault Ratio</h4>
+                  <h4>Vault Ratio</h4>{" "}
+                  <OverlayTrigger
+                    key="top"
+                    placement="top"
+                    overlay={
+                      <Tooltip id="tooltip-top">
+                        Ratio must be {`>`} 150% or you will be liquidated
+                      </Tooltip>
+                    }
+                  >
+                    <Button variant="dark">?</Button>
+                  </OverlayTrigger>
                   <div>
                     <div className="amount">
                       <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>

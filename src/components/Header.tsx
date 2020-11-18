@@ -22,6 +22,17 @@ const Header = () => {
     const loadAddress = async () => {
       if (signer.signer && tokens.tcapToken) {
         const currentAddress = await signer.signer?.getAddress();
+        const filterMint = tokens.tcapToken.filters.Transfer(null, currentAddress);
+        const filterBurn = tokens.tcapToken.filters.Transfer(currentAddress, null);
+        tokens.tcapToken.on(filterMint, async () => {
+          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          setTokenBalance(ethers.utils.formatEther(currentBalance));
+        });
+
+        tokens.tcapToken.on(filterBurn, async () => {
+          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          setTokenBalance(ethers.utils.formatEther(currentBalance));
+        });
         setAddress(makeShortAddress(currentAddress));
         const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));

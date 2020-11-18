@@ -33,7 +33,12 @@ export const parseUint = (value: string) => {
 
 export const toUSD = (amount: string, price: string) => parseFloat(amount) * parseFloat(price);
 
-export const sendNotification = async (title: string, body: string, fn: any = () => {}) => {
+export const sendNotification = async (
+  title: string,
+  body: string,
+  duration: number | false = 3000,
+  fn: any = () => {}
+) => {
   const toastConstant = (
     <div className="body">
       <h5>{title}</h5>
@@ -43,7 +48,7 @@ export const sendNotification = async (title: string, body: string, fn: any = ()
   toast(toastConstant, {
     // @ts-ignore
     position: toast.POSITION.TOP_RIGHT,
-    autoClose: 3000,
+    autoClose: duration,
     hideProgressBar: true,
     onClose: () => {
       fn();
@@ -53,12 +58,13 @@ export const sendNotification = async (title: string, body: string, fn: any = ()
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   let notificationTitle = "⏰ Transaction Sent!";
-  let notificationBody = "Please wait for the confirmation, it migh take some seconds";
+  let notificationBody = "Plz wait for the transaction confirmation.";
 
-  sendNotification(notificationTitle, notificationBody);
+  sendNotification(notificationTitle, notificationBody, false, () => {
+    notificationTitle = "✔️ Transaction Confirmed!";
+    notificationBody = "All set!";
+    sendNotification(notificationTitle, notificationBody, 3000, fn);
+  });
   await tx.wait(1);
-
-  notificationTitle = "✔️ Transaction Confirmed!";
-  notificationBody = "All set!";
-  sendNotification(notificationTitle, notificationBody, fn);
+  toast.dismiss();
 };

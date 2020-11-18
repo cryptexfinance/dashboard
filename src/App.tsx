@@ -105,6 +105,7 @@ const App = () => {
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     setContracts(currentSigner);
+    setloading(false);
   });
 
   useEffect(() => {
@@ -126,9 +127,6 @@ const App = () => {
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
         setContracts(currentSigner);
-      }
-      if (signer.signer) {
-        setContracts(signer.signer);
       } else {
         // TODO: get network from env
         const network = "rinkeby";
@@ -144,7 +142,7 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal, isLoading]);
+  }, [web3Modal]);
 
   if (isLoading) {
     return (
