@@ -10,7 +10,6 @@ import TokensContext from "../state/TokensContext";
 import { makeShortAddress } from "../utils/utils";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
-// TODO: Update TCAP Balance on mint and burn
 const Header = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);

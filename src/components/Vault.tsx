@@ -8,6 +8,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch } from "react-router-dom";
+import { useQuery, gql } from "@apollo/client";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import OraclesContext from "../state/OraclesContext";
 import TokensContext from "../state/TokensContext";
@@ -95,6 +96,23 @@ const Vault = () => {
   // Infinite Approval
   const approveValue = BigNumber.from("1157920892373161954235709850086879078532699");
 
+  const USER_VAULT = gql`
+    query {
+      vaults(
+        owner: "0xf03307c4aC66692Ffcac69988182dD17F4f3AaaF"
+        address: "0xb6428cdb64b028e504767e7e279ad63d5bc43e05"
+      ) {
+        id
+        vaultId
+        owner
+        collateral
+        address
+      }
+    }
+  `;
+
+  const { data } = useQuery(USER_VAULT);
+
   const loadVault = async (vaultType: string) => {
     if (
       signer.signer &&
@@ -150,7 +168,7 @@ const Vault = () => {
       });
 
       // TODO: Optimize with Graph
-      const vaultId = await currentVault.vaultToUser(address);
+      const vaultId = await currentVault.userToVault(address);
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       setSelectedVaultId(vaultId.toString());

@@ -29,15 +29,15 @@ const Welcome = () => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
 
-  const TCAP_PRICESS = gql`
+  const TCAP_PRICE = gql`
     query {
-      tcaps(first: 1, orderBy: updatedAt, orderDirection: desc) {
-        tcap
+      oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
+        answer
       }
     }
   `;
 
-  const { data } = useQuery(TCAP_PRICESS);
+  const { data } = useQuery(TCAP_PRICE);
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -49,7 +49,7 @@ const Welcome = () => {
         setTcapBalance(tcapString);
       }
       if (data) {
-        const currentTotalPrice = BigNumber.from(await data?.tcaps[0].tcap);
+        const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));

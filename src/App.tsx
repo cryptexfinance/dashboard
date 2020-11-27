@@ -35,7 +35,7 @@ import TCAPToken from "./contracts/TCAP.json";
 import Loading from "./components/Loading";
 
 const clientOracle = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap-oracle-graph",
+  uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap-rinkeby",
   cache: new InMemoryCache(),
 });
 
@@ -180,20 +180,20 @@ const App = () => {
               <Header />
               <ToastContainer />
               <Switch>
-                <Route path={`${match.url}/`}>
-                  <ApolloProvider client={clientOracle}>
-                    <Welcome />{" "}
-                  </ApolloProvider>
-                </Route>
-                <Route path={`${match.url}graph`}>
-                  <Graph />
-                </Route>
-                <Route path={`${match.url}vault`}>
-                  <Vault />
-                </Route>
-                <Route path={`${match.url}faucet`}>
-                  <Faucet />
-                </Route>
+                <ApolloProvider client={clientOracle}>
+                  <Route path={`${match.url}/`}>
+                    <Welcome />
+                  </Route>
+                  <Route path={`${match.url}graph`}>
+                    <Graph />
+                  </Route>
+                  <Route path={`${match.url}vault`}>
+                    <Vault />
+                  </Route>
+                  <Route path={`${match.url}faucet`}>
+                    <Faucet />
+                  </Route>
+                </ApolloProvider>
               </Switch>
             </Container>
           </vaultsContext.Provider>
