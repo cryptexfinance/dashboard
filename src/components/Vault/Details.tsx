@@ -9,25 +9,28 @@ import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import OraclesContext from "../state/OraclesContext";
-import TokensContext from "../state/TokensContext";
-import VaultsContext from "../state/VaultsContext";
-import SignerContext from "../state/SignerContext";
-import "../styles/vault.scss";
-import { ReactComponent as ETHIconSmall } from "../assets/images/vault/eth.svg";
-import { ReactComponent as BTCIconSmall } from "../assets/images/vault/bitcoin.svg";
-import { ReactComponent as DAIIconSmall } from "../assets/images/vault/dai.svg";
-import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
-import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
-import { ReactComponent as RatioIcon } from "../assets/images/vault/ratio.svg";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD } from "../utils/utils";
-import Loading from "./Loading";
+import { Web3ModalContext } from "../../state/Web3ModalContext";
+import OraclesContext from "../../state/OraclesContext";
+import TokensContext from "../../state/TokensContext";
+import VaultsContext from "../../state/VaultsContext";
+import SignerContext from "../../state/SignerContext";
+import "../../styles/vault.scss";
+import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
+import { ReactComponent as BTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
+import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
+import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
+import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
+import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
+import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import { notifyUser, toUSD } from "../../utils/utils";
+import Loading from "../Loading";
 
-// TODO: Refactor names
-const Vault = () => {
+type props = {
+  address: string;
+};
+
+const Details = ({ address }: props) => {
   const web3Modal = useContext(Web3ModalContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
@@ -97,21 +100,23 @@ const Vault = () => {
   const approveValue = BigNumber.from("1157920892373161954235709850086879078532699");
 
   const USER_VAULT = gql`
-    query {
-      vaults(
-        owner: "0xf03307c4aC66692Ffcac69988182dD17F4f3AaaF"
-        address: "0xb6428cdb64b028e504767e7e279ad63d5bc43e05"
-      ) {
+    query getVault($owner: String!) {
+      vaults(owner: $owner) {
         id
         vaultId
         owner
         collateral
+        debt
+        currentRatio
         address
+        owner
       }
     }
   `;
 
-  const { data } = useQuery(USER_VAULT);
+  const { data, refetch } = useQuery(USER_VAULT, {
+    variables: { owner: address },
+  });
 
   const loadVault = async (vaultType: string) => {
     if (
@@ -127,7 +132,7 @@ const Vault = () => {
       tokens.daiToken &&
       tokens.wbtcToken
     ) {
-      let currentVault;
+      let currentVault: any;
       let currentOracle;
       let currentToken;
       let balance;
@@ -159,76 +164,83 @@ const Vault = () => {
           break;
       }
 
-      // TODO: get network from env
-      const network = "rinkeby";
-      const address = await signer.signer.getAddress();
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
-
-      // TODO: Optimize with Graph
-      const vaultId = await currentVault.userToVault(address);
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
-      setSelectedVaultId(vaultId.toString());
 
-      if (vaultType === "ETH") {
-        setIsApproved(true);
-        balance = await provider.getBalance(address);
-      } else {
-        balance = await currentToken.balanceOf(address);
-        const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
-        if (!allowance.isZero()) {
+      let currentVaultData: any;
+
+      await data.vaults.forEach((v: any) => {
+        if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+          currentVaultData = v;
+        }
+      });
+
+      if (currentVaultData) {
+        const { vaultId, owner, collateral, debt, currentRatio } = currentVaultData;
+        // TODO: get network from env
+        const network = "rinkeby";
+        const provider = ethers.getDefaultProvider(network, {
+          infura: process.env.REACT_APP_INFURA_ID,
+          // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+        });
+
+        setSelectedVaultId(vaultId);
+
+        if (vaultType === "ETH") {
           setIsApproved(true);
+          balance = await provider.getBalance(owner);
         } else {
-          setText(
-            "Vault not approved. Please approve your collateral to start minting TCAP tokens."
-          );
-          setTitle("Approve Vault");
-          setIsApproved(false);
+          balance = await currentToken.balanceOf(owner);
+          const allowance: BigNumber = await currentToken.allowance(owner, currentVault.address);
+          if (!allowance.isZero()) {
+            setIsApproved(true);
+          } else {
+            setText(
+              "Vault not approved. Please approve your collateral to start minting TCAP tokens."
+            );
+            setTitle("Approve Vault");
+            setIsApproved(false);
+          }
         }
-      }
 
-      let currentPrice = await currentOracle.getLatestAnswer();
-      currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
-      setCollateralPrice(currentPrice);
+        let currentPrice = await currentOracle.getLatestAnswer();
+        currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
+        setCollateralPrice(currentPrice);
 
-      const currentBalance = ethers.utils.formatEther(balance);
-      if (parseFloat(currentBalance) < 0.09) {
-        setTokenBalanceDecimals(4);
-      }
-      setTokenBalance(currentBalance);
-      let usd = toUSD(currentPrice, currentBalance);
-      setTokenBalanceUSD(usd.toString());
-
-      if (vaultId.toString() !== "0") {
-        const ratio: BigNumber = await currentVault.getVaultRatio(vaultId);
-        const vault = await currentVault.getVault(vaultId);
-        const debt = ethers.utils.formatEther(vault[3]);
-
-        setVaultRatio(ratio.toString());
-        if (ratio.eq(0)) {
-          setVaultStatus("N/A");
-        } else if (ratio.gte(200)) {
-          setVaultStatus("safe");
-        } else if (ratio.gte(180)) {
-          setVaultStatus("warning");
-        } else {
-          setVaultStatus("danger");
+        const currentBalance = ethers.utils.formatEther(balance);
+        if (parseFloat(currentBalance) < 0.09) {
+          setTokenBalanceDecimals(4);
         }
-        const currentCollateral = ethers.utils.formatEther(vault[1]);
-        setVaultCollateral(currentCollateral);
-        usd = toUSD(currentPrice, currentCollateral);
-        setVaultCollateralUSD(usd.toString());
+        setTokenBalance(currentBalance);
+        let usd = toUSD(currentPrice, currentBalance);
+        setTokenBalanceUSD(usd.toString());
 
-        let currentTCAPPrice = await oracles.tcapOracle.getLatestAnswer();
-        currentTCAPPrice = ethers.utils.formatEther(currentTCAPPrice);
-        setTcapPrice(currentTCAPPrice);
-        setVaultDebt(debt);
-        usd = toUSD(currentTCAPPrice, debt);
-        setVaultDebtUSD(usd.toString());
+        if (vaultId) {
+          setVaultRatio(currentRatio);
+          if (currentRatio === "0") {
+            setVaultStatus("N/A");
+          } else if (currentRatio >= 200) {
+            setVaultStatus("safe");
+          } else if (currentRatio >= 180) {
+            setVaultStatus("warning");
+          } else {
+            setVaultStatus("danger");
+          }
+          const parsedCollateral = ethers.utils.formatEther(collateral);
+          setVaultCollateral(parsedCollateral);
+          usd = toUSD(currentPrice, parsedCollateral);
+          setVaultCollateralUSD(usd.toString());
+
+          let currentTCAPPrice = await oracles.tcapOracle.getLatestAnswer();
+          currentTCAPPrice = ethers.utils.formatEther(currentTCAPPrice);
+          setTcapPrice(currentTCAPPrice);
+          const parsedDebt = ethers.utils.formatEther(debt);
+          setVaultDebt(parsedDebt);
+          usd = toUSD(currentTCAPPrice, parsedDebt);
+          setVaultDebtUSD(usd.toString());
+        }
       } else {
+        setSelectedVaultId("0");
         setText(
           "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
         );
@@ -239,6 +251,7 @@ const Vault = () => {
   };
 
   const refresh = () => {
+    refetch();
     loadVault(selectedVault);
   };
 
@@ -363,61 +376,55 @@ const Vault = () => {
 
   useEffect(() => {
     async function load() {
-      if (!signer.signer) {
-        setText(
-          "No wallet connected. Please Connect your wallet to Create a Vault and approve your collateral to start minting TCAP tokens."
-        );
-        setTitle("Connect Wallet");
-      } else {
+      if (data) {
         await loadVault(selectedVault);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
     load();
     // eslint-disable-next-line
-  }, [signer.signer]);
+  }, [address, data]);
 
   if (isLoading) {
-    return <Loading title="Loading" message="Please wait" />;
+    return <></>;
   }
 
   return (
-    <div className="vault">
-      <div>
-        <h3>The Vault</h3>
-        <p>Select your Collateral</p>
-        <div className="icon-container">
-          {(() => {
-            switch (selectedVault) {
-              case "DAI":
-                return <DAIIconSmall className="dai" />;
-              case "WBTC":
-                return <BTCIconSmall className="btc" />;
-              default:
-                return <ETHIconSmall className="weth" />;
-            }
-          })()}
+    <>
+      <p>Select your Collateral</p>
+      <div className="icon-container">
+        {(() => {
+          switch (selectedVault) {
+            case "DAI":
+              return <DAIIconSmall className="dai" />;
+            case "WBTC":
+              return <BTCIconSmall className="btc" />;
+            default:
+              return <ETHIconSmall className="weth" />;
+          }
+        })()}
 
-          <div className="select-container">
-            <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
-              <option value="ETH">ETH</option>
-              <option>WETH</option>
-              <option>WBTC</option>
-              <option>DAI</option>
-            </Form.Control>
-            <p className="number">
-              <NumberFormat
-                className="number"
-                value={tokenBalanceUSD}
-                displayType="text"
-                thousandSeparator
-                prefix="$"
-                decimalScale={2}
-              />
-            </p>
-          </div>
+        <div className="select-container">
+          <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
+            <option value="ETH">ETH</option>
+            <option>WETH</option>
+            <option>WBTC</option>
+            <option>DAI</option>
+          </Form.Control>
+          <p className="number">
+            <NumberFormat
+              className="number"
+              value={tokenBalanceUSD}
+              displayType="text"
+              thousandSeparator
+              prefix="$"
+              decimalScale={2}
+            />
+          </p>
         </div>
-        {isApproved ? (
+      </div>
+      {isApproved ? (
+        <>
           <div className="actions-container">
             <div className="balance">
               <Card>
@@ -687,29 +694,29 @@ const Vault = () => {
               </Card>
             </div>
           </div>
-        ) : (
-          <div className="pre-actions">
-            <h3 className="action-title">{title}</h3>
-            <p>{text}</p>
-            {!signer.signer ? (
-              <Button
-                variant="pink neon-pink"
-                onClick={() => {
-                  web3Modal.toggleModal();
-                }}
-              >
-                {title}
-              </Button>
-            ) : (
-              <Button variant="pink neon-pink" onClick={action}>
-                {title}
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+        </>
+      ) : (
+        <div className="pre-actions">
+          <h5 className="action-title">{title}</h5>
+          <p>{text}</p>
+          {!signer.signer ? (
+            <Button
+              variant="pink neon-pink"
+              onClick={() => {
+                web3Modal.toggleModal();
+              }}
+            >
+              {title}
+            </Button>
+          ) : (
+            <Button variant="pink neon-pink" onClick={action}>
+              {title}
+            </Button>
+          )}
+        </div>
+      )}
+    </>
   );
 };
 
-export default Vault;
+export default Details;

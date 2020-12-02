@@ -10,7 +10,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
-import Vault from "./components/Vault";
+import Vault from "./components/Vault/Vault";
 import Faucet from "./components/Faucet";
 import { useSigner } from "./hooks/useSigner";
 import { useVaults } from "./hooks/useVaults";
