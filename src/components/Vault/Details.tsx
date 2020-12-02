@@ -101,7 +101,7 @@ const Details = ({ address }: props) => {
 
   const USER_VAULT = gql`
     query getVault($owner: String!) {
-      vaults(owner: $owner) {
+      vaults(where: { owner: $owner }) {
         id
         vaultId
         owner
@@ -166,54 +166,53 @@ const Details = ({ address }: props) => {
 
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
-
       let currentVaultData: any;
 
       await data.vaults.forEach((v: any) => {
+        console.log("🚀 ~ file: Details.tsx ~ line 172 ~ awaitdata.vaults.forEach ~ v", v);
         if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
           currentVaultData = v;
         }
       });
 
-      if (currentVaultData) {
-        const { vaultId, owner, collateral, debt, currentRatio } = currentVaultData;
-        // TODO: get network from env
-        const network = "rinkeby";
-        const provider = ethers.getDefaultProvider(network, {
-          infura: process.env.REACT_APP_INFURA_ID,
-          // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-        });
+      const network = "rinkeby";
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
 
-        setSelectedVaultId(vaultId);
-
-        if (vaultType === "ETH") {
+      if (vaultType === "ETH") {
+        setIsApproved(true);
+        balance = await provider.getBalance(address);
+      } else {
+        balance = await currentToken.balanceOf(address);
+        const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
+        if (!allowance.isZero()) {
           setIsApproved(true);
-          balance = await provider.getBalance(owner);
         } else {
-          balance = await currentToken.balanceOf(owner);
-          const allowance: BigNumber = await currentToken.allowance(owner, currentVault.address);
-          if (!allowance.isZero()) {
-            setIsApproved(true);
-          } else {
-            setText(
-              "Vault not approved. Please approve your collateral to start minting TCAP tokens."
-            );
-            setTitle("Approve Vault");
-            setIsApproved(false);
-          }
+          setText(
+            "Vault not approved. Please approve your collateral to start minting TCAP tokens."
+          );
+          setTitle("Approve Vault");
+          setIsApproved(false);
         }
+      }
 
-        let currentPrice = await currentOracle.getLatestAnswer();
-        currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
-        setCollateralPrice(currentPrice);
+      const currentBalance = ethers.utils.formatEther(balance);
+      if (parseFloat(currentBalance) < 0.09) {
+        setTokenBalanceDecimals(4);
+      }
+      setTokenBalance(currentBalance);
+      let currentPrice = await currentOracle.getLatestAnswer();
+      currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
+      setCollateralPrice(currentPrice);
+      let usd = toUSD(currentPrice, currentBalance);
+      setTokenBalanceUSD(usd.toString());
 
-        const currentBalance = ethers.utils.formatEther(balance);
-        if (parseFloat(currentBalance) < 0.09) {
-          setTokenBalanceDecimals(4);
-        }
-        setTokenBalance(currentBalance);
-        let usd = toUSD(currentPrice, currentBalance);
-        setTokenBalanceUSD(usd.toString());
+      if (currentVaultData) {
+        const { vaultId, collateral, debt, currentRatio } = currentVaultData;
+        // TODO: get network from env
+        setSelectedVaultId(vaultId);
 
         if (vaultId) {
           setVaultRatio(currentRatio);
@@ -386,7 +385,11 @@ const Details = ({ address }: props) => {
   }, [address, data]);
 
   if (isLoading) {
-    return <></>;
+    return (
+      <div className="loading-container">
+        <Loading title="Loading Vault" message="Please wait..." />
+      </div>
+    );
   }
 
   return (
