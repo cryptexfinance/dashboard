@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import "../styles/graph.scss";
 import Card from "react-bootstrap/esm/Card";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
+import { useQuery, gql } from "@apollo/client";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
@@ -29,21 +30,49 @@ const Graph = () => {
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
 
+  const VAULTS_STATE = gql`
+    {
+      states {
+        amountStaked
+        id
+      }
+    }
+  `;
+
+  const { data } = useQuery(VAULTS_STATE);
+
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens) {
+      if (oracles && tokens && data) {
+        console.log(data);
         const currentTotalPrice = await oracles.tcapOracle?.getLatestAnswer();
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
-        const currentDAIStake = await tokens.daiToken?.balanceOf(DAIVault.address);
+        let currentDAIStake = BigNumber.from(0);
+        let currentWBTCStake = BigNumber.from(0);
+        let currentWETHStake = BigNumber.from(0);
+
+        await data.states.forEach((s: any) => {
+          switch (s.id.toLowerCase()) {
+            case DAIVault.address.toLowerCase():
+              currentDAIStake = s.amountStaked;
+              break;
+            case WETHVault.address.toLowerCase():
+              currentWETHStake = s.amountStaked;
+              break;
+            case WBTCVault.address.toLowerCase():
+              currentWBTCStake = s.amountStaked;
+              break;
+            default:
+              break;
+          }
+        });
+
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
 
-        const currentWBTCStake = await tokens.wbtcToken?.balanceOf(WBTCVault.address);
         const formatWBTC = ethers.utils.formatEther(currentWBTCStake);
         setWBTCStake(formatWBTC);
-
-        const currentWETHStake = await tokens.wethToken?.balanceOf(WETHVault.address);
 
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
@@ -67,7 +96,7 @@ const Graph = () => {
     };
     load();
     // eslint-disable-next-line
-  }, []);
+  }, [data]);
 
   if (loading) {
     return <Loading title="Loading" message="Please wait" />;

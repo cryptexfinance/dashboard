@@ -12,6 +12,8 @@ import TokensContext from "../state/TokensContext";
 import { makeShortAddress } from "../utils/utils";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
+// TODO: On change account reload page
+
 const Header = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);

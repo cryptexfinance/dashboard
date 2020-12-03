@@ -39,7 +39,8 @@ export const sendNotification = async (
   body: string,
   duration: number | false = 3000,
   fn: any = () => {},
-  delay: number = 0
+  delay: number = 0,
+  className: string = ""
 ) => {
   const toastConstant = (
     <div className="body">
@@ -54,11 +55,39 @@ export const sendNotification = async (
     autoClose: duration,
     hideProgressBar: true,
     delay,
+    className,
     onClose: () => {
       fn();
     },
   });
 };
+
+// export const errorNotification = async (
+//   title: string,
+//   body: string,
+//   duration: number | false = 3000,
+//   fn: any = () => {},
+//   delay: number = 0
+// ) => {
+//   const toastConstant = (
+//     <div className="body">
+//       <img src={toasty} alt="toasty" className="toasty" />
+//       <h5>❌ Whoopsie!</h5>
+//       <p>Amount of gas set to low. </p>
+//     </div>
+//   );
+//   toast(toastConstant, {
+//     // @ts-ignore
+//     position: toast.POSITION.TOP_RIGHT,
+//     autoClose: false,
+//     hideProgressBar: true,
+//     delay,
+//     className: "error",
+//     onClose: () => {
+//       fn();
+//     },
+//   });
+// };
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   let notificationTitle = "⏰ Transaction Sent!";
@@ -69,5 +98,5 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
   toast.dismiss();
   notificationTitle = "✔️ Transaction Confirmed!";
   notificationBody = "All set!";
-  sendNotification(notificationTitle, notificationBody, 3000, fn, 1000);
+  sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
 };
