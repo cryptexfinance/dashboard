@@ -169,7 +169,6 @@ const Details = ({ address }: props) => {
       let currentVaultData: any;
 
       await data.vaults.forEach((v: any) => {
-        console.log("🚀 ~ file: Details.tsx ~ line 172 ~ awaitdata.vaults.forEach ~ v", v);
         if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
           currentVaultData = v;
         }
@@ -211,7 +210,7 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const { vaultId, collateral, debt, currentRatio } = currentVaultData;
-        // TODO: get network from env
+        console.log("🚀 ~ file: Details.tsx ~ line 213 ~ loadVault ~ collateral", collateral);
         setSelectedVaultId(vaultId);
 
         if (vaultId) {
@@ -371,6 +370,7 @@ const Details = ({ address }: props) => {
     setBurnFee("0");
     // Load values
     loadVault(event.target.value);
+    // TODO: update url
   };
 
   useEffect(() => {
