@@ -8,8 +8,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch } from "react-router-dom";
-import { useQuery, gql } from "@apollo/client";
-import { Web3ModalContext } from "../../state/Web3ModalContext";
+import { useQuery, gql, NetworkStatus } from "@apollo/client";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
 import VaultsContext from "../../state/VaultsContext";
@@ -31,7 +30,6 @@ type props = {
 };
 
 const Details = ({ address }: props) => {
-  const web3Modal = useContext(Web3ModalContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
@@ -114,11 +112,7 @@ const Details = ({ address }: props) => {
     }
   `;
 
-  const { data, refetch } = useQuery(USER_VAULT, {
-    variables: { owner: address },
-  });
-
-  const loadVault = async (vaultType: string) => {
+  async function loadVault(vaultType: string, vaultData: any) {
     if (
       signer.signer &&
       oracles.wethOracle &&
@@ -130,32 +124,45 @@ const Details = ({ address }: props) => {
       vaults.wbtcVault &&
       tokens.wethToken &&
       tokens.daiToken &&
-      tokens.wbtcToken
+      tokens.wbtcToken &&
+      vaultData
     ) {
       let currentVault: any;
       let currentOracle;
       let currentToken;
       let balance;
+
       switch (vaultType) {
-        case "ETH":
+        case "ETH": {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
+          const network = "rinkeby";
+          const provider = ethers.getDefaultProvider(network, {
+            infura: process.env.REACT_APP_INFURA_ID,
+            // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+          });
+          // setIsApproved(true);
+          balance = await provider.getBalance(address);
           break;
+        }
         case "WETH":
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
+          balance = await currentToken.balanceOf(address);
           break;
         case "DAI":
           currentVault = vaults.daiVault;
           currentOracle = oracles.daiOracle;
           currentToken = tokens.daiToken;
+          balance = await currentToken.balanceOf(address);
           break;
         case "WBTC":
           currentVault = vaults.wbtcVault;
           currentOracle = oracles.wbtcOracle;
           currentToken = tokens.wbtcToken;
+          balance = await currentToken.balanceOf(address);
           break;
         default:
           currentVault = vaults.wethVault;
@@ -163,39 +170,14 @@ const Details = ({ address }: props) => {
           currentToken = tokens.wethToken;
           break;
       }
-
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
-
-      await data.vaults.forEach((v: any) => {
+      await vaultData.vaults.forEach((v: any) => {
         if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
           currentVaultData = v;
         }
       });
-
-      const network = "rinkeby";
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
-
-      if (vaultType === "ETH") {
-        setIsApproved(true);
-        balance = await provider.getBalance(address);
-      } else {
-        balance = await currentToken.balanceOf(address);
-        const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
-        if (!allowance.isZero()) {
-          setIsApproved(true);
-        } else {
-          setText(
-            "Vault not approved. Please approve your collateral to start minting TCAP tokens."
-          );
-          setTitle("Approve Vault");
-          setIsApproved(false);
-        }
-      }
 
       const currentBalance = ethers.utils.formatEther(balance);
       if (parseFloat(currentBalance) < 0.09) {
@@ -207,13 +189,12 @@ const Details = ({ address }: props) => {
       setCollateralPrice(currentPrice);
       let usd = toUSD(currentPrice, currentBalance);
       setTokenBalanceUSD(usd.toString());
-
       if (currentVaultData) {
+        const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
         const { vaultId, collateral, debt, currentRatio } = currentVaultData;
-        console.log("🚀 ~ file: Details.tsx ~ line 213 ~ loadVault ~ collateral", collateral);
         setSelectedVaultId(vaultId);
-
-        if (vaultId) {
+        if (!allowance.isZero() || vaultType === "ETH") {
+          setIsApproved(true);
           setVaultRatio(currentRatio);
           if (currentRatio === "0") {
             setVaultStatus("N/A");
@@ -236,6 +217,12 @@ const Details = ({ address }: props) => {
           setVaultDebt(parsedDebt);
           usd = toUSD(currentTCAPPrice, parsedDebt);
           setVaultDebtUSD(usd.toString());
+        } else {
+          setText(
+            "Vault not approved. Please approve your collateral to start minting TCAP tokens."
+          );
+          setTitle("Approve Vault");
+          setIsApproved(false);
         }
       } else {
         setSelectedVaultId("0");
@@ -246,11 +233,23 @@ const Details = ({ address }: props) => {
         setIsApproved(false);
       }
     }
-  };
+  }
 
-  const refresh = () => {
-    refetch();
-    loadVault(selectedVault);
+  const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
+    variables: { owner: address },
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    onCompleted: () => {
+      loadVault(selectedVault, data);
+    },
+  });
+
+  const refresh = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      // catch error in case the vault screen is changed
+    }
   };
 
   // forms
@@ -356,7 +355,7 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const onChangeVault = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeVault = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedVault(event.target.value);
     // Clean form
     setAddCollateralTxt("");
@@ -369,14 +368,14 @@ const Details = ({ address }: props) => {
     setBurnUSD("0");
     setBurnFee("0");
     // Load values
-    loadVault(event.target.value);
     // TODO: update url
+    await refetch();
   };
 
   useEffect(() => {
     async function load() {
-      if (data) {
-        await loadVault(selectedVault);
+      if (networkStatus === NetworkStatus.ready) {
+        // await loadVault(selectedVault);
         setIsLoading(false);
       }
     }
@@ -415,6 +414,14 @@ const Details = ({ address }: props) => {
             <option>DAI</option>
           </Form.Control>
           <p className="number">
+            <NumberFormat
+              className="number"
+              value={tokenBalance}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+            />{" "}
+            {selectedVault} /{" "}
             <NumberFormat
               className="number"
               value={tokenBalanceUSD}
@@ -702,20 +709,9 @@ const Details = ({ address }: props) => {
         <div className="pre-actions">
           <h5 className="action-title">{title}</h5>
           <p>{text}</p>
-          {!signer.signer ? (
-            <Button
-              variant="pink neon-pink"
-              onClick={() => {
-                web3Modal.toggleModal();
-              }}
-            >
-              {title}
-            </Button>
-          ) : (
-            <Button variant="pink neon-pink" onClick={action}>
-              {title}
-            </Button>
-          )}
+          <Button variant="pink neon-pink" onClick={action}>
+            {title}
+          </Button>
         </div>
       )}
     </>

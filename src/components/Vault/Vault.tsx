@@ -8,26 +8,17 @@ import Loading from "../Loading";
 import Details from "./Details";
 
 // TODO: Refactor names
-// TODO: update vault on other component
 const Vault = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
 
   // State
-  const [title, setTitle] = useState("Create Vault");
-  const [text, setText] = useState(
-    "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
-  );
   const [isLoading, setIsLoading] = useState(true);
   const [address, setAddress] = useState("");
 
   useEffect(() => {
     async function load() {
       if (!signer.signer) {
-        setText(
-          "No wallet connected. Please Connect your wallet to Create a Vault and approve your collateral to start minting TCAP tokens."
-        );
-        setTitle("Connect Wallet");
         setIsLoading(false);
       } else if (signer.signer) {
         const currentAddress = await signer.signer.getAddress();
@@ -43,24 +34,24 @@ const Vault = () => {
     return <Loading title="Loading" message="Please wait" />;
   }
 
-  // TODO: Hide if no wallet, Show Token balance and usd
-
   return (
     <div className="vault">
       <div>
         <h3>The Vault</h3>
-
         {!signer.signer ? (
           <div className="pre-actions">
-            <h5 className="action-title mt-4 pt-2">{title}</h5>
-            <p>{text}</p>
+            <h5 className="action-title mt-4 pt-2">Connect Wallet</h5>
+            <p>
+              No wallet connected. Please Connect your wallet to Create a Vault and approve your
+              collateral to start minting TCAP tokens.
+            </p>
             <Button
               variant="pink neon-pink"
               onClick={() => {
                 web3Modal.toggleModal();
               }}
             >
-              {title}
+              Connect Wallet
             </Button>
           </div>
         ) : (
