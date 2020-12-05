@@ -71,7 +71,7 @@ const Welcome = () => {
     <div className="welcome">
       <div>
         <Row className="data">
-          <Col>
+          <Col xs={12} sm={12} lg={5}>
             <h2 className="number neon-highlight">
               <NumberFormat
                 className="number"
@@ -84,7 +84,7 @@ const Welcome = () => {
             </h2>
             <p>Total Cryptocurrency Market Capitalization</p>
           </Col>
-          <Col sm={6} md={7}>
+          <Col xs={12} sm={12} lg={7} className="token-price">
             <h2 className="number neon-dark-blue">
               <NumberFormat
                 className="number"
@@ -99,7 +99,7 @@ const Welcome = () => {
           </Col>
         </Row>
         <Row className="card-wrapper">
-          <Col>
+          <Col xs={12} lg={5}>
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
@@ -160,7 +160,7 @@ const Welcome = () => {
               </Card>
             )}
           </Col>
-          <Col sm={6} md={7}>
+          <Col xs={12} sm={12} lg={7} className="use-tcap">
             <Card className="diamond">
               <h2>Use TCAP</h2>
               <p>Trade TCAP using uniswap or create new supply using a vault</p>

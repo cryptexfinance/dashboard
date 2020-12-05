@@ -93,10 +93,42 @@
     }
   }
 
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    .actions-container {
+      display: grid;
+      grid-template-columns: auto;
+      margin-bottom: 2rem;
+    }
+
+    .balance {
+      grid-row-gap: 0rem;
+      row-gap: 0rem;
+    }
+
+    .card {
+      margin-bottom: 2rem;
+    }
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    .actions-container {
+      display: grid;
+      grid-template-columns: 33% auto 33%;
+      margin-bottom: 0rem;
+    }
+    .balance {
+      row-gap: 2rem;
+    }
+
+    .card {
+      margin-bottom: 0rem;
+    }
+  }
+
   .actions-container {
     margin-top: 1rem;
-    display: grid;
-    grid-template-columns: 33% auto 33%;
     column-gap: 2rem;
 
     p {
@@ -222,7 +254,7 @@
     .balance {
       display: flex;
       flex-direction: column;
-      row-gap: 2rem;
+
       .card {
         min-height: 12rem;
       }

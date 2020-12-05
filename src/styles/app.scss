@@ -130,6 +130,7 @@ input[type="text"].neon-orange:focus {
 //Same width as sidebar
 .wrapper {
   padding-left: 5rem;
+  overflow: overlay;
 }
 .wrapper::before {
   background-image: url("../assets/images/liquid.png");
