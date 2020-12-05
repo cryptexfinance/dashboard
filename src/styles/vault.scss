@@ -30,6 +30,10 @@
     .select-container {
       display: inline-block;
       margin-left: 1rem;
+
+      p {
+        margin-left: -2rem;
+      }
     }
   }
 

@@ -39,7 +39,11 @@ const Graph = () => {
     }
   `;
 
-  const { data } = useQuery(VAULTS_STATE);
+  const { data } = useQuery(VAULTS_STATE, {
+    notifyOnNetworkStatusChange: true,
+    pollInterval: 5000,
+    fetchPolicy: "no-cache",
+  });
 
   useEffect(() => {
     const load = async () => {
