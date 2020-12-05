@@ -5,6 +5,27 @@
   padding: 5rem 3rem;
   padding-bottom: 0px;
 
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    .token-price {
+      margin-top: 2rem;
+    }
+  }
+
+  // Medium devices (tablets, 768px and up)
+  @media (min-width: 768px) {
+    // .token-price {
+    //   margin-top: 0rem;
+    // }
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    .token-price {
+      margin-top: 0rem;
+    }
+  }
+
   h2 {
     font-size: 1.75rem;
     margin-bottom: 0.875rem;
@@ -37,6 +58,30 @@
 
     p {
       font-size: 0.875;
+    }
+
+    // Small devices (landscape phones, 576px and up)
+    @media (min-width: 576px) {
+      .use-tcap {
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+      }
+    }
+
+    // Medium devices (tablets, 768px and up)
+    @media (min-width: 768px) {
+      // .use-tcap {
+      //   margin-top: 0rem;
+      //   margin-bottom: 0rem;
+      // }
+    }
+
+    // Large devices (desktops, 992px and up)
+    @media (min-width: 992px) {
+      .use-tcap {
+        margin-top: 0rem;
+        margin-bottom: 0rem;
+      }
     }
 
     .card {
