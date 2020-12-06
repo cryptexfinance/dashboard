@@ -479,7 +479,7 @@ const Details = ({ address }: props) => {
                         displayType="text"
                         thousandSeparator
                         prefix="$"
-                        decimalScale={2}
+                        decimalScale={parseFloat(tokenBalanceUSD) > 1000 ? 0 : 2}
                       />
                     </p>
                   </div>
@@ -542,7 +542,7 @@ const Details = ({ address }: props) => {
                         displayType="text"
                         thousandSeparator
                         prefix="$"
-                        decimalScale={2}
+                        decimalScale={parseFloat(vaultCollateralUSD) > 1000 ? 0 : 2}
                       />
                     </p>
                   </div>
@@ -629,7 +629,7 @@ const Details = ({ address }: props) => {
                         displayType="text"
                         thousandSeparator
                         prefix="$"
-                        decimalScale={2}
+                        decimalScale={parseFloat(vaultDebtUSD) > 1000 ? 0 : 2}
                       />
                     </p>
                   </div>

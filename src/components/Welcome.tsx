@@ -130,7 +130,7 @@ const Welcome = () => {
                         displayType="text"
                         thousandSeparator
                         prefix="$"
-                        decimalScale={2}
+                        decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
                       />
                     </h3>
                     <p>USD Balance</p>
