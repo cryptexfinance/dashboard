@@ -105,7 +105,7 @@ const Welcome = () => {
                 <div className="">
                   <h2>My Total Balance</h2>
                   <p>
-                    Connected Account <b className="ml-2">{address}</b>
+                    Connected Account <b className="">{address}</b>
                   </p>
                 </div>
                 <Row className="">

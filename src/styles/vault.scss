@@ -2,8 +2,22 @@
 @import "./fonts";
 
 .vault {
-  padding: 1rem 3rem;
   padding-bottom: 0px;
+
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    padding: 1rem 3rem;
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    padding: 1rem 1.5rem;
+  }
+
+  // Large devices (small laptos)
+  @media (min-width: 1300px) {
+    padding: 1rem 3rem;
+  }
 
   .loading-container {
     padding-top: 12.5%;
@@ -115,7 +129,7 @@
   @media (min-width: 992px) {
     .actions-container {
       display: grid;
-      grid-template-columns: 33% auto 33%;
+      grid-template-columns: auto 33% 33%;
       margin-bottom: 0rem;
     }
     .balance {
