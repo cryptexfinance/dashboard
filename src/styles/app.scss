@@ -110,7 +110,20 @@ body {
   text-shadow: 3px 3px 15px $pink;
 }
 
-input[type="text"] {
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="text"],
+input[type="number"] {
   border-radius: 1px;
   background: no-repeat;
   border-color: $dark;
@@ -118,14 +131,20 @@ input[type="text"] {
   height: 3.375rem;
 }
 
-input[type="text"].neon-green:focus {
+input[type="text"].neon-green:focus,
+input[type="number"].neon-green:focus {
   border-color: $green !important;
   box-shadow: -1px 0px 15px -6px $green;
+  background: no-repeat;
+  color: $white;
 }
 
-input[type="text"].neon-orange:focus {
+input[type="text"].neon-orange:focus,
+input[type="number"].neon-orange:focus {
   border-color: $orange !important;
   box-shadow: -1px 0px 15px -6px $orange;
+  color: $white;
+  background: no-repeat;
 }
 
 .card {

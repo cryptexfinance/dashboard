@@ -283,6 +283,20 @@ const Details = ({ address }: props) => {
     }
   };
 
+  // const resetRatio = () => {
+  //   if (parseFloat(tempRatio) === 0) {
+  //     setVaultStatus("N/A");
+  //   } else if (parseFloat(tempRatio) >= 200) {
+  //     setVaultStatus("safe");
+  //   } else if (parseFloat(tempRatio) >= 180) {
+  //     setVaultStatus("warning");
+  //   } else {
+  //     setVaultStatus("danger");
+  //   }
+  //   setVaultRatio(tempRatio);
+  //   setTempRatio("0");
+  // };
+
   // forms
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddCollateralTxt(event.target.value);
@@ -652,7 +666,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Add Collateral</Form.Label>
                     <InputGroup>
                       <Form.Control
-                        type="text"
+                        type="number"
                         placeholder=""
                         className="neon-green"
                         value={addCollateralTxt}
@@ -679,7 +693,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Remove Collateral</Form.Label>
                     <InputGroup>
                       <Form.Control
-                        type="text"
+                        type="number"
                         placeholder=""
                         className="neon-orange"
                         value={removeCollateralTxt}
@@ -739,7 +753,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Mint TCAP</Form.Label>
                     <InputGroup>
                       <Form.Control
-                        type="text"
+                        type="number"
                         placeholder=""
                         className="neon-green"
                         value={mintTxt}
@@ -766,7 +780,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Burn TCAP</Form.Label>
                     <InputGroup>
                       <Form.Control
-                        type="text"
+                        type="number"
                         placeholder=""
                         className="neon-orange"
                         value={burnTxt}
