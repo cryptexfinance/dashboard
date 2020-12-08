@@ -253,8 +253,19 @@ const Details = ({ address }: props) => {
     }
   };
 
+  const resetFields = () => {
+    setBurnFee("0");
+    setAddCollateralUSD("0");
+    setAddCollateralTxt("");
+    setRemoveCollateralTxt("");
+    setRemoveCollateralUSD("0");
+    setMintTxt("");
+    setMintUSD("0");
+    setBurnUSD("0");
+    setBurnTxt("");
+  };
+
   const changeVault = async (newRatio: number) => {
-    setVaultRatio(newRatio.toString());
     if (!Number.isNaN(newRatio)) {
       if (newRatio === 0) {
         setVaultStatus("N/A");
@@ -268,6 +279,7 @@ const Details = ({ address }: props) => {
         setVaultStatus("error");
       }
       if (tempRatio === "0") setTempRatio(vaultRatio);
+      setVaultRatio(newRatio.toString());
     } else {
       if (parseFloat(tempRatio) === 0) {
         setVaultStatus("N/A");
@@ -280,22 +292,9 @@ const Details = ({ address }: props) => {
       }
       setVaultRatio(tempRatio);
       setTempRatio("0");
+      resetFields();
     }
   };
-
-  // const resetRatio = () => {
-  //   if (parseFloat(tempRatio) === 0) {
-  //     setVaultStatus("N/A");
-  //   } else if (parseFloat(tempRatio) >= 200) {
-  //     setVaultStatus("safe");
-  //   } else if (parseFloat(tempRatio) >= 180) {
-  //     setVaultStatus("warning");
-  //   } else {
-  //     setVaultStatus("danger");
-  //   }
-  //   setVaultRatio(tempRatio);
-  //   setTempRatio("0");
-  // };
 
   // forms
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
