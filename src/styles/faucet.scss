@@ -20,6 +20,9 @@ div.faucet {
       grid-template-columns: auto;
       margin-bottom: 4rem;
     }
+    .card {
+      margin-bottom: 2rem;
+    }
   }
 
   // Medium devices (tablets, 768px and up)
@@ -35,6 +38,11 @@ div.faucet {
       margin-top: 2.5rem;
       display: grid;
       grid-template-columns: 33% auto 33%;
+      margin-bottom: 0rem;
+      column-gap: 1rem;
+    }
+
+    .card {
       margin-bottom: 0rem;
     }
   }

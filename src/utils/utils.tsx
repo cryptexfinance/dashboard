@@ -62,32 +62,10 @@ export const sendNotification = async (
   });
 };
 
-// export const errorNotification = async (
-//   title: string,
-//   body: string,
-//   duration: number | false = 3000,
-//   fn: any = () => {},
-//   delay: number = 0
-// ) => {
-//   const toastConstant = (
-//     <div className="body">
-//       <img src={toasty} alt="toasty" className="toasty" />
-//       <h5>❌ Whoopsie!</h5>
-//       <p>Amount of gas set to low. </p>
-//     </div>
-//   );
-//   toast(toastConstant, {
-//     // @ts-ignore
-//     position: toast.POSITION.TOP_RIGHT,
-//     autoClose: false,
-//     hideProgressBar: true,
-//     delay,
-//     className: "error",
-//     onClose: () => {
-//       fn();
-//     },
-//   });
-// };
+export const errorNotification = async (body: string) => {
+  const title = "❌ Whoopsie!";
+  sendNotification(title, body, 3000, () => {}, 0, "error");
+};
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
@@ -106,4 +84,19 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     // catch error when vault screen changes in the middle of an update
     console.log(error);
   }
+};
+
+export const getRatio = async (
+  collateral: string,
+  collateralPrice: string,
+  debt: string,
+  tcapPrice: string
+) => {
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const d = parseFloat(debt);
+  if (d === 0) return 0;
+  const tp = parseFloat(tcapPrice);
+  const ratio = (c * cp * 100) / (d * tp);
+  return ratio;
 };

@@ -22,7 +22,7 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD } from "../../utils/utils";
+import { notifyUser, toUSD, errorNotification, getRatio } from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -71,6 +71,7 @@ const Details = ({ address }: props) => {
   const [vaultCollateral, setVaultCollateral] = useState("0");
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
+  const [tempRatio, setTempRatio] = useState("0");
   const [collateralPrice, setCollateralPrice] = useState("0");
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
@@ -252,31 +253,70 @@ const Details = ({ address }: props) => {
     }
   };
 
+  const changeVault = async (newRatio: number) => {
+    setVaultRatio(newRatio.toString());
+    if (!Number.isNaN(newRatio)) {
+      if (newRatio === 0) {
+        setVaultStatus("N/A");
+      } else if (newRatio >= 200) {
+        setVaultStatus("safe");
+      } else if (newRatio >= 180) {
+        setVaultStatus("warning");
+      } else if (newRatio >= 150) {
+        setVaultStatus("danger");
+      } else {
+        setVaultStatus("error");
+      }
+      if (tempRatio === "0") setTempRatio(vaultRatio);
+    } else {
+      if (parseFloat(tempRatio) === 0) {
+        setVaultStatus("N/A");
+      } else if (parseFloat(tempRatio) >= 200) {
+        setVaultStatus("safe");
+      } else if (parseFloat(tempRatio) >= 180) {
+        setVaultStatus("warning");
+      } else {
+        setVaultStatus("danger");
+      }
+      setVaultRatio(tempRatio);
+      setTempRatio("0");
+    }
+  };
+
   // forms
-  const onChangeAddCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddCollateralTxt(event.target.value);
     let usd = toUSD(collateralPrice, event.target.value);
     if (!usd) {
       usd = 0;
     }
+    const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
+    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    changeVault(r);
     setAddCollateralUSD(usd.toString());
   };
 
-  const onChangeRemoveCollateral = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeRemoveCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setRemoveCollateralTxt(event.target.value);
     let usd = toUSD(collateralPrice, event.target.value);
     if (!usd) {
       usd = 0;
     }
+    const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
+    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    changeVault(r);
     setRemoveCollateralUSD(usd.toString());
   };
 
-  const onChangeMint = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeMint = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setMintTxt(event.target.value);
     let usd = toUSD(tcapPrice, event.target.value);
     if (!usd) {
       usd = 0;
     }
+    const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
+    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    changeVault(r);
     setMintUSD(usd.toString());
   };
 
@@ -286,6 +326,9 @@ const Details = ({ address }: props) => {
     if (!usd) {
       usd = 0;
     }
+    const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
+    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    changeVault(r);
     setBurnUSD(usd.toString());
     if (event.target.value !== "") {
       const currentBurnFee = await selectedVaultContract?.getFee(
@@ -299,49 +342,97 @@ const Details = ({ address }: props) => {
   };
 
   const addCollateral = async () => {
-    const amount = ethers.utils.parseEther(addCollateralTxt);
-    if (selectedVault === "ETH") {
-      const tx = await selectedVaultContract?.addCollateralETH({
-        value: amount,
-      });
-      notifyUser(tx, refresh);
+    if (addCollateralTxt) {
+      const amount = ethers.utils.parseEther(addCollateralTxt);
+      try {
+        if (selectedVault === "ETH") {
+          const tx = await selectedVaultContract?.addCollateralETH({
+            value: amount,
+          });
+          notifyUser(tx, refresh);
+        } else {
+          const tx = await selectedVaultContract?.addCollateral(amount);
+          notifyUser(tx, refresh);
+        }
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          errorNotification("Insufficient funds to stake");
+        }
+      }
+      setAddCollateralTxt("");
+      setAddCollateralUSD("0");
     } else {
-      const tx = await selectedVaultContract?.addCollateral(amount);
-      notifyUser(tx, refresh);
+      errorNotification("Field can't be empty");
     }
-    setAddCollateralTxt("");
-    setAddCollateralUSD("0");
   };
 
   const removeCollateral = async () => {
-    const amount = ethers.utils.parseEther(removeCollateralTxt);
-    if (selectedVault === "ETH") {
-      const tx = await selectedVaultContract?.removeCollateralETH(amount);
-      notifyUser(tx, refresh);
+    if (removeCollateralTxt) {
+      const amount = ethers.utils.parseEther(removeCollateralTxt);
+      try {
+        if (selectedVault === "ETH") {
+          const tx = await selectedVaultContract?.removeCollateralETH(amount);
+          notifyUser(tx, refresh);
+        } else {
+          const tx = await selectedVaultContract?.removeCollateral(amount);
+          notifyUser(tx, refresh);
+        }
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          errorNotification("Not enough collateral on vault");
+        }
+      }
+      setRemoveCollateralTxt("");
+      setRemoveCollateralUSD("0");
     } else {
-      const tx = await selectedVaultContract?.removeCollateral(amount);
-      notifyUser(tx, refresh);
+      errorNotification("Field can't be empty");
     }
-    setRemoveCollateralTxt("");
-    setRemoveCollateralUSD("0");
   };
 
   const mintTCAP = async () => {
-    const amount = ethers.utils.parseEther(mintTxt);
-    const tx = await selectedVaultContract?.mint(amount);
-    notifyUser(tx, refresh);
-    setMintTxt("");
-    setMintUSD("0");
+    if (mintTxt) {
+      try {
+        const amount = ethers.utils.parseEther(mintTxt);
+        const tx = await selectedVaultContract?.mint(amount);
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          errorNotification("Not enough collateral on vault");
+        }
+      }
+      setMintTxt("");
+      setMintUSD("0");
+    } else {
+      errorNotification("Field can't be empty");
+    }
   };
 
   const burnTCAP = async () => {
-    const amount = ethers.utils.parseEther(burnTxt);
-    const fee = ethers.utils.parseEther(burnFee);
-    const tx = await selectedVaultContract?.burn(amount, { value: fee });
-    notifyUser(tx, refresh);
-    setBurnTxt("");
-    setBurnUSD("0");
-    setBurnFee("0");
+    if (burnTxt) {
+      try {
+        const amount = ethers.utils.parseEther(burnTxt);
+        const fee = ethers.utils.parseEther(burnFee);
+        const tx = await selectedVaultContract?.burn(amount, { value: fee });
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          errorNotification("Burn value too high");
+        }
+      }
+      setBurnTxt("");
+      setBurnUSD("0");
+      setBurnFee("0");
+    } else {
+      errorNotification("Field can't be empty");
+    }
   };
 
   const action = async () => {
@@ -502,7 +593,16 @@ const Details = ({ address }: props) => {
                   </OverlayTrigger>
                   <div>
                     <div className="amount">
-                      <h4 className=" ml-2 number neon-blue">{vaultRatio}%</h4>
+                      <h4 className=" ml-2 number neon-blue">
+                        <NumberFormat
+                          className="number"
+                          value={vaultRatio}
+                          displayType="text"
+                          thousandSeparator
+                          decimalScale={0}
+                          suffix="%"
+                        />
+                      </h4>
                     </div>
                     <p className={`number ${vaultStatus}`}>{vaultStatus.toUpperCase()}</p>
                   </div>

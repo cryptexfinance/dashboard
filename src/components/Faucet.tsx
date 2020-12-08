@@ -21,15 +21,39 @@ const Faucet = () => {
     setAmount(event.target.value);
   };
 
-  const printMoney = async (event: React.MouseEvent) => {
+  const printDAI = async (event: React.MouseEvent) => {
     event.preventDefault();
     if (tokens) {
       const validAddress = await isValidAddress(walletAddress);
-      if (validAddress && tokens.wethToken && tokens.wbtcToken && tokens.daiToken) {
+      if (validAddress && tokens.daiToken) {
+        const value = ethers.utils.parseEther(amount.toString());
+        await tokens.daiToken.mint(validAddress, value);
+        setWalletAddress("");
+        setAmount("");
+      }
+    }
+  };
+
+  const printWBTC = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (tokens) {
+      const validAddress = await isValidAddress(walletAddress);
+      if (validAddress && tokens.wbtcToken) {
+        const value = ethers.utils.parseEther(amount.toString());
+        await tokens.wbtcToken.mint(validAddress, value);
+        setWalletAddress("");
+        setAmount("");
+      }
+    }
+  };
+
+  const wrapETH = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (tokens) {
+      const validAddress = await isValidAddress(walletAddress);
+      if (validAddress && tokens.wethToken) {
         const value = ethers.utils.parseEther(amount.toString());
         await tokens.wethToken.deposit({ value });
-        await tokens.daiToken.mint(validAddress, value);
-        await tokens.wbtcToken.mint(validAddress, value);
         setWalletAddress("");
         setAmount("");
       }
@@ -43,8 +67,7 @@ const Faucet = () => {
         <div className="actions">
           <Card>
             <div className="info">
-              <h4>Print Tokens</h4>
-              <p>WETH, WBTC, DAI</p>
+              <h4 className="mb-4">Print DAI</h4>
             </div>
             <Form>
               <Form.Group>
@@ -70,8 +93,77 @@ const Faucet = () => {
                     onChange={onChangeAmount}
                   />
                 </InputGroup>
-                <Form.Text className="text-muted">You require that amount on ETH</Form.Text>
-                <Button variant="pink" className="" onClick={printMoney}>
+                <Button variant="pink" className="" onClick={printDAI}>
+                  Print
+                </Button>
+              </Form.Group>
+            </Form>
+          </Card>
+          <Card>
+            <div className="info">
+              <h4 className="mb-4">Print WBTC</h4>
+            </div>
+            <Form>
+              <Form.Group>
+                <Form.Label>Wallet Address</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder=""
+                    className=""
+                    value={walletAddress}
+                    onChange={onChangeWallet}
+                  />
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="remove">
+                <Form.Label>Amount to Print</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder=""
+                    className=""
+                    value={amount}
+                    onChange={onChangeAmount}
+                  />
+                </InputGroup>
+                <Button variant="pink" className="" onClick={printWBTC}>
+                  Print
+                </Button>
+              </Form.Group>
+            </Form>
+          </Card>
+          <Card>
+            <div className="info">
+              <h4>Wrap ETH</h4>
+              <p>You require that amount on ETH</p>
+            </div>
+            <Form>
+              <Form.Group>
+                <Form.Label>Wallet Address</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder=""
+                    className=""
+                    value={walletAddress}
+                    onChange={onChangeWallet}
+                  />
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="remove">
+                <Form.Label>Amount to Print</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder=""
+                    className=""
+                    value={amount}
+                    onChange={onChangeAmount}
+                  />
+                </InputGroup>
+
+                <Button variant="pink" className="" onClick={wrapETH}>
                   Print
                 </Button>
               </Form.Group>

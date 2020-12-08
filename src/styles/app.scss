@@ -83,6 +83,10 @@ body {
 .danger {
   text-shadow: 0px 4px 13px $orange;
 }
+
+.error {
+  text-shadow: 0px 4px 13px red;
+}
 .number.neon-blue,
 .safe {
   text-shadow: 0px 4px 13px rgb(6, 136, 255);
