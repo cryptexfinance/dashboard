@@ -29,6 +29,8 @@ type props = {
   address: string;
 };
 
+// TODO: Vault doesn't show if approve is 0 even if there is data in the vault
+
 const Details = ({ address }: props) => {
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
@@ -202,9 +204,9 @@ const Details = ({ address }: props) => {
           setVaultRatio(currentRatio);
           if (currentRatio === "0") {
             setVaultStatus("N/A");
-          } else if (currentRatio >= parseFloat(minRatio) + 50) {
+          } else if (currentRatio >= parseFloat(currentMinRatio) + 50) {
             setVaultStatus("safe");
-          } else if (currentRatio >= parseFloat(minRatio) + 30) {
+          } else if (currentRatio >= parseFloat(currentMinRatio) + 30) {
             setVaultStatus("warning");
           } else {
             setVaultStatus("danger");
