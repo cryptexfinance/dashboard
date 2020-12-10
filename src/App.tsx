@@ -6,6 +6,7 @@ import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import Container from "react-bootstrap/esm/Container";
+import Alert from "react-bootstrap/esm/Alert";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./components/Welcome";
@@ -44,6 +45,7 @@ const App = () => {
   const web3Modal = useContext(Web3ModalContext);
   const [isLoading, setloading] = useState(true);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
+  const [show, setShow] = useState(true);
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
@@ -109,6 +111,9 @@ const App = () => {
   });
 
   useEffect(() => {
+    const savedAlert = localStorage.getItem("alert");
+    if (savedAlert) setShow(false);
+
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
         const networkProvider = await web3Modal.connect();
@@ -132,7 +137,7 @@ const App = () => {
         const network = "rinkeby";
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
-          //  alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
         });
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         setContracts(randomSigner);
@@ -177,6 +182,21 @@ const App = () => {
           <vaultsContext.Provider value={vaults}>
             <Sidebar />
             <Container fluid className="wrapper">
+              {show && (
+                <Alert
+                  variant="rinkeby"
+                  onClose={() => {
+                    setShow(false);
+                    localStorage.setItem("alert", "false");
+                  }}
+                  dismissible
+                >
+                  <b>
+                    💀 Oracles and Data reflect Rinkeby Testnet prices, don't send Mainnet tokens or
+                    ETH
+                  </b>
+                </Alert>
+              )}
               <Header />
               <ToastContainer />
               <Switch>

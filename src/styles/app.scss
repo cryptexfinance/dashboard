@@ -32,6 +32,15 @@ body {
   background-color: $primary;
 }
 
+.alert {
+  background-color: $purple;
+  color: $white;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2rem;
+}
+
 .btn {
   color: $white;
   font-family: "Nineteen Ninety Seven";
@@ -84,7 +93,7 @@ body {
   text-shadow: 0px 4px 13px $orange;
 }
 
-.error {
+.number.error {
   text-shadow: 0px 4px 13px red;
 }
 .number.neon-blue,

@@ -100,3 +100,19 @@ export const getRatio = async (
   const ratio = (c * cp * 100) / (d * tp);
   return ratio;
 };
+
+export const getMaxMint = async (
+  ratio: string,
+  collateral: string,
+  collateralPrice: string,
+  tcapPrice: string,
+  debt: string
+) => {
+  const r = parseFloat(ratio);
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const tp = parseFloat(tcapPrice);
+  const d = parseFloat(debt);
+  const maxMint = (c * cp * 100) / (r * tp);
+  return maxMint - d;
+};

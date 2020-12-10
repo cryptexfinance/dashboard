@@ -67,7 +67,8 @@ const Faucet = () => {
         <div className="actions">
           <Card>
             <div className="info">
-              <h4 className="mb-4">Print DAI</h4>
+              <h4>Print DAI</h4>
+              <p>Fake DAI will be created</p>
             </div>
             <Form>
               <Form.Group>
@@ -101,7 +102,8 @@ const Faucet = () => {
           </Card>
           <Card>
             <div className="info">
-              <h4 className="mb-4">Print WBTC</h4>
+              <h4>Print WBTC</h4>
+              <p>Fake WBTC will be created</p>
             </div>
             <Form>
               <Form.Group>
@@ -136,7 +138,7 @@ const Faucet = () => {
           <Card>
             <div className="info">
               <h4>Wrap ETH</h4>
-              <p>You require that amount on ETH</p>
+              <p>You ETH will be turned into WETH</p>
             </div>
             <Form>
               <Form.Group>

@@ -225,6 +225,17 @@
         label {
           font-family: "Nineteen Ninety Seven";
           color: $white;
+
+          &.max {
+            float: right;
+            a {
+              color: $green;
+
+              &.orange {
+                color: $orange;
+              }
+            }
+          }
         }
 
         .text-muted {

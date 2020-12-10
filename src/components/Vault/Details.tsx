@@ -22,7 +22,7 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD, errorNotification, getRatio } from "../../utils/utils";
+import { notifyUser, toUSD, errorNotification, getRatio, getMaxMint } from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -141,7 +141,7 @@ const Details = ({ address }: props) => {
           const network = "rinkeby";
           const provider = ethers.getDefaultProvider(network, {
             infura: process.env.REACT_APP_INFURA_ID,
-            // alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+            alchemy: process.env.REACT_APP_ALCHEMY_KEY,
           });
           // setIsApproved(true);
           balance = await provider.getBalance(address);
@@ -381,6 +381,31 @@ const Details = ({ address }: props) => {
     }
   };
 
+  const maxAddCollateral = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    let balance = "0";
+    if (selectedVault === "ETH") {
+      const network = "rinkeby";
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
+      // setIsApproved(true);
+      balance = ethers.utils.formatEther(await provider.getBalance(address));
+    } else if (selectedCollateralContract) {
+      balance = ethers.utils.formatEther(await selectedCollateralContract.balanceOf(address));
+    }
+    setAddCollateralTxt(balance);
+    let usd = toUSD(collateralPrice, balance);
+    if (!usd) {
+      usd = 0;
+    }
+    const newCollateral = parseFloat(balance) + parseFloat(vaultCollateral);
+    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    changeVault(r);
+    setAddCollateralUSD(usd.toString());
+  };
+
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
       const amount = ethers.utils.parseEther(removeCollateralTxt);
@@ -406,6 +431,19 @@ const Details = ({ address }: props) => {
     }
   };
 
+  const maxRemoveCollateral = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setRemoveCollateralTxt(vaultCollateral);
+    let usd = toUSD(collateralPrice, vaultCollateral);
+    if (!usd) {
+      usd = 0;
+    }
+    const newCollateral = parseFloat(vaultCollateral) - parseFloat(vaultCollateral);
+    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    changeVault(r);
+    setRemoveCollateralUSD(usd.toString());
+  };
+
   const mintTCAP = async () => {
     if (mintTxt) {
       try {
@@ -424,6 +462,20 @@ const Details = ({ address }: props) => {
     } else {
       errorNotification("Field can't be empty");
     }
+  };
+
+  const maxMintTCAP = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const maxMint = await getMaxMint("150", vaultCollateral, collateralPrice, tcapPrice, vaultDebt);
+    setMintTxt(maxMint.toString());
+    let usd = toUSD(tcapPrice, maxMint.toString());
+    if (!usd) {
+      usd = 0;
+    }
+    const newDebt = maxMint + parseFloat(vaultDebt);
+    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    changeVault(r);
+    setMintUSD(usd.toString());
   };
 
   const burnTCAP = async () => {
@@ -445,6 +497,33 @@ const Details = ({ address }: props) => {
       setBurnFee("0");
     } else {
       errorNotification("Field can't be empty");
+    }
+  };
+
+  const maxBurnTCAP = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const currentBalance = ethers.utils.formatEther(await tokens.tcapToken?.balanceOf(address));
+    let balance = "0";
+    if (parseFloat(currentBalance) < parseFloat(vaultDebt)) {
+      balance = currentBalance;
+    } else {
+      balance = vaultDebt;
+    }
+    setBurnTxt(balance);
+    let usd = toUSD(tcapPrice, balance);
+    if (!usd) {
+      usd = 0;
+    }
+    const newDebt = parseFloat(balance) - parseFloat(balance);
+    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    changeVault(r);
+    setBurnUSD(usd.toString());
+    if (balance !== "") {
+      const currentBurnFee = await selectedVaultContract?.getFee(ethers.utils.parseEther(balance));
+      const ethFee = ethers.utils.formatEther(currentBurnFee);
+      setBurnFee(ethFee.toString());
+    } else {
+      setBurnFee("0");
     }
   };
 
@@ -663,6 +742,11 @@ const Details = ({ address }: props) => {
                 <Form>
                   <Form.Group>
                     <Form.Label>Add Collateral</Form.Label>
+                    <Form.Label className="max">
+                      <a href="/" className="number" onClick={maxAddCollateral}>
+                        MAX
+                      </a>
+                    </Form.Label>
                     <InputGroup>
                       <Form.Control
                         type="number"
@@ -690,6 +774,11 @@ const Details = ({ address }: props) => {
                   </Form.Group>
                   <Form.Group className="remove">
                     <Form.Label>Remove Collateral</Form.Label>
+                    <Form.Label className="max">
+                      <a href="/" className="number orange" onClick={maxRemoveCollateral}>
+                        MAX
+                      </a>
+                    </Form.Label>
                     <InputGroup>
                       <Form.Control
                         type="number"
@@ -750,6 +839,11 @@ const Details = ({ address }: props) => {
                 <Form>
                   <Form.Group>
                     <Form.Label>Mint TCAP</Form.Label>
+                    <Form.Label className="max">
+                      <a href="/" className="number" onClick={maxMintTCAP}>
+                        MAX
+                      </a>
+                    </Form.Label>
                     <InputGroup>
                       <Form.Control
                         type="number"
@@ -777,6 +871,11 @@ const Details = ({ address }: props) => {
                   </Form.Group>
                   <Form.Group className="remove">
                     <Form.Label>Burn TCAP</Form.Label>
+                    <Form.Label className="max">
+                      <a href="/" className="number orange" onClick={maxBurnTCAP}>
+                        MAX
+                      </a>
+                    </Form.Label>
                     <InputGroup>
                       <Form.Control
                         type="number"
