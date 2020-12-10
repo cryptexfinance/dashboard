@@ -72,6 +72,7 @@ const Details = ({ address }: props) => {
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [tempRatio, setTempRatio] = useState("0");
+  const [minRatio, setMinRatio] = useState("0");
   const [collateralPrice, setCollateralPrice] = useState("0");
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
@@ -195,13 +196,15 @@ const Details = ({ address }: props) => {
         const { vaultId, collateral, debt, currentRatio } = currentVaultData;
         setSelectedVaultId(vaultId);
         if (!allowance.isZero() || vaultType === "ETH") {
+          const currentMinRatio = (await currentVault.ratio()).toString();
+          setMinRatio(currentMinRatio);
           setIsApproved(true);
           setVaultRatio(currentRatio);
           if (currentRatio === "0") {
             setVaultStatus("N/A");
-          } else if (currentRatio >= 200) {
+          } else if (currentRatio >= parseFloat(minRatio) + 50) {
             setVaultStatus("safe");
-          } else if (currentRatio >= 180) {
+          } else if (currentRatio >= parseFloat(minRatio) + 30) {
             setVaultStatus("warning");
           } else {
             setVaultStatus("danger");
@@ -269,11 +272,11 @@ const Details = ({ address }: props) => {
     if (!Number.isNaN(newRatio)) {
       if (newRatio === 0) {
         setVaultStatus("N/A");
-      } else if (newRatio >= 200) {
+      } else if (newRatio >= parseFloat(minRatio) + 50) {
         setVaultStatus("safe");
-      } else if (newRatio >= 180) {
+      } else if (newRatio >= parseFloat(minRatio) + 30) {
         setVaultStatus("warning");
-      } else if (newRatio >= 150) {
+      } else if (newRatio >= parseFloat(minRatio)) {
         setVaultStatus("danger");
       } else {
         setVaultStatus("error");
@@ -283,9 +286,9 @@ const Details = ({ address }: props) => {
     } else {
       if (parseFloat(tempRatio) === 0) {
         setVaultStatus("N/A");
-      } else if (parseFloat(tempRatio) >= 200) {
+      } else if (parseFloat(tempRatio) >= parseFloat(minRatio) + 50) {
         setVaultStatus("safe");
-      } else if (parseFloat(tempRatio) >= 180) {
+      } else if (parseFloat(tempRatio) >= parseFloat(minRatio) + 30) {
         setVaultStatus("warning");
       } else {
         setVaultStatus("danger");
@@ -466,7 +469,13 @@ const Details = ({ address }: props) => {
 
   const maxMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const maxMint = await getMaxMint("150", vaultCollateral, collateralPrice, tcapPrice, vaultDebt);
+    const maxMint = await getMaxMint(
+      minRatio,
+      vaultCollateral,
+      collateralPrice,
+      tcapPrice,
+      vaultDebt
+    );
     setMintTxt(maxMint.toString());
     let usd = toUSD(tcapPrice, maxMint.toString());
     if (!usd) {
@@ -677,7 +686,7 @@ const Details = ({ address }: props) => {
                     placement="top"
                     overlay={
                       <Tooltip id="tooltip-top">
-                        Ratio must be {`>`} 150% or you will be liquidated
+                        Ratio must be {`>`} {minRatio}% or you will be liquidated
                       </Tooltip>
                     }
                   >
