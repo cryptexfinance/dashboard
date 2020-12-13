@@ -170,7 +170,10 @@ const Welcome = () => {
                     variant="primary"
                     className="neon-highlight"
                     onClick={() => {
-                      window.open("https://app.uniswap.org/#/swap", "_blank");
+                      window.open(
+                        "https://app.uniswap.org/#/swap?outputCurrency=0x827ee082C8A5697d47dE0E40e97c662415bACFD6",
+                        "_blank"
+                      );
                     }}
                   >
                     Trade
