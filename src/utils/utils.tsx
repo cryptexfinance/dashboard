@@ -75,7 +75,7 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     await tx.wait(1);
     toast.dismiss();
     notificationTitle = "✔️ Transaction Confirmed!";
-    notificationBody = "All set";
+    notificationBody = "All set, please wait for another confirmation";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
     await tx.wait(2);

@@ -171,7 +171,7 @@ const Welcome = () => {
                     className="neon-highlight"
                     onClick={() => {
                       window.open(
-                        "https://app.uniswap.org/#/swap?outputCurrency=0x827ee082C8A5697d47dE0E40e97c662415bACFD6",
+                        "https://app.uniswap.org/#/swap?outputCurrency=0x0a9246A29F8eac8a94d6001a2A83373Eb3d338D2",
                         "_blank"
                       );
                     }}
