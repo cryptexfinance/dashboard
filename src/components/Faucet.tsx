@@ -6,7 +6,7 @@ import InputGroup from "react-bootstrap/esm/InputGroup";
 import { ethers } from "ethers";
 import TokensContext from "../state/TokensContext";
 import "../styles/faucet.scss";
-import { isValidAddress } from "../utils/utils";
+import { isValidAddress, errorNotification } from "../utils/utils";
 
 const Faucet = () => {
   const tokens = useContext(TokensContext);
@@ -26,10 +26,14 @@ const Faucet = () => {
     if (tokens) {
       const validAddress = await isValidAddress(walletAddress);
       if (validAddress && tokens.daiToken) {
-        const value = ethers.utils.parseEther(amount.toString());
-        await tokens.daiToken.mint(validAddress, value);
-        setWalletAddress("");
-        setAmount("");
+        if (parseFloat(amount) < 1000) {
+          const value = ethers.utils.parseEther(amount.toString());
+          await tokens.daiToken.mint(validAddress, value);
+          setWalletAddress("");
+          setAmount("");
+        } else {
+          errorNotification("Mint amount too high, try 1000 DAI");
+        }
       }
     }
   };
@@ -39,8 +43,13 @@ const Faucet = () => {
     if (tokens) {
       const validAddress = await isValidAddress(walletAddress);
       if (validAddress && tokens.wbtcToken) {
-        const value = ethers.utils.parseEther(amount.toString());
-        await tokens.wbtcToken.mint(validAddress, value);
+        if (parseFloat(amount) <= 1) {
+          const value = ethers.utils.parseEther(amount.toString());
+          await tokens.wbtcToken.mint(validAddress, value);
+        } else {
+          errorNotification("Mint amount too high, try 1 WBTC");
+        }
+
         setWalletAddress("");
         setAmount("");
       }

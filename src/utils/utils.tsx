@@ -95,8 +95,8 @@ export const getRatio = async (
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const d = parseFloat(debt);
-  if (d === 0) return 0;
   const tp = parseFloat(tcapPrice);
+  if (d === 0 || tp === 0) return 0;
   const ratio = (c * cp * 100) / (d * tp);
   return ratio;
 };
@@ -113,6 +113,7 @@ export const getMaxMint = async (
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);
   const d = parseFloat(debt);
+  if (r === 0 || tp === 0) return 0;
   const maxMint = (c * cp * 100) / (r * tp);
   return maxMint - d;
 };

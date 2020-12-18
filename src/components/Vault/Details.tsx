@@ -7,7 +7,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
-import { useRouteMatch } from "react-router-dom";
+import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
@@ -39,8 +39,9 @@ const Details = ({ address }: props) => {
 
   let currency = "ETH";
   const match = useRouteMatch("/vault/:currency");
+  const history = useHistory();
   // @ts-ignore
-  switch (match?.params?.currency) {
+  switch (match?.params?.currency?.toLowerCase()) {
     case "eth":
       currency = "ETH";
       break;
@@ -73,7 +74,7 @@ const Details = ({ address }: props) => {
   const [vaultCollateral, setVaultCollateral] = useState("0");
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
-  const [tempRatio, setTempRatio] = useState("0");
+  const [tempRatio, setTempRatio] = useState("");
   const [minRatio, setMinRatio] = useState("0");
   const [collateralPrice, setCollateralPrice] = useState("0");
   const [selectedVault, setSelectedVault] = useState(currency);
@@ -270,91 +271,106 @@ const Details = ({ address }: props) => {
     setBurnTxt("");
   };
 
-  const changeVault = async (newRatio: number) => {
-    if (!Number.isNaN(newRatio)) {
-      if (newRatio === 0) {
-        setVaultStatus("N/A");
-      } else if (newRatio >= parseFloat(minRatio) + 50) {
-        setVaultStatus("safe");
-      } else if (newRatio >= parseFloat(minRatio) + 30) {
-        setVaultStatus("warning");
-      } else if (newRatio >= parseFloat(minRatio)) {
-        setVaultStatus("danger");
-      } else {
-        setVaultStatus("error");
-      }
-      if (tempRatio === "0") setTempRatio(vaultRatio);
-      setVaultRatio(newRatio.toString());
-    } else {
-      if (parseFloat(tempRatio) === 0) {
-        setVaultStatus("N/A");
-      } else if (parseFloat(tempRatio) >= parseFloat(minRatio) + 50) {
-        setVaultStatus("safe");
-      } else if (parseFloat(tempRatio) >= parseFloat(minRatio) + 30) {
-        setVaultStatus("warning");
-      } else {
-        setVaultStatus("danger");
-      }
+  const changeVault = async (newRatio: number, reset = false) => {
+    let r = newRatio;
+    if (reset) {
+      r = parseFloat(tempRatio);
       setVaultRatio(tempRatio);
-      setTempRatio("0");
+      setTempRatio("");
       resetFields();
+    } else {
+      if (tempRatio === "") {
+        setTempRatio(vaultRatio);
+      }
+      r = newRatio;
+      setVaultRatio(r.toString());
+    }
+
+    if (r === 0) {
+      setVaultStatus("N/A");
+    } else if (r >= parseFloat(minRatio) + 50) {
+      setVaultStatus("safe");
+    } else if (r >= parseFloat(minRatio) + 30) {
+      setVaultStatus("warning");
+    } else if (r >= parseFloat(minRatio)) {
+      setVaultStatus("danger");
+    } else {
+      setVaultRatio("0");
+      setVaultStatus("error");
     }
   };
 
   // forms
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddCollateralTxt(event.target.value);
-    let usd = toUSD(collateralPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
+    if (event.target.value !== "") {
+      let usd = toUSD(collateralPrice, event.target.value);
+      if (!usd) {
+        usd = 0;
+      }
+      const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
+      const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+      changeVault(r);
+      setAddCollateralUSD(usd.toString());
+    } else {
+      changeVault(0, true);
+      setAddCollateralUSD("0");
     }
-    const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
-    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
-    changeVault(r);
-    setAddCollateralUSD(usd.toString());
   };
 
   const onChangeRemoveCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setRemoveCollateralTxt(event.target.value);
-    let usd = toUSD(collateralPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
+    if (event.target.value !== "") {
+      let usd = toUSD(collateralPrice, event.target.value);
+      if (!usd) {
+        usd = 0;
+      }
+      const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
+      const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+      changeVault(r);
+      setRemoveCollateralUSD(usd.toString());
+    } else {
+      changeVault(0, true);
+      setRemoveCollateralUSD("0");
     }
-    const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
-    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
-    changeVault(r);
-    setRemoveCollateralUSD(usd.toString());
   };
 
   const onChangeMint = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setMintTxt(event.target.value);
-    let usd = toUSD(tcapPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
+    if (event.target.value !== "") {
+      let usd = toUSD(tcapPrice, event.target.value);
+      if (!usd) {
+        usd = 0;
+      }
+      const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
+      const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+      changeVault(r);
+      setMintUSD(usd.toString());
+    } else {
+      changeVault(0, true);
+      setMintUSD("0");
     }
-    const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
-    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
-    changeVault(r);
-    setMintUSD(usd.toString());
   };
 
   const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setBurnTxt(event.target.value);
-    let usd = toUSD(tcapPrice, event.target.value);
-    if (!usd) {
-      usd = 0;
-    }
-    const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
-    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
-    changeVault(r);
-    setBurnUSD(usd.toString());
     if (event.target.value !== "") {
+      let usd = toUSD(tcapPrice, event.target.value);
+      if (!usd) {
+        usd = 0;
+      }
+      const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
+      const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+      changeVault(r);
+      setBurnUSD(usd.toString());
       const currentBurnFee = await selectedVaultContract?.getFee(
         ethers.utils.parseEther(event.target.value)
       );
       const ethFee = ethers.utils.formatEther(currentBurnFee);
       setBurnFee(ethFee.toString());
     } else {
+      changeVault(0, true);
+      setBurnUSD("0");
       setBurnFee("0");
     }
   };
@@ -562,7 +578,7 @@ const Details = ({ address }: props) => {
     setBurnUSD("0");
     setBurnFee("0");
     // Load values
-    // TODO: update url
+    history?.push(`/vault/${event.target.value}`);
     await refetch();
   };
 

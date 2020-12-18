@@ -3,6 +3,8 @@ import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
@@ -82,7 +84,22 @@ const Welcome = () => {
                 decimalScale={0}
               />
             </h2>
-            <p>Total Cryptocurrency Market Capitalization</p>
+            <p>
+              Total Cryptocurrency Market Capitalization
+              <OverlayTrigger
+                key="bottom"
+                placement="bottom"
+                overlay={
+                  <Tooltip id="tooltip-bottom">
+                    Total Crypto Market Capitalization is updated on-chain on every 1% movement
+                  </Tooltip>
+                }
+              >
+                <Button variant="dark" className="question">
+                  ?
+                </Button>
+              </OverlayTrigger>
+            </p>
           </Col>
           <Col xs={12} sm={12} lg={7} className="token-price">
             <h2 className="number neon-dark-blue">
