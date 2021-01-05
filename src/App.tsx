@@ -13,6 +13,7 @@ import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
 import Vault from "./components/Vault/Vault";
 import Faucet from "./components/Faucet";
+import Governance from "./components/Governance";
 import { useSigner } from "./hooks/useSigner";
 import { useVaults } from "./hooks/useVaults";
 import { useTokens } from "./hooks/useTokens";
@@ -209,6 +210,9 @@ const App = () => {
                   </Route>
                   <Route path={`${match.url}vault`}>
                     <Vault />
+                  </Route>
+                  <Route path={`${match.url}governance`}>
+                    <Governance />
                   </Route>
                   <Route path={`${match.url}faucet`}>
                     <Faucet />
