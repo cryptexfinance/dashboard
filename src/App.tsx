@@ -22,17 +22,17 @@ import vaultsContext from "./state/VaultsContext";
 import tokensContext from "./state/TokensContext";
 import oraclesContext from "./state/OraclesContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
-import WETHVault from "./contracts/WETHVaultHandler.json";
-import WBTCVault from "./contracts/BTCVaultHandler.json";
-import DAIVault from "./contracts/DAIVaultHandler.json";
-import WETHOracle from "./contracts/WETHOracle.json";
-import WBTCOracle from "./contracts/BTCOracle.json";
-import DAIOracle from "./contracts/DAIOracle.json";
-import TCAPOracle from "./contracts/TCAPOracle.json";
-import WETHToken from "./contracts/WETH.json";
-import WBTCToken from "./contracts/WBTC.json";
-import DAIToken from "./contracts/DAI.json";
-import TCAPToken from "./contracts/TCAP.json";
+import WETHVault from "./contracts/vaults/WETHVaultHandler.json";
+import WBTCVault from "./contracts/vaults/BTCVaultHandler.json";
+import DAIVault from "./contracts/vaults/DAIVaultHandler.json";
+import WETHOracle from "./contracts/vaults/WETHOracle.json";
+import WBTCOracle from "./contracts/vaults/BTCOracle.json";
+import DAIOracle from "./contracts/vaults/DAIOracle.json";
+import TCAPOracle from "./contracts/vaults/TCAPOracle.json";
+import WETHToken from "./contracts/vaults/WETH.json";
+import WBTCToken from "./contracts/vaults/WBTC.json";
+import DAIToken from "./contracts/vaults/DAI.json";
+import TCAPToken from "./contracts/vaults/TCAP.json";
 import Loading from "./components/Loading";
 
 const clientOracle = new ApolloClient({
