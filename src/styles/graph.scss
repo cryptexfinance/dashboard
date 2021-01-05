@@ -1,9 +1,40 @@
 .graph {
-  padding: 5rem 3rem;
   padding-bottom: 0px;
 
   // Small devices (landscape phones, 576px and up)
+  @media (min-width: 300px) {
+    padding: 1rem 1rem;
+    padding-bottom: 0px;
+
+    .grid {
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: auto auto auto;
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    h4 {
+      font-size: 0.8rem;
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
+
+    h5 {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      margin-bottom: 0;
+    }
+
+    .card {
+      padding: 2rem;
+    }
+  }
+
+  // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
+    padding: 5rem 3rem;
+
     .grid {
       display: grid;
       grid-template-columns: auto auto;
@@ -11,17 +42,48 @@
       gap: 2rem;
       margin-bottom: 4rem;
     }
+
+    h4 {
+      font-size: 1rem;
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
+
+    h5 {
+      margin-top: 0.75rem;
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+    .card {
+      padding: 2.5rem;
+    }
   }
 
   // Medium devices (tablets, 768px and up)
   @media (min-width: 768px) {
+    padding: 5rem 3rem;
     // .token-price {
     //   margin-top: 0rem;
     // }
+
+    .card {
+      h4 {
+        font-size: 1.25rem;
+        margin-top: 2rem;
+        margin-bottom: 0;
+      }
+
+      h5 {
+        margin-top: 0.75rem;
+        font-size: 1.3rem;
+        margin-bottom: 0;
+      }
+    }
   }
 
   // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
+    padding: 5rem 3rem;
     .grid {
       display: grid;
       grid-template-columns: auto auto auto;
@@ -33,7 +95,6 @@
 
   .card {
     height: 14rem;
-    padding: 2.5rem;
 
     svg {
       height: 16.25rem;
@@ -61,18 +122,6 @@
 
     svg.dai {
       filter: drop-shadow(0px 0px 5px rgba(242, 128, 64, 0.42));
-    }
-
-    h4 {
-      font-size: 1.25rem;
-      margin-top: 2rem;
-      margin-bottom: 0;
-    }
-
-    h5 {
-      margin-top: 0.75rem;
-      font-size: 1.3rem;
-      margin-bottom: 0;
     }
   }
 }
