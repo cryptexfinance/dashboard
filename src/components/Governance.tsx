@@ -3,12 +3,12 @@ import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
-import Form from "react-bootstrap/esm/Form";
-import InputGroup from "react-bootstrap/esm/InputGroup";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import Table from "react-bootstrap/esm/Table";
+import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import ethers from "ethers";
 import NumberFormat from "react-number-format";
-import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
@@ -22,7 +22,7 @@ import Loading from "./Loading";
 
 const Governance = () => {
   const [address, setAddress] = useState("");
-  const [tcapBalance, setCtxBalance] = useState("0.0");
+  const [ctxBalance, setCtxBalance] = useState("0.0");
   const [currentVotes, setCurrentVotes] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
@@ -31,7 +31,6 @@ const Governance = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const [noDelegate, setNoDelegate] = useState(false);
-  const [delegateAddresstxt, setDelegateAddresstxt] = useState("");
 
   const TCAP_PRICE = gql`
     query {
@@ -42,11 +41,6 @@ const Governance = () => {
   `;
 
   const { data } = useQuery(TCAP_PRICE);
-
-  // forms
-  const onChangeDelegateAddress = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDelegateAddresstxt(event.target.value);
-  };
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -82,6 +76,62 @@ const Governance = () => {
     <div className="governance-dashboard">
       <div>
         <h3>Governance Portal</h3>
+        <Row className="data">
+          <Col>
+            <h2 className="number neon-highlight">
+              <CtxIcon className="ctx-neon" />
+              <NumberFormat
+                className="number"
+                value="10,000,000"
+                displayType="text"
+                thousandSeparator
+                prefix=""
+                decimalScale={0}
+              />{" "}
+            </h2>
+            <p>Total Supply</p>
+          </Col>
+          <Col>
+            <h2 className="number neon-highlight">
+              <CtxIcon className="ctx-neon" />
+              <NumberFormat
+                className="number"
+                value="400,000"
+                displayType="text"
+                thousandSeparator
+                prefix=""
+                decimalScale={0}
+              />{" "}
+            </h2>
+            <p>Quorum Required</p>
+          </Col>
+          <Col className="token-price">
+            <h2 className="number neon-dark-blue">
+              <CtxIcon className="ctx-neon" />
+              <NumberFormat
+                className="number"
+                value="100,000"
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />
+            </h2>
+            <p>Proposal Threshold</p>
+          </Col>
+          <Col className="token-price">
+            <h2 className="number neon-dark-blue">
+              <NumberFormat
+                className="number"
+                value="3 "
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              days
+            </h2>
+            <p>Voting Period</p>
+          </Col>
+        </Row>
         <Row className="card-wrapper">
           <Col xs={12} lg={3}>
             {address !== "" ? (
@@ -101,10 +151,10 @@ const Governance = () => {
                 <Row className="">
                   <Col>
                     <h3 className="number neon-blue">
-                      <CtxIcon className="tcap-neon" />
+                      <CtxIcon className="ctx-neon" />
                       <NumberFormat
                         className="number"
-                        value={tcapBalance}
+                        value={ctxBalance}
                         displayType="text"
                         thousandSeparator
                         decimalScale={2}
@@ -112,19 +162,6 @@ const Governance = () => {
                     </h3>
                     <p>CTX Balance</p>
                   </Col>
-                  {/* <Col>
-                    <h3 className="number neon-dark-blue">
-                      <NumberFormat
-                        className="number"
-                        value={currentVotes}
-                        displayType="text"
-                        thousandSeparator
-                        // prefix="$"
-                        // decimalScale={parseFloat(currentVotes) > 1000 ? 0 : 2}
-                      />
-                    </h3>
-                    <p>Current Votes</p>
-                  </Col> */}
                 </Row>
                 <br />
                 <Button variant="dark" className="" disabled>
@@ -159,14 +196,15 @@ const Governance = () => {
           <Col xs={12} sm={12} lg={9} className="use-tcap">
             <Card className="diamond">
               <h2>Proposals</h2>
-              <p>Trade TCAP using uniswap or create new supply using a vault</p>
+              <p>User your CTX to vote for TCAP</p>
               <Row className="">
                 <Table hover>
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Proposal</th>
+                      <th>Description</th>
                       <th>Proposer</th>
+                      <th>Votes</th>
                       <th>Status</th>
                       <th />
                     </tr>
@@ -176,6 +214,22 @@ const Governance = () => {
                       <td>1</td>
                       <td>Raise ETH Vault Fee</td>
                       <td>0x1234...1234</td>
+                      <td>
+                        <OverlayTrigger
+                          key="top"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-top">
+                              👍: 41,000 <br /> 👎: 61,000
+                            </Tooltip>
+                          }
+                        >
+                          <ProgressBar>
+                            <ProgressBar animated variant="highlight" now={40} key={1} />
+                            <ProgressBar animated variant="warning" now={60} key={2} />
+                          </ProgressBar>
+                        </OverlayTrigger>
+                      </td>
                       <td>Active</td>
                       <td>
                         <Button variant="primary" className="neon-highlight">
@@ -187,7 +241,23 @@ const Governance = () => {
                       <td>2</td>
                       <td>Raise ETH Vault Fee</td>
                       <td>0x1234...1234</td>
-                      <td>Active</td>
+                      <td>
+                        <OverlayTrigger
+                          key="top"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-top">
+                              👍: 41,000 <br /> 👎: 61,000
+                            </Tooltip>
+                          }
+                        >
+                          <ProgressBar>
+                            <ProgressBar variant="primary" now={30} key={1} />
+                            <ProgressBar variant="warning" now={70} key={2} />
+                          </ProgressBar>
+                        </OverlayTrigger>
+                      </td>
+                      <td>Defeated</td>
                       <td>
                         <Button variant="primary" className="neon-highlight">
                           Vote
@@ -198,7 +268,23 @@ const Governance = () => {
                       <td>3</td>
                       <td>Raise ETH Vault Fee</td>
                       <td>0x1234...1234</td>
-                      <td>Active</td>
+                      <td>
+                        <OverlayTrigger
+                          key="top"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-top">
+                              👍: 41,000 <br /> 👎: 61,000
+                            </Tooltip>
+                          }
+                        >
+                          <ProgressBar>
+                            <ProgressBar variant="primary" now={60} key={1} />
+                            <ProgressBar variant="warning" now={40} key={2} />
+                          </ProgressBar>
+                        </OverlayTrigger>
+                      </td>
+                      <td>Executed</td>
                       <td>
                         <Button variant="primary" className="neon-highlight">
                           Vote
