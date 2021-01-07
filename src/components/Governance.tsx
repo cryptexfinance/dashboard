@@ -3,33 +3,35 @@ import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
-import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
-import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers, { BigNumber } from "ethers";
+import Form from "react-bootstrap/esm/Form";
+import InputGroup from "react-bootstrap/esm/InputGroup";
+import Table from "react-bootstrap/esm/Table";
+import ethers from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
+import GovernanceContext from "../state/GovernanceContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import { makeShortAddress } from "../utils/utils";
-import "../styles/welcome.scss";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import "../styles/governance.scss";
+import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import Loading from "./Loading";
 
 const Governance = () => {
   const [address, setAddress] = useState("");
-  const [tcapBalance, setTcapBalance] = useState("0.0");
-  const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
-  const [totalPrice, setTotalPrice] = useState("0.0");
-  const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [tcapBalance, setCtxBalance] = useState("0.0");
+  const [currentVotes, setCurrentVotes] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
-  const history = useHistory();
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
+  const governance = useContext(GovernanceContext);
+  const [noDelegate, setNoDelegate] = useState(false);
+  const [delegateAddresstxt, setDelegateAddresstxt] = useState("");
 
   const TCAP_PRICE = gql`
     query {
@@ -41,94 +43,65 @@ const Governance = () => {
 
   const { data } = useQuery(TCAP_PRICE);
 
+  // forms
+  const onChangeDelegateAddress = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDelegateAddresstxt(event.target.value);
+  };
+
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle) {
+      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
         const currentAddress = await signer.signer.getAddress();
-        setAddress(makeShortAddress(currentAddress));
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
-        const tcapString = ethers.utils.formatEther(currentTcapBalance);
-        setTcapBalance(tcapString);
+        const delegateAddress = await governance.ctxToken.delegates(currentAddress);
+        if (delegateAddress === ethers.constants.AddressZero) {
+          setNoDelegate(true);
+        } else {
+          setNoDelegate(false);
+        }
+        setAddress(makeShortAddress(delegateAddress));
+        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const tcapString = ethers.utils.formatEther(currentCtxBalance);
+        setCtxBalance(tcapString);
+        const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
+        setCurrentVotes(votes.toString());
       }
       if (data) {
-        const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
-        const TotalTcapPrice = currentTotalPrice.mul(10000000000);
-        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
-        const tcapUSD = parseFloat(tcapBalance) * parseFloat(tcapPrice);
-        setTcapUSDBalance(tcapUSD.toString());
         setIsLoading(false);
       }
     };
 
     loadAddress();
     // eslint-disable-next-line
-  }, [tcapUSDBalance, data, isLoading, address]);
+  }, [currentVotes, data, isLoading, address]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }
 
   return (
-    <div className="welcome">
+    <div className="governance-dashboard">
       <div>
-        <Row className="data">
-          <Col xs={12} sm={12} lg={5}>
-            <h2 className="number neon-highlight">
-              <NumberFormat
-                className="number"
-                value={totalPrice}
-                displayType="text"
-                thousandSeparator
-                prefix="$"
-                decimalScale={0}
-              />
-            </h2>
-            <p>
-              Total Cryptocurrency Market Capitalization
-              <OverlayTrigger
-                key="bottom"
-                placement="bottom"
-                overlay={
-                  <Tooltip id="tooltip-bottom">
-                    Total Crypto Market Capitalization is updated on-chain on every 1% movement
-                  </Tooltip>
-                }
-              >
-                <Button variant="dark" className="question">
-                  ?
-                </Button>
-              </OverlayTrigger>
-            </p>
-          </Col>
-          <Col xs={12} sm={12} lg={7} className="token-price">
-            <h2 className="number neon-dark-blue">
-              <NumberFormat
-                className="number"
-                value={tcapPrice}
-                displayType="text"
-                thousandSeparator
-                prefix="$"
-                decimalScale={2}
-              />
-            </h2>
-            <p>Total Cryptocurrency Market Capitalization Token</p>
-          </Col>
-        </Row>
+        <h3>Governance Portal</h3>
         <Row className="card-wrapper">
-          <Col xs={12} lg={5}>
+          <Col xs={12} lg={3}>
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
                   <h2>My Total Balance</h2>
                   <p>
-                    Connected Account <b className="">{address}</b>
+                    {noDelegate ? (
+                      <>No votes delegated</>
+                    ) : (
+                      <>
+                        Delegated Account <b className="">{address}</b>
+                      </>
+                    )}
                   </p>
                 </div>
                 <Row className="">
                   <Col>
                     <h3 className="number neon-blue">
-                      <TcapIcon className="tcap-neon" />
+                      <CtxIcon className="tcap-neon" />
                       <NumberFormat
                         className="number"
                         value={tcapBalance}
@@ -137,22 +110,28 @@ const Governance = () => {
                         decimalScale={2}
                       />
                     </h3>
-                    <p>TCAP Balance</p>
+                    <p>CTX Balance</p>
                   </Col>
-                  <Col>
+                  {/* <Col>
                     <h3 className="number neon-dark-blue">
                       <NumberFormat
                         className="number"
-                        value={tcapUSDBalance}
+                        value={currentVotes}
                         displayType="text"
                         thousandSeparator
-                        prefix="$"
-                        decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
+                        // prefix="$"
+                        // decimalScale={parseFloat(currentVotes) > 1000 ? 0 : 2}
                       />
                     </h3>
-                    <p>USD Balance</p>
-                  </Col>
+                    <p>Current Votes</p>
+                  </Col> */}
                 </Row>
+                <br />
+                <Button variant="dark" className="" disabled>
+                  Delegate
+                </Button>
+                <br />
+                <Button className="neon-highlight">New Proposal</Button> <br />
               </Card>
             ) : (
               <Card className="balance">
@@ -177,40 +156,57 @@ const Governance = () => {
               </Card>
             )}
           </Col>
-          <Col xs={12} sm={12} lg={7} className="use-tcap">
+          <Col xs={12} sm={12} lg={9} className="use-tcap">
             <Card className="diamond">
-              <h2>Use TCAP</h2>
+              <h2>Proposals</h2>
               <p>Trade TCAP using uniswap or create new supply using a vault</p>
               <Row className="">
-                <Col>
-                  <Button
-                    variant="primary"
-                    className="neon-highlight"
-                    onClick={() => {
-                      window.open(
-                        "https://app.uniswap.org/#/swap?outputCurrency=0xA82bf5A9A3FD034101ccfA2764Ad39d987ac8fc8",
-                        "_blank"
-                      );
-                    }}
-                  >
-                    Trade
-                  </Button>
-                  {address !== "" ? (
-                    <Button
-                      variant="success"
-                      className="neon-green"
-                      onClick={() => {
-                        history.push("/vault");
-                      }}
-                    >
-                      Mint
-                    </Button>
-                  ) : (
-                    <Button variant="dark" className="" disabled>
-                      Mint
-                    </Button>
-                  )}
-                </Col>
+                <Table hover>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Proposal</th>
+                      <th>Proposer</th>
+                      <th>Status</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>Raise ETH Vault Fee</td>
+                      <td>0x1234...1234</td>
+                      <td>Active</td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight">
+                          Vote
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>Raise ETH Vault Fee</td>
+                      <td>0x1234...1234</td>
+                      <td>Active</td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight">
+                          Vote
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>Raise ETH Vault Fee</td>
+                      <td>0x1234...1234</td>
+                      <td>Active</td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight">
+                          Vote
+                        </Button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
               </Row>
             </Card>
           </Col>

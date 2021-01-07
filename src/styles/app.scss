@@ -156,6 +156,14 @@ input[type="number"].neon-orange:focus {
   background: no-repeat;
 }
 
+input[type="text"].neon-hightlight:focus,
+input[type="number"].neon-hightlight:focus {
+  border-color: $highlight !important;
+  box-shadow: -1px 0px 15px -6px $highlight;
+  color: $white;
+  background: no-repeat;
+}
+
 .card {
   background-color: $darker;
 }
