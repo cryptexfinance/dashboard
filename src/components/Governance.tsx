@@ -19,6 +19,8 @@ import { makeShortAddress } from "../utils/utils";
 import "../styles/governance.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import Loading from "./Loading";
+import { NewProposal } from "./modals/NewProposal";
+import { Delegate } from "./modals/Delegate";
 
 const Governance = () => {
   const [address, setAddress] = useState("");
@@ -41,6 +43,8 @@ const Governance = () => {
   `;
 
   const { data } = useQuery(TCAP_PRICE);
+  const [newProposalShow, setNewProposalShow] = useState(false);
+  const [delegateShow, setDelegateShow] = useState(false);
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -164,11 +168,14 @@ const Governance = () => {
                   </Col>
                 </Row>
                 <br />
-                <Button variant="dark" className="" disabled>
+                <Button className="neon-highlight" onClick={() => setDelegateShow(true)}>
                   Delegate
                 </Button>
                 <br />
-                <Button className="neon-highlight">New Proposal</Button> <br />
+                <Button className="neon-highlight" onClick={() => setNewProposalShow(true)}>
+                  New Proposal
+                </Button>{" "}
+                <br />
               </Card>
             ) : (
               <Card className="balance">
@@ -298,6 +305,8 @@ const Governance = () => {
           </Col>
         </Row>
       </div>
+      <Delegate show={delegateShow} onHide={() => setDelegateShow(false)} />
+      <NewProposal show={newProposalShow} onHide={() => setNewProposalShow(false)} />
     </div>
   );
 };

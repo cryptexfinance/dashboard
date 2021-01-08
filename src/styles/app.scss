@@ -119,6 +119,20 @@ body {
   text-shadow: 3px 3px 15px $pink;
 }
 
+.table thead th {
+  border-top: 2px solid $highlight;
+  border-bottom: 2px solid $highlight;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid $highlight;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.175);
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
