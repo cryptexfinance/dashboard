@@ -24,8 +24,8 @@ import { Delegate } from "./modals/Delegate";
 
 const Governance = () => {
   const [address, setAddress] = useState("");
-  const [ctxBalance, setCtxBalance] = useState("0.0");
-  const [currentVotes, setCurrentVotes] = useState("0.0");
+  const [ctxBalance, setCtxBalance] = useState("0");
+  const [currentVotes, setCurrentVotes] = useState("0");
   const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
@@ -46,6 +46,28 @@ const Governance = () => {
   const [newProposalShow, setNewProposalShow] = useState(false);
   const [delegateShow, setDelegateShow] = useState(false);
 
+  const refresh = async () => {
+    try {
+      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
+        const currentAddress = await signer.signer.getAddress();
+        const delegateAddress = await governance.ctxToken.delegates(currentAddress);
+        if (delegateAddress === ethers.constants.AddressZero) {
+          setNoDelegate(true);
+        } else {
+          setNoDelegate(false);
+        }
+        setAddress(makeShortAddress(delegateAddress));
+        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const tcapString = ethers.utils.formatEther(currentCtxBalance);
+        setCtxBalance(tcapString);
+        const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
+        setCurrentVotes(votes.toString());
+      }
+    } catch (error) {
+      // catch error in case the vault screen is changed
+    }
+  };
+
   useEffect(() => {
     const loadAddress = async () => {
       if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
@@ -61,7 +83,7 @@ const Governance = () => {
         const tcapString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(tcapString);
         const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
-        setCurrentVotes(votes.toString());
+        setCurrentVotes(ethers.utils.formatEther(votes));
       }
       if (data) {
         setIsLoading(false);
@@ -144,7 +166,7 @@ const Governance = () => {
                   <h2>My Total Balance</h2>
                   <p>
                     {noDelegate ? (
-                      <>No votes delegated</>
+                      <></>
                     ) : (
                       <>
                         Delegated Account <b className="">{address}</b>
@@ -167,6 +189,25 @@ const Governance = () => {
                     <p>CTX Balance</p>
                   </Col>
                 </Row>
+                {currentVotes !== "0" && currentVotes !== "0.0" && (
+                  <>
+                    <Row className="">
+                      <Col>
+                        <h3 className="number neon-blue">
+                          <CtxIcon className="ctx-neon" />
+                          <NumberFormat
+                            className="number"
+                            value={currentVotes}
+                            displayType="text"
+                            thousandSeparator
+                            decimalScale={2}
+                          />
+                        </h3>
+                        <p>Delegated Votes</p>
+                      </Col>
+                    </Row>
+                  </>
+                )}
                 <br />
                 <Button className="neon-highlight" onClick={() => setDelegateShow(true)}>
                   Delegate
@@ -305,7 +346,11 @@ const Governance = () => {
           </Col>
         </Row>
       </div>
-      <Delegate show={delegateShow} onHide={() => setDelegateShow(false)} />
+      <Delegate
+        show={delegateShow}
+        onHide={() => setDelegateShow(false)}
+        refresh={() => refresh()}
+      />
       <NewProposal show={newProposalShow} onHide={() => setNewProposalShow(false)} />
     </div>
   );
