@@ -21,6 +21,7 @@ import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import Loading from "./Loading";
 import { NewProposal } from "./modals/NewProposal";
 import { Delegate } from "./modals/Delegate";
+import { Vote } from "./modals/Vote";
 
 const Governance = () => {
   const [address, setAddress] = useState("");
@@ -45,6 +46,7 @@ const Governance = () => {
   const { data } = useQuery(TCAP_PRICE);
   const [newProposalShow, setNewProposalShow] = useState(false);
   const [delegateShow, setDelegateShow] = useState(false);
+  const [voteShow, setVoteShow] = useState(false);
 
   const refresh = async () => {
     try {
@@ -163,7 +165,7 @@ const Governance = () => {
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
-                  <h2>My Total Balance</h2>
+                  <h2>Balance</h2>
                   <p>
                     {noDelegate ? (
                       <></>
@@ -213,8 +215,12 @@ const Governance = () => {
                   Delegate
                 </Button>
                 <br />
-                <Button className="neon-highlight" onClick={() => setNewProposalShow(true)}>
-                  New Proposal
+                <Button
+                  className="neon-green"
+                  variant="success"
+                  onClick={() => setNewProposalShow(true)}
+                >
+                  Propose
                 </Button>{" "}
                 <br />
               </Card>
@@ -260,7 +266,7 @@ const Governance = () => {
                   <tbody>
                     <tr>
                       <td>1</td>
-                      <td>Raise ETH Vault Fee</td>
+                      <td>Raise DAI Vault Fee</td>
                       <td>0x1234...1234</td>
                       <td>
                         <OverlayTrigger
@@ -280,14 +286,18 @@ const Governance = () => {
                       </td>
                       <td>Active</td>
                       <td>
-                        <Button variant="primary" className="neon-highlight">
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => setVoteShow(true)}
+                        >
                           Vote
                         </Button>
                       </td>
                     </tr>
                     <tr>
                       <td>2</td>
-                      <td>Raise ETH Vault Fee</td>
+                      <td>Raise WBTC Vault Fee</td>
                       <td>0x1234...1234</td>
                       <td>
                         <OverlayTrigger
@@ -307,7 +317,11 @@ const Governance = () => {
                       </td>
                       <td>Defeated</td>
                       <td>
-                        <Button variant="primary" className="neon-highlight">
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => setVoteShow(true)}
+                        >
                           Vote
                         </Button>
                       </td>
@@ -334,7 +348,11 @@ const Governance = () => {
                       </td>
                       <td>Executed</td>
                       <td>
-                        <Button variant="primary" className="neon-highlight">
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => setVoteShow(true)}
+                        >
                           Vote
                         </Button>
                       </td>
@@ -352,6 +370,12 @@ const Governance = () => {
         refresh={() => refresh()}
       />
       <NewProposal show={newProposalShow} onHide={() => setNewProposalShow(false)} />
+      <Vote
+        show={voteShow}
+        onHide={() => {
+          setVoteShow(false);
+        }}
+      />
     </div>
   );
 };

@@ -17,6 +17,7 @@ export const NewProposal = ({ show, onHide }: props) => (
     aria-labelledby="contained-modal-title-vcenter"
     centered
     onHide={onHide}
+    className="green"
   >
     <Modal.Header closeButton>
       <Modal.Title id="contained-modal-title-vcenter">New Proposal</Modal.Title>
@@ -43,7 +44,7 @@ export const NewProposal = ({ show, onHide }: props) => (
       </Form>
     </Modal.Body>
     <Modal.Footer>
-      <Button variant="primary" className="neon-highlight">
+      <Button variant="success" className="neon-green">
         Create Proposal
       </Button>
     </Modal.Footer>
