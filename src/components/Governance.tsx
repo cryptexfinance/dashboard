@@ -228,7 +228,7 @@ const Governance = () => {
               <Card className="balance">
                 <div className="">
                   <h2>Connect Your Account</h2>
-                  <p>Mint TCAP,or check your balance connecting your account</p>
+                  <p>Vote and delegate with your CTX tokens connecting your account</p>
                 </div>
                 <Row className="">
                   <Col>
