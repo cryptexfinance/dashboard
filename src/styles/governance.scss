@@ -1,8 +1,8 @@
 @import "./colors";
 @import "./fonts";
 
-.welcome {
-  padding: 5rem 3rem;
+.governance-dashboard {
+  padding: 1rem 3rem;
   padding-bottom: 2rem;
 
   // Small devices (landscape phones, 576px and up)
@@ -27,8 +27,20 @@
   }
 
   h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     margin-bottom: 0.875rem;
+  }
+
+  .data {
+    margin-top: 2.5rem;
+    svg {
+      height: 2rem;
+      margin-right: 0.5rem;
+
+      &.ctx-neon {
+        filter: none;
+      }
+    }
   }
 
   .btn {
@@ -56,14 +68,15 @@
   }
 
   .card-wrapper {
-    margin-top: 2.9375rem;
+    margin-top: 2rem;
+
     h2 {
       font-size: 1.375rem;
       margin-bottom: 1.5625rem;
     }
 
     h3 {
-      font-size: 1.625rem;
+      font-size: 1rem;
     }
 
     p {
@@ -117,9 +130,12 @@
           margin-right: 0.5rem;
           filter: drop-shadow(0px 4px 13px $dark-blue);
 
-          &.tcap-neon {
+          &.ctx-neon {
             filter: none;
           }
+        }
+        .row {
+          margin-top: 0rem;
         }
 
         h3 {
@@ -132,11 +148,61 @@
         }
       }
 
-      &.diamond {
-        background-image: url("../assets/images/welcome/diamond.svg");
-        background-repeat: no-repeat;
-        background-position: right bottom;
+      .btn {
+        background-color: $darker;
+        // width: 3.375rem;
+        border-radius: 1px;
+        height: 3.375rem;
+        width: 100%;
+      }
 
+      form {
+        // padding: 2rem 2rem 0rem 2rem;
+        margin-top: 1rem;
+
+        label {
+          font-family: "Nineteen Ninety Seven";
+          color: $white;
+
+          &.max {
+            float: right;
+            a {
+              color: $green;
+
+              &.orange {
+                color: $orange;
+              }
+            }
+          }
+        }
+
+        .text-muted {
+          text-align: left;
+          font-size: 1rem;
+        }
+
+        input[type="text"] {
+          border-radius: 1px;
+          background: no-repeat;
+          border-color: $dark;
+          color: $white;
+          height: 3.375rem;
+        }
+
+        .btn {
+          background-color: $darker;
+          // width: 3.375rem;
+          border-radius: 1px;
+          height: 3.375rem;
+          width: 100%;
+        }
+
+        .remove {
+          margin-top: 3.5rem;
+        }
+      }
+
+      &.diamond {
         p {
           width: 70%;
         }
@@ -145,6 +211,23 @@
 
           &.neon-green {
             box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+          }
+        }
+
+        .table {
+          color: $white;
+          tr:hover {
+            color: $white;
+          }
+
+          td {
+            vertical-align: middle;
+          }
+
+          .btn {
+            width: 80%;
+            height: 2.5rem;
+            padding: 0rem;
           }
         }
       }

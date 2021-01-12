@@ -32,6 +32,10 @@
       }
     }
 
+    a svg.governance {
+      width: 1.7rem;
+    }
+
     a.active svg {
       -webkit-filter: drop-shadow(3px 3px 2px $highlight);
       filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);

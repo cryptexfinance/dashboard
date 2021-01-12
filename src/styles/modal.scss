@@ -1,0 +1,101 @@
+@import "./colors";
+@import "./fonts";
+
+.modal-content {
+  padding: 2rem;
+  background-color: $primary;
+  background-clip: padding-box;
+  border: 1px solid $highlight;
+  box-sizing: border-box;
+  box-shadow: 0px 0px 39px -6px rgba(164, 64, 242, 0.4);
+  border-radius: 2px;
+
+  .green & {
+    border: 1px solid $green;
+    box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+  }
+
+  b {
+    color: $purple;
+  }
+
+  .modal-header,
+  .modal-footer {
+    border: 0px;
+  }
+
+  .modal-title {
+    font-family: "Nineteen Ninety Seven";
+    color: $white;
+  }
+
+  .btn {
+    background-color: $darker;
+    width: 100%;
+    border-radius: 1px;
+    height: 3.375rem;
+
+    &:hover {
+      color: $white;
+    }
+  }
+
+  .close {
+    margin-top: -2rem;
+    margin-right: -1rem;
+    color: $white;
+    opacity: 1;
+  }
+  form {
+    // padding: 2rem 2rem 0rem 2rem;
+    margin-top: 1rem;
+
+    label {
+      font-family: "Nineteen Ninety Seven";
+      color: $white;
+
+      &.max {
+        float: right;
+        a {
+          color: $green;
+
+          &.orange {
+            color: $orange;
+          }
+        }
+      }
+    }
+
+    .text-muted {
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    input[type="text"] {
+      border-radius: 1px;
+      background: no-repeat;
+      border-color: $dark;
+      color: $white;
+      height: 3.375rem;
+    }
+
+    .btn {
+      background-color: $darker;
+      border-radius: 1px;
+      height: 3.375rem;
+      width: 100%;
+    }
+
+    .remove {
+      margin-top: 3.5rem;
+    }
+  }
+
+  .progress {
+    height: 2rem;
+
+    .progress-bar {
+      font-weight: bold;
+    }
+  }
+}
