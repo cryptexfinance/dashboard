@@ -34,19 +34,71 @@ const Governance = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const [noDelegate, setNoDelegate] = useState(false);
+  const [proposals, setProposals] = useState<any[]>([]);
+  const [newProposalShow, setNewProposalShow] = useState(false);
+  const [delegateShow, setDelegateShow] = useState(false);
+  const [proposerThreshold, setProposerThreshold] = useState("0");
+  const [currentBlock, setCurrentBlock] = useState(0);
+  const [currentTimestamp, setCurrentTimestamp] = useState(0);
 
-  const TCAP_PRICE = gql`
+  // Vote Modal
+  const [voteShow, setVoteShow] = useState(false);
+  const [voteDescription, setVoteDescription] = useState("");
+  const [voteFor, setVoteFor] = useState(0);
+  const [voteAgainst, setVoteAgainst] = useState(0);
+  const [voteStatus, setVoteStatus] = useState("");
+  const [voteSignatures, setVoteSignatures] = useState("");
+  const [voteCalldatas, setVoteCalldatas] = useState("");
+  const [voteEndTime, setVoteEndTime] = useState("");
+  const [voteId, setVoteId] = useState("");
+
+  function clickVote(
+    description: string,
+    forVote: number,
+    against: number,
+    status: string,
+    signatures: string,
+    calldatas: string,
+    endTime: string,
+    id: string
+  ) {
+    setVoteDescription(description);
+    setVoteFor(forVote);
+    setVoteAgainst(against);
+    setVoteStatus(status);
+    setVoteSignatures(signatures);
+    setVoteCalldatas(calldatas);
+    setVoteEndTime(endTime);
+    setVoteId(id);
+    setVoteShow(true);
+  }
+
+  const PROPOSALS = gql`
     query {
-      oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
-        answer
+      proposals {
+        id
+        proposer {
+          id
+        }
+        targets
+        values
+        signatures
+        calldatas
+        status
+        description
+        startBlock
+        endBlock
+
+        votes {
+          id
+          support
+          votes
+        }
       }
     }
   `;
 
-  const { data } = useQuery(TCAP_PRICE);
-  const [newProposalShow, setNewProposalShow] = useState(false);
-  const [delegateShow, setDelegateShow] = useState(false);
-  const [voteShow, setVoteShow] = useState(false);
+  const { data } = useQuery(PROPOSALS);
 
   const refresh = async () => {
     try {
@@ -72,7 +124,13 @@ const Governance = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
+      if (
+        signer.signer &&
+        tokens.tcapToken &&
+        oracles.tcapOracle &&
+        governance.ctxToken &&
+        governance.governorAlpha
+      ) {
         const currentAddress = await signer.signer.getAddress();
         const delegateAddress = await governance.ctxToken.delegates(currentAddress);
         if (delegateAddress === ethers.constants.AddressZero) {
@@ -86,8 +144,24 @@ const Governance = () => {
         setCtxBalance(tcapString);
         const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
         setCurrentVotes(ethers.utils.formatEther(votes));
+        const currentThreshold = await governance.governorAlpha.proposalThreshold();
+        setProposerThreshold(ethers.utils.formatEther(currentThreshold));
       }
       if (data) {
+        const currentProposals: any[] = [];
+        await data.proposals.forEach((p: any) => {
+          currentProposals.push(p);
+        });
+        setProposals(currentProposals);
+        const network = "rinkeby";
+        const provider = ethers.getDefaultProvider(network, {
+          infura: process.env.REACT_APP_INFURA_ID,
+          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+        });
+        const block = await provider.getBlockNumber();
+        setCurrentBlock(block);
+        const timestamp = Date.now();
+        setCurrentTimestamp(timestamp);
         setIsLoading(false);
       }
     };
@@ -138,10 +212,10 @@ const Governance = () => {
               <CtxIcon className="ctx-neon" />
               <NumberFormat
                 className="number"
-                value="100,000"
+                value={proposerThreshold}
                 displayType="text"
                 thousandSeparator
-                decimalScale={2}
+                decimalScale={0}
               />
             </h2>
             <p>Proposal Threshold</p>
@@ -264,6 +338,100 @@ const Governance = () => {
                     </tr>
                   </thead>
                   <tbody>
+                    {proposals.map((proposal, i) => {
+                      let forVotes = 0;
+                      let againstVotes = 0;
+                      proposal.votes.map((vote: any) => {
+                        if (vote.support) {
+                          forVotes += vote.votes;
+                        } else {
+                          againstVotes += vote.votes;
+                        }
+                        return true;
+                      });
+                      const denominator = forVotes + againstVotes;
+                      const forRate = denominator !== 0 ? forVotes / denominator : 0;
+                      const againstRate = denominator !== 0 ? againstVotes / denominator : 0;
+                      const animated = proposal.status === "PENDING";
+                      const timeBlock = proposal.endBlock - currentBlock;
+                      console.log(timeBlock);
+                      const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
+                      const endTime = new Date(endTimeMili).toDateString();
+                      // TODO: Construct vote button to send parameters to modal
+                      const row = (
+                        <tr key={i}>
+                          <td>{proposal.id}</td>
+                          <td>{proposal.description}</td>
+                          <td>
+                            <a
+                              href={`https://rinkeby.etherscan.io/address/${proposal.proposer.id}`}
+                            >
+                              {makeShortAddress(proposal.proposer.id)}
+                            </a>
+                          </td>
+                          <td>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              overlay={
+                                <Tooltip id="tooltip-top">
+                                  👍: {forVotes}
+                                  <br /> 👎: {againstVotes}
+                                </Tooltip>
+                              }
+                            >
+                              <ProgressBar>
+                                <ProgressBar
+                                  animated={animated}
+                                  variant="highlight"
+                                  now={forRate}
+                                  key={1}
+                                />
+                                <ProgressBar
+                                  animated={animated}
+                                  variant="warning"
+                                  now={againstRate}
+                                  key={2}
+                                />
+                              </ProgressBar>
+                            </OverlayTrigger>
+                          </td>
+                          <td>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              overlay={<Tooltip id="tooltip-top">Closes on {endTime}</Tooltip>}
+                            >
+                              <span>
+                                {proposal.status.charAt(0) + proposal.status.slice(1).toLowerCase()}
+                                {proposal.status === "PENDING" && <span> ⏰</span>}
+                              </span>
+                            </OverlayTrigger>
+                          </td>
+                          <td>
+                            <Button
+                              variant="primary"
+                              className="neon-highlight"
+                              onClick={() => {
+                                clickVote(
+                                  proposal.description,
+                                  forVotes,
+                                  againstVotes,
+                                  proposal.status,
+                                  proposal.signatures,
+                                  proposal.calldatas.toString(),
+                                  endTime,
+                                  proposal.id
+                                );
+                              }}
+                            >
+                              Vote
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                      return row;
+                    })}
                     <tr>
                       <td>1</td>
                       <td>Raise DAI Vault Fee</td>
@@ -369,12 +537,24 @@ const Governance = () => {
         onHide={() => setDelegateShow(false)}
         refresh={() => refresh()}
       />
-      <NewProposal show={newProposalShow} onHide={() => setNewProposalShow(false)} />
+      <NewProposal
+        show={newProposalShow}
+        onHide={() => setNewProposalShow(false)}
+        refresh={() => refresh()}
+      />
       <Vote
         show={voteShow}
         onHide={() => {
           setVoteShow(false);
         }}
+        description={voteDescription}
+        forVote={voteFor}
+        against={voteAgainst}
+        status={voteStatus}
+        signatures={voteSignatures}
+        calldatas={voteCalldatas}
+        endTime={voteEndTime}
+        proposalId={voteId}
       />
     </div>
   );
