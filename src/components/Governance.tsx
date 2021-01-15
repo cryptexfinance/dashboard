@@ -43,33 +43,16 @@ const Governance = () => {
 
   // Vote Modal
   const [voteShow, setVoteShow] = useState(false);
-  const [voteDescription, setVoteDescription] = useState("");
+  const [voteProposal, setVoteProposal] = useState<any>();
   const [voteFor, setVoteFor] = useState(0);
   const [voteAgainst, setVoteAgainst] = useState(0);
-  const [voteStatus, setVoteStatus] = useState("");
-  const [voteSignatures, setVoteSignatures] = useState("");
-  const [voteCalldatas, setVoteCalldatas] = useState("");
   const [voteEndTime, setVoteEndTime] = useState("");
-  const [voteId, setVoteId] = useState("");
 
-  function clickVote(
-    description: string,
-    forVote: number,
-    against: number,
-    status: string,
-    signatures: string,
-    calldatas: string,
-    endTime: string,
-    id: string
-  ) {
-    setVoteDescription(description);
+  function clickVote(proposal: any, forVote: number, against: number, endTime: string) {
+    setVoteProposal(proposal);
     setVoteFor(forVote);
     setVoteAgainst(against);
-    setVoteStatus(status);
-    setVoteSignatures(signatures);
-    setVoteCalldatas(calldatas);
     setVoteEndTime(endTime);
-    setVoteId(id);
     setVoteShow(true);
   }
 
@@ -343,21 +326,23 @@ const Governance = () => {
                       let againstVotes = 0;
                       proposal.votes.map((vote: any) => {
                         if (vote.support) {
-                          forVotes += vote.votes;
+                          forVotes += parseInt(vote.votes);
                         } else {
-                          againstVotes += vote.votes;
+                          againstVotes += parseInt(vote.votes);
                         }
                         return true;
                       });
                       const denominator = forVotes + againstVotes;
-                      const forRate = denominator !== 0 ? forVotes / denominator : 0;
-                      const againstRate = denominator !== 0 ? againstVotes / denominator : 0;
-                      const animated = proposal.status === "PENDING";
+                      const forRate = denominator !== 0 ? (forVotes / denominator) * 100 : 0;
+                      const againstRate =
+                        denominator !== 0 ? (againstVotes / denominator) * 100 : 0;
+                      const animated =
+                        proposal.status === "PENDING" || proposal.status === "ACTIVE";
                       const timeBlock = proposal.endBlock - currentBlock;
                       console.log(timeBlock);
                       const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
                       const endTime = new Date(endTimeMili).toDateString();
-                      // TODO: Construct vote button to send parameters to modal
+
                       const row = (
                         <tr key={i}>
                           <td>{proposal.id}</td>
@@ -375,8 +360,8 @@ const Governance = () => {
                               placement="top"
                               overlay={
                                 <Tooltip id="tooltip-top">
-                                  👍: {forVotes}
-                                  <br /> 👎: {againstVotes}
+                                  👍: {forVotes.toLocaleString()}
+                                  <br /> 👎: {againstVotes.toLocaleString()}
                                 </Tooltip>
                               }
                             >
@@ -413,16 +398,7 @@ const Governance = () => {
                               variant="primary"
                               className="neon-highlight"
                               onClick={() => {
-                                clickVote(
-                                  proposal.description,
-                                  forVotes,
-                                  againstVotes,
-                                  proposal.status,
-                                  proposal.signatures,
-                                  proposal.calldatas.toString(),
-                                  endTime,
-                                  proposal.id
-                                );
+                                clickVote(proposal, forVotes, againstVotes, endTime);
                               }}
                             >
                               Vote
@@ -432,99 +408,6 @@ const Governance = () => {
                       );
                       return row;
                     })}
-                    <tr>
-                      <td>1</td>
-                      <td>Raise DAI Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar animated variant="highlight" now={40} key={1} />
-                            <ProgressBar animated variant="warning" now={60} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Active</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>Raise WBTC Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar variant="primary" now={30} key={1} />
-                            <ProgressBar variant="warning" now={70} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Defeated</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Raise ETH Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar variant="primary" now={60} key={1} />
-                            <ProgressBar variant="warning" now={40} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Executed</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
                   </tbody>
                 </Table>
               </Row>
@@ -547,14 +430,10 @@ const Governance = () => {
         onHide={() => {
           setVoteShow(false);
         }}
-        description={voteDescription}
+        proposal={voteProposal}
         forVote={voteFor}
         against={voteAgainst}
-        status={voteStatus}
-        signatures={voteSignatures}
-        calldatas={voteCalldatas}
         endTime={voteEndTime}
-        proposalId={voteId}
       />
     </div>
   );

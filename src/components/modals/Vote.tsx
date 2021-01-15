@@ -1,47 +1,53 @@
-import React from "react";
+import React, { useContext } from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import ethers from "ethers";
+import governanceContext from "../../state/GovernanceContext";
 import "../../styles/modal.scss";
+import { errorNotification, notifyUser } from "../../utils/utils";
 
 type props = {
   show: boolean;
   onHide: () => void;
-  description: string;
+  proposal: any;
   forVote: number;
   against: number;
-  status: string;
-  signatures: string;
-  calldatas: string;
   endTime: string;
-  proposalId: string;
 };
 
-export const Vote = ({
-  show,
-  onHide,
-  description,
-  forVote,
-  against,
-  status,
-  signatures,
-  calldatas,
-  endTime,
-  proposalId,
-}: props) => {
-  const denominator = forVote + against;
-  const forRate = denominator !== 0 ? forVote / denominator : 0;
-  const againstRate = denominator !== 0 ? against / denominator : 0;
-  const animated = status === "PENDING";
-  if (calldatas !== "") {
-    const abi = new ethers.utils.AbiCoder();
-    const decodedCalldata = abi.decode(["address", "uint256"], calldatas);
-    console.log("🚀 ~ file: Vote.tsx ~ line 41 ~ decodedCalldata", decodedCalldata);
+export const Vote = ({ show, onHide, proposal, forVote, against, endTime }: props) => {
+  const governance = useContext(governanceContext);
+  if (!proposal) {
+    return <></>;
   }
-  // TODO: show the data
+
+  const denominator = forVote + against;
+  const forRate = denominator !== 0 ? (forVote / denominator) * 100 : 0;
+  const againstRate = denominator !== 0 ? (against / denominator) * 100 : 0;
+  const animated = proposal.status === "PENDING";
+
+  const abi = new ethers.utils.AbiCoder();
+
+  const clickVote = async (support: Boolean) => {
+    if (governance.governorAlpha) {
+      try {
+        const tx = await governance.governorAlpha.castVote(proposal.id, support);
+        notifyUser(tx);
+        onHide();
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          onHide();
+          errorNotification("Voter already voted");
+        }
+      }
+    }
+  };
+
   return (
     <Modal
       show={show}
@@ -51,13 +57,55 @@ export const Vote = ({
       onHide={onHide}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">{description}</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{proposal.description}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>
-          Calling: <b>{signatures}</b>
+          Targets:{" "}
+          {proposal.targets.map((target: string, i: number) => {
+            let targetDescription = target;
+            if (target === "0x5f671e22bb8eff4c37b1acde466c544bd87bad56") {
+              targetDescription = "Orchestrator";
+            }
+            if (i === 0) {
+              return (
+                <b key={i}>
+                  <a href={`https://rinkeby.etherscan.io/address/${target}`}>{targetDescription}</a>
+                </b>
+              );
+            }
+
+            return (
+              <b key={i}>
+                , <a href={`https://rinkeby.etherscan.io/address/${target}`}>{targetDescription}</a>
+              </b>
+            );
+          })}
           <br />
-          Values: <b>{calldatas}</b>
+          Actions:{" "}
+          {proposal.signatures.map((signature: string, i: number) => {
+            if (i === 0) {
+              return <b key={i}>{signature}</b>;
+            }
+            return (
+              <>
+                , <b key={i}>{signature},</b>
+              </>
+            );
+          })}
+          <br />
+          Values:{" "}
+          {proposal.calldatas.map((calldata: string, i: number) => {
+            const decodedCalldata = abi.decode(["address", "uint256"], calldata);
+            if (i === 0) {
+              return <b key={i}>[{decodedCalldata.toString()}]</b>;
+            }
+            return (
+              <>
+                , <b key={i}>[{decodedCalldata.toString()}]</b>
+              </>
+            );
+          })}
           <br />
           Voting Close: <b>{endTime}</b>
         </p>
@@ -69,14 +117,14 @@ export const Vote = ({
               now={forRate}
               key={1}
               animated={animated}
-              label={`For 👍: ${forVote}`}
+              label={`For 👍: ${forVote.toLocaleString()}`}
             />
             <ProgressBar
               variant="warning"
               now={againstRate}
               key={2}
               animated={animated}
-              label={`Against 👎: ${against}"`}
+              label={`Against 👎: ${against.toLocaleString()}"`}
             />
           </ProgressBar>
         ) : (
@@ -85,12 +133,24 @@ export const Vote = ({
 
         <Row className="mt-4">
           <Col>
-            <Button variant="primary" className="neon-highlight">
+            <Button
+              variant="primary"
+              className="neon-highlight"
+              onClick={() => {
+                clickVote(true);
+              }}
+            >
               For
             </Button>
           </Col>
           <Col>
-            <Button variant="warning" className="neon-orange">
+            <Button
+              variant="warning"
+              className="neon-orange"
+              onClick={() => {
+                clickVote(false);
+              }}
+            >
               Against
             </Button>
           </Col>
