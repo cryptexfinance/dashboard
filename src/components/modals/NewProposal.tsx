@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
-import InputGroup from "react-bootstrap/esm/InputGroup";
 import ethers from "ethers";
 import governanceContext from "../../state/GovernanceContext";
 import "../../styles/modal.scss";
@@ -16,11 +15,25 @@ type props = {
 
 export const NewProposal = ({ show, onHide, refresh }: props) => {
   const governance = useContext(governanceContext);
-
   const [description, setDescription] = useState("");
+  const [target, setTarget] = useState("");
+  const [signature, setSignature] = useState("");
+  const [values, setValues] = useState("");
 
   const onChangeDescription = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
+  };
+
+  const onChangeTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTarget(event.target.value);
+  };
+
+  const onChangeSignature = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSignature(event.target.value);
+  };
+
+  const onChangeValues = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValues(event.target.value);
   };
 
   const createProposal = async (event: React.MouseEvent) => {
@@ -28,10 +41,11 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
     if (governance.governorAlpha) {
       if (description !== "") {
         try {
-          const targets = ["0x5F671E22bb8EFf4C37b1acDe466c544bd87BaD56"];
-          const values = ["0"];
-          const signatures = ["setRatio(address, uint256)"];
+          const targets = [target];
+          const msgValues = ["0"];
+          const signatures = [signature];
           const abi = new ethers.utils.AbiCoder();
+          // TODO: fix this
           const calldata = abi.encode(
             ["address", "uint256"],
             ["0x8ad7af3ACec2455f7CC842a1D725c3e51896C13f", "250"]
@@ -39,7 +53,7 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
           const calldatas = [calldata];
           const tx = await governance.governorAlpha.propose(
             targets,
-            values,
+            msgValues,
             signatures,
             calldatas,
             description
@@ -48,8 +62,6 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
           setDescription("");
           onHide();
         } catch (error) {
-          console.log("🚀 ~ file: NewProposal.tsx ~ line 36 ~ createProposal ~ error", error);
-
           if (error.code === 4001) {
             errorNotification("Transaction rejected");
           } else {
@@ -91,14 +103,46 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
             />
           </Form.Group>
           <Form.Group>
+            <Form.Label>Target Contract</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="0x5F671E22bb8EFf4C37b1acDe466c544bd87BaD56"
+              className="neon-green"
+              onChange={onChangeTarget}
+              value={target}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Function to Call</Form.Label>
+            <Form.Control
+              type="text"
+              className="neon-green"
+              placeholder="setRatio(address, uint256)"
+              onChange={onChangeSignature}
+              value={signature}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Values</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="0x8ad7af3ACec2455f7CC842a1D725c3e51896C13f,250"
+              className="neon-green"
+              onChange={onChangeValues}
+              value={values}
+            />
+          </Form.Group>
+          {/* <Form.Group>
             <Form.Label>Add Action</Form.Label>
             <InputGroup>
               <Form.Control type="text" placeholder="" className="neon-green" />
               <InputGroup.Append>
-                <Button className="neon-green">+</Button>
+                <Button variant="success" className="neon-green">
+                  +
+                </Button>
               </InputGroup.Append>
             </InputGroup>
-          </Form.Group>
+          </Form.Group> */}
         </Form>
       </Modal.Body>
       <Modal.Footer>
