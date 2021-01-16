@@ -58,7 +58,7 @@ const Governance = () => {
 
   const PROPOSALS = gql`
     query {
-      proposals {
+      proposals(orderBy: id, orderDirection: desc) {
         id
         proposer {
           id
@@ -339,7 +339,6 @@ const Governance = () => {
                       const animated =
                         proposal.status === "PENDING" || proposal.status === "ACTIVE";
                       const timeBlock = proposal.endBlock - currentBlock;
-                      console.log(timeBlock);
                       const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
                       const endTime = new Date(endTimeMili).toDateString();
 
@@ -389,7 +388,8 @@ const Governance = () => {
                             >
                               <span>
                                 {proposal.status.charAt(0) + proposal.status.slice(1).toLowerCase()}
-                                {proposal.status === "PENDING" && <span> ⏰</span>}
+                                {(proposal.status === "PENDING" ||
+                                  proposal.status === "ACTIVE") && <span> ⏰</span>}
                               </span>
                             </OverlayTrigger>
                           </td>

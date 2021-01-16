@@ -82,7 +82,6 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
-    console.log(error);
   }
 };
 

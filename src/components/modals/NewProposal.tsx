@@ -46,10 +46,11 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
           const signatures = [signature];
           const abi = new ethers.utils.AbiCoder();
           // TODO: fix this
-          const calldata = abi.encode(
-            ["address", "uint256"],
-            ["0x8ad7af3ACec2455f7CC842a1D725c3e51896C13f", "250"]
-          );
+          const start = signature.indexOf("(") + 1;
+          const end = signature.indexOf(")");
+          const types = signature.substring(start, end).split(",");
+          const valuesArray = values.split(",");
+          const calldata = abi.encode(types, valuesArray);
           const calldatas = [calldata];
           const tx = await governance.governorAlpha.propose(
             targets,
