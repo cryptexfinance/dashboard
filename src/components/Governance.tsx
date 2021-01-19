@@ -71,7 +71,7 @@ const Governance = () => {
         description
         startBlock
         endBlock
-
+        eta
         votes {
           id
           support
@@ -339,6 +339,8 @@ const Governance = () => {
                       const animated =
                         proposal.status === "PENDING" || proposal.status === "ACTIVE";
                       const timeBlock = proposal.endBlock - currentBlock;
+                      console.log(proposal.eta);
+                      // TODO: depending on number the proposal is active, pending, Succeeded or Defeated, Expired. This is not saved on the graph so needs to be calculated here
                       const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
                       const endTime = new Date(endTimeMili).toDateString();
 
