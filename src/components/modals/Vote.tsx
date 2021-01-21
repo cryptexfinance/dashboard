@@ -16,9 +16,10 @@ type props = {
   forVote: number;
   against: number;
   endTime: string;
+  status: string;
 };
 
-export const Vote = ({ show, onHide, proposal, forVote, against, endTime }: props) => {
+export const Vote = ({ show, onHide, proposal, forVote, against, endTime, status }: props) => {
   const governance = useContext(governanceContext);
   if (!proposal) {
     return <></>;
@@ -27,7 +28,7 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime }: prop
   const denominator = forVote + against;
   const forRate = denominator !== 0 ? (forVote / denominator) * 100 : 0;
   const againstRate = denominator !== 0 ? (against / denominator) * 100 : 0;
-  const animated = proposal.status === "PENDING";
+  const animated = status === "PENDING";
 
   const abi = new ethers.utils.AbiCoder();
 
@@ -60,55 +61,66 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime }: prop
         <Modal.Title id="contained-modal-title-vcenter">{proposal.description}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>
-          Targets:{" "}
-          {proposal.targets.map((target: string, i: number) => {
-            let targetDescription = target;
-            if (target === "0x5f671e22bb8eff4c37b1acde466c544bd87bad56") {
-              targetDescription = "Orchestrator";
-            }
-            if (i === 0) {
+        <ul>
+          <li>
+            Targets:{" "}
+            {proposal.targets.map((target: string, i: number) => {
+              let targetDescription = target;
+              if (target === "0x5f671e22bb8eff4c37b1acde466c544bd87bad56") {
+                targetDescription = "Orchestrator";
+              }
+              if (i === 0) {
+                return (
+                  <b key={i}>
+                    <a href={`https://rinkeby.etherscan.io/address/${target}`}>
+                      {targetDescription}
+                    </a>
+                  </b>
+                );
+              }
+
               return (
                 <b key={i}>
+                  ,{" "}
                   <a href={`https://rinkeby.etherscan.io/address/${target}`}>{targetDescription}</a>
                 </b>
               );
-            }
-
-            return (
-              <b key={i}>
-                , <a href={`https://rinkeby.etherscan.io/address/${target}`}>{targetDescription}</a>
-              </b>
-            );
-          })}
-          <br />
-          Actions:{" "}
-          {proposal.signatures.map((signature: string, i: number) => {
-            if (i === 0) {
-              return <b key={i}>{signature}</b>;
-            }
-            return (
-              <>
-                , <b key={i}>{signature},</b>
-              </>
-            );
-          })}
-          <br />
-          Values:{" "}
-          {proposal.calldatas.map((calldata: string, i: number) => {
-            const decodedCalldata = abi.decode(["address", "uint256"], calldata);
-            if (i === 0) {
-              return <b key={i}>[{decodedCalldata.toString()}]</b>;
-            }
-            return (
-              <>
-                , <b key={i}>[{decodedCalldata.toString()}]</b>
-              </>
-            );
-          })}
-          <br />
-          Voting Close: <b>{endTime}</b>
-        </p>
+            })}
+          </li>
+          <li>
+            Actions:{" "}
+            {proposal.signatures.map((signature: string, i: number) => {
+              if (i === 0) {
+                return <b key={i}>{signature}</b>;
+              }
+              return (
+                <>
+                  , <b key={i}>{signature},</b>
+                </>
+              );
+            })}
+          </li>
+          <li>
+            Values:{" "}
+            {proposal.calldatas.map((calldata: string, i: number) => {
+              const decodedCalldata = abi.decode(["address", "uint256"], calldata);
+              if (i === 0) {
+                return <b key={i}>[{decodedCalldata.toString()}]</b>;
+              }
+              return (
+                <>
+                  , <b key={i}>[{decodedCalldata.toString()}]</b>
+                </>
+              );
+            })}
+          </li>
+          <li>
+            Voting Ends: <b>{endTime}</b>
+          </li>
+          <li>
+            Status: <b>{status.charAt(0) + status.slice(1).toLowerCase()}</b>
+          </li>
+        </ul>
 
         {denominator !== 0 ? (
           <ProgressBar>
@@ -130,30 +142,45 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime }: prop
         ) : (
           <h5>No votes yet!</h5>
         )}
-
         <Row className="mt-4">
-          <Col>
-            <Button
-              variant="primary"
-              className="neon-highlight"
-              onClick={() => {
-                clickVote(true);
-              }}
-            >
-              For
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              variant="warning"
-              className="neon-orange"
-              onClick={() => {
-                clickVote(false);
-              }}
-            >
-              Against
-            </Button>
-          </Col>
+          {status !== "ACTIVE" ? (
+            <Col>
+              <Button
+                variant="primary"
+                className="neon-highlight"
+                onClick={() => {
+                  onHide();
+                }}
+              >
+                Close
+              </Button>
+            </Col>
+          ) : (
+            <>
+              <Col>
+                <Button
+                  variant="primary"
+                  className="neon-highlight"
+                  onClick={() => {
+                    clickVote(true);
+                  }}
+                >
+                  For
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  variant="warning"
+                  className="neon-orange"
+                  onClick={() => {
+                    clickVote(false);
+                  }}
+                >
+                  Against
+                </Button>
+              </Col>
+            </>
+          )}
         </Row>
       </Modal.Body>
     </Modal>

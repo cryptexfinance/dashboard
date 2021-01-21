@@ -46,6 +46,13 @@
     color: $white;
     opacity: 1;
   }
+  ul {
+    list-style-type: none;
+    padding: 0;
+    li {
+      color: $light;
+    }
+  }
   form {
     // padding: 2rem 2rem 0rem 2rem;
     margin-top: 1rem;

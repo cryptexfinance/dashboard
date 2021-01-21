@@ -116,3 +116,31 @@ export const getMaxMint = async (
   const maxMint = (c * cp * 100) / (r * tp);
   return maxMint - d;
 };
+
+export const getProposalStatus = (
+  startBlock: number,
+  endBlock: number,
+  currentBlock: number,
+  forVotes: number,
+  againstVotes: number,
+  quorumVotes: number,
+  eta: number,
+  gracePeriod: number
+) => {
+  if (currentBlock <= startBlock) {
+    return "PENDING";
+  }
+  if (currentBlock <= endBlock) {
+    return "ACTIVE";
+  }
+  if (forVotes <= againstVotes || forVotes < quorumVotes) {
+    return "DEFEATED";
+  }
+  if (eta === 0) {
+    return "SUCCEEDED";
+  }
+  if (currentBlock >= eta + gracePeriod) {
+    return "EXPIRED";
+  }
+  return "QUEUED";
+};

@@ -15,7 +15,7 @@ import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress } from "../utils/utils";
+import { makeShortAddress, getProposalStatus, notifyUser, errorNotification } from "../utils/utils";
 import "../styles/governance.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import Loading from "./Loading";
@@ -38,8 +38,10 @@ const Governance = () => {
   const [newProposalShow, setNewProposalShow] = useState(false);
   const [delegateShow, setDelegateShow] = useState(false);
   const [proposerThreshold, setProposerThreshold] = useState("0");
+  const [quorumVotes, setQuorumVotes] = useState("0");
   const [currentBlock, setCurrentBlock] = useState(0);
   const [currentTimestamp, setCurrentTimestamp] = useState(0);
+  const [gracePeriod, setGracePeriod] = useState(0);
 
   // Vote Modal
   const [voteShow, setVoteShow] = useState(false);
@@ -47,12 +49,20 @@ const Governance = () => {
   const [voteFor, setVoteFor] = useState(0);
   const [voteAgainst, setVoteAgainst] = useState(0);
   const [voteEndTime, setVoteEndTime] = useState("");
+  const [voteStatus, setVoteStatus] = useState("");
 
-  function clickVote(proposal: any, forVote: number, against: number, endTime: string) {
+  function clickVote(
+    proposal: any,
+    forVote: number,
+    against: number,
+    endTime: string,
+    status: string
+  ) {
     setVoteProposal(proposal);
     setVoteFor(forVote);
     setVoteAgainst(against);
     setVoteEndTime(endTime);
+    setVoteStatus(status);
     setVoteShow(true);
   }
 
@@ -71,7 +81,7 @@ const Governance = () => {
         description
         startBlock
         endBlock
-        eta
+        executionETA
         votes {
           id
           support
@@ -112,9 +122,11 @@ const Governance = () => {
         tokens.tcapToken &&
         oracles.tcapOracle &&
         governance.ctxToken &&
-        governance.governorAlpha
+        governance.governorAlpha &&
+        governance.timelock
       ) {
         const currentAddress = await signer.signer.getAddress();
+
         const delegateAddress = await governance.ctxToken.delegates(currentAddress);
         if (delegateAddress === ethers.constants.AddressZero) {
           setNoDelegate(true);
@@ -129,6 +141,10 @@ const Governance = () => {
         setCurrentVotes(ethers.utils.formatEther(votes));
         const currentThreshold = await governance.governorAlpha.proposalThreshold();
         setProposerThreshold(ethers.utils.formatEther(currentThreshold));
+        const currentQuorum = await governance.governorAlpha.quorumVotes();
+        setQuorumVotes(ethers.utils.formatEther(currentQuorum));
+        const currentGrace = await governance.timelock.GRACE_PERIOD();
+        setGracePeriod(currentGrace);
       }
       if (data) {
         const currentProposals: any[] = [];
@@ -151,7 +167,20 @@ const Governance = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [currentVotes, data, isLoading, address]);
+  }, [data]);
+
+  async function queueTransaction(id: number) {
+    if (governance.governorAlpha) {
+      try {
+        const tx = await governance.governorAlpha.queue(id);
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
+    }
+  }
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
@@ -181,7 +210,7 @@ const Governance = () => {
               <CtxIcon className="ctx-neon" />
               <NumberFormat
                 className="number"
-                value="400,000"
+                value={quorumVotes}
                 displayType="text"
                 thousandSeparator
                 prefix=""
@@ -324,35 +353,58 @@ const Governance = () => {
                     {proposals.map((proposal, i) => {
                       let forVotes = 0;
                       let againstVotes = 0;
-                      proposal.votes.map((vote: any) => {
+                      let {
+                        id,
+                        description,
+                        status,
+                        executionETA,
+                        startBlock,
+                        endBlock,
+                        votes,
+                        proposer,
+                      } = proposal;
+                      votes.forEach((vote: any) => {
                         if (vote.support) {
                           forVotes += parseInt(vote.votes);
                         } else {
                           againstVotes += parseInt(vote.votes);
                         }
-                        return true;
                       });
+
                       const denominator = forVotes + againstVotes;
                       const forRate = denominator !== 0 ? (forVotes / denominator) * 100 : 0;
                       const againstRate =
                         denominator !== 0 ? (againstVotes / denominator) * 100 : 0;
-                      const animated =
-                        proposal.status === "PENDING" || proposal.status === "ACTIVE";
-                      const timeBlock = proposal.endBlock - currentBlock;
-                      console.log(proposal.eta);
-                      // TODO: depending on number the proposal is active, pending, Succeeded or Defeated, Expired. This is not saved on the graph so needs to be calculated here
-                      const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
-                      const endTime = new Date(endTimeMili).toDateString();
 
+                      const timeBlock = endBlock - currentBlock;
+                      const eta = executionETA || 0;
+                      const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
+                      let endTime = new Date(endTimeMili).toDateString();
+                      if (status !== "EXECUTED") {
+                        status = getProposalStatus(
+                          startBlock,
+                          endBlock,
+                          currentBlock,
+                          forVotes,
+                          againstVotes,
+                          parseInt(quorumVotes),
+                          eta,
+                          gracePeriod
+                        );
+                      }
+
+                      if (eta !== 0) {
+                        endTime = new Date(eta * 1000).toDateString();
+                      }
+
+                      const animated = status === "PENDING" || status === "ACTIVE";
                       const row = (
                         <tr key={i}>
-                          <td>{proposal.id}</td>
-                          <td>{proposal.description}</td>
+                          <td>{id}</td>
+                          <td>{description}</td>
                           <td>
-                            <a
-                              href={`https://rinkeby.etherscan.io/address/${proposal.proposer.id}`}
-                            >
-                              {makeShortAddress(proposal.proposer.id)}
+                            <a href={`https://rinkeby.etherscan.io/address/${proposer.id}`}>
+                              {makeShortAddress(proposer.id)}
                             </a>
                           </td>
                           <td>
@@ -389,22 +441,35 @@ const Governance = () => {
                               overlay={<Tooltip id="tooltip-top">Closes on {endTime}</Tooltip>}
                             >
                               <span>
-                                {proposal.status.charAt(0) + proposal.status.slice(1).toLowerCase()}
-                                {(proposal.status === "PENDING" ||
-                                  proposal.status === "ACTIVE") && <span> ⏰</span>}
+                                {status.charAt(0) + status.slice(1).toLowerCase()}
+                                {(status === "PENDING" ||
+                                  status === "ACTIVE" ||
+                                  status === "QUEUED") && <span> ⏰</span>}
                               </span>
                             </OverlayTrigger>
                           </td>
                           <td>
-                            <Button
-                              variant="primary"
-                              className="neon-highlight"
-                              onClick={() => {
-                                clickVote(proposal, forVotes, againstVotes, endTime);
-                              }}
-                            >
-                              Vote
-                            </Button>
+                            {status === "SUCCEEDED" ? (
+                              <Button
+                                variant="primary"
+                                className="neon-highlight"
+                                onClick={() => {
+                                  queueTransaction(id);
+                                }}
+                              >
+                                Queue
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                className="neon-highlight"
+                                onClick={() => {
+                                  clickVote(proposal, forVotes, againstVotes, endTime, status);
+                                }}
+                              >
+                                {status === "ACTIVE" ? <>Vote</> : <>Details</>}
+                              </Button>
+                            )}
                           </td>
                         </tr>
                       );
@@ -436,6 +501,7 @@ const Governance = () => {
         forVote={voteFor}
         against={voteAgainst}
         endTime={voteEndTime}
+        status={voteStatus}
       />
     </div>
   );

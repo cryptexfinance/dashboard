@@ -45,7 +45,6 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
           const msgValues = ["0"];
           const signatures = [signature];
           const abi = new ethers.utils.AbiCoder();
-          // TODO: fix this
           const start = signature.indexOf("(") + 1;
           const end = signature.indexOf(")");
           const types = signature.substring(start, end).split(",");
@@ -89,7 +88,7 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
       </Modal.Header>
       <Modal.Body>
         <p>
-          Create a new proposla with a maximun of 10 actions. You need a total of 100,000 CTX
+          Create a new proposal with a maximun of 10 actions. You need a total of 100,000 CTX
           delegated to your address in order to create a new proposal
         </p>
         <Form>
@@ -133,17 +132,6 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
               value={values}
             />
           </Form.Group>
-          {/* <Form.Group>
-            <Form.Label>Add Action</Form.Label>
-            <InputGroup>
-              <Form.Control type="text" placeholder="" className="neon-green" />
-              <InputGroup.Append>
-                <Button variant="success" className="neon-green">
-                  +
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
-          </Form.Group> */}
         </Form>
       </Modal.Body>
       <Modal.Footer>
