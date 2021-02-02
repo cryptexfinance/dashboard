@@ -15,7 +15,7 @@ import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress } from "../utils/utils";
+import { makeShortAddress, getProposalStatus, notifyUser, errorNotification } from "../utils/utils";
 import "../styles/governance.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import Loading from "./Loading";
@@ -34,19 +34,64 @@ const Governance = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const [noDelegate, setNoDelegate] = useState(false);
+  const [proposals, setProposals] = useState<any[]>([]);
+  const [newProposalShow, setNewProposalShow] = useState(false);
+  const [delegateShow, setDelegateShow] = useState(false);
+  const [proposerThreshold, setProposerThreshold] = useState("0");
+  const [quorumVotes, setQuorumVotes] = useState("0");
+  const [currentBlock, setCurrentBlock] = useState(0);
+  const [currentTimestamp, setCurrentTimestamp] = useState(0);
+  const [gracePeriod, setGracePeriod] = useState(0);
 
-  const TCAP_PRICE = gql`
+  // Vote Modal
+  const [voteShow, setVoteShow] = useState(false);
+  const [voteProposal, setVoteProposal] = useState<any>();
+  const [voteFor, setVoteFor] = useState(0);
+  const [voteAgainst, setVoteAgainst] = useState(0);
+  const [voteEndTime, setVoteEndTime] = useState("");
+  const [voteStatus, setVoteStatus] = useState("");
+
+  function clickVote(
+    proposal: any,
+    forVote: number,
+    against: number,
+    endTime: string,
+    status: string
+  ) {
+    setVoteProposal(proposal);
+    setVoteFor(forVote);
+    setVoteAgainst(against);
+    setVoteEndTime(endTime);
+    setVoteStatus(status);
+    setVoteShow(true);
+  }
+
+  const PROPOSALS = gql`
     query {
-      oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
-        answer
+      proposals(orderBy: id, orderDirection: desc) {
+        id
+        proposer {
+          id
+        }
+        targets
+        values
+        signatures
+        calldatas
+        status
+        description
+        startBlock
+        endBlock
+        executionETA
+        votes {
+          id
+          support
+          votes
+        }
       }
     }
   `;
 
-  const { data } = useQuery(TCAP_PRICE);
-  const [newProposalShow, setNewProposalShow] = useState(false);
-  const [delegateShow, setDelegateShow] = useState(false);
-  const [voteShow, setVoteShow] = useState(false);
+  const { data } = useQuery(PROPOSALS);
 
   const refresh = async () => {
     try {
@@ -72,8 +117,16 @@ const Governance = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
+      if (
+        signer.signer &&
+        tokens.tcapToken &&
+        oracles.tcapOracle &&
+        governance.ctxToken &&
+        governance.governorAlpha &&
+        governance.timelock
+      ) {
         const currentAddress = await signer.signer.getAddress();
+
         const delegateAddress = await governance.ctxToken.delegates(currentAddress);
         if (delegateAddress === ethers.constants.AddressZero) {
           setNoDelegate(true);
@@ -86,15 +139,61 @@ const Governance = () => {
         setCtxBalance(tcapString);
         const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
         setCurrentVotes(ethers.utils.formatEther(votes));
+        const currentThreshold = await governance.governorAlpha.proposalThreshold();
+        setProposerThreshold(ethers.utils.formatEther(currentThreshold));
+        const currentQuorum = await governance.governorAlpha.quorumVotes();
+        setQuorumVotes(ethers.utils.formatEther(currentQuorum));
+        const currentGrace = await governance.timelock.GRACE_PERIOD();
+        setGracePeriod(currentGrace);
       }
       if (data) {
+        const currentProposals: any[] = [];
+        await data.proposals.forEach((p: any) => {
+          currentProposals.push(p);
+        });
+        setProposals(currentProposals);
+        const network = "rinkeby";
+        const provider = ethers.getDefaultProvider(network, {
+          infura: process.env.REACT_APP_INFURA_ID,
+          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+        });
+        const block = await provider.getBlockNumber();
+        setCurrentBlock(block);
+        const timestamp = Date.now();
+        setCurrentTimestamp(timestamp);
         setIsLoading(false);
       }
     };
 
     loadAddress();
     // eslint-disable-next-line
-  }, [currentVotes, data, isLoading, address]);
+  }, [data]);
+
+  async function queueTransaction(id: number) {
+    if (governance.governorAlpha) {
+      try {
+        const tx = await governance.governorAlpha.queue(id);
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
+    }
+  }
+
+  async function executeTransaction(id: number) {
+    if (governance.governorAlpha) {
+      try {
+        const tx = await governance.governorAlpha.execute(id);
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
+    }
+  }
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
@@ -124,7 +223,7 @@ const Governance = () => {
               <CtxIcon className="ctx-neon" />
               <NumberFormat
                 className="number"
-                value="400,000"
+                value={quorumVotes}
                 displayType="text"
                 thousandSeparator
                 prefix=""
@@ -138,10 +237,10 @@ const Governance = () => {
               <CtxIcon className="ctx-neon" />
               <NumberFormat
                 className="number"
-                value="100,000"
+                value={proposerThreshold}
                 displayType="text"
                 thousandSeparator
-                decimalScale={2}
+                decimalScale={0}
               />
             </h2>
             <p>Proposal Threshold</p>
@@ -264,99 +363,156 @@ const Governance = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>Raise DAI Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar animated variant="highlight" now={40} key={1} />
-                            <ProgressBar animated variant="warning" now={60} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Active</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>Raise WBTC Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar variant="primary" now={30} key={1} />
-                            <ProgressBar variant="warning" now={70} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Defeated</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Raise ETH Vault Fee</td>
-                      <td>0x1234...1234</td>
-                      <td>
-                        <OverlayTrigger
-                          key="top"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-top">
-                              👍: 41,000 <br /> 👎: 61,000
-                            </Tooltip>
-                          }
-                        >
-                          <ProgressBar>
-                            <ProgressBar variant="primary" now={60} key={1} />
-                            <ProgressBar variant="warning" now={40} key={2} />
-                          </ProgressBar>
-                        </OverlayTrigger>
-                      </td>
-                      <td>Executed</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="neon-highlight"
-                          onClick={() => setVoteShow(true)}
-                        >
-                          Vote
-                        </Button>
-                      </td>
-                    </tr>
+                    {proposals.map((proposal, i) => {
+                      let forVotes = 0;
+                      let againstVotes = 0;
+                      let {
+                        id,
+                        description,
+                        status,
+                        executionETA,
+                        startBlock,
+                        endBlock,
+                        votes,
+                        proposer,
+                      } = proposal;
+                      votes.forEach((vote: any) => {
+                        if (vote.support) {
+                          forVotes += parseInt(vote.votes);
+                        } else {
+                          againstVotes += parseInt(vote.votes);
+                        }
+                      });
+
+                      const denominator = forVotes + againstVotes;
+                      const forRate = denominator !== 0 ? (forVotes / denominator) * 100 : 0;
+                      const againstRate =
+                        denominator !== 0 ? (againstVotes / denominator) * 100 : 0;
+
+                      const timeBlock = endBlock - currentBlock;
+                      const eta = executionETA || 0;
+                      const endTimeMili = currentTimestamp + timeBlock * 13 * 1000;
+                      let endTime = new Date(endTimeMili).toDateString();
+                      if (status !== "EXECUTED") {
+                        status = getProposalStatus(
+                          startBlock,
+                          endBlock,
+                          currentBlock,
+                          forVotes,
+                          againstVotes,
+                          parseInt(quorumVotes),
+                          eta,
+                          gracePeriod
+                        );
+                      }
+
+                      if (eta !== 0) {
+                        endTime = new Date(eta * 1000).toDateString();
+                      }
+
+                      const animated = status === "PENDING" || status === "ACTIVE";
+                      const row = (
+                        <tr key={i}>
+                          <td>{id}</td>
+                          <td>{description}</td>
+                          <td>
+                            <a href={`https://rinkeby.etherscan.io/address/${proposer.id}`}>
+                              {makeShortAddress(proposer.id)}
+                            </a>
+                          </td>
+                          <td>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              overlay={
+                                <Tooltip id="tooltip-top">
+                                  👍: {forVotes.toLocaleString()}
+                                  <br /> 👎: {againstVotes.toLocaleString()}
+                                </Tooltip>
+                              }
+                            >
+                              <ProgressBar>
+                                <ProgressBar
+                                  animated={animated}
+                                  variant="highlight"
+                                  now={forRate}
+                                  key={1}
+                                />
+                                <ProgressBar
+                                  animated={animated}
+                                  variant="warning"
+                                  now={againstRate}
+                                  key={2}
+                                />
+                              </ProgressBar>
+                            </OverlayTrigger>
+                          </td>
+                          <td>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              overlay={<Tooltip id="tooltip-top">Closes on {endTime}</Tooltip>}
+                            >
+                              <span>
+                                {status.charAt(0) + status.slice(1).toLowerCase()}
+                                {(status === "PENDING" ||
+                                  status === "ACTIVE" ||
+                                  status === "QUEUED") && <span> ⏰</span>}
+                              </span>
+                            </OverlayTrigger>
+                          </td>
+                          <td>
+                            {(() => {
+                              switch (status) {
+                                case "SUCCEEDED":
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        queueTransaction(id);
+                                      }}
+                                    >
+                                      Queue
+                                    </Button>
+                                  );
+                                case "READY":
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        executeTransaction(id);
+                                      }}
+                                    >
+                                      Execute
+                                    </Button>
+                                  );
+                                default:
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        clickVote(
+                                          proposal,
+                                          forVotes,
+                                          againstVotes,
+                                          endTime,
+                                          status
+                                        );
+                                      }}
+                                    >
+                                      {status === "ACTIVE" ? <>Vote</> : <>Details</>}
+                                    </Button>
+                                  );
+                              }
+                            })()}
+                          </td>
+                        </tr>
+                      );
+                      return row;
+                    })}
                   </tbody>
                 </Table>
               </Row>
@@ -369,12 +525,21 @@ const Governance = () => {
         onHide={() => setDelegateShow(false)}
         refresh={() => refresh()}
       />
-      <NewProposal show={newProposalShow} onHide={() => setNewProposalShow(false)} />
+      <NewProposal
+        show={newProposalShow}
+        onHide={() => setNewProposalShow(false)}
+        refresh={() => refresh()}
+      />
       <Vote
         show={voteShow}
         onHide={() => {
           setVoteShow(false);
         }}
+        proposal={voteProposal}
+        forVote={voteFor}
+        against={voteAgainst}
+        endTime={voteEndTime}
+        status={voteStatus}
       />
     </div>
   );
