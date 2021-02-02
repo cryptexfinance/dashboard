@@ -127,6 +127,7 @@ export const getProposalStatus = (
   eta: number,
   gracePeriod: number
 ) => {
+  const currentBlockTime = currentBlock * 13 * 1000;
   if (currentBlock <= startBlock) {
     return "PENDING";
   }
@@ -139,8 +140,11 @@ export const getProposalStatus = (
   if (eta === 0) {
     return "SUCCEEDED";
   }
-  if (currentBlock >= eta + gracePeriod) {
+  if (currentBlockTime >= eta + gracePeriod) {
     return "EXPIRED";
+  }
+  if (currentBlockTime >= eta) {
+    return "READY";
   }
   return "QUEUED";
 };

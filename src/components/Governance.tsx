@@ -182,6 +182,19 @@ const Governance = () => {
     }
   }
 
+  async function executeTransaction(id: number) {
+    if (governance.governorAlpha) {
+      try {
+        const tx = await governance.governorAlpha.execute(id);
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
+    }
+  }
+
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }
@@ -449,27 +462,52 @@ const Governance = () => {
                             </OverlayTrigger>
                           </td>
                           <td>
-                            {status === "SUCCEEDED" ? (
-                              <Button
-                                variant="primary"
-                                className="neon-highlight"
-                                onClick={() => {
-                                  queueTransaction(id);
-                                }}
-                              >
-                                Queue
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="primary"
-                                className="neon-highlight"
-                                onClick={() => {
-                                  clickVote(proposal, forVotes, againstVotes, endTime, status);
-                                }}
-                              >
-                                {status === "ACTIVE" ? <>Vote</> : <>Details</>}
-                              </Button>
-                            )}
+                            {(() => {
+                              switch (status) {
+                                case "SUCCEEDED":
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        queueTransaction(id);
+                                      }}
+                                    >
+                                      Queue
+                                    </Button>
+                                  );
+                                case "READY":
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        executeTransaction(id);
+                                      }}
+                                    >
+                                      Execute
+                                    </Button>
+                                  );
+                                default:
+                                  return (
+                                    <Button
+                                      variant="primary"
+                                      className="neon-highlight"
+                                      onClick={() => {
+                                        clickVote(
+                                          proposal,
+                                          forVotes,
+                                          againstVotes,
+                                          endTime,
+                                          status
+                                        );
+                                      }}
+                                    >
+                                      {status === "ACTIVE" ? <>Vote</> : <>Details</>}
+                                    </Button>
+                                  );
+                              }
+                            })()}
                           </td>
                         </tr>
                       );
