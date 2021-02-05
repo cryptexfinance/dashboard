@@ -10,6 +10,7 @@ import { ReactComponent as FaucetIcon } from "../assets/images/welcome/faucet.sv
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as GovernanceIcon } from "../assets/images/welcome/governance.svg";
+import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -26,6 +27,9 @@ const Sidebar = () => {
       break;
     case "/faucet":
       activeVal = "faucet";
+      break;
+    case "/farm":
+      activeVal = "farm";
       break;
     case "/governance":
       activeVal = "governance";
@@ -83,6 +87,28 @@ const Sidebar = () => {
             }}
           >
             <VaultIcon />
+          </Link>
+        )}
+      </Nav.Item>
+      <Nav.Item>
+        {active === "farm" ? (
+          <Link
+            to="/farm"
+            className="active"
+            onClick={() => {
+              setActive("farm");
+            }}
+          >
+            <FarmIcon />
+          </Link>
+        ) : (
+          <Link
+            to="/farm"
+            onClick={() => {
+              setActive("farm");
+            }}
+          >
+            <FarmIcon />
           </Link>
         )}
       </Nav.Item>
