@@ -46,6 +46,10 @@ import Timelock from "./contracts/Timelock.json";
 import WETHReward from "./contracts/WETHRewardHandler.json";
 import WBTCReward from "./contracts/BTCRewardHandler.json";
 import DAIReward from "./contracts/DAIRewardHandler.json";
+import WETHPoolReward from "./contracts/ETHLiquidityReward.json";
+import WBTCPoolReward from "./contracts/WBTCLiquidityReward.json";
+import DAIPoolReward from "./contracts/DAILiquidityReward.json";
+import CTXPoolReward from "./contracts/CTXLiquidityReward.json";
 
 const clientOracle = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap",
@@ -98,6 +102,34 @@ const App = () => {
       currentSigner
     );
     rewards.setCurrentWBTCReward(currentWBTCReward);
+
+    // Set Liquidity Rewards
+    const currentWETHPoolReward = new ethers.Contract(
+      WETHPoolReward.address,
+      WETHPoolReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentWETHPoolReward(currentWETHPoolReward);
+    const currentDAIPoolReward = new ethers.Contract(
+      DAIPoolReward.address,
+      DAIPoolReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentDAIPoolReward(currentDAIPoolReward);
+    const currentWBTCPoolReward = new ethers.Contract(
+      WBTCPoolReward.address,
+      WBTCPoolReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentWBTCPoolReward(currentWBTCPoolReward);
+
+    const currentCTXPoolReward = new ethers.Contract(
+      CTXPoolReward.address,
+      CTXPoolReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
+
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
       WETHOracle.address,

@@ -179,14 +179,6 @@ const Details = ({ address }: props) => {
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
       await vaultData.vaults.forEach((v: any) => {
-        console.log(
-          "🚀 ~ file: Details.tsx ~ line 183 ~ awaitvaultData.vaults.forEach ~ currentVault.address.toLowerCase()",
-          currentVault.address.toLowerCase()
-        );
-        console.log(
-          "🚀 ~ file: Details.tsx ~ line 183 ~ awaitvaultData.vaults.forEach ~ v.address.toLowerCase() ",
-          v.address.toLowerCase()
-        );
         if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
           currentVaultData = v;
         }
@@ -394,12 +386,10 @@ const Details = ({ address }: props) => {
           });
           notifyUser(tx, refresh);
         } else {
-          console.log(await selectedVaultContract?.collateralContract());
           const tx = await selectedVaultContract?.addCollateral(amount);
           notifyUser(tx, refresh);
         }
       } catch (error) {
-        console.log("🚀 ~ file: Details.tsx ~ line 394 ~ addCollateral ~ error", error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
