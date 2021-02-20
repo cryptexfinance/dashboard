@@ -22,6 +22,7 @@ import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
 import { notifyUser, errorNotification } from "../utils/utils";
+import { Stake } from "./modals/Stake";
 
 const Farm = () => {
   const [address, setAddress] = useState("");
@@ -29,9 +30,21 @@ const Farm = () => {
   const [ethRewards, setEthRewards] = useState("0");
   const [wbtcRewards, setWbtcRewards] = useState("0");
   const [daiRewards, setDaiRewards] = useState("0");
+  const [ethPoolRewards, setEthPoolRewards] = useState("0.0");
+  const [wbtcPoolRewards, setWbtcPoolRewards] = useState("0.0");
+  const [daiPoolRewards, setDaiPoolRewards] = useState("0.0");
+  const [ctxPoolRewards, setCtxPoolRewards] = useState("0.0");
   const [ethDebt, setEthDebt] = useState("0.0");
   const [wbtcDebt, setWbtcDebt] = useState("0.0");
   const [daiDebt, setDaiDebt] = useState("0.0");
+  const [ethPoolStake, setEthPoolStake] = useState("0.0");
+  const [wbtcPoolStake, setWbtcPoolStake] = useState("0.0");
+  const [daiPoolStake, setDaiPoolStake] = useState("0.0");
+  const [ctxPoolStake, setCtxPoolStake] = useState("0.0");
+  const [ethPoolBalance, setEthPoolBalance] = useState("0.0");
+  const [wbtcPoolBalance, setWbtcPoolBalance] = useState("0.0");
+  const [daiPoolBalance, setDaiPoolBalance] = useState("0.0");
+  const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const tokens = useContext(TokensContext);
@@ -39,6 +52,11 @@ const Farm = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const rewards = useContext(RewardsContext);
+  const [stakeShow, setStakeShow] = useState(false);
+  const [stakeBalance, setStakeBalance] = useState("0");
+  const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
+  const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
+  const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
 
   const USER_VAULTS = gql`
     query getVault($owner: String!) {
@@ -109,6 +127,33 @@ const Farm = () => {
         const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
         setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
+        const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
+        setEthPoolRewards(ethers.utils.formatEther(currentEthPoolReward));
+        const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
+        setWbtcPoolRewards(ethers.utils.formatEther(currentWbtcPoolReward));
+        const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
+        setDaiPoolRewards(ethers.utils.formatEther(currentDaiPoolReward));
+        const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
+        setCtxPoolRewards(ethers.utils.formatEther(currentCtxPoolReward));
+
+        const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
+        setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
+        const currentWbtcPoolStake = await rewards.wbtcPoolReward?.balanceOf(currentAddress);
+        setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
+        const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
+        setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
+        const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
+        setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+
+        const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
+        setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
+        const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
+        setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
+        const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
+        setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
+        const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
+        setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
+
         setIsLoading(false);
       }
     };
@@ -150,7 +195,7 @@ const Farm = () => {
           tx = await rewards?.wethReward?.getReward();
           break;
       }
-      notifyUser(tx, refresh());
+      notifyUser(tx, refresh);
     } catch (error) {
       if (error.code === 4001) {
         errorNotification("Transaction rejected");
@@ -160,25 +205,40 @@ const Farm = () => {
     }
   };
 
+  const exitRewards = async (vaultType: string) => {
+    try {
+      let tx: ethers.ContractTransaction;
+      switch (vaultType) {
+        case "ETHPOOL":
+          tx = await rewards?.wethPoolReward?.exit();
+          break;
+        case "WBTCPOOL":
+          tx = await rewards?.wbtcPoolReward?.exit();
+          break;
+        case "DAIPOOL":
+          tx = await rewards?.daiPoolReward?.exit();
+          break;
+        case "CTXPOOL":
+          tx = await rewards?.ctxPoolReward?.exit();
+          break;
+        default:
+          tx = await rewards?.wethPoolReward?.exit();
+          break;
+      }
+      notifyUser(tx, refresh);
+    } catch (error) {
+      if (error.code === 4001) {
+        errorNotification("Transaction rejected");
+      } else {
+        errorNotification("Insufficient funds to exit");
+      }
+    }
+  };
+
   return (
     <div className="farm">
       <div>
         <h3>Farming </h3>{" "}
-        {/* <Row className="data">
-          <Col>
-            <h3 className="number neon-blue">
-              <CtxIcon className="ctx-neon" />
-              <NumberFormat
-                className="number"
-                value={ctxBalance}
-                displayType="text"
-                thousandSeparator
-                decimalScale={2}
-              />
-            </h3>
-            <p>Current Balance</p>
-          </Col>
-        </Row> */}
         <Row className="card-wrapper">
           {address === "" ? (
             <Col xs={12} lg={3}>
@@ -213,7 +273,7 @@ const Farm = () => {
                     <th>Current Mint</th>
                     <th>Current Reward</th>
                     <th />
-                    <th />
+                    <th /> <th />
                   </tr>
                 </thead>
                 <tbody>
@@ -260,6 +320,7 @@ const Farm = () => {
                         Claim
                       </Button>
                     </td>
+                    <td />
                   </tr>
                   <tr>
                     <td>
@@ -303,7 +364,8 @@ const Farm = () => {
                       >
                         Claim
                       </Button>
-                    </td>
+                    </td>{" "}
+                    <td />
                   </tr>
                   <tr>
                     <td>
@@ -347,7 +409,8 @@ const Farm = () => {
                       >
                         Claim
                       </Button>
-                    </td>
+                    </td>{" "}
+                    <td />
                   </tr>
                   <tr>
                     <th />
@@ -355,7 +418,7 @@ const Farm = () => {
                     <th>Current Stake</th>
                     <th>Current Reward</th>
                     <th />
-                    <th />
+                    <th /> <th />
                   </tr>
                   <tr>
                     <td>
@@ -363,10 +426,42 @@ const Farm = () => {
                       <WETHIcon className="weth" />
                     </td>
                     <td>Uniswap ETH/TCAP Pool</td>
-                    <td className="number">0 ETHTCAP</td>
-                    <td className="number">0 CTX</td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ethPoolStake}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      ETHTCAP
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ethPoolRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
                     <td>
-                      <Button variant="primary" className="neon-highlight" onClick={() => {}}>
+                      <Button
+                        variant="primary"
+                        className="neon-highlight"
+                        onClick={() => {
+                          setStakeBalance(ethPoolBalance);
+                          setSelectedPoolTitle("Uniswap ETH/TCAP Pool");
+                          if (rewards.wethPoolReward) {
+                            setSelectedPool(rewards.wethPoolReward);
+                            setSelectedPoolToken(tokens.wethPoolToken);
+                          }
+                          setStakeShow(true);
+                        }}
+                      >
                         Stake
                       </Button>
                     </td>
@@ -381,6 +476,17 @@ const Farm = () => {
                         Claim
                       </Button>
                     </td>
+                    <td>
+                      <Button
+                        variant="warning"
+                        className="neon-ora"
+                        onClick={() => {
+                          exitRewards("ETHPOOL");
+                        }}
+                      >
+                        Exit
+                      </Button>
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -388,10 +494,43 @@ const Farm = () => {
                       <WBTCIcon className="wbtc" />
                     </td>
                     <td>Uniswap WBTC/TCAP Pool</td>
-                    <td className="number">0 WBTCTCAP</td>
-                    <td className="number">0 CTX</td>
+                    <td className="number">
+                      {" "}
+                      <NumberFormat
+                        className="number"
+                        value={wbtcPoolStake}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      WBTCTCAP
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={wbtcPoolRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
                     <td>
-                      <Button variant="primary" className="neon-highlight" onClick={() => {}}>
+                      <Button
+                        variant="primary"
+                        className="neon-highlight"
+                        onClick={() => {
+                          setStakeBalance(wbtcPoolBalance);
+                          setSelectedPoolTitle("Uniswap WBTC/TCAP Pool");
+                          if (rewards.wbtcPoolReward) {
+                            setSelectedPool(rewards.wbtcPoolReward);
+                            setSelectedPoolToken(tokens.wbtcPoolToken);
+                          }
+                          setStakeShow(true);
+                        }}
+                      >
                         Stake
                       </Button>
                     </td>
@@ -405,6 +544,17 @@ const Farm = () => {
                       >
                         Claim
                       </Button>
+                    </td>{" "}
+                    <td>
+                      <Button
+                        variant="warning"
+                        className="neon-orange"
+                        onClick={() => {
+                          exitRewards("WBTCPOOL");
+                        }}
+                      >
+                        Exit
+                      </Button>
                     </td>
                   </tr>
                   <tr>
@@ -413,10 +563,42 @@ const Farm = () => {
                       <DAIIcon className="dai" />
                     </td>
                     <td>Uniswap DAI/TCAP Pool</td>
-                    <td className="number">0 DAITCAP</td>
-                    <td className="number">0 CTX</td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={daiPoolStake}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      DAITCAP
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={daiPoolRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
                     <td>
-                      <Button variant="primary" className="neon-highlight" onClick={() => {}}>
+                      <Button
+                        variant="primary"
+                        className="neon-highlight"
+                        onClick={() => {
+                          setStakeBalance(daiPoolBalance);
+                          setSelectedPoolTitle("Uniswap DAI/TCAP Pool");
+                          if (rewards.daiPoolReward) {
+                            setSelectedPool(rewards.daiPoolReward);
+                            setSelectedPoolToken(tokens.daiPoolToken);
+                          }
+                          setStakeShow(true);
+                        }}
+                      >
                         Stake
                       </Button>
                     </td>
@@ -430,6 +612,17 @@ const Farm = () => {
                       >
                         Claim
                       </Button>
+                    </td>{" "}
+                    <td>
+                      <Button
+                        variant="warning"
+                        className="neon-orange"
+                        onClick={() => {
+                          exitRewards("DAIPOOL");
+                        }}
+                      >
+                        Exit
+                      </Button>
                     </td>
                   </tr>
                   <tr>
@@ -438,10 +631,42 @@ const Farm = () => {
                       <CtxIcon className="ctx-neon" />
                     </td>
                     <td>Uniswap CTX/ETH Pool</td>
-                    <td className="number">0 ETHCTX</td>
-                    <td className="number">0 CTX</td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ctxPoolStake}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      ETHCTX
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ctxPoolRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
                     <td>
-                      <Button variant="primary" className="neon-highlight" onClick={() => {}}>
+                      <Button
+                        variant="primary"
+                        className="neon-highlight"
+                        onClick={() => {
+                          setStakeBalance(ctxPoolBalance);
+                          setSelectedPoolTitle("Uniswap ETH/CTX Pool");
+                          if (rewards.ctxPoolReward) {
+                            setSelectedPool(rewards.ctxPoolReward);
+                            setSelectedPoolToken(tokens.ctxPoolToken);
+                          }
+                          setStakeShow(true);
+                        }}
+                      >
                         Stake
                       </Button>
                     </td>
@@ -455,6 +680,17 @@ const Farm = () => {
                       >
                         Claim
                       </Button>
+                    </td>{" "}
+                    <td>
+                      <Button
+                        variant="warning"
+                        className="neon-orange"
+                        onClick={() => {
+                          exitRewards("CTXPOOL");
+                        }}
+                      >
+                        Exit
+                      </Button>
                     </td>
                   </tr>
                 </tbody>
@@ -463,6 +699,15 @@ const Farm = () => {
           )}
         </Row>
       </div>
+      <Stake
+        pool={selectedPool}
+        poolTitle={selectedPoolTitle}
+        poolToken={selectedPoolToken}
+        balance={stakeBalance}
+        show={stakeShow}
+        onHide={() => setStakeShow(false)}
+        refresh={() => refresh()}
+      />
     </div>
   );
 };
