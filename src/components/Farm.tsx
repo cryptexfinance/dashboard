@@ -15,8 +15,8 @@ import GovernanceContext from "../state/GovernanceContext";
 import RewardsContext from "../state/RewardsContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import "../styles/farm.scss";
-import { ReactComponent as CtxIcon } from "../assets/images/ctx-neon.svg";
-import { ReactComponent as UniIcon } from "../assets/images/uni.svg";
+import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
+import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
@@ -34,6 +34,10 @@ const Farm = () => {
   const [wbtcPoolRewards, setWbtcPoolRewards] = useState("0.0");
   const [daiPoolRewards, setDaiPoolRewards] = useState("0.0");
   const [ctxPoolRewards, setCtxPoolRewards] = useState("0.0");
+  const [vethPoolRewards, setVEthPoolRewards] = useState("0.0");
+  const [vwbtcPoolRewards, setVWbtcPoolRewards] = useState("0.0");
+  const [vdaiPoolRewards, setVDaiPoolRewards] = useState("0.0");
+  const [vctxPoolRewards, setVCtxPoolRewards] = useState("0.0");
   const [ethDebt, setEthDebt] = useState("0.0");
   const [wbtcDebt, setWbtcDebt] = useState("0.0");
   const [daiDebt, setDaiDebt] = useState("0.0");
@@ -127,14 +131,32 @@ const Farm = () => {
         const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
         setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
+        const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
+
         const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
-        setEthPoolRewards(ethers.utils.formatEther(currentEthPoolReward));
+        setEthPoolRewards(
+          ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))
+        );
+        const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(currentAddress);
+        setVEthPoolRewards(ethers.utils.formatEther(currentVEthPoolReward));
         const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
-        setWbtcPoolRewards(ethers.utils.formatEther(currentWbtcPoolReward));
+        setWbtcPoolRewards(
+          ethers.utils.formatEther(currentWbtcPoolReward.mul(100 - vestingRatio).div(100))
+        );
+        const currentVWbtcPoolReward = await rewards.wbtcPoolReward?.vestingAmounts(currentAddress);
+        setVWbtcPoolRewards(ethers.utils.formatEther(currentVWbtcPoolReward));
         const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
-        setDaiPoolRewards(ethers.utils.formatEther(currentDaiPoolReward));
+        setDaiPoolRewards(
+          ethers.utils.formatEther(currentDaiPoolReward.mul(100 - vestingRatio).div(100))
+        );
+        const currentVDaiPoolReward = await rewards.daiPoolReward?.vestingAmounts(currentAddress);
+        setVDaiPoolRewards(ethers.utils.formatEther(currentVDaiPoolReward));
         const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
-        setCtxPoolRewards(ethers.utils.formatEther(currentCtxPoolReward));
+        setCtxPoolRewards(
+          ethers.utils.formatEther(currentCtxPoolReward.mul(100 - vestingRatio).div(100))
+        );
+        const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(currentAddress);
+        setVCtxPoolRewards(ethers.utils.formatEther(currentVCtxPoolReward));
 
         const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
         setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
@@ -153,9 +175,8 @@ const Farm = () => {
         setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
         const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
         setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
-
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
 
     loadAddress();
@@ -241,7 +262,7 @@ const Farm = () => {
         <h3>Farming </h3>{" "}
         <Row className="card-wrapper">
           {address === "" ? (
-            <Col xs={12} lg={3}>
+            <Col xs={12} lg={6}>
               <Card className="balance">
                 <div className="">
                   <h2>Connect Your Account</h2>
@@ -252,7 +273,7 @@ const Farm = () => {
                     <Button
                       variant="primary"
                       id="connect"
-                      className="neon-pink"
+                      className="neon-pink mt-2"
                       onClick={() => {
                         web3Modal.toggleModal();
                       }}
@@ -264,438 +285,567 @@ const Farm = () => {
               </Card>
             </Col>
           ) : (
-            <Card className="diamond">
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th />
-                    <th>Description</th>
-                    <th>Current Mint</th>
-                    <th>Current Reward</th>
-                    <th />
-                    <th /> <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <WETHIcon className="weth" />
-                    </td>
-                    <td>ETH Vault</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethDebt}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      TCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button variant="primary" className="neon-highlight" href="vault/ETH">
-                        Mint
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("ETH");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>
-                    <td />
-                  </tr>
-                  <tr>
-                    <td>
-                      <WBTCIcon className="wbtc" />
-                    </td>
-                    <td>WBTC Vault</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={wbtcDebt}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      TCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={wbtcRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button variant="primary" className="neon-highlight" href="vault/WBTC">
-                        Mint
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("WBTC");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>{" "}
-                    <td />
-                  </tr>
-                  <tr>
-                    <td>
-                      <DAIIcon className="dai" />
-                    </td>
-                    <td>DAI Vault</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiDebt}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      TCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button variant="primary" className="neon-highlight" href="vault/DAI">
-                        Mint
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("DAI");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>{" "}
-                    <td />
-                  </tr>
-                  <tr>
-                    <th />
-                    <th>Description</th>
-                    <th>Current Stake</th>
-                    <th>Current Reward</th>
-                    <th />
-                    <th /> <th />
-                  </tr>
-                  <tr>
-                    <td>
-                      <UniIcon className="uni" />
-                      <WETHIcon className="weth" />
-                    </td>
-                    <td>Uniswap ETH/TCAP Pool</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethPoolStake}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      ETHTCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethPoolRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          setStakeBalance(ethPoolBalance);
-                          setSelectedPoolTitle("Uniswap ETH/TCAP Pool");
-                          if (rewards.wethPoolReward) {
-                            setSelectedPool(rewards.wethPoolReward);
-                            setSelectedPoolToken(tokens.wethPoolToken);
-                          }
-                          setStakeShow(true);
-                        }}
-                      >
-                        Stake
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("ETHPOOL");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="warning"
-                        className="neon-ora"
-                        onClick={() => {
-                          exitRewards("ETHPOOL");
-                        }}
-                      >
-                        Exit
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <UniIcon className="uni" />
-                      <WBTCIcon className="wbtc" />
-                    </td>
-                    <td>Uniswap WBTC/TCAP Pool</td>
-                    <td className="number">
-                      {" "}
-                      <NumberFormat
-                        className="number"
-                        value={wbtcPoolStake}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      WBTCTCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={wbtcPoolRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          setStakeBalance(wbtcPoolBalance);
-                          setSelectedPoolTitle("Uniswap WBTC/TCAP Pool");
-                          if (rewards.wbtcPoolReward) {
-                            setSelectedPool(rewards.wbtcPoolReward);
-                            setSelectedPoolToken(tokens.wbtcPoolToken);
-                          }
-                          setStakeShow(true);
-                        }}
-                      >
-                        Stake
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("WBTCPOOL");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>{" "}
-                    <td>
-                      <Button
-                        variant="warning"
-                        className="neon-orange"
-                        onClick={() => {
-                          exitRewards("WBTCPOOL");
-                        }}
-                      >
-                        Exit
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <UniIcon className="uni" />
-                      <DAIIcon className="dai" />
-                    </td>
-                    <td>Uniswap DAI/TCAP Pool</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiPoolStake}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      DAITCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiPoolRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          setStakeBalance(daiPoolBalance);
-                          setSelectedPoolTitle("Uniswap DAI/TCAP Pool");
-                          if (rewards.daiPoolReward) {
-                            setSelectedPool(rewards.daiPoolReward);
-                            setSelectedPoolToken(tokens.daiPoolToken);
-                          }
-                          setStakeShow(true);
-                        }}
-                      >
-                        Stake
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("DAIPOOL");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>{" "}
-                    <td>
-                      <Button
-                        variant="warning"
-                        className="neon-orange"
-                        onClick={() => {
-                          exitRewards("DAIPOOL");
-                        }}
-                      >
-                        Exit
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <UniIcon className="uni" />
-                      <CtxIcon className="ctx-neon" />
-                    </td>
-                    <td>Uniswap CTX/ETH Pool</td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ctxPoolStake}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      ETHCTX
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ctxPoolRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          setStakeBalance(ctxPoolBalance);
-                          setSelectedPoolTitle("Uniswap ETH/CTX Pool");
-                          if (rewards.ctxPoolReward) {
-                            setSelectedPool(rewards.ctxPoolReward);
-                            setSelectedPoolToken(tokens.ctxPoolToken);
-                          }
-                          setStakeShow(true);
-                        }}
-                      >
-                        Stake
-                      </Button>
-                    </td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        className="neon-highlight"
-                        onClick={() => {
-                          claimRewards("CTXPOOL");
-                        }}
-                      >
-                        Claim
-                      </Button>
-                    </td>{" "}
-                    <td>
-                      <Button
-                        variant="warning"
-                        className="neon-orange"
-                        onClick={() => {
-                          exitRewards("CTXPOOL");
-                        }}
-                      >
-                        Exit
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Card>
+            <>
+              <Card className="diamond mb-2">
+                <h2>Minting Rewards </h2>
+                <Table hover className="mt-2">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Description</th>
+                      <th>Current Mint</th>
+                      <th>Current Reward</th>
+                      <th />
+                      <th /> <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <WETHIcon className="weth" />
+                      </td>
+                      <td>ETH Vault</td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethDebt}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        TCAP
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight" href="vault/ETH">
+                          Mint
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("ETH");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>
+                      <td />
+                    </tr>
+                    <tr>
+                      <td>
+                        <WBTCIcon className="wbtc" />
+                      </td>
+                      <td>WBTC Vault</td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={wbtcDebt}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        TCAP
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={wbtcRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight" href="vault/WBTC">
+                          Mint
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("WBTC");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>{" "}
+                      <td />
+                    </tr>
+                    <tr>
+                      <td>
+                        <DAIIcon className="dai" />
+                      </td>
+                      <td>DAI Vault</td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={daiDebt}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        TCAP
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={daiRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button variant="primary" className="neon-highlight" href="vault/DAI">
+                          Mint
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("DAI");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>{" "}
+                      <td />
+                    </tr>
+                  </tbody>
+                </Table>
+              </Card>
+              <Card className="diamond mt-4">
+                <h2>Liquidity Rewards </h2>
+                <Table hover className="mt-2">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Description</th>
+                      <th>Balance</th>
+                      <th>Stake</th>
+                      <th>Vested Reward</th>
+                      <th>Unvested Reward</th>
+                      <th />
+                      <th /> <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <WETHIcon className="weth" />
+                        <TcapIcon className="tcap" />
+                      </td>
+                      <td>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/ETH`}
+                        >
+                          Uniswap ETH/TCAP Pool
+                        </a>
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethPoolBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vethPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            setStakeBalance(ethPoolBalance);
+                            setSelectedPoolTitle("Uniswap ETH/TCAP Pool");
+                            if (rewards.wethPoolReward) {
+                              setSelectedPool(rewards.wethPoolReward);
+                              setSelectedPoolToken(tokens.wethPoolToken);
+                            }
+                            setStakeShow(true);
+                          }}
+                        >
+                          Stake
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("ETHPOOL");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="warning"
+                          className="neon-ora"
+                          onClick={() => {
+                            exitRewards("ETHPOOL");
+                          }}
+                        >
+                          Exit
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <WBTCIcon className="wbtc" />
+                        <TcapIcon className="tcap" />{" "}
+                      </td>
+                      <td>
+                        {" "}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                        >
+                          Uniswap WBTC/TCAP Pool
+                        </a>
+                      </td>{" "}
+                      <td className="number">
+                        {" "}
+                        <NumberFormat
+                          className="number"
+                          value={wbtcPoolBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        {" "}
+                        <NumberFormat
+                          className="number"
+                          value={wbtcPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>{" "}
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={wbtcPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vwbtcPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            setStakeBalance(wbtcPoolBalance);
+                            setSelectedPoolTitle("Uniswap WBTC/TCAP Pool");
+                            if (rewards.wbtcPoolReward) {
+                              setSelectedPool(rewards.wbtcPoolReward);
+                              setSelectedPoolToken(tokens.wbtcPoolToken);
+                            }
+                            setStakeShow(true);
+                          }}
+                        >
+                          Stake
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("WBTCPOOL");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>{" "}
+                      <td>
+                        <Button
+                          variant="warning"
+                          className="neon-orange"
+                          onClick={() => {
+                            exitRewards("WBTCPOOL");
+                          }}
+                        >
+                          Exit
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <DAIIcon className="dai" />
+                        <TcapIcon className="tcap" />{" "}
+                      </td>
+                      <td>
+                        {" "}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                        >
+                          Uniswap DAI/TCAP Pool
+                        </a>
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={daiPoolBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>{" "}
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={daiPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={daiPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vdaiPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            setStakeBalance(daiPoolBalance);
+                            setSelectedPoolTitle("Uniswap DAI/TCAP Pool");
+                            if (rewards.daiPoolReward) {
+                              setSelectedPool(rewards.daiPoolReward);
+                              setSelectedPoolToken(tokens.daiPoolToken);
+                            }
+                            setStakeShow(true);
+                          }}
+                        >
+                          Stake
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("DAIPOOL");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>{" "}
+                      <td>
+                        <Button
+                          variant="warning"
+                          className="neon-orange"
+                          onClick={() => {
+                            exitRewards("DAIPOOL");
+                          }}
+                        >
+                          Exit
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <CtxIcon className="ctx-neon" />
+                        <WETHIcon className="weth" />{" "}
+                      </td>
+                      <td>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${governance.ctxToken?.address}`}
+                        >
+                          Uniswap CTX/ETH Pool
+                        </a>
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>{" "}
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>{" "}
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vctxPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            setStakeBalance(ctxPoolBalance);
+                            setSelectedPoolTitle("Uniswap ETH/CTX Pool");
+                            if (rewards.ctxPoolReward) {
+                              setSelectedPool(rewards.ctxPoolReward);
+                              setSelectedPoolToken(tokens.ctxPoolToken);
+                            }
+                            setStakeShow(true);
+                          }}
+                        >
+                          Stake
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          className="neon-highlight"
+                          onClick={() => {
+                            claimRewards("CTXPOOL");
+                          }}
+                        >
+                          Claim
+                        </Button>
+                      </td>{" "}
+                      <td>
+                        <Button
+                          variant="warning"
+                          className="neon-orange"
+                          onClick={() => {
+                            exitRewards("CTXPOOL");
+                          }}
+                        >
+                          Exit
+                        </Button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Card>
+            </>
           )}
         </Row>
       </div>

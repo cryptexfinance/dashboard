@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import SignerContext from "../../state/SignerContext";
 import "../../styles/modal.scss";
 
@@ -22,6 +22,9 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
   const signer = useContext(SignerContext);
+
+  // Infinite Approval
+  const infiniteApproveValue = BigNumber.from("1157920892373161954235709850086879078532699");
 
   useEffect(() => {
     async function load() {
@@ -88,6 +91,24 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
     }
   };
 
+  const infiniteApproveTokens = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (poolToken) {
+      try {
+        const tx = await poolToken.approve(pool?.address, infiniteApproveValue);
+        notifyUser(tx, refresh);
+        setStakeText("");
+        setIsApproved(true);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        } else {
+          console.log(error);
+        }
+      }
+    }
+  };
+
   const maxStake = async (e: React.MouseEvent) => {
     e.preventDefault();
     setStakeText(balance);
@@ -140,6 +161,9 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           <>
             <Button variant="primary" className="neon-highlight" onClick={approveTokens}>
               Approve Tokens
+            </Button>
+            <Button variant="primary" className="neon-green mt-4" onClick={infiniteApproveTokens}>
+              Infinite Approve
             </Button>
           </>
         )}{" "}
