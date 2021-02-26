@@ -328,14 +328,14 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button variant="primary" className="" href="vault/ETH">
                           Mint
                         </Button>
 
                         <Button
                           variant="success"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             claimRewards("ETH");
                           }}
@@ -373,14 +373,14 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button variant="primary" className="" href="vault/WBTC">
                           Mint
                         </Button>
 
                         <Button
                           variant="success"
-                          className="mt-2"
+                          className="ml-4"
                           onClick={() => {
                             claimRewards("WBTC");
                           }}
@@ -418,14 +418,14 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button variant="primary" className="" href="vault/DAI">
                           Mint
                         </Button>
 
                         <Button
                           variant="success"
-                          className="mt-2"
+                          className="ml-4"
                           onClick={() => {
                             claimRewards("DAI");
                           }}
@@ -508,7 +508,7 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button
                           variant="primary"
                           className=""
@@ -527,7 +527,7 @@ const Farm = () => {
 
                         <Button
                           variant="success"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             claimRewards("ETHPOOL");
                           }}
@@ -537,7 +537,7 @@ const Farm = () => {
 
                         <Button
                           variant="warning"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             exitRewards("ETHPOOL");
                           }}
@@ -605,7 +605,7 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button
                           variant="primary"
                           className=""
@@ -624,7 +624,7 @@ const Farm = () => {
 
                         <Button
                           variant="success"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             claimRewards("WBTCPOOL");
                           }}
@@ -634,7 +634,7 @@ const Farm = () => {
 
                         <Button
                           variant="warning"
-                          className="mt-2"
+                          className="ml-4"
                           onClick={() => {
                             exitRewards("WBTCPOOL");
                           }}
@@ -700,7 +700,7 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button
                           variant="primary"
                           className=""
@@ -719,7 +719,7 @@ const Farm = () => {
 
                         <Button
                           variant="success"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             claimRewards("DAIPOOL");
                           }}
@@ -729,7 +729,7 @@ const Farm = () => {
 
                         <Button
                           variant="warning"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             exitRewards("DAIPOOL");
                           }}
@@ -794,7 +794,7 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
+                      <td align="right">
                         <Button
                           variant="primary"
                           className=""
@@ -813,7 +813,7 @@ const Farm = () => {
 
                         <Button
                           variant="success"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             claimRewards("CTXPOOL");
                           }}
@@ -823,7 +823,7 @@ const Farm = () => {
 
                         <Button
                           variant="warning"
-                          className=" mt-2"
+                          className=" ml-4"
                           onClick={() => {
                             exitRewards("CTXPOOL");
                           }}
