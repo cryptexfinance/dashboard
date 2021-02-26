@@ -303,7 +303,9 @@ const Farm = () => {
                       <td>
                         <WETHIcon className="weth" />
                       </td>
-                      <td>ETH Vault</td>
+                      <td>
+                        <a href="vault/ETH">ETH Vault</a>
+                      </td>
                       <td className="number">
                         <NumberFormat
                           className="number"
@@ -346,7 +348,9 @@ const Farm = () => {
                       <td>
                         <WBTCIcon className="wbtc" />
                       </td>
-                      <td>WBTC Vault</td>
+                      <td>
+                        <a href="vault/WBTC">WBTC Vault</a>
+                      </td>
                       <td className="number">
                         <NumberFormat
                           className="number"
@@ -389,7 +393,9 @@ const Farm = () => {
                       <td>
                         <DAIIcon className="dai" />
                       </td>
-                      <td>DAI Vault</td>
+                      <td>
+                        <a href="vault/DAI">DAI Vault</a>
+                      </td>
                       <td className="number">
                         <NumberFormat
                           className="number"
