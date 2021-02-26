@@ -296,7 +296,6 @@ const Farm = () => {
                       <th>Current Mint</th>
                       <th>Current Reward</th>
                       <th />
-                      <th /> <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -328,14 +327,13 @@ const Farm = () => {
                         CTX
                       </td>
                       <td>
-                        <Button variant="primary" className="neon-highlight" href="vault/ETH">
+                        <Button variant="primary" className="" href="vault/ETH">
                           Mint
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className=" mt-2"
                           onClick={() => {
                             claimRewards("ETH");
                           }}
@@ -343,7 +341,6 @@ const Farm = () => {
                           Claim
                         </Button>
                       </td>
-                      <td />
                     </tr>
                     <tr>
                       <td>
@@ -373,14 +370,13 @@ const Farm = () => {
                         CTX
                       </td>
                       <td>
-                        <Button variant="primary" className="neon-highlight" href="vault/WBTC">
+                        <Button variant="primary" className="" href="vault/WBTC">
                           Mint
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className="mt-2"
                           onClick={() => {
                             claimRewards("WBTC");
                           }}
@@ -388,7 +384,6 @@ const Farm = () => {
                           Claim
                         </Button>
                       </td>{" "}
-                      <td />
                     </tr>
                     <tr>
                       <td>
@@ -418,14 +413,13 @@ const Farm = () => {
                         CTX
                       </td>
                       <td>
-                        <Button variant="primary" className="neon-highlight" href="vault/DAI">
+                        <Button variant="primary" className="" href="vault/DAI">
                           Mint
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className="mt-2"
                           onClick={() => {
                             claimRewards("DAI");
                           }}
@@ -433,7 +427,6 @@ const Farm = () => {
                           Claim
                         </Button>
                       </td>{" "}
-                      <td />
                     </tr>
                   </tbody>
                 </Table>
@@ -450,7 +443,6 @@ const Farm = () => {
                       <th>Vested Reward</th>
                       <th>Unvested Reward</th>
                       <th />
-                      <th /> <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -513,7 +505,7 @@ const Farm = () => {
                       <td>
                         <Button
                           variant="primary"
-                          className="neon-highlight"
+                          className=""
                           onClick={() => {
                             setStakeBalance(ethPoolBalance);
                             setSelectedPoolTitle("Uniswap ETH/TCAP Pool");
@@ -526,22 +518,20 @@ const Farm = () => {
                         >
                           Stake
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className=" mt-2"
                           onClick={() => {
                             claimRewards("ETHPOOL");
                           }}
                         >
                           Claim
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
                           variant="warning"
-                          className="neon-ora"
+                          className=" mt-2"
                           onClick={() => {
                             exitRewards("ETHPOOL");
                           }}
@@ -612,7 +602,7 @@ const Farm = () => {
                       <td>
                         <Button
                           variant="primary"
-                          className="neon-highlight"
+                          className=""
                           onClick={() => {
                             setStakeBalance(wbtcPoolBalance);
                             setSelectedPoolTitle("Uniswap WBTC/TCAP Pool");
@@ -625,22 +615,20 @@ const Farm = () => {
                         >
                           Stake
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className=" mt-2"
                           onClick={() => {
                             claimRewards("WBTCPOOL");
                           }}
                         >
                           Claim
                         </Button>
-                      </td>{" "}
-                      <td>
+
                         <Button
                           variant="warning"
-                          className="neon-orange"
+                          className="mt-2"
                           onClick={() => {
                             exitRewards("WBTCPOOL");
                           }}
@@ -709,7 +697,7 @@ const Farm = () => {
                       <td>
                         <Button
                           variant="primary"
-                          className="neon-highlight"
+                          className=""
                           onClick={() => {
                             setStakeBalance(daiPoolBalance);
                             setSelectedPoolTitle("Uniswap DAI/TCAP Pool");
@@ -722,22 +710,20 @@ const Farm = () => {
                         >
                           Stake
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className=" mt-2"
                           onClick={() => {
                             claimRewards("DAIPOOL");
                           }}
                         >
                           Claim
                         </Button>
-                      </td>{" "}
-                      <td>
+
                         <Button
                           variant="warning"
-                          className="neon-orange"
+                          className=" mt-2"
                           onClick={() => {
                             exitRewards("DAIPOOL");
                           }}
@@ -755,7 +741,7 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${governance.ctxToken?.address}`}
+                          href={`https://app.uniswap.org/#/add/ETH/${governance.ctxToken?.address}`}
                         >
                           Uniswap CTX/ETH Pool
                         </a>
@@ -805,7 +791,7 @@ const Farm = () => {
                       <td>
                         <Button
                           variant="primary"
-                          className="neon-highlight"
+                          className=""
                           onClick={() => {
                             setStakeBalance(ctxPoolBalance);
                             setSelectedPoolTitle("Uniswap ETH/CTX Pool");
@@ -818,22 +804,20 @@ const Farm = () => {
                         >
                           Stake
                         </Button>
-                      </td>
-                      <td>
+
                         <Button
-                          variant="primary"
-                          className="neon-highlight"
+                          variant="success"
+                          className=" mt-2"
                           onClick={() => {
                             claimRewards("CTXPOOL");
                           }}
                         >
                           Claim
                         </Button>
-                      </td>{" "}
-                      <td>
+
                         <Button
                           variant="warning"
-                          className="neon-orange"
+                          className=" mt-2"
                           onClick={() => {
                             exitRewards("CTXPOOL");
                           }}

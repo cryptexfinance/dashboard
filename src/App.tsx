@@ -100,18 +100,21 @@ const App = () => {
         currentSigner
       );
       tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
+
       const currentDAIPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_DAI,
         DAIToken.abi,
         currentSigner
       );
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
+
       const currentWBTCPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_WBTC,
         DAIToken.abi,
         currentSigner
       );
       tokens.setCurrentWBTCPoolToken(currentWBTCPoolToken);
+
       const currentCTXPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_CTX,
         DAIToken.abi,
@@ -127,8 +130,10 @@ const App = () => {
       currentSigner
     );
     rewards.setCurrentWETHReward(currentWETHReward);
+
     const currentDAIReward = new ethers.Contract(DAIReward.address, DAIReward.abi, currentSigner);
     rewards.setCurrentDAIReward(currentDAIReward);
+
     const currentWBTCReward = new ethers.Contract(
       WBTCReward.address,
       WBTCReward.abi,
@@ -143,12 +148,14 @@ const App = () => {
       currentSigner
     );
     rewards.setCurrentWETHPoolReward(currentWETHPoolReward);
+
     const currentDAIPoolReward = new ethers.Contract(
       DAIPoolReward.address,
       DAIPoolReward.abi,
       currentSigner
     );
     rewards.setCurrentDAIPoolReward(currentDAIPoolReward);
+
     const currentWBTCPoolReward = new ethers.Contract(
       WBTCPoolReward.address,
       WBTCPoolReward.abi,
