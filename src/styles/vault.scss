@@ -336,4 +336,21 @@
       }
     }
   }
+
+  @media (max-width: 730px) {
+    padding-top: 4rem;
+    padding-left: 1.7rem;
+
+    .pre-actions {
+      p {
+        width: 20rem;
+      }
+    }
+
+    @media (max-width: 575px) {
+      .card {
+        margin-bottom: 2rem;
+      }
+    }
+  }
 }

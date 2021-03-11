@@ -231,3 +231,9 @@ html,
     font-family: "Space Mono";
   }
 }
+
+@media (max-width: 600px) {
+  .wrapper {
+    padding-left: 0rem;
+  }
+}

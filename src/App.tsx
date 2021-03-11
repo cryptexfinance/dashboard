@@ -5,6 +5,8 @@ import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
+import { useSwipeable } from "react-swipeable";
+import { useMediaQuery } from "@react-hook/media-query";
 import Container from "react-bootstrap/esm/Container";
 import Alert from "react-bootstrap/esm/Alert";
 import Header from "./components/Header";
@@ -62,6 +64,8 @@ const App = () => {
   const [isLoading, setloading] = useState(true);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const [show, setShow] = useState(true);
+  const isMobile = useMediaQuery("only screen and (max-width: 600px)");
+  const [showSidebar, setShowSidebar] = useState(!isMobile);
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
@@ -263,10 +267,18 @@ const App = () => {
     // eslint-disable-next-line
   }, [web3Modal]);
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setShowSidebar(true),
+    onSwipedRight: () => setShowSidebar(false),
+    delta: 40,
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
   if (isLoading) {
     return (
       <>
-        <Sidebar />
+        <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
         <Container fluid className="wrapper">
           <Loading title="Loading" message="Please wait" position="total" />
         </Container>
@@ -277,7 +289,7 @@ const App = () => {
   if (invalidNetwork) {
     return (
       <>
-        <Sidebar />
+        <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
         <Container fluid className="wrapper">
           <Loading
             title="Invalid Network"
@@ -296,8 +308,8 @@ const App = () => {
           <vaultsContext.Provider value={vaults}>
             <governanceContext.Provider value={governance}>
               <rewardsContext.Provider value={rewards}>
-                <Sidebar />
-                <Container fluid className="wrapper">
+                <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
+                <Container fluid className="wrapper" {...handlers}>
                   {show && (
                     <Alert
                       variant="rinkeby"

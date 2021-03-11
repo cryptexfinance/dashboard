@@ -150,14 +150,12 @@
 
       .btn {
         background-color: $darker;
-        // width: 3.375rem;
         border-radius: 1px;
         height: 3.375rem;
         width: 100%;
       }
 
       form {
-        // padding: 2rem 2rem 0rem 2rem;
         margin-top: 1rem;
 
         label {
@@ -312,6 +310,43 @@
         width: 35px;
         height: 35px;
         margin-right: 0.5rem;
+      }
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .card {
+      overflow-x: scroll;
+    }
+  }
+
+  @media only screen and (max-width: 1100px) {
+    .card-wrapper {
+      .card {
+        &.diamond {
+          .btn {
+            margin-bottom: 3px;
+          }
+        }
+
+        svg.tcap {
+          margin-left: 0rem;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding-top: 4rem;
+
+    #connect {
+      width: 12rem;
+    }
+
+    .card-wrapper {
+      .card {
+        padding: 3.125rem 1.8125rem;
       }
     }
   }

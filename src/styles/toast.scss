@@ -19,6 +19,12 @@
     width: 26.25rem;
     margin-top: 3rem;
     margin-right: 3rem;
+
+    @media (max-width: 480px) {
+      width: 22.25rem;
+      margin-right: 0rem;
+      margin-left: 1rem;
+    }
   }
 
   .body {
