@@ -41,4 +41,21 @@
       filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
     }
   }
+
+  &.mobile {
+    z-index: 10;
+    top: 0;
+
+    &.slide-out {
+      left: -5rem;
+      -webkit-transition: left 0.3s ease-in;
+      transition: left 0.3s ease-in;
+    }
+
+    &.slide-in {
+      left: 0px;
+      -webkit-transition: right 0.4s ease-in;
+      transition: right 0.4s ease-in;
+    }
+  }
 }

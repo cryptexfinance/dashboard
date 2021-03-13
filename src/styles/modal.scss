@@ -105,4 +105,10 @@
       font-weight: bold;
     }
   }
+
+  @media (max-width: 1000px) {
+    .modal-body {
+      overflow-x: scroll;
+    }
+  }
 }

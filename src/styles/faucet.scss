@@ -89,4 +89,12 @@ div.faucet {
       box-shadow: 0px 6px 25px -6px rgba(241, 36, 255, 0.4);
     }
   }
+
+  @media (max-width: 600px) {
+    padding: 4rem 1.4rem;
+
+    .card {
+      margin-top: 2rem;
+    }
+  }
 }
