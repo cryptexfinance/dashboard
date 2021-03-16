@@ -48,7 +48,6 @@ const Graph = () => {
   useEffect(() => {
     const load = async () => {
       if (oracles && tokens && data) {
-        console.log(data);
         const currentTotalPrice = await oracles.tcapOracle?.getLatestAnswer();
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));

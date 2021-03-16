@@ -119,6 +119,20 @@ body {
   text-shadow: 3px 3px 15px $pink;
 }
 
+.table thead th {
+  border-top: 2px solid $highlight;
+  border-bottom: 2px solid $highlight;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid $highlight;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.175);
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -152,6 +166,14 @@ input[type="text"].neon-orange:focus,
 input[type="number"].neon-orange:focus {
   border-color: $orange !important;
   box-shadow: -1px 0px 15px -6px $orange;
+  color: $white;
+  background: no-repeat;
+}
+
+input[type="text"].neon-hightlight:focus,
+input[type="number"].neon-hightlight:focus {
+  border-color: $highlight !important;
+  box-shadow: -1px 0px 15px -6px $highlight;
   color: $white;
   background: no-repeat;
 }
@@ -207,5 +229,11 @@ html,
 
   .web3modal-provider-description {
     font-family: "Space Mono";
+  }
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    padding-left: 0rem;
   }
 }

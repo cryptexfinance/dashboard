@@ -188,7 +188,7 @@ const Welcome = () => {
                     className="neon-highlight"
                     onClick={() => {
                       window.open(
-                        "https://app.uniswap.org/#/swap?outputCurrency=0xA82bf5A9A3FD034101ccfA2764Ad39d987ac8fc8",
+                        `https://app.uniswap.org/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
                         "_blank"
                       );
                     }}
