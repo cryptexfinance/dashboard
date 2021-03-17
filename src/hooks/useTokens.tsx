@@ -7,6 +7,10 @@ export const useTokens = (): TokensContext => {
   const [daiToken, setDAIToken] = useState<ethers.Contract>();
   const [wbtcToken, setWBTCToken] = useState<ethers.Contract>();
   const [tcapToken, setTCAPToken] = useState<ethers.Contract>();
+  const [wethPoolToken, setWETHPoolToken] = useState<ethers.Contract>();
+  const [daiPoolToken, setDAIPoolToken] = useState<ethers.Contract>();
+  const [wbtcPoolToken, setWBTCPoolToken] = useState<ethers.Contract>();
+  const [ctxPoolToken, setCTXPoolToken] = useState<ethers.Contract>();
 
   const setCurrentWETHToken = React.useCallback((currentWETHToken: ethers.Contract): void => {
     setETHToken(currentWETHToken);
@@ -20,6 +24,24 @@ export const useTokens = (): TokensContext => {
   const setCurrentTCAPToken = React.useCallback((currentTCAPToken: ethers.Contract): void => {
     setTCAPToken(currentTCAPToken);
   }, []);
+  const setCurrentWETHPoolToken = React.useCallback(
+    (currentWETHPoolToken: ethers.Contract): void => {
+      setWETHPoolToken(currentWETHPoolToken);
+    },
+    []
+  );
+  const setCurrentDAIPoolToken = React.useCallback((currentDAIPoolToken: ethers.Contract): void => {
+    setDAIPoolToken(currentDAIPoolToken);
+  }, []);
+  const setCurrentWBTCPoolToken = React.useCallback(
+    (currentWBTCPoolToken: ethers.Contract): void => {
+      setWBTCPoolToken(currentWBTCPoolToken);
+    },
+    []
+  );
+  const setCurrentCTXPoolToken = React.useCallback((currentCTXPoolToken: ethers.Contract): void => {
+    setCTXPoolToken(currentCTXPoolToken);
+  }, []);
   return {
     wethToken,
     setCurrentWETHToken,
@@ -29,5 +51,13 @@ export const useTokens = (): TokensContext => {
     setCurrentWBTCToken,
     tcapToken,
     setCurrentTCAPToken,
+    wethPoolToken,
+    setCurrentWETHPoolToken,
+    daiPoolToken,
+    setCurrentDAIPoolToken,
+    wbtcPoolToken,
+    setCurrentWBTCPoolToken,
+    ctxPoolToken,
+    setCurrentCTXPoolToken,
   };
 };

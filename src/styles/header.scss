@@ -21,4 +21,10 @@
   .address {
     color: white;
   }
+
+  @media (max-width: 600px) {
+    padding-right: 0rem;
+    justify-content: center;
+    margin-top: 50px;
+  }
 }

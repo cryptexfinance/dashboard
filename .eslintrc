@@ -115,7 +115,15 @@
       }
     ],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "react/jsx-props-no-spreading": [
+      "error",
+      {
+        "html": "enforce",
+        "custom": "enforce",
+        "exceptions": ["Container"],  
+      }
+    ]
   },
   "plugins": ["html", "prettier", "react-hooks", "@typescript-eslint"]
 }

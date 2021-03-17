@@ -82,7 +82,6 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
-    console.log(error);
   }
 };
 
@@ -116,4 +115,36 @@ export const getMaxMint = async (
   if (r === 0 || tp === 0) return 0;
   const maxMint = (c * cp * 100) / (r * tp);
   return maxMint - d;
+};
+
+export const getProposalStatus = (
+  startBlock: number,
+  endBlock: number,
+  currentBlock: number,
+  forVotes: number,
+  againstVotes: number,
+  quorumVotes: number,
+  eta: number,
+  gracePeriod: number
+) => {
+  const currentBlockTime = currentBlock * 13 * 1000;
+  if (currentBlock <= startBlock) {
+    return "PENDING";
+  }
+  if (currentBlock <= endBlock) {
+    return "ACTIVE";
+  }
+  if (forVotes <= againstVotes || forVotes < quorumVotes) {
+    return "DEFEATED";
+  }
+  if (eta === 0) {
+    return "SUCCEEDED";
+  }
+  if (currentBlockTime >= eta + gracePeriod) {
+    return "EXPIRED";
+  }
+  if (currentBlockTime >= eta) {
+    return "READY";
+  }
+  return "QUEUED";
 };

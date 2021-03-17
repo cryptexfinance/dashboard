@@ -194,6 +194,7 @@ const Details = ({ address }: props) => {
       setCollateralPrice(currentPrice);
       let usd = toUSD(currentPrice, currentBalance);
       setTokenBalanceUSD(usd.toString());
+
       if (currentVaultData) {
         const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
         const { vaultId, collateral, debt, currentRatio } = currentVaultData;

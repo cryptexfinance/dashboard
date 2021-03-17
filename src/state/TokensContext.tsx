@@ -10,6 +10,14 @@ export interface TokensContext {
   setCurrentWBTCToken: (currentToken: ethers.Contract) => void;
   tcapToken?: ethers.Contract;
   setCurrentTCAPToken: (currentToken: ethers.Contract) => void;
+  wethPoolToken?: ethers.Contract;
+  setCurrentWETHPoolToken: (currentPoolToken: ethers.Contract) => void;
+  daiPoolToken?: ethers.Contract;
+  setCurrentDAIPoolToken: (currentPoolToken: ethers.Contract) => void;
+  wbtcPoolToken?: ethers.Contract;
+  setCurrentWBTCPoolToken: (currentPoolToken: ethers.Contract) => void;
+  ctxPoolToken?: ethers.Contract;
+  setCurrentCTXPoolToken: (currentPoolToken: ethers.Contract) => void;
 }
 
 export const TOKENS_DEFAULT_VALUE = {
@@ -17,6 +25,10 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentDAIToken: () => {},
   setCurrentWBTCToken: () => {},
   setCurrentTCAPToken: () => {},
+  setCurrentWETHPoolToken: () => {},
+  setCurrentDAIPoolToken: () => {},
+  setCurrentWBTCPoolToken: () => {},
+  setCurrentCTXPoolToken: () => {},
 };
 
 const tokensContext = React.createContext<TokensContext>(TOKENS_DEFAULT_VALUE);

@@ -3,7 +3,7 @@
 
 .welcome {
   padding: 5rem 3rem;
-  padding-bottom: 0px;
+  padding-bottom: 2rem;
 
   // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
@@ -142,9 +142,30 @@
         }
         .btn {
           width: 11.0625rem;
+          margin-bottom: 0.8rem;
 
           &.neon-green {
             box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 5rem 1.2rem;
+
+    h2 {
+      font-size: 1.3rem;
+    }
+
+    .card-wrapper {
+      .card {
+        margin-bottom: 1.2rem;
+
+        &.diamond {
+          p {
+            width: 85%;
           }
         }
       }

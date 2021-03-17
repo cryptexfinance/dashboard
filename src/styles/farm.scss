@@ -1,0 +1,353 @@
+@import "./colors";
+@import "./fonts";
+
+.farm {
+  padding: 1rem 3rem;
+  padding-bottom: 2rem;
+
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    .token-price {
+      margin-top: 2rem;
+    }
+  }
+
+  // Medium devices (tablets, 768px and up)
+  @media (min-width: 768px) {
+    // .token-price {
+    //   margin-top: 0rem;
+    // }
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    .token-price {
+      margin-top: 0rem;
+    }
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .data {
+    margin-top: 2.5rem;
+    svg {
+      height: 2rem;
+      margin-right: 0.5rem;
+
+      &.ctx-neon {
+        filter: drop-shadow(0 0 0.25rem #6450fb);
+      }
+    }
+  }
+
+  .btn {
+    background-color: $darker;
+    width: 10rem;
+    height: 3rem;
+    margin-right: 30px;
+
+    &.question {
+      border-radius: 2px;
+      width: 20px;
+      height: 20px;
+      margin-right: 0px;
+      font-size: 10px;
+      padding: 2px;
+      margin-left: 5px;
+    }
+  }
+
+  #connect {
+    background-color: $pink;
+    width: 15rem;
+    height: 3rem;
+    border-radius: 0;
+  }
+
+  .card-wrapper {
+    margin-top: 2rem;
+
+    h2 {
+      font-size: 1.375rem;
+      margin-bottom: 1.5625rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.875;
+    }
+
+    // Small devices (landscape phones, 576px and up)
+    @media (min-width: 576px) {
+      .use-tcap {
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+      }
+    }
+
+    // Medium devices (tablets, 768px and up)
+    @media (min-width: 768px) {
+      // .use-tcap {
+      //   margin-top: 0rem;
+      //   margin-bottom: 0rem;
+      // }
+    }
+
+    // Large devices (desktops, 992px and up)
+    @media (min-width: 992px) {
+      .use-tcap {
+        margin-top: 0rem;
+        margin-bottom: 0rem;
+      }
+    }
+
+    .card {
+      padding: 3.125rem 2.8125rem;
+      min-height: 20.1875rem;
+
+      .cls-1 {
+        fill: $darker;
+      }
+
+      b {
+        font-family: "Nineteen Ninety Seven";
+        color: $purple;
+      }
+
+      .row {
+        margin-top: 2.5rem;
+      }
+
+      &.balance {
+        svg {
+          height: 2rem;
+          margin-right: 0.5rem;
+          filter: drop-shadow(0px 4px 13px $dark-blue);
+
+          &.ctx-neon {
+            filter: drop-shadow(0 0 0.25rem #6450fb);
+          }
+        }
+        .row {
+          margin-top: 0rem;
+        }
+
+        h3 {
+          display: flex;
+          align-items: center;
+        }
+
+        p {
+          margin-top: 1rem;
+        }
+      }
+
+      .btn {
+        background-color: $darker;
+        border-radius: 1px;
+        height: 3.375rem;
+        width: 100%;
+      }
+
+      form {
+        margin-top: 1rem;
+
+        label {
+          font-family: "Nineteen Ninety Seven";
+          color: $white;
+
+          &.max {
+            float: right;
+            a {
+              color: $green;
+
+              &.orange {
+                color: $orange;
+              }
+            }
+          }
+        }
+
+        .text-muted {
+          text-align: left;
+          font-size: 1rem;
+        }
+
+        input[type="text"] {
+          border-radius: 1px;
+          background: no-repeat;
+          border-color: $dark;
+          color: $white;
+          height: 3.375rem;
+        }
+
+        .btn {
+          background-color: $darker;
+          // width: 3.375rem;
+          border-radius: 1px;
+          height: 3.375rem;
+          width: 100%;
+        }
+
+        .remove {
+          margin-top: 3.5rem;
+        }
+      }
+
+      &.diamond {
+        padding-bottom: 1rem;
+        width: 100%;
+        p {
+          width: 70%;
+        }
+        .btn {
+          width: 11.0625rem;
+
+          &.neon-green {
+            box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+          }
+        }
+
+        .table {
+          color: $white;
+          tr:hover {
+            color: $white;
+          }
+
+          td {
+            vertical-align: middle;
+
+            a {
+              font-weight: bold;
+              color: $purple;
+            }
+          }
+
+          a.btn {
+            padding-top: 0.4rem;
+            height: 2.5rem;
+            color: white;
+            width: 5rem;
+            margin-left: auto;
+            margin-right: auto;
+          }
+
+          .btn {
+            width: 80%;
+            height: 2.5rem;
+            padding: 0rem;
+            width: 5rem;
+            margin-left: auto;
+            margin-right: auto;
+
+            &.question {
+              border-radius: 2px;
+              width: 20px;
+              height: 20px;
+              margin-right: 0px;
+              font-size: 10px;
+              padding: 2px;
+              margin-left: 5px;
+            }
+          }
+        }
+      }
+    }
+    .card {
+      svg {
+        height: 2rem;
+      }
+      svg.stake {
+        filter: drop-shadow(0px 0px 5px rgba(191, 245, 225, 0.7));
+      }
+
+      svg.h24 {
+        filter: drop-shadow(0px 0px 5px rgba(6, 180, 255, 0.53));
+      }
+
+      svg.tcap {
+        width: 3rem;
+      }
+
+      svg.weth {
+        filter: drop-shadow(0px 0px 5px rgba(111, 19, 202, 0.53));
+        border-radius: 30px;
+        border-color: #ac3eff;
+        border-style: solid;
+        border-width: 1.8px;
+        width: 32px;
+        height: 32px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin-top: 2px;
+        margin-left: 2px;
+        margin-right: 2px;
+      }
+
+      svg.wbtc {
+        filter: drop-shadow(0px 0px 5px rgba(249, 252, 73, 0.42));
+      }
+
+      svg.dai {
+        filter: drop-shadow(0px 0px 5px rgba(242, 128, 64, 0.42));
+      }
+
+      svg.tcap {
+        margin-left: 0.5rem;
+        width: 35px;
+        height: 35px;
+      }
+
+      svg.ctx-neon {
+        width: 32px;
+        height: 32px;
+        width: 35px;
+        height: 35px;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .card {
+      overflow-x: scroll;
+    }
+  }
+
+  @media only screen and (max-width: 1100px) {
+    .card-wrapper {
+      .card {
+        &.diamond {
+          .btn {
+            margin-bottom: 3px;
+          }
+        }
+
+        svg.tcap {
+          margin-left: 0rem;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding-top: 4rem;
+
+    #connect {
+      width: 12rem;
+    }
+
+    .card-wrapper {
+      .card {
+        padding: 3.125rem 1.8125rem;
+      }
+    }
+  }
+}
