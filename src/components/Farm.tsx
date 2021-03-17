@@ -62,6 +62,8 @@ const Farm = () => {
   const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
   const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
 
+  const lpURL = process.env.REACT_APP_LP_URL;
+
   const USER_VAULTS = gql`
     query getVault($owner: String!) {
       vaults(where: { owner: $owner }) {
@@ -477,9 +479,9 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/ETH`}
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                         >
-                          Uniswap ETH/TCAP Pool
+                          SushiSwap ETH/TCAP Pool
                         </a>
                       </td>
                       <td className="number">
@@ -530,7 +532,7 @@ const Farm = () => {
                           className=""
                           onClick={() => {
                             setStakeBalance(ethPoolBalance);
-                            setSelectedPoolTitle("Uniswap ETH/TCAP Pool");
+                            setSelectedPoolTitle("SushiSwap ETH/TCAP Pool");
                             if (rewards.wethPoolReward) {
                               setSelectedPool(rewards.wethPoolReward);
                               setSelectedPoolToken(tokens.wethPoolToken);
@@ -572,9 +574,9 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
                         >
-                          Uniswap WBTC/TCAP Pool
+                          SushiSwap WBTC/TCAP Pool
                         </a>
                       </td>{" "}
                       <td className="number">
@@ -627,7 +629,7 @@ const Farm = () => {
                           className=""
                           onClick={() => {
                             setStakeBalance(wbtcPoolBalance);
-                            setSelectedPoolTitle("Uniswap WBTC/TCAP Pool");
+                            setSelectedPoolTitle("SushiSwap WBTC/TCAP Pool");
                             if (rewards.wbtcPoolReward) {
                               setSelectedPool(rewards.wbtcPoolReward);
                               setSelectedPoolToken(tokens.wbtcPoolToken);
@@ -669,9 +671,9 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`https://app.uniswap.org/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
                         >
-                          Uniswap DAI/TCAP Pool
+                          SushiSwap DAI/TCAP Pool
                         </a>
                       </td>
                       <td className="number">
@@ -722,7 +724,7 @@ const Farm = () => {
                           className=""
                           onClick={() => {
                             setStakeBalance(daiPoolBalance);
-                            setSelectedPoolTitle("Uniswap DAI/TCAP Pool");
+                            setSelectedPoolTitle("SushiSwap DAI/TCAP Pool");
                             if (rewards.daiPoolReward) {
                               setSelectedPool(rewards.daiPoolReward);
                               setSelectedPoolToken(tokens.daiPoolToken);
@@ -763,9 +765,9 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`https://app.uniswap.org/#/add/ETH/${governance.ctxToken?.address}`}
+                          href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
                         >
-                          Uniswap CTX/ETH Pool
+                          SushiSwap CTX/ETH Pool
                         </a>
                       </td>
                       <td className="number">
@@ -816,7 +818,7 @@ const Farm = () => {
                           className=""
                           onClick={() => {
                             setStakeBalance(ctxPoolBalance);
-                            setSelectedPoolTitle("Uniswap ETH/CTX Pool");
+                            setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
                             if (rewards.ctxPoolReward) {
                               setSelectedPool(rewards.ctxPoolReward);
                               setSelectedPoolToken(tokens.ctxPoolToken);
