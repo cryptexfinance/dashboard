@@ -5,21 +5,19 @@
   padding: 1rem 3rem;
   padding-bottom: 2rem;
 
-  // Small devices (landscape phones, 576px and up)
-  @media (min-width: 590px) and (max-width: 790px) {
+  @media (max-width: 991px) {
     .token-price {
       margin-top: 2rem;
     }
+
+    @media (min-width: 470px) {
+      .col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
   }
 
-  // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) {
-    // .token-price {
-    //   margin-top: 0rem;
-    // }
-  }
-
-  // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
     .token-price {
       margin-top: 0rem;
@@ -36,6 +34,7 @@
     svg {
       height: 2rem;
       margin-right: 0.5rem;
+      margin-top: -5px;
 
       &.ctx-neon {
         filter: none;
@@ -65,6 +64,14 @@
     width: 15rem;
     height: 3rem;
     border-radius: 0;
+
+    @media (max-width: 1450px) and (min-width: 992px){
+      width: 12rem;
+    }
+    @media (max-width: 1275px) and (min-width: 992px){
+      width: 10rem;
+      height: 4rem;
+    }
   }
 
   .card-wrapper {
@@ -89,14 +96,6 @@
         margin-top: 2rem;
         margin-bottom: 4rem;
       }
-    }
-
-    // Medium devices (tablets, 768px and up)
-    @media (min-width: 768px) {
-      // .use-tcap {
-      //   margin-top: 0rem;
-      //   margin-bottom: 0rem;
-      // }
     }
 
     // Large devices (desktops, 992px and up)
@@ -245,17 +244,17 @@
 
   @media (max-width: 1300px) {
     h2 {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
   }
 
-  @media (min-width: 991px) and (max-width: 1130px) {
-    @media (max-width: 1050px) {
+  @media (min-width: 991px) and (max-width: 1180px) {
+    @media (max-width: 1100px) {
       padding: 1rem 1rem;
     }
 
     h2 {
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
     .card-wrapper {
       .card {
@@ -267,7 +266,7 @@
   @media (max-width: 900px) {
     padding: 4rem 1.5rem;
     h2 {
-      font-size: 1rem;
+      font-size: 1.3rem;
     }
     .card-wrapper {
       .card {
@@ -275,10 +274,32 @@
         margin-bottom: 3rem;
       }
     }
+    @media (max-width: 640px) {
+      h2 {
+        font-size: 1.1rem;
+      }
+    }
+  }
 
-    @media (max-width: 460px) {
-      .token-price {
-        margin-top: 20px;
+  @media (max-width: 490px) {
+    h2 {
+      font-size: 0.85rem;
+    }
+    .data {
+      svg {
+        height: 1.8rem;
+        margin-right: 0.3rem;
+      }
+      .col-7 {
+        padding-left: 6px;
+        padding-right: 1px;
+      }
+      .col-5 {
+        padding-left: 2px;
+        padding-right: 0px;
+      }
+      .token-price.col-md-3.col-sm-6.col-7 {
+        padding-right: 20px;
       }
     }
   }

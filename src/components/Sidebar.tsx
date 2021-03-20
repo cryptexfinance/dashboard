@@ -4,6 +4,7 @@ import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
+import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
 import { ReactComponent as FaucetIcon } from "../assets/images/welcome/faucet.svg";
@@ -14,10 +15,11 @@ import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
 type props = {
   showSidebar: boolean;
+  setShowSidebar: (showSidebar: boolean) => void;
   isMobile: boolean;
 };
 
-const Sidebar = ({ showSidebar, isMobile }: props) => {
+const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
   const location = useLocation();
   let activeVal = "dashboard";
   switch (location.pathname) {
@@ -50,13 +52,15 @@ const Sidebar = ({ showSidebar, isMobile }: props) => {
     if (showSidebar) return "sidebar mobile slide-out";
     return "sidebar mobile slide-in";
   };
+  const sideBarLogo = () => {
+    if (isMobile) return <MenuLogo className="menu" onClick={() => setShowSidebar(true)} />;
+    return <Logo />;
+  };
 
   return (
     <>
       <Nav className={sidebarClass()}>
-        <Nav.Item className="mt-4 mb-1">
-          <Logo />
-        </Nav.Item>
+        <Nav.Item className="mt-4 mb-1">{sideBarLogo()}</Nav.Item>
         <Nav.Item>
           {active === "dashboard" ? (
             <Link

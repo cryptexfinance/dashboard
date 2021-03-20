@@ -204,7 +204,7 @@ const Governance = () => {
       <div>
         <h3>Governance Portal</h3>
         <Row className="data">
-          <Col>
+          <Col md={3} sm={6} xs={7}>
             <h2 className="number neon-highlight">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -218,7 +218,7 @@ const Governance = () => {
             </h2>
             <p>Total Supply</p>
           </Col>
-          <Col>
+          <Col md={3} sm={6} xs={5}>
             <h2 className="number neon-highlight">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -232,7 +232,7 @@ const Governance = () => {
             </h2>
             <p>Quorum Required</p>
           </Col>
-          <Col className="token-price">
+          <Col className="token-price" md={3} sm={6} xs={7}>
             <h2 className="number neon-dark-blue">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -245,7 +245,7 @@ const Governance = () => {
             </h2>
             <p>Proposal Threshold</p>
           </Col>
-          <Col className="token-price">
+          <Col className="token-price" md={3} sm={6} xs={5}>
             <h2 className="number neon-dark-blue">
               <NumberFormat
                 className="number"

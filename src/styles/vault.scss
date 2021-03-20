@@ -3,6 +3,7 @@
 
 .vault {
   padding-bottom: 0px;
+  margin-bottom: 3rem;
 
   // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
@@ -337,9 +338,62 @@
     }
   }
 
+  @media (min-width: 992px) and (max-width: 1200px) {
+    .actions-container {
+      column-gap: 1rem;
+      .form-card {
+        form {
+          label {
+            font-size: 0.87rem;
+          }
+        }
+        .card {
+          .info {
+            padding: 2rem 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-height: 700px) and (min-width: 992px) {
+    .icon-container {
+      margin-top: 1rem;
+    }
+    .actions-container {
+      margin-top: 0rem;
+
+      .card {
+        padding: 1rem 1rem;
+      }
+      .form-card {
+        .card {
+          min-height: 23rem;
+
+          .info {
+            padding-top: 1.3rem;
+            padding-bottom: 1.3rem;
+          }
+        }
+        form {
+          padding-top: 1.5rem;
+          .remove {
+            margin-top: 2.7rem;
+          }
+        }
+      }
+      .balance {
+        row-gap: 1rem;
+        .card {
+          min-height: 11.17rem;
+        }
+      }
+    }
+  }
+
   @media (max-width: 730px) {
     padding-top: 4rem;
-    padding-left: 1.7rem;
+    padding-left: 1rem;
 
     .pre-actions {
       p {
@@ -348,6 +402,24 @@
     }
 
     @media (max-width: 575px) {
+      .actions-container {
+        .card {
+          padding: 2rem 1.5rem;
+        }
+        .form-card {
+          .card {
+            .info {
+              padding: 2rem 1rem;
+            }
+          }
+        }
+        @media (max-width: 380px) {
+          .card {
+            padding: 2rem 0.9rem;
+          }
+        }
+      }
+
       .card {
         margin-bottom: 2rem;
       }

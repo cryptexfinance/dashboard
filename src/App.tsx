@@ -11,6 +11,7 @@ import Container from "react-bootstrap/esm/Container";
 import Alert from "react-bootstrap/esm/Alert";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import Topbar from "./components/Topbar";
 import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
 import Vault from "./components/Vault/Vault";
@@ -278,7 +279,7 @@ const App = () => {
   if (isLoading) {
     return (
       <>
-        <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
+        <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} isMobile={isMobile} />
         <Container fluid className="wrapper">
           <Loading title="Loading" message="Please wait" position="total" />
         </Container>
@@ -289,7 +290,7 @@ const App = () => {
   if (invalidNetwork) {
     return (
       <>
-        <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
+        <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} isMobile={isMobile} />
         <Container fluid className="wrapper">
           <Loading
             title="Invalid Network"
@@ -308,7 +309,16 @@ const App = () => {
           <vaultsContext.Provider value={vaults}>
             <governanceContext.Provider value={governance}>
               <rewardsContext.Provider value={rewards}>
-                <Sidebar showSidebar={showSidebar} isMobile={isMobile} />
+                <Sidebar
+                  showSidebar={showSidebar}
+                  setShowSidebar={setShowSidebar}
+                  isMobile={isMobile}
+                />
+                <Topbar
+                  showSidebar={showSidebar}
+                  setShowSidebar={setShowSidebar}
+                  isMobile={isMobile}
+                />
                 <Container fluid className="wrapper" {...handlers}>
                   {show && (
                     <Alert
