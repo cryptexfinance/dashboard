@@ -66,7 +66,7 @@ const App = () => {
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const [show, setShow] = useState(true);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
-  const [showSidebar, setShowSidebar] = useState(!isMobile);
+  const [showSidebar, setShowSidebar] = useState(true);
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
