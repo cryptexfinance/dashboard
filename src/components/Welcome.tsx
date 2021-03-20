@@ -31,6 +31,8 @@ const Welcome = () => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
 
+  const lpURL = process.env.REACT_APP_LP_URL;
+
   const TCAP_PRICE = gql`
     query {
       oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
@@ -180,7 +182,7 @@ const Welcome = () => {
           <Col xs={12} sm={12} lg={7} className="use-tcap">
             <Card className="diamond">
               <h2>Use TCAP</h2>
-              <p>Trade TCAP using uniswap or create new supply using a vault</p>
+              <p>Trade TCAP using SushiSwap or create new supply using a vault</p>
               <Row className="">
                 <Col>
                   <Button
@@ -188,7 +190,7 @@ const Welcome = () => {
                     className="neon-highlight"
                     onClick={() => {
                       window.open(
-                        `https://app.uniswap.org/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
+                        `${lpURL}/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
                         "_blank"
                       );
                     }}
