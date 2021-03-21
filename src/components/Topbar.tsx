@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import "../styles/topbar.scss";
 import { ReactComponent as Logo } from "../assets/images/logo.svg";
