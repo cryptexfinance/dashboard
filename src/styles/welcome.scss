@@ -12,13 +12,6 @@
     }
   }
 
-  // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) {
-    // .token-price {
-    //   margin-top: 0rem;
-    // }
-  }
-
   // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
     .token-price {
@@ -88,14 +81,6 @@
       }
     }
 
-    // Medium devices (tablets, 768px and up)
-    @media (min-width: 768px) {
-      // .use-tcap {
-      //   margin-top: 0rem;
-      //   margin-bottom: 0rem;
-      // }
-    }
-
     // Large devices (desktops, 992px and up)
     @media (min-width: 992px) {
       .use-tcap {
@@ -162,10 +147,13 @@
     }
   }
 
-  @media (max-height: 750px) and (min-width: 992px) {
+  @media (max-height: 800px) and (min-width: 992px) {
     padding-top: 1rem;
     .card-wrapper {
       margin-top: 1.5rem;
+      .card {
+        padding: 2rem 2.8125rem;
+      }
     }
   }
 

@@ -61,10 +61,7 @@
 
   // Medium devices (tablets, 768px and up)
   @media (min-width: 768px) {
-    padding: 5rem 3rem;
-    // .token-price {
-    //   margin-top: 0rem;
-    // }
+    padding: 5rem 2rem;
 
     .card {
       h4 {
@@ -90,6 +87,12 @@
       grid-template-rows: auto auto;
       gap: 2rem;
       margin-bottom: 0rem;
+    }
+    @media (max-height: 680px) {
+      padding: 2rem 3rem;
+      .grid {
+        gap: 1.5rem;
+      }
     }
   }
 

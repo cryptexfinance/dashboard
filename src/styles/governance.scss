@@ -65,10 +65,10 @@
     height: 3rem;
     border-radius: 0;
 
-    @media (max-width: 1450px) and (min-width: 992px){
+    @media (max-width: 1450px) and (min-width: 992px) {
       width: 12rem;
     }
-    @media (max-width: 1275px) and (min-width: 992px){
+    @media (max-width: 1275px) and (min-width: 992px) {
       width: 10rem;
       height: 4rem;
     }
@@ -152,6 +152,7 @@
         border-radius: 1px;
         height: 3.375rem;
         width: 100%;
+        margin-bottom: 0.8rem;
       }
 
       form {
@@ -257,8 +258,14 @@
       font-size: 1.1rem;
     }
     .card-wrapper {
+      @media (max-height: 800px) {
+        margin-top: 1.5rem;
+      }
       .card {
         padding: 3.125rem 1.1125rem;
+        @media (max-height: 800px) {
+          padding: 2rem 1.1125rem;
+        }
       }
     }
   }

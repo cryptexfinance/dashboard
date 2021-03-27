@@ -313,7 +313,6 @@ const Governance = () => {
                 <Button className="neon-highlight" onClick={() => setDelegateShow(true)}>
                   Delegate
                 </Button>
-                <br />
                 <Button
                   className="neon-green"
                   variant="success"
@@ -321,7 +320,6 @@ const Governance = () => {
                 >
                   Propose
                 </Button>{" "}
-                <br />
               </Card>
             ) : (
               <Card className="balance">

@@ -108,40 +108,6 @@
     }
   }
 
-  // Small devices (landscape phones, 576px and up)
-  @media (min-width: 576px) {
-    .actions-container {
-      display: grid;
-      grid-template-columns: auto;
-      margin-bottom: 2rem;
-    }
-
-    .balance {
-      grid-row-gap: 0rem;
-      row-gap: 0rem;
-    }
-
-    .card {
-      margin-bottom: 2rem;
-    }
-  }
-
-  // Large devices (desktops, 992px and up)
-  @media (min-width: 992px) {
-    .actions-container {
-      display: grid;
-      grid-template-columns: auto 33% 33%;
-      margin-bottom: 0rem;
-    }
-    .balance {
-      row-gap: 2rem;
-    }
-
-    .card {
-      margin-bottom: 0rem;
-    }
-  }
-
   .actions-container {
     margin-top: 1rem;
     column-gap: 2rem;
@@ -168,6 +134,7 @@
 
       .amount {
         display: flex;
+        flex-direction: row;
         justify-content: flex-end;
       }
     }
@@ -194,10 +161,13 @@
         }
 
         svg {
-          // margin-top: -5px;
+          //margin-top: -5px;
           vertical-align: top;
           width: 0.8rem;
           filter: brightness(1118%) drop-shadow(0px 0px 5px rgba(6, 52, 255, 0.53));
+          @supports (-webkit-touch-callout: none) {
+            height: intrinsic;
+          }
 
           &.tcap-neon {
             margin-top: 0px;
@@ -280,6 +250,7 @@
     .balance {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
 
       .card {
         min-height: 12rem;
@@ -292,6 +263,11 @@
       .ratio {
         width: 1.9375rem;
         filter: drop-shadow(0px 0px 15px rgba(15, 217, 255, 0.53));
+      }
+
+      .info-data {
+        display: flex;
+        flex-direction: column;
       }
 
       .info {
@@ -313,10 +289,15 @@
       }
 
       svg.small {
-        margin-top: -5px;
+        @supports not (-webkit-touch-callout: none) {
+          margin-top: -5px;
+        }
         vertical-align: top;
         width: 0.8rem;
         filter: brightness(1118%) drop-shadow(0px 0px 5px $highlight);
+        @supports (-webkit-touch-callout: none) {
+          height: intrinsic;
+        }
 
         &.btc.small {
           margin-top: -5px;
@@ -336,13 +317,67 @@
         min-height: 26rem;
       }
     }
+    .token-icon-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-height: 0rem;
+      min-width: 0rem;
+    }
+  }
+
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    .actions-container {
+      display: grid;
+      grid-template-columns: auto;
+      margin-bottom: 2rem;
+    }
+
+    .balance {
+      grid-row-gap: 0rem;
+      row-gap: 0rem;
+    }
+
+    .card {
+      margin-bottom: 2rem;
+    }
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    .actions-container {
+      display: grid;
+      grid-template-columns: auto 33% 33%;
+      margin-bottom: 0rem;
+    }
+    .balance {
+      row-gap: 2rem;
+    }
+
+    .card {
+      margin-bottom: 0rem;
+    }
   }
 
   @media (min-width: 992px) and (max-width: 1200px) {
     .actions-container {
       column-gap: 1rem;
+      .balance {
+        .card {
+          padding: 2rem 1.2rem;
+        }
+        h4 {
+          font-size: 1.35rem;
+        }
+        p {
+          font-size: 0.9rem;
+        }
+      }
       .form-card {
         form {
+          padding: 2rem 1.2rem 0rem 1.2rem;
           label {
             font-size: 0.87rem;
           }
@@ -350,6 +385,23 @@
         .card {
           .info {
             padding: 2rem 1rem;
+          }
+        }
+      }
+      @media (max-width: 1140px) {
+        .form-group {
+          span {
+            font-size: 0.9rem;
+          }
+        }
+        .form-card {
+          h4 {
+            font-size: 1.32rem;
+          }
+        }
+        .balance {
+          h4 {
+            font-size: 1.25rem;
           }
         }
       }

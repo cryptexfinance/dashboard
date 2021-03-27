@@ -153,6 +153,9 @@
         border-radius: 1px;
         height: 3.375rem;
         width: 100%;
+        @media only screen and (min-width: 1100px) and (max-width: 1415px) {
+          margin-bottom: 5px;
+        }
       }
 
       form {
@@ -325,7 +328,7 @@
       .card {
         &.diamond {
           .btn {
-            margin-bottom: 3px;
+            margin-bottom: 5px;
           }
         }
 
