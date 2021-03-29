@@ -88,6 +88,9 @@
       gap: 2rem;
       margin-bottom: 0rem;
     }
+    @media (max-height: 820px) {
+      padding: 3rem 3rem;
+    }
     @media (max-height: 680px) {
       padding: 2rem 3rem;
       .grid {

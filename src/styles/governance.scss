@@ -243,6 +243,15 @@
     }
   }
 
+  @media (max-height: 820px) and (min-width: 992px) {
+    .card-wrapper {
+      margin-top: 1rem;
+      .card {
+        padding: 2.125rem 2.8125rem;
+      }
+    }
+  }
+
   @media (max-width: 1300px) {
     h2 {
       font-size: 1.3rem;
