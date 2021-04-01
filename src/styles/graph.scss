@@ -15,14 +15,14 @@
     }
 
     h4 {
-      font-size: 0.8rem;
+      font-size: 1rem;
       margin-top: 2rem;
       margin-bottom: 0;
     }
 
     h5 {
       margin-top: 0.75rem;
-      font-size: 0.8rem;
+      font-size: 1rem;
       margin-bottom: 0;
     }
 
@@ -55,7 +55,27 @@
       margin-bottom: 0;
     }
     .card {
-      padding: 2.5rem;
+      padding: 2.2rem;
+
+      @media (max-width: 750px) {
+        padding: 1.8rem;
+        h4 {
+          font-size: 0.9rem;
+        }
+        h5 {
+          font-size: 0.9rem;
+        }
+      }
+      @media (max-width: 680px) {
+        padding: 1.5rem;
+        h4 {
+          font-size: 0.8rem;
+        }
+        h5 {
+          font-size: 0.8rem;
+          margin-top: 0.5rem;
+        }
+      }
     }
   }
 
@@ -74,6 +94,25 @@
         margin-top: 0.75rem;
         font-size: 1.3rem;
         margin-bottom: 0;
+      }
+
+      @media (max-width: 935px) {
+        h4 {
+          font-size: 1.2rem;
+          margin-top: 1.7rem;
+        }
+        h5 {
+          font-size: 1.25rem;
+        }
+      }
+      @media (max-width: 830px) {
+        padding: 2rem;
+        h4 {
+          font-size: 1.15rem;
+        }
+        h5 {
+          font-size: 1.2rem;
+        }
       }
     }
   }
@@ -95,6 +134,46 @@
       padding: 2rem 3rem;
       .grid {
         gap: 1.5rem;
+      }
+    }
+
+    .card {
+      @media (max-width: 1340px) {
+        h4 {
+          font-size: 1.2rem;
+        }
+        h5 {
+          font-size: 1.25rem;
+        }
+      }
+      @media (max-width: 1310px) {
+        h4 {
+          font-size: 1.1rem;
+        }
+        h5 {
+          font-size: 1.23rem;
+        }
+      }
+      @media (max-width: 1250px) {
+        padding: 2.2rem;
+        h4 {
+          font-size: 1rem;
+        }
+        h5 {
+          font-size: 1.2rem;
+        }
+      }
+      @media (max-width: 1180px) {
+        padding: 1.8rem;
+      }
+      @media (max-width: 1110px) {
+        padding: 1.6rem;
+        h4 {
+          font-size: 0.9rem;
+        }
+        h5 {
+          font-size: 1.1rem;
+        }
       }
     }
   }

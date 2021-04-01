@@ -187,7 +187,7 @@ const Welcome = () => {
                 <Col>
                   <Button
                     variant="primary"
-                    className="neon-highlight"
+                    className="neon-orange"
                     onClick={() => {
                       window.open(
                         `${lpURL}/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
@@ -210,6 +210,22 @@ const Welcome = () => {
                   ) : (
                     <Button variant="dark" className="" disabled>
                       Mint
+                    </Button>
+                  )}
+                </Col>
+              </Row>
+              <Row className="">
+                <Col>
+                  <Button variant="primary" className="neon-blue">
+                    Pool
+                  </Button>
+                  {address !== "" ? (
+                    <Button variant="success" className="neon-pink">
+                      Farm
+                    </Button>
+                  ) : (
+                    <Button variant="dark" className="" disabled>
+                      Farm
                     </Button>
                   )}
                 </Col>

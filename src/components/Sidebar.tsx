@@ -84,6 +84,28 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
           )}
         </Nav.Item>
         <Nav.Item>
+          {active === "graph" ? (
+            <Link
+              to="/graph"
+              className="active"
+              onClick={() => {
+                setActive("graph");
+              }}
+            >
+              <GraphIcon />
+            </Link>
+          ) : (
+            <Link
+              to="/graph"
+              onClick={() => {
+                setActive("graph");
+              }}
+            >
+              <GraphIcon />
+            </Link>
+          )}
+        </Nav.Item>
+        <Nav.Item>
           {active === "vault" ? (
             <Link
               to="/vault"
@@ -146,28 +168,6 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
               }}
             >
               <GovernanceIcon className="governance" />
-            </Link>
-          )}
-        </Nav.Item>
-        <Nav.Item>
-          {active === "graph" ? (
-            <Link
-              to="/graph"
-              className="active"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/graph"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
             </Link>
           )}
         </Nav.Item>

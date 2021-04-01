@@ -78,7 +78,7 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     notificationBody = "All set, please wait for another confirmation";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
-    await tx.wait(2);
+    await tx.wait(3);
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
@@ -100,14 +100,14 @@ export const getRatio = async (
   return ratio;
 };
 
-export const getMaxMint = async (
+export const getSafeMint = async (
   ratio: string,
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
   debt: string
 ) => {
-  const r = parseFloat(ratio);
+  const r = parseFloat(ratio) + 50;
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);

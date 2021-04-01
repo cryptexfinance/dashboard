@@ -4,6 +4,8 @@ import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import ethers from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
@@ -312,7 +314,21 @@ const Farm = () => {
                       <th />
                       <th>Description</th>
                       <th>Current Mint</th>
-                      <th>Current Reward</th>
+                      <th>
+                        <div className="rewards">
+                          <div className="title-current">Current Reward</div>
+                          <div className="button-current">
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                            >
+                              <Button variant="dark">?</Button>
+                            </OverlayTrigger>
+                          </div>
+                        </div>
+                      </th>
                       <th />
                     </tr>
                   </thead>
@@ -464,8 +480,36 @@ const Farm = () => {
                       <th>Description</th>
                       <th>Balance</th>
                       <th>Stake</th>
-                      <th>Vested Reward</th>
-                      <th>Unvested Reward</th>
+                      <th>
+                        <div className="rewards">
+                          <div className="title">Vested Reward</div>
+                          <div className="button">
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                            >
+                              <Button variant="dark">?</Button>
+                            </OverlayTrigger>
+                          </div>
+                        </div>
+                      </th>
+                      <th>
+                        <div className="rewards">
+                          <div className="title">Unvested Reward</div>
+                          <div className="button">
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                            >
+                              <Button variant="dark">?</Button>
+                            </OverlayTrigger>
+                          </div>
+                        </div>
+                      </th>
                       <th />
                     </tr>
                   </thead>

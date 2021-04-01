@@ -102,11 +102,19 @@
         color: $purple;
       }
 
+      p {
+        margin-bottom: 1.5rem;
+      }
+
       .row {
-        margin-top: 2.5rem;
+        margin-top: 0.5rem;
       }
 
       &.balance {
+        .row {
+          margin-top: 3rem;
+        }
+
         svg {
           height: 2rem;
           margin-right: 0.5rem;
@@ -141,6 +149,9 @@
 
           &.neon-green {
             box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+          }
+          &.neon-blue {
+            box-shadow: 0px 0px 39px -6px rgba(15, 217, 255, 0.4);
           }
         }
       }

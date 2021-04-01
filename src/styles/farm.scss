@@ -12,13 +12,6 @@
     }
   }
 
-  // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) {
-    // .token-price {
-    //   margin-top: 0rem;
-    // }
-  }
-
   // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
     .token-price {
@@ -89,14 +82,6 @@
         margin-top: 2rem;
         margin-bottom: 4rem;
       }
-    }
-
-    // Medium devices (tablets, 768px and up)
-    @media (min-width: 768px) {
-      // .use-tcap {
-      //   margin-top: 0rem;
-      //   margin-bottom: 0rem;
-      // }
     }
 
     // Large devices (desktops, 992px and up)
@@ -259,7 +244,44 @@
               margin-left: 5px;
             }
           }
+
+          thead {
+            .btn {
+              width: 37px;
+              min-width: 35px;
+              height: 35px;
+              border-radius: 0.25rem;
+              background-color: $dark;
+              margin-top: 5px;
+              margin-left: 7px;
+            }
+            .rewards {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+            }
+            @media (max-width: 1500px) {
+              .title {
+                flex: 1;
+              }
+              .button {
+                flex: 2;
+              }
+            }
+            @media (max-width: 1000px) {
+              .title-current {
+                flex: 1;
+              }
+              .button-current {
+                flex: 2;
+              }
+            }
+          }
         }
+      }
+
+      th {
+        vertical-align: middle;
       }
     }
     .card {
@@ -317,9 +339,11 @@
     }
   }
 
-  @media (max-width: 1000px) {
-    .card {
-      overflow-x: scroll;
+  @media (max-width: 1050px) {
+    .card-wrapper {
+      .card {
+        overflow-x: scroll;
+      }
     }
   }
 

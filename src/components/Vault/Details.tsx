@@ -22,7 +22,7 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD, errorNotification, getRatio, getMaxMint } from "../../utils/utils";
+import { notifyUser, toUSD, errorNotification, getRatio, getSafeMint } from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -488,7 +488,7 @@ const Details = ({ address }: props) => {
 
   const maxMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const maxMint = await getMaxMint(
+    const maxMint = await getSafeMint(
       minRatio,
       vaultCollateral,
       collateralPrice,
@@ -869,7 +869,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Mint TCAP</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={maxMintTCAP}>
-                        MAX
+                        SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
