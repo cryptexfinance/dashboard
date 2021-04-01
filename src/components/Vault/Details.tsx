@@ -245,6 +245,7 @@ const Details = ({ address }: props) => {
 
   const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
     variables: { owner: address },
+    pollInterval: 200000,
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     onCompleted: () => {
