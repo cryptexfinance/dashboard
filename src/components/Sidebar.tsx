@@ -7,7 +7,7 @@ import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
-import { ReactComponent as FaucetIcon } from "../assets/images/welcome/faucet.svg";
+import { ReactComponent as PoolsIcon } from "../assets/images/welcome/pool.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as GovernanceIcon } from "../assets/images/welcome/governance.svg";
@@ -32,8 +32,8 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
     case "/graph":
       activeVal = "graph";
       break;
-    case "/faucet":
-      activeVal = "faucet";
+    case "/pools":
+      activeVal = "pools";
       break;
     case "/farm":
       activeVal = "farm";
@@ -106,6 +106,28 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
           )}
         </Nav.Item>
         <Nav.Item>
+          {active === "pools" ? (
+            <Link
+              to="/pools"
+              className="active"
+              onClick={() => {
+                setActive("pools");
+              }}
+            >
+              <PoolsIcon />
+            </Link>
+          ) : (
+            <Link
+              to="/pools"
+              onClick={() => {
+                setActive("pools");
+              }}
+            >
+              <PoolsIcon />
+            </Link>
+          )}
+        </Nav.Item>
+        <Nav.Item>
           {active === "farm" ? (
             <Link
               to="/farm"
@@ -146,28 +168,6 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
               }}
             >
               <GovernanceIcon className="governance" />
-            </Link>
-          )}
-        </Nav.Item>
-        <Nav.Item>
-          {active === "faucet" ? (
-            <Link
-              to="/faucet"
-              className="active"
-              onClick={() => {
-                setActive("faucet");
-              }}
-            >
-              <FaucetIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/faucet"
-              onClick={() => {
-                setActive("faucet");
-              }}
-            >
-              <FaucetIcon />
             </Link>
           )}
         </Nav.Item>

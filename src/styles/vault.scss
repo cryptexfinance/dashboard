@@ -199,6 +199,9 @@
 
           &.max {
             float: right;
+            @media (min-width: 992px) and (max-width: 1300px) {
+              font-size: 0.9rem;
+            }
             a {
               color: $green;
 

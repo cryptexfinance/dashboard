@@ -787,7 +787,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Add Collateral</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={maxAddCollateral}>
-                        MAX SAFE
+                        MAX
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -819,7 +819,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Remove Collateral</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number orange" onClick={safeRemoveCollateral}>
-                        SAFE
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -884,7 +884,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Mint TCAP</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={safeMintTCAP}>
-                        SAFE
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -916,7 +916,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Burn TCAP</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number orange" onClick={maxBurnTCAP}>
-                        MAX SAFE
+                        MAX
                       </a>
                     </Form.Label>
                     <InputGroup>

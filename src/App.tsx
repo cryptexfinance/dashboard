@@ -15,7 +15,7 @@ import Topbar from "./components/Topbar";
 import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
 import Vault from "./components/Vault/Vault";
-import Faucet from "./components/Faucet";
+import Pool from "./components/Pool";
 import Governance from "./components/Governance";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
@@ -354,8 +354,8 @@ const App = () => {
                       <Route path={`${match.url}governance`}>
                         <Governance />
                       </Route>
-                      <Route path={`${match.url}faucet`}>
-                        <Faucet />
+                      <Route path={`${match.url}pools`}>
+                        <Pool />
                       </Route>
                     </ApolloProvider>
                   </Switch>
