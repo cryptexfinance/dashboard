@@ -188,6 +188,11 @@
         }
       }
 
+      &.pool {
+        small {
+          color: white;
+        }
+      }
       &.diamond {
         padding-bottom: 1rem;
         width: 100%;
