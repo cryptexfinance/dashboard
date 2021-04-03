@@ -22,7 +22,14 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD, errorNotification, getRatio, getSafeMint } from "../../utils/utils";
+import {
+  notifyUser,
+  toUSD,
+  errorNotification,
+  getRatio,
+  getSafeRemoveCollateral,
+  getSafeMint,
+} from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -454,14 +461,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxRemoveCollateral = async (e: React.MouseEvent) => {
+  const safeRemoveCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setRemoveCollateralTxt(vaultCollateral);
-    let usd = toUSD(collateralPrice, vaultCollateral);
+    const collateralToRemove = await getSafeRemoveCollateral(
+      minRatio,
+      vaultCollateral,
+      collateralPrice,
+      tcapPrice,
+      vaultDebt
+    );
+    setRemoveCollateralTxt(collateralToRemove.toString());
+    let usd = toUSD(collateralPrice, collateralToRemove.toString());
     if (!usd) {
       usd = 0;
     }
-    const newCollateral = parseFloat(vaultCollateral) - parseFloat(vaultCollateral);
+    const newCollateral = parseFloat(vaultCollateral) - collateralToRemove;
     const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
     changeVault(r);
     setRemoveCollateralUSD(usd.toString());
@@ -487,21 +501,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxMintTCAP = async (e: React.MouseEvent) => {
+  const safeMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const maxMint = await getSafeMint(
+    const safeMint = await getSafeMint(
       minRatio,
       vaultCollateral,
       collateralPrice,
       tcapPrice,
       vaultDebt
     );
-    setMintTxt(maxMint.toString());
-    let usd = toUSD(tcapPrice, maxMint.toString());
+    setMintTxt(safeMint.toString());
+    let usd = toUSD(tcapPrice, safeMint.toString());
     if (!usd) {
       usd = 0;
     }
-    const newDebt = maxMint + parseFloat(vaultDebt);
+    const newDebt = safeMint + parseFloat(vaultDebt);
     const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
     changeVault(r);
     setMintUSD(usd.toString());
@@ -773,7 +787,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Add Collateral</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={maxAddCollateral}>
-                        MAX
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -804,8 +818,8 @@ const Details = ({ address }: props) => {
                   <Form.Group className="remove">
                     <Form.Label>Remove Collateral</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number orange" onClick={maxRemoveCollateral}>
-                        MAX
+                      <a href="/" className="number orange" onClick={safeRemoveCollateral}>
+                        SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -869,7 +883,7 @@ const Details = ({ address }: props) => {
                   <Form.Group>
                     <Form.Label>Mint TCAP</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number" onClick={maxMintTCAP}>
+                      <a href="/" className="number" onClick={safeMintTCAP}>
                         SAFE
                       </a>
                     </Form.Label>
@@ -902,7 +916,7 @@ const Details = ({ address }: props) => {
                     <Form.Label>Burn TCAP</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number orange" onClick={maxBurnTCAP}>
-                        MAX
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>

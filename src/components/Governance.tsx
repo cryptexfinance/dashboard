@@ -347,7 +347,7 @@ const Governance = () => {
           <Col xs={12} sm={12} lg={9} className="use-tcap">
             <Card className="diamond">
               <h2>Proposals</h2>
-              <p>Use your CTX to vote for TCAP</p>
+              <p>Delegate CTX to yourself or others, to vote on the future of the protocol.</p>
               <Row className="">
                 <Table hover>
                   <thead>

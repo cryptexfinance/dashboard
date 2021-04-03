@@ -113,8 +113,25 @@ export const getSafeMint = async (
   const tp = parseFloat(tcapPrice);
   const d = parseFloat(debt);
   if (r === 0 || tp === 0) return 0;
-  const maxMint = (c * cp * 100) / (r * tp);
-  return maxMint - d;
+  const safeMint = (c * cp * 100) / (r * tp);
+  return safeMint - d;
+};
+
+export const getSafeRemoveCollateral = async (
+  ratio: string,
+  collateral: string,
+  collateralPrice: string,
+  tcapPrice: string,
+  debt: string
+) => {
+  const r = parseFloat(ratio) + 50;
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const tp = parseFloat(tcapPrice);
+  const d = parseFloat(debt);
+  if (cp === 0) return 0;
+  const n = (r * d * tp) / (cp * 100);
+  return c - n;
 };
 
 export const getProposalStatus = (
