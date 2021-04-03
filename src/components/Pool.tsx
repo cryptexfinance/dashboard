@@ -6,14 +6,13 @@ import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import ethers from "ethers";
 import NumberFormat from "react-number-format";
-import { useQuery, gql } from "@apollo/client";
+
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
-import VaultsContext from "../state/VaultsContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
-import RewardsContext from "../state/RewardsContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
+import { toUSD } from "../utils/utils";
 import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -21,98 +20,22 @@ import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import { notifyUser, errorNotification } from "../utils/utils";
-import { Stake } from "./modals/Stake";
 
 const Farm = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [ethRewards, setEthRewards] = useState("0");
-  const [wbtcRewards, setWbtcRewards] = useState("0");
-  const [daiRewards, setDaiRewards] = useState("0");
-  const [ethPoolRewards, setEthPoolRewards] = useState("0.0");
-  const [wbtcPoolRewards, setWbtcPoolRewards] = useState("0.0");
-  const [daiPoolRewards, setDaiPoolRewards] = useState("0.0");
-  const [ctxPoolRewards, setCtxPoolRewards] = useState("0.0");
-  const [vethPoolRewards, setVEthPoolRewards] = useState("0.0");
-  const [vwbtcPoolRewards, setVWbtcPoolRewards] = useState("0.0");
-  const [vdaiPoolRewards, setVDaiPoolRewards] = useState("0.0");
-  const [vctxPoolRewards, setVCtxPoolRewards] = useState("0.0");
-  const [ethDebt, setEthDebt] = useState("0.0");
-  const [wbtcDebt, setWbtcDebt] = useState("0.0");
-  const [daiDebt, setDaiDebt] = useState("0.0");
-  const [ethPoolStake, setEthPoolStake] = useState("0.0");
-  const [wbtcPoolStake, setWbtcPoolStake] = useState("0.0");
-  const [daiPoolStake, setDaiPoolStake] = useState("0.0");
-  const [ctxPoolStake, setCtxPoolStake] = useState("0.0");
-  const [ethPoolBalance, setEthPoolBalance] = useState("0.0");
-  const [wbtcPoolBalance, setWbtcPoolBalance] = useState("0.0");
-  const [daiPoolBalance, setDaiPoolBalance] = useState("0.0");
-  const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
+  const [ethLiquidity, setEthLiquidity] = useState("0");
+  const [wbtcLiquidity, setWbtcLiquidity] = useState("0");
+  const [daiLiquidity, setDaiLiquidity] = useState("0");
+  // const [ctxLiquidty, setCtxLiquidty] = useState("0.0");
+
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const tokens = useContext(TokensContext);
-  const vaults = useContext(VaultsContext);
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
-  const rewards = useContext(RewardsContext);
-  const [stakeShow, setStakeShow] = useState(false);
-  const [stakeBalance, setStakeBalance] = useState("0");
-  const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
-  const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
-  const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
 
-  const lpURL = process.env.REACT_APP_LP_URL;
-
-  const USER_VAULTS = gql`
-    query getVault($owner: String!) {
-      vaults(where: { owner: $owner }) {
-        id
-        vaultId
-        owner
-        collateral
-        debt
-        currentRatio
-        address
-        owner
-      }
-    }
-  `;
-
-  async function setDebt(vaultData: any) {
-    await vaultData.vaults.forEach((v: any) => {
-      switch (v.address.toLowerCase()) {
-        case vaults?.wethVault?.address.toLowerCase():
-          setEthDebt(ethers.utils.formatEther(v.debt));
-          break;
-        case vaults?.wbtcVault?.address.toLowerCase():
-          setWbtcDebt(ethers.utils.formatEther(v.debt));
-          break;
-        case vaults?.daiVault?.address.toLowerCase():
-          setDaiDebt(ethers.utils.formatEther(v.debt));
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  const { data, refetch } = useQuery(USER_VAULTS, {
-    variables: { owner: address },
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    onCompleted: () => {
-      setDebt(data);
-    },
-  });
-
-  const refresh = async () => {
-    try {
-      await refetch();
-    } catch (error) {
-      // catch error in case the vault screen is changed
-    }
-  };
+  const lpURL = process.env.REACT_APP_LP_VISION;
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -126,153 +49,60 @@ const Farm = () => {
       ) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(currentAddress);
-        const currentEthReward = await rewards?.wethReward?.earned(currentAddress);
-        setEthRewards(ethers.utils.formatEther(currentEthReward));
-        const currentWbtcReward = await rewards?.wbtcReward?.earned(currentAddress);
-        setWbtcRewards(ethers.utils.formatEther(currentWbtcReward));
-        const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
-        setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
-        const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
+        const ethUSD = ethers.utils.formatEther(
+          (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
+        );
+        const daiUSD = ethers.utils.formatEther(
+          (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
+        );
+        const wbtcUSD = ethers.utils.formatEther(
+          (await oracles.wbtcOracle?.getLatestAnswer()).mul(10000000000)
+        );
+        const tcapUSD = ethers.utils.formatEther(await oracles.tcapOracle?.getLatestAnswer());
 
-        const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
-        setEthPoolRewards(
-          ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(currentAddress);
-        setVEthPoolRewards(
-          ethers.utils.formatEther(
-            currentVEthPoolReward.add(currentEthPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
-        setWbtcPoolRewards(
-          ethers.utils.formatEther(currentWbtcPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVWbtcPoolReward = await rewards.wbtcPoolReward?.vestingAmounts(currentAddress);
-        setVWbtcPoolRewards(
-          ethers.utils.formatEther(
-            currentVWbtcPoolReward.add(currentWbtcPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
-        setDaiPoolRewards(
-          ethers.utils.formatEther(currentDaiPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVDaiPoolReward = await rewards.daiPoolReward?.vestingAmounts(currentAddress);
-        setVDaiPoolRewards(
-          ethers.utils.formatEther(
-            currentVDaiPoolReward.add(currentDaiPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
-        setCtxPoolRewards(
-          ethers.utils.formatEther(currentCtxPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(currentAddress);
-        setVCtxPoolRewards(
-          ethers.utils.formatEther(
-            currentVCtxPoolReward.add(currentCtxPoolReward.mul(vestingRatio).div(100))
-          )
-        );
+        const currentPoolWeth = await tokens.wethToken?.balanceOf(process?.env?.REACT_APP_POOL_ETH);
+        let formatPair1 = ethers.utils.formatEther(currentPoolWeth);
+        const currentWethTCAP = await tokens.tcapToken?.balanceOf(process?.env?.REACT_APP_POOL_ETH);
+        let formatPair2 = ethers.utils.formatEther(currentWethTCAP);
+        let totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
+        setEthLiquidity(totalUSD.toString());
 
-        const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
-        setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
-        const currentWbtcPoolStake = await rewards.wbtcPoolReward?.balanceOf(currentAddress);
-        setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
-        const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
-        setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
-        const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
-        setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+        const currentPoolWbtc = await tokens.wbtcToken?.balanceOf(
+          process?.env?.REACT_APP_POOL_WBTC
+        );
+        formatPair1 = ethers.utils.formatEther(currentPoolWbtc);
+        const currentWbtcTCAP = await tokens.tcapToken?.balanceOf(
+          process?.env?.REACT_APP_POOL_WBTC
+        );
+        formatPair2 = ethers.utils.formatEther(currentWbtcTCAP);
+        totalUSD = toUSD(formatPair1, wbtcUSD) + toUSD(formatPair2, tcapUSD);
+        setWbtcLiquidity(totalUSD.toString());
 
-        const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
-        setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
-        const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
-        setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
-        const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
-        setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
-        const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
-        setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
+        const currentPoolDai = await tokens.daiToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
+        formatPair1 = ethers.utils.formatEther(currentPoolDai);
+        const currentDaiTCAP = await tokens.tcapToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
+        formatPair2 = ethers.utils.formatEther(currentDaiTCAP);
+        totalUSD = toUSD(formatPair1, daiUSD) + toUSD(formatPair2, tcapUSD);
+        setDaiLiquidity(totalUSD.toString());
+
+        // const currentPoolCtx = await governance.ctxToken?.balanceOf(
+        //   process?.env?.REACT_APP_POOL_CTX
+        // );
+        // const currentPoolWethCtx = await tokens.wethToken?.balanceOf(
+        //   process?.env?.REACT_APP_POOL_CTX
+        // );
       }
       setIsLoading(false);
     };
 
     loadAddress();
     // eslint-disable-next-line
-  }, [data]);
+  }, []);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }
-
-  const claimRewards = async (vaultType: string) => {
-    try {
-      let tx: ethers.ContractTransaction;
-      switch (vaultType) {
-        case "ETH":
-          tx = await rewards?.wethReward?.getReward();
-          break;
-        case "WBTC":
-          tx = await rewards?.wbtcReward?.getReward();
-          break;
-        case "DAI":
-          tx = await rewards?.daiReward?.getReward();
-          break;
-        case "ETHPOOL":
-          tx = await rewards?.wethPoolReward?.getReward();
-          break;
-        case "WBTCPOOL":
-          tx = await rewards?.wbtcPoolReward?.getReward();
-          break;
-        case "DAIPOOL":
-          tx = await rewards?.daiPoolReward?.getReward();
-          break;
-        case "CTXPOOL":
-          tx = await rewards?.ctxPoolReward?.getReward();
-          break;
-        default:
-          tx = await rewards?.wethReward?.getReward();
-          break;
-      }
-      notifyUser(tx, refresh);
-    } catch (error) {
-      if (error.code === 4001) {
-        errorNotification("Transaction rejected");
-      } else {
-        errorNotification("Insufficient funds to stake");
-      }
-    }
-  };
-
-  const exitRewards = async (vaultType: string) => {
-    try {
-      let tx: ethers.ContractTransaction;
-      switch (vaultType) {
-        case "ETHPOOL":
-          tx = await rewards?.wethPoolReward?.exit();
-          break;
-        case "WBTCPOOL":
-          tx = await rewards?.wbtcPoolReward?.exit();
-          break;
-        case "DAIPOOL":
-          tx = await rewards?.daiPoolReward?.exit();
-          break;
-        case "CTXPOOL":
-          tx = await rewards?.ctxPoolReward?.exit();
-          break;
-        default:
-          tx = await rewards?.wethPoolReward?.exit();
-          break;
-      }
-      notifyUser(tx, refresh);
-    } catch (error) {
-      if (error.code === 4001) {
-        errorNotification("Transaction rejected");
-      } else {
-        errorNotification("Insufficient funds to exit");
-      }
-    }
-  };
 
   return (
     <div className="farm">
@@ -312,7 +142,7 @@ const Farm = () => {
                       <th />
                       <th>Available Pools</th>
                       <th>Liquidity</th>
-                      <th />
+                      <th /> <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -332,10 +162,10 @@ const Farm = () => {
                         </a>
                       </td>
                       <td className="number">
-                        Ξ{" "}
+                        $
                         <NumberFormat
                           className="number"
-                          value={ethPoolBalance}
+                          value={ethLiquidity}
                           displayType="text"
                           thousandSeparator
                           prefix=""
@@ -343,13 +173,7 @@ const Farm = () => {
                         />{" "}
                       </td>
                       <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            exitRewards("ETHPOOL");
-                          }}
-                        >
+                        <Button variant="primary" className="">
                           Pool
                         </Button>
                       </td>
@@ -371,10 +195,10 @@ const Farm = () => {
                         </a>
                       </td>{" "}
                       <td className="number">
-                        Ξ{" "}
+                        $
                         <NumberFormat
                           className="number"
-                          value={wbtcPoolBalance}
+                          value={wbtcLiquidity}
                           displayType="text"
                           thousandSeparator
                           prefix=""
@@ -382,13 +206,7 @@ const Farm = () => {
                         />{" "}
                       </td>
                       <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            exitRewards("ETHPOOL");
-                          }}
-                        >
+                        <Button variant="primary" className="">
                           Pool
                         </Button>
                       </td>
@@ -410,10 +228,10 @@ const Farm = () => {
                         </a>
                       </td>
                       <td className="number">
-                        Ξ{" "}
+                        $
                         <NumberFormat
                           className="number"
-                          value={daiPoolBalance}
+                          value={daiLiquidity}
                           displayType="text"
                           thousandSeparator
                           prefix=""
@@ -421,13 +239,7 @@ const Farm = () => {
                         />{" "}
                       </td>{" "}
                       <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            exitRewards("ETHPOOL");
-                          }}
-                        >
+                        <Button variant="primary" className="">
                           Pool
                         </Button>
                       </td>
@@ -448,24 +260,18 @@ const Farm = () => {
                         </a>
                       </td>
                       <td className="number">
-                        Ξ{" "}
-                        <NumberFormat
+                        N/A
+                        {/* <NumberFormat
                           className="number"
-                          value={ctxPoolBalance}
+                          value={1}
                           displayType="text"
                           thousandSeparator
                           prefix=""
                           decimalScale={2}
-                        />{" "}
+                        />{" "} */}
                       </td>{" "}
                       <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            exitRewards("ETHPOOL");
-                          }}
-                        >
+                        <Button variant="primary" className="">
                           Pool
                         </Button>
                       </td>
@@ -477,15 +283,6 @@ const Farm = () => {
           )}
         </Row>
       </div>
-      <Stake
-        pool={selectedPool}
-        poolTitle={selectedPoolTitle}
-        poolToken={selectedPoolToken}
-        balance={stakeBalance}
-        show={stakeShow}
-        onHide={() => setStakeShow(false)}
-        refresh={() => refresh()}
-      />
     </div>
   );
 };
