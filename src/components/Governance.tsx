@@ -51,6 +51,8 @@ const Governance = () => {
   const [voteEndTime, setVoteEndTime] = useState("");
   const [voteStatus, setVoteStatus] = useState("");
 
+  const etherscanURL = process?.env?.REACT_APP_ETHERSCAN;
+
   function clickVote(
     proposal: any,
     forVote: number,
@@ -414,7 +416,7 @@ const Governance = () => {
                           <td>{id}</td>
                           <td>{description}</td>
                           <td>
-                            <a href={`https://rinkeby.etherscan.io/address/${proposer.id}`}>
+                            <a href={`${etherscanURL}/address/${proposer.id}`}>
                               {makeShortAddress(proposer.id)}
                             </a>
                           </td>

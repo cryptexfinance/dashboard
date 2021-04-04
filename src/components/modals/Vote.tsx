@@ -32,6 +32,8 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime, status
 
   const abi = new ethers.utils.AbiCoder();
 
+  const etherscanURL = process?.env?.REACT_APP_ETHERSCAN;
+
   const clickVote = async (support: Boolean) => {
     if (governance.governorAlpha) {
       try {
@@ -72,17 +74,14 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime, status
               if (i === 0) {
                 return (
                   <b key={i}>
-                    <a href={`https://rinkeby.etherscan.io/address/${target}`}>
-                      {targetDescription}
-                    </a>
+                    <a href={`${etherscanURL}}/address/${target}`}>{targetDescription}</a>
                   </b>
                 );
               }
 
               return (
                 <b key={i}>
-                  ,{" "}
-                  <a href={`https://rinkeby.etherscan.io/address/${target}`}>{targetDescription}</a>
+                  , <a href={`${etherscanURL}}/address/${target}`}>{targetDescription}</a>
                 </b>
               );
             })}
