@@ -149,7 +149,7 @@ const Details = ({ address }: props) => {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = "rinkeby";
+          const network = process.env.REACT_APP_NETWORK_NAME;
           const provider = ethers.getDefaultProvider(network, {
             infura: process.env.REACT_APP_INFURA_ID,
             alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -415,7 +415,7 @@ const Details = ({ address }: props) => {
     e.preventDefault();
     let balance = "0";
     if (selectedVault === "ETH") {
-      const network = "rinkeby";
+      const network = process.env.REACT_APP_NETWORK_NAME;
       const provider = ethers.getDefaultProvider(network, {
         infura: process.env.REACT_APP_INFURA_ID,
         alchemy: process.env.REACT_APP_ALCHEMY_KEY,

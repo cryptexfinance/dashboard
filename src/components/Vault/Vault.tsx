@@ -7,7 +7,6 @@ import "../../styles/vault.scss";
 import Loading from "../Loading";
 import Details from "./Details";
 
-// TODO: Refactor names
 const Vault = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);

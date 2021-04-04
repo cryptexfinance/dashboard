@@ -152,7 +152,7 @@ const Governance = () => {
           currentProposals.push(p);
         });
         setProposals(currentProposals);
-        const network = "rinkeby";
+        const network = process.env.REACT_APP_NETWORK_NAME;
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
           alchemy: process.env.REACT_APP_ALCHEMY_KEY,

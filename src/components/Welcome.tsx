@@ -236,11 +236,29 @@ const Welcome = () => {
               </Row>
               <Row className="">
                 <Col>
-                  <Button variant="primary" className="neon-blue">
-                    Pool
-                  </Button>
                   {address !== "" ? (
-                    <Button variant="success" className="neon-orange">
+                    <Button
+                      variant="info"
+                      className="neon-blue"
+                      onClick={() => {
+                        history.push("/pools");
+                      }}
+                    >
+                      Pool
+                    </Button>
+                  ) : (
+                    <Button variant="dark" className="" disabled>
+                      Pool
+                    </Button>
+                  )}
+                  {address !== "" ? (
+                    <Button
+                      variant="warning"
+                      className="neon-orange"
+                      onClick={() => {
+                        history.push("/farm");
+                      }}
+                    >
                       Farm
                     </Button>
                   ) : (
