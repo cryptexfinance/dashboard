@@ -35,7 +35,8 @@ const Farm = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
 
-  const lpURL = process.env.REACT_APP_LP_VISION;
+  const lpURL = process.env.REACT_APP_LP_URL;
+  const visionURL = process.env.REACT_APP_LP_VISION;
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -155,7 +156,7 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_ETH}`}
                         >
                           ETH/TCAP <br />
                           <small>SushiSwap</small>
@@ -173,7 +174,12 @@ const Farm = () => {
                         />{" "}
                       </td>
                       <td className="number">
-                        <Button variant="primary" className="">
+                        <Button
+                          variant="primary"
+                          className=""
+                          target="_blank"
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                        >
                           Pool
                         </Button>
                       </td>
@@ -188,7 +194,7 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_WBTC}`}
                         >
                           WBTC/TCAP <br />
                           <small>SushiSwap</small>
@@ -206,7 +212,12 @@ const Farm = () => {
                         />{" "}
                       </td>
                       <td className="number">
-                        <Button variant="primary" className="">
+                        <Button
+                          variant="primary"
+                          className=""
+                          target="_blank"
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                        >
                           Pool
                         </Button>
                       </td>
@@ -221,7 +232,7 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_DAI}`}
                         >
                           DAI/TCAP <br />
                           <small>SushiSwap</small>
@@ -239,7 +250,12 @@ const Farm = () => {
                         />{" "}
                       </td>{" "}
                       <td className="number">
-                        <Button variant="primary" className="">
+                        <Button
+                          variant="primary"
+                          className=""
+                          target="_blank"
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                        >
                           Pool
                         </Button>
                       </td>
@@ -253,7 +269,7 @@ const Farm = () => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
                         >
                           CTX/ETH Pool <br />
                           <small>SushiSwap</small>
@@ -271,7 +287,12 @@ const Farm = () => {
                         />{" "} */}
                       </td>{" "}
                       <td className="number">
-                        <Button variant="primary" className="">
+                        <Button
+                          variant="primary"
+                          className=""
+                          target="_blank"
+                          href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                        >
                           Pool
                         </Button>
                       </td>

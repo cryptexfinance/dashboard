@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Switch, Route, useRouteMatch } from "react-router-dom";
+import { Switch, Route, useRouteMatch, useLocation } from "react-router-dom";
 import { ethers } from "ethers";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
@@ -65,6 +65,7 @@ const App = () => {
   const [isLoading, setloading] = useState(true);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const [show, setShow] = useState(true);
+  const [vaultWarning, setVaultWarning] = useState(true);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
   const [showSidebar, setShowSidebar] = useState(true);
   const vaults = useVaults();
@@ -73,6 +74,7 @@ const App = () => {
   const governance = useGovernance();
   const rewards = useRewards();
   const match = useRouteMatch();
+  const location = useLocation();
 
   const setContracts = (currentSigner: ethers.Signer) => {
     // Set Vaults
@@ -252,8 +254,7 @@ const App = () => {
         signer.setCurrentSigner(currentSigner);
         setContracts(currentSigner);
       } else {
-        // TODO: get network from env
-        const network = "rinkeby";
+        const network = process.env.REACT_APP_NETWORK_NAME;
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
           alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -288,13 +289,14 @@ const App = () => {
   }
 
   if (invalidNetwork) {
+    const networkName = process.env.REACT_APP_NETWORK_NAME;
     return (
       <>
         <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} isMobile={isMobile} />
         <Container fluid className="wrapper">
           <Loading
             title="Invalid Network"
-            message="Please switch to Rinkeby network"
+            message={`Please switch to ${networkName} network`}
             position="total"
           />
         </Container>
@@ -322,19 +324,30 @@ const App = () => {
                 <Container fluid className="wrapper" {...handlers}>
                   {show && (
                     <Alert
-                      variant="rinkeby"
                       onClose={() => {
                         setShow(false);
                         localStorage.setItem("alert", "false");
                       }}
                       dismissible
                     >
+                      <b>💀 This project is on beta. Use at your own risk.</b>
+                    </Alert>
+                  )}
+                  {vaultWarning && location.pathname === "/vault" && (
+                    <Alert
+                      onClose={() => {
+                        setVaultWarning(false);
+                        localStorage.setItem("alert", "false");
+                      }}
+                      dismissible
+                    >
                       <b>
-                        💀 Oracles and Data reflect Rinkeby Testnet prices, don't send Mainnet
-                        tokens or ETH
+                        ⚠️ Make sure to always have a ratio above the minimun ratio to avoid getting
+                        liquidated.
                       </b>
                     </Alert>
                   )}
+
                   <Header />
                   <ToastContainer />
                   <Switch>

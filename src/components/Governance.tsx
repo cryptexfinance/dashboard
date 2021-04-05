@@ -51,6 +51,8 @@ const Governance = () => {
   const [voteEndTime, setVoteEndTime] = useState("");
   const [voteStatus, setVoteStatus] = useState("");
 
+  const etherscanURL = process?.env?.REACT_APP_ETHERSCAN;
+
   function clickVote(
     proposal: any,
     forVote: number,
@@ -152,7 +154,7 @@ const Governance = () => {
           currentProposals.push(p);
         });
         setProposals(currentProposals);
-        const network = "rinkeby";
+        const network = process.env.REACT_APP_NETWORK_NAME;
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
           alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -414,7 +416,7 @@ const Governance = () => {
                           <td>{id}</td>
                           <td>{description}</td>
                           <td>
-                            <a href={`https://rinkeby.etherscan.io/address/${proposer.id}`}>
+                            <a href={`${etherscanURL}/address/${proposer.id}`}>
                               {makeShortAddress(proposer.id)}
                             </a>
                           </td>
