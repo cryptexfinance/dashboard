@@ -82,7 +82,7 @@ const Welcome = () => {
     <div className="welcome">
       <div>
         <Row className="data">
-          <Col xs={12} sm={12} lg={5}>
+          <Col xs={12} sm={12} md={6} lg={6}>
             <h2 className="number neon-highlight">
               <NumberFormat
                 className="number"
@@ -110,7 +110,7 @@ const Welcome = () => {
               </OverlayTrigger>
             </p>
           </Col>
-          <Col xs={12} sm={12} lg={7} className="token-price">
+          <Col xs={12} sm={12} md={6} lg={6} className="token-price">
             <h2 className="number neon-dark-blue">
               <NumberFormat
                 className="number"
@@ -125,7 +125,7 @@ const Welcome = () => {
           </Col>
         </Row>
         <Row className="card-wrapper">
-          <Col xs={12} md={5} lg={6}>
+          <Col xs={12} md={6} lg={6}>
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
@@ -136,30 +136,31 @@ const Welcome = () => {
                 </div>
                 <Row className="">
                   <Col>
-                    <h3 className="number neon-blue">
+                    <div className="tcap-balance">
                       <TcapIcon className="tcap-neon" />
-                      <NumberFormat
-                        className="number"
-                        value={tcapBalance}
-                        displayType="text"
-                        thousandSeparator
-                        decimalScale={2}
-                      />
-                    </h3>
-                    <p>TCAP Balance</p>
-                  </Col>
-                  <Col>
-                    <h3 className="number neon-dark-blue">
-                      <NumberFormat
-                        className="number"
-                        value={tcapUSDBalance}
-                        displayType="text"
-                        thousandSeparator
-                        prefix="$"
-                        decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
-                      />
-                    </h3>
-                    <p>USD Balance</p>
+                      <div>
+                        <h3 className="number neon-blue">
+                          <NumberFormat
+                            className="number"
+                            value={tcapBalance}
+                            displayType="text"
+                            thousandSeparator
+                            decimalScale={2}
+                          />
+                        </h3>
+                        <p className="number usd-balance">
+                          <NumberFormat
+                            className="number"
+                            value={tcapUSDBalance}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
+                          />
+                        </p>
+                      </div>
+                    </div>
+                    <p className="title tcap">TCAP Balance</p>
                   </Col>
                   <Col>
                     <h3 className="number neon-dark-blue">
@@ -172,7 +173,7 @@ const Welcome = () => {
                         decimalScale={2}
                       />
                     </h3>
-                    <p>CTX Balance</p>
+                    <p className="title ctx">CTX Balance</p>
                   </Col>
                 </Row>
               </Card>
@@ -199,7 +200,7 @@ const Welcome = () => {
               </Card>
             )}
           </Col>
-          <Col xs={12} sm={12} md={7} lg={6} className="use-tcap">
+          <Col xs={12} sm={12} md={6} lg={6} className="use-tcap">
             <Card className="diamond">
               <h2>Use TCAP</h2>
               <p>Trade TCAP using SushiSwap or create new supply using a vault</p>
