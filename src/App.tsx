@@ -55,7 +55,7 @@ import DAIPoolReward from "./contracts/DAILiquidityReward.json";
 import CTXPoolReward from "./contracts/CTXLiquidityReward.json";
 
 const clientOracle = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/cryptexglobal/tcap",
+  uri: process.env.REACT_APP_GRAPH_URL,
   cache: new InMemoryCache(),
 });
 
