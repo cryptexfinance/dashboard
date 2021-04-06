@@ -320,9 +320,17 @@ const Farm = () => {
                           <div className="button-current">
                             <OverlayTrigger
                               key="top"
-                              placement="top"
+                              placement="auto"
                               trigger={["hover", "click"]}
-                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                              overlay={
+                                <Tooltip id="ttip-current-reward" className="farm-tooltip">
+                                  Early adopters rewards are issued over 14 days for a total of
+                                  500,000 CTX. Assuming approximately 6500 Ethereum blocks per day
+                                  over 14 days (91,000 Ethereum blocks), the per block reward would
+                                  be 5.4945 CTX split across the debtors at that point in time. 100%
+                                  of the reward is immediately available.
+                                </Tooltip>
+                              }
                             >
                               <Button variant="dark">?</Button>
                             </OverlayTrigger>
@@ -486,9 +494,20 @@ const Farm = () => {
                           <div className="button">
                             <OverlayTrigger
                               key="top"
-                              placement="top"
+                              placement="auto"
                               trigger={["hover", "click"]}
-                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                              overlay={
+                                <Tooltip id="ttip-vreward" className="farm-tooltip">
+                                  The total amount of CTX for the initial 6 month liquidity provider
+                                  rewards is 20% of the protocol or 2,000,000 CTX. Assuming
+                                  approximately 6500 Ethereum blocks per day over 6 months
+                                  (1,170,000 blocks), this would result in 1.7094 CTX issued per
+                                  block. Newly rewarded CTX tokens shall be subjected to a vesting
+                                  period of 6 months where 30% of the reward is immediately
+                                  available while the remaining 70% reward will not be accessible
+                                  until 6 months vesting period has been reached.
+                                </Tooltip>
+                              }
                             >
                               <Button variant="dark">?</Button>
                             </OverlayTrigger>
@@ -501,9 +520,20 @@ const Farm = () => {
                           <div className="button">
                             <OverlayTrigger
                               key="top"
-                              placement="top"
+                              placement="auto"
                               trigger={["hover", "click"]}
-                              overlay={<Tooltip id="tooltip-top">...</Tooltip>}
+                              overlay={
+                                <Tooltip id="tooltip-top" className="farm-tooltip">
+                                  The total amount of CTX for the initial 6 month liquidity provider
+                                  rewards is 20% of the protocol or 2,000,000 CTX. Assuming
+                                  approximately 6500 Ethereum blocks per day over 6 months
+                                  (1,170,000 blocks), this would result in 1.7094 CTX issued per
+                                  block. Newly rewarded CTX tokens shall be subjected to a vesting
+                                  period of 6 months where 30% of the reward is immediately
+                                  available while the remaining 70% reward will not be accessible
+                                  until 6 months vesting period has been reached.
+                                </Tooltip>
+                              }
                             >
                               <Button variant="dark">?</Button>
                             </OverlayTrigger>
