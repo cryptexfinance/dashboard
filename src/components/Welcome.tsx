@@ -235,7 +235,7 @@ const Welcome = () => {
                   )}
                 </Col>
               </Row>
-              <Row className="">
+              {/* <Row className="">
                 <Col>
                   {address !== "" ? (
                     <Button
@@ -268,7 +268,7 @@ const Welcome = () => {
                     </Button>
                   )}
                 </Col>
-              </Row>
+              </Row> */}
             </Card>
           </Col>
         </Row>
