@@ -12,10 +12,13 @@ import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
+import GovernanceContext from "../state/GovernanceContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import { makeShortAddress } from "../utils/utils";
 import "../styles/welcome.scss";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
+
 import Loading from "./Loading";
 
 const Welcome = () => {
@@ -24,12 +27,15 @@ const Welcome = () => {
   const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
   const [totalPrice, setTotalPrice] = useState("0.0");
   const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [ctxBalance, setCtxBalance] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const history = useHistory();
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
+  const governance = useContext(GovernanceContext);
+  const lpURL = process.env.REACT_APP_LP_URL;
 
   const TCAP_PRICE = gql`
     query {
@@ -43,12 +49,15 @@ const Welcome = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle) {
+      if (signer.signer && tokens.tcapToken && governance.ctxToken && oracles.tcapOracle) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(makeShortAddress(currentAddress));
         const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
         const tcapString = ethers.utils.formatEther(currentTcapBalance);
         setTcapBalance(tcapString);
+        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const ctxString = ethers.utils.formatEther(currentCtxBalance);
+        setCtxBalance(ctxString);
       }
       if (data) {
         const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
@@ -73,7 +82,7 @@ const Welcome = () => {
     <div className="welcome">
       <div>
         <Row className="data">
-          <Col xs={12} sm={12} lg={5}>
+          <Col xs={12} sm={12} md={6} lg={6}>
             <h2 className="number neon-highlight">
               <NumberFormat
                 className="number"
@@ -101,7 +110,7 @@ const Welcome = () => {
               </OverlayTrigger>
             </p>
           </Col>
-          <Col xs={12} sm={12} lg={7} className="token-price">
+          <Col xs={12} sm={12} md={6} lg={6} className="token-price">
             <h2 className="number neon-dark-blue">
               <NumberFormat
                 className="number"
@@ -116,7 +125,7 @@ const Welcome = () => {
           </Col>
         </Row>
         <Row className="card-wrapper">
-          <Col xs={12} lg={5}>
+          <Col xs={12} md={6} lg={6}>
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
@@ -127,30 +136,44 @@ const Welcome = () => {
                 </div>
                 <Row className="">
                   <Col>
-                    <h3 className="number neon-blue">
+                    <div className="tcap-balance">
                       <TcapIcon className="tcap-neon" />
+                      <div>
+                        <h3 className="number neon-blue">
+                          <NumberFormat
+                            className="number"
+                            value={tcapBalance}
+                            displayType="text"
+                            thousandSeparator
+                            decimalScale={2}
+                          />
+                        </h3>
+                        <p className="number usd-balance">
+                          <NumberFormat
+                            className="number"
+                            value={tcapUSDBalance}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
+                          />
+                        </p>
+                      </div>
+                    </div>
+                    <p className="title tcap">TCAP Balance</p>
+                  </Col>
+                  <Col>
+                    <h3 className="number neon-dark-blue">
+                      <CtxIcon className="tcap-neon" />
                       <NumberFormat
                         className="number"
-                        value={tcapBalance}
+                        value={ctxBalance}
                         displayType="text"
                         thousandSeparator
                         decimalScale={2}
                       />
                     </h3>
-                    <p>TCAP Balance</p>
-                  </Col>
-                  <Col>
-                    <h3 className="number neon-dark-blue">
-                      <NumberFormat
-                        className="number"
-                        value={tcapUSDBalance}
-                        displayType="text"
-                        thousandSeparator
-                        prefix="$"
-                        decimalScale={parseFloat(tcapUSDBalance) > 1000 ? 0 : 2}
-                      />
-                    </h3>
-                    <p>USD Balance</p>
+                    <p className="title ctx">CTX Balance</p>
                   </Col>
                 </Row>
               </Card>
@@ -177,18 +200,18 @@ const Welcome = () => {
               </Card>
             )}
           </Col>
-          <Col xs={12} sm={12} lg={7} className="use-tcap">
+          <Col xs={12} sm={12} md={6} lg={6} className="use-tcap">
             <Card className="diamond">
               <h2>Use TCAP</h2>
-              <p>Trade TCAP using uniswap or create new supply using a vault</p>
+              <p>Trade TCAP using SushiSwap or create new supply using a vault</p>
               <Row className="">
                 <Col>
                   <Button
                     variant="primary"
-                    className="neon-highlight"
+                    className="neon-pink"
                     onClick={() => {
                       window.open(
-                        `https://app.uniswap.org/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
+                        `${lpURL}/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
                         "_blank"
                       );
                     }}
@@ -208,6 +231,40 @@ const Welcome = () => {
                   ) : (
                     <Button variant="dark" className="" disabled>
                       Mint
+                    </Button>
+                  )}
+                </Col>
+              </Row>
+              <Row className="">
+                <Col>
+                  {address !== "" ? (
+                    <Button
+                      variant="info"
+                      className="neon-blue"
+                      onClick={() => {
+                        history.push("/pools");
+                      }}
+                    >
+                      Pool
+                    </Button>
+                  ) : (
+                    <Button variant="dark" className="" disabled>
+                      Pool
+                    </Button>
+                  )}
+                  {address !== "" ? (
+                    <Button
+                      variant="warning"
+                      className="neon-orange"
+                      onClick={() => {
+                        history.push("/farm");
+                      }}
+                    >
+                      Farm
+                    </Button>
+                  ) : (
+                    <Button variant="dark" className="" disabled>
+                      Farm
                     </Button>
                   )}
                 </Col>

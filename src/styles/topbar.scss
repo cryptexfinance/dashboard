@@ -1,0 +1,56 @@
+@import "./colors";
+
+.topbar {
+  height: 3.1rem;
+  width: 100%;
+  background-color: $darker;
+  border-bottom: solid 1px $dark;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  position: fixed;
+  top: 0px;
+  z-index: 9;
+
+  .logo.nav-item {
+    width: 75%;
+  }
+  .menu.nav-item {
+    width: 25%;
+    padding-left: 5px;
+  }
+
+  .nav-item {
+    width: auto;
+    height: 100%;
+
+    svg {
+      height: 2.3rem;
+      margin-top: 0.4rem;
+      fill: $white;
+
+      .cls-2 {
+        fill: $white;
+      }
+      .cls-3 {
+        fill: $highlight;
+      }
+      .cls-4 {
+        fill: $green;
+      }
+    }
+  }
+
+  &.slide-out {
+    left: -45rem;
+    transition: left 0.7s ease-out;
+  }
+
+  &.slide-in {
+    left: 0rem;
+    transition: left 0.7s ease-out;
+  }
+
+  &.hidden {
+    display: none;
+  }
+}

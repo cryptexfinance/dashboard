@@ -43,19 +43,26 @@
   }
 
   &.mobile {
+    width: 4.5rem;
     z-index: 10;
     top: 0;
-
+    svg.menu {
+      fill: $white;
+    }
+    .mt-4.nav-item {
+      margin-top: 0.5rem !important;
+    }
+    .nav-item {
+      height: 4.5rem;
+    }
     &.slide-out {
       left: -5rem;
-      -webkit-transition: left 0.3s ease-in;
-      transition: left 0.3s ease-in;
+      transition: left 0.6s ease-out;
     }
 
     &.slide-in {
       left: 0px;
-      -webkit-transition: right 0.4s ease-in;
-      transition: right 0.4s ease-in;
+      transition: left 0.6s ease-out;
     }
   }
 }

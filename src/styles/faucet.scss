@@ -12,41 +12,6 @@ div.faucet {
     margin-top: 2rem;
   }
 
-  // Small devices (landscape phones, 576px and up)
-  @media (min-width: 576px) {
-    .actions {
-      margin-top: 2.5rem;
-      display: grid;
-      grid-template-columns: auto;
-      margin-bottom: 4rem;
-    }
-    .card {
-      margin-bottom: 2rem;
-    }
-  }
-
-  // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) {
-    // .token-price {
-    //   margin-top: 0rem;
-    // }
-  }
-
-  // Large devices (desktops, 992px and up)
-  @media (min-width: 992px) {
-    .actions {
-      margin-top: 2.5rem;
-      display: grid;
-      grid-template-columns: 33% auto 33%;
-      margin-bottom: 0rem;
-      column-gap: 1rem;
-    }
-
-    .card {
-      margin-bottom: 0rem;
-    }
-  }
-
   .info {
     border-bottom: 1px solid $dark;
 
@@ -87,6 +52,53 @@ div.faucet {
       border-radius: 1px;
       width: 100%;
       box-shadow: 0px 6px 25px -6px rgba(241, 36, 255, 0.4);
+    }
+  }
+
+  // Small devices (landscape phones, 576px and up)
+  @media (min-width: 576px) {
+    .actions {
+      margin-top: 2.5rem;
+      display: grid;
+      grid-template-columns: auto;
+      margin-bottom: 4rem;
+    }
+    .card {
+      margin-bottom: 2rem;
+    }
+  }
+
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) {
+    .actions {
+      margin-top: 2.5rem;
+      display: grid;
+      grid-template-columns: 33% auto 33%;
+      margin-bottom: 0rem;
+      column-gap: 1rem;
+    }
+
+    .card {
+      margin-bottom: 0rem;
+    }
+
+    @media (max-width: 1100px) {
+      .card {
+        .info {
+          h4 {
+            font-size: 1.4rem;
+          }
+        }
+      }
+
+      @media (max-height: 780px) {
+        .actions {
+          margin-top: 2rem;
+        }
+        form {
+          padding: 1rem 2rem;
+        }
+      }
     }
   }
 

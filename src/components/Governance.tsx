@@ -51,6 +51,8 @@ const Governance = () => {
   const [voteEndTime, setVoteEndTime] = useState("");
   const [voteStatus, setVoteStatus] = useState("");
 
+  const etherscanURL = process?.env?.REACT_APP_ETHERSCAN;
+
   function clickVote(
     proposal: any,
     forVote: number,
@@ -152,7 +154,7 @@ const Governance = () => {
           currentProposals.push(p);
         });
         setProposals(currentProposals);
-        const network = "rinkeby";
+        const network = process.env.REACT_APP_NETWORK_NAME;
         const provider = ethers.getDefaultProvider(network, {
           infura: process.env.REACT_APP_INFURA_ID,
           alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -204,7 +206,7 @@ const Governance = () => {
       <div>
         <h3>Governance Portal</h3>
         <Row className="data">
-          <Col>
+          <Col md={3} sm={6} xs={7}>
             <h2 className="number neon-highlight">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -218,7 +220,7 @@ const Governance = () => {
             </h2>
             <p>Total Supply</p>
           </Col>
-          <Col>
+          <Col md={3} sm={6} xs={5}>
             <h2 className="number neon-highlight">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -232,7 +234,7 @@ const Governance = () => {
             </h2>
             <p>Quorum Required</p>
           </Col>
-          <Col className="token-price">
+          <Col className="token-price" md={3} sm={6} xs={7}>
             <h2 className="number neon-dark-blue">
               <CtxIcon className="ctx-neon" />
               <NumberFormat
@@ -245,7 +247,7 @@ const Governance = () => {
             </h2>
             <p>Proposal Threshold</p>
           </Col>
-          <Col className="token-price">
+          <Col className="token-price" md={3} sm={6} xs={5}>
             <h2 className="number neon-dark-blue">
               <NumberFormat
                 className="number"
@@ -313,7 +315,6 @@ const Governance = () => {
                 <Button className="neon-highlight" onClick={() => setDelegateShow(true)}>
                   Delegate
                 </Button>
-                <br />
                 <Button
                   className="neon-green"
                   variant="success"
@@ -321,7 +322,6 @@ const Governance = () => {
                 >
                   Propose
                 </Button>{" "}
-                <br />
               </Card>
             ) : (
               <Card className="balance">
@@ -349,7 +349,7 @@ const Governance = () => {
           <Col xs={12} sm={12} lg={9} className="use-tcap">
             <Card className="diamond">
               <h2>Proposals</h2>
-              <p>User your CTX to vote for TCAP</p>
+              <p>Delegate CTX to yourself or others, to vote on the future of the protocol.</p>
               <Row className="">
                 <Table hover>
                   <thead>
@@ -416,7 +416,7 @@ const Governance = () => {
                           <td>{id}</td>
                           <td>{description}</td>
                           <td>
-                            <a href={`https://rinkeby.etherscan.io/address/${proposer.id}`}>
+                            <a href={`${etherscanURL}/address/${proposer.id}`}>
                               {makeShortAddress(proposer.id)}
                             </a>
                           </td>

@@ -22,7 +22,14 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD, errorNotification, getRatio, getMaxMint } from "../../utils/utils";
+import {
+  notifyUser,
+  toUSD,
+  errorNotification,
+  getRatio,
+  getSafeRemoveCollateral,
+  getSafeMint,
+} from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -142,7 +149,7 @@ const Details = ({ address }: props) => {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = "rinkeby";
+          const network = process.env.REACT_APP_NETWORK_NAME;
           const provider = ethers.getDefaultProvider(network, {
             infura: process.env.REACT_APP_INFURA_ID,
             alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -245,6 +252,7 @@ const Details = ({ address }: props) => {
 
   const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
     variables: { owner: address },
+    pollInterval: 200000,
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     onCompleted: () => {
@@ -407,7 +415,7 @@ const Details = ({ address }: props) => {
     e.preventDefault();
     let balance = "0";
     if (selectedVault === "ETH") {
-      const network = "rinkeby";
+      const network = process.env.REACT_APP_NETWORK_NAME;
       const provider = ethers.getDefaultProvider(network, {
         infura: process.env.REACT_APP_INFURA_ID,
         alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -453,14 +461,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxRemoveCollateral = async (e: React.MouseEvent) => {
+  const safeRemoveCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setRemoveCollateralTxt(vaultCollateral);
-    let usd = toUSD(collateralPrice, vaultCollateral);
+    const collateralToRemove = await getSafeRemoveCollateral(
+      minRatio,
+      vaultCollateral,
+      collateralPrice,
+      tcapPrice,
+      vaultDebt
+    );
+    setRemoveCollateralTxt(collateralToRemove.toString());
+    let usd = toUSD(collateralPrice, collateralToRemove.toString());
     if (!usd) {
       usd = 0;
     }
-    const newCollateral = parseFloat(vaultCollateral) - parseFloat(vaultCollateral);
+    const newCollateral = parseFloat(vaultCollateral) - collateralToRemove;
     const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
     changeVault(r);
     setRemoveCollateralUSD(usd.toString());
@@ -486,21 +501,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxMintTCAP = async (e: React.MouseEvent) => {
+  const safeMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const maxMint = await getMaxMint(
+    const safeMint = await getSafeMint(
       minRatio,
       vaultCollateral,
       collateralPrice,
       tcapPrice,
       vaultDebt
     );
-    setMintTxt(maxMint.toString());
-    let usd = toUSD(tcapPrice, maxMint.toString());
+    setMintTxt(safeMint.toString());
+    let usd = toUSD(tcapPrice, safeMint.toString());
     if (!usd) {
       usd = 0;
     }
-    const newDebt = maxMint + parseFloat(vaultDebt);
+    const newDebt = safeMint + parseFloat(vaultDebt);
     const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
     changeVault(r);
     setMintUSD(usd.toString());
@@ -803,8 +818,8 @@ const Details = ({ address }: props) => {
                   <Form.Group className="remove">
                     <Form.Label>Remove Collateral</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number orange" onClick={maxRemoveCollateral}>
-                        MAX
+                      <a href="/" className="number orange" onClick={safeRemoveCollateral}>
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -868,8 +883,8 @@ const Details = ({ address }: props) => {
                   <Form.Group>
                     <Form.Label>Mint TCAP</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number" onClick={maxMintTCAP}>
-                        MAX
+                      <a href="/" className="number" onClick={safeMintTCAP}>
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>

@@ -17,7 +17,6 @@ switch (process.env.REACT_APP_NETWORK_ID) {
   case "4":
     network = "rinkeby";
     break;
-
   case "5":
     network = "goerli";
     break;
