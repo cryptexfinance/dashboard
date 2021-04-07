@@ -58,13 +58,13 @@ const Graph = () => {
         await data.states.forEach((s: any) => {
           switch (s.id.toLowerCase()) {
             case DAIVault.address.toLowerCase():
-              currentDAIStake = s.amountStaked ? s.amountStaked : 0;
+              currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             case WETHVault.address.toLowerCase():
-              currentWETHStake = s.amountStaked ? s.amountStaked : 0;
+              currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             case WBTCVault.address.toLowerCase():
-              currentWBTCStake = s.amountStaked ? s.amountStaked : 0;
+              currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             default:
               break;
