@@ -94,18 +94,29 @@ const App = () => {
     const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
     tokens.setCurrentTCAPToken(currentTCAPToken);
 
-    // Set Pool Tokens
+    // TODO:remove this once other pools work
+    if (process.env.REACT_APP_POOL_ETH) {
+      const currentWETHPoolToken = new ethers.Contract(
+        process.env.REACT_APP_POOL_ETH,
+        DAIToken.abi,
+        currentSigner
+      );
+
+      tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
+    }
     if (
       process.env.REACT_APP_POOL_ETH &&
       process.env.REACT_APP_POOL_WBTC &&
       process.env.REACT_APP_POOL_DAI &&
       process.env.REACT_APP_POOL_CTX
     ) {
+      // Set Pool Tokens
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
         DAIToken.abi,
         currentSigner
       );
+
       tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
 
       const currentDAIPoolToken = new ethers.Contract(

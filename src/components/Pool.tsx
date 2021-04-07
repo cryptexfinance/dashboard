@@ -71,23 +71,27 @@ const Farm = () => {
         let totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
         setEthLiquidity(totalUSD.toString());
 
-        const currentPoolWbtc = await tokens.wbtcToken?.balanceOf(
-          process?.env?.REACT_APP_POOL_WBTC
-        );
-        formatPair1 = ethers.utils.formatEther(currentPoolWbtc);
-        const currentWbtcTCAP = await tokens.tcapToken?.balanceOf(
-          process?.env?.REACT_APP_POOL_WBTC
-        );
-        formatPair2 = ethers.utils.formatEther(currentWbtcTCAP);
-        totalUSD = toUSD(formatPair1, wbtcUSD) + toUSD(formatPair2, tcapUSD);
-        setWbtcLiquidity(totalUSD.toString());
+        if (phase > 2) {
+          const currentPoolWbtc = await tokens.wbtcToken?.balanceOf(
+            process?.env?.REACT_APP_POOL_WBTC
+          );
+          formatPair1 = ethers.utils.formatEther(currentPoolWbtc);
+          const currentWbtcTCAP = await tokens.tcapToken?.balanceOf(
+            process?.env?.REACT_APP_POOL_WBTC
+          );
+          formatPair2 = ethers.utils.formatEther(currentWbtcTCAP);
+          totalUSD = toUSD(formatPair1, wbtcUSD) + toUSD(formatPair2, tcapUSD);
+          setWbtcLiquidity(totalUSD.toString());
 
-        const currentPoolDai = await tokens.daiToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
-        formatPair1 = ethers.utils.formatEther(currentPoolDai);
-        const currentDaiTCAP = await tokens.tcapToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
-        formatPair2 = ethers.utils.formatEther(currentDaiTCAP);
-        totalUSD = toUSD(formatPair1, daiUSD) + toUSD(formatPair2, tcapUSD);
-        setDaiLiquidity(totalUSD.toString());
+          const currentPoolDai = await tokens.daiToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
+          formatPair1 = ethers.utils.formatEther(currentPoolDai);
+          const currentDaiTCAP = await tokens.tcapToken?.balanceOf(
+            process?.env?.REACT_APP_POOL_DAI
+          );
+          formatPair2 = ethers.utils.formatEther(currentDaiTCAP);
+          totalUSD = toUSD(formatPair1, daiUSD) + toUSD(formatPair2, tcapUSD);
+          setDaiLiquidity(totalUSD.toString());
+        }
 
         // const currentPoolCtx = await governance.ctxToken?.balanceOf(
         //   process?.env?.REACT_APP_POOL_CTX
