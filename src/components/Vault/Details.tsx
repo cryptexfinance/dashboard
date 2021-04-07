@@ -225,7 +225,10 @@ const Details = ({ address }: props) => {
           } else {
             setVaultStatus("danger");
           }
-          const parsedCollateral = ethers.utils.formatEther(collateral);
+
+          const parsedCollateral = collateral.div(BigNumber.from(10).pow(decimals)).toString();
+
+          // const parsedCollateral = ethers.utils.formatEther(collateral);
           setVaultCollateral(parsedCollateral);
           usd = toUSD(currentPrice, parsedCollateral);
           setVaultCollateralUSD(usd.toString());
