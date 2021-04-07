@@ -180,7 +180,7 @@ const Farm = () => {
                           variant="primary"
                           className=""
                           target="_blank"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                          href={`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`}
                         >
                           Pool
                         </Button>
