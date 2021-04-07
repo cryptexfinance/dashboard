@@ -210,10 +210,7 @@ const Welcome = () => {
                     variant="primary"
                     className="neon-pink"
                     onClick={() => {
-                      window.open(
-                        `${lpURL}/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
-                        "_blank"
-                      );
+                      window.open(`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`, "_blank");
                     }}
                   >
                     Trade
@@ -235,7 +232,7 @@ const Welcome = () => {
                   )}
                 </Col>
               </Row>
-              {/* <Row className="">
+              <Row className="">
                 <Col>
                   {address !== "" ? (
                     <Button
@@ -268,7 +265,7 @@ const Welcome = () => {
                     </Button>
                   )}
                 </Col>
-              </Row> */}
+              </Row>
             </Card>
           </Col>
         </Row>

@@ -38,6 +38,8 @@ const Farm = () => {
   const lpURL = process.env.REACT_APP_LP_URL;
   const visionURL = process.env.REACT_APP_LP_VISION;
 
+  const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
+
   useEffect(() => {
     const loadAddress = async () => {
       if (
@@ -178,106 +180,110 @@ const Farm = () => {
                           variant="primary"
                           className=""
                           target="_blank"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                          href={`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`}
                         >
                           Pool
                         </Button>
                       </td>
                     </tr>
-                    <tr>
-                      <td>
-                        <WBTCIcon className="wbtc" />
-                        <TcapIcon className="tcap" />{" "}
-                      </td>
-                      <td>
-                        {" "}
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_WBTC}`}
-                        >
-                          WBTC/TCAP <br />
-                          <small>SushiSwap</small>
-                        </a>
-                      </td>{" "}
-                      <td className="number">
-                        $
-                        <NumberFormat
-                          className="number"
-                          value={wbtcLiquidity}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          target="_blank"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
-                        >
-                          Pool
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <DAIIcon className="dai" />
-                        <TcapIcon className="tcap" />{" "}
-                      </td>
-                      <td>
-                        {" "}
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_DAI}`}
-                        >
-                          DAI/TCAP <br />
-                          <small>SushiSwap</small>
-                        </a>
-                      </td>
-                      <td className="number">
-                        $
-                        <NumberFormat
-                          className="number"
-                          value={daiLiquidity}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>{" "}
-                      <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          target="_blank"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
-                        >
-                          Pool
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <CtxIcon className="ctx-neon" />
-                        <WETHIcon className="weth" />{" "}
-                      </td>
-                      <td>
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
-                        >
-                          CTX/ETH Pool <br />
-                          <small>SushiSwap</small>
-                        </a>
-                      </td>
-                      <td className="number">
-                        N/A
-                        {/* <NumberFormat
+
+                    {phase > 2 && (
+                      <>
+                        <tr>
+                          <td>
+                            <WBTCIcon className="wbtc" />
+                            <TcapIcon className="tcap" />{" "}
+                          </td>
+                          <td>
+                            {" "}
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`${visionURL}/${process?.env?.REACT_APP_POOL_WBTC}`}
+                            >
+                              WBTC/TCAP <br />
+                              <small>SushiSwap</small>
+                            </a>
+                          </td>{" "}
+                          <td className="number">
+                            $
+                            <NumberFormat
+                              className="number"
+                              value={wbtcLiquidity}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>
+                          <td className="number">
+                            <Button
+                              variant="primary"
+                              className=""
+                              target="_blank"
+                              href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                            >
+                              Pool
+                            </Button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <DAIIcon className="dai" />
+                            <TcapIcon className="tcap" />{" "}
+                          </td>
+                          <td>
+                            {" "}
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`${visionURL}/${process?.env?.REACT_APP_POOL_DAI}`}
+                            >
+                              DAI/TCAP <br />
+                              <small>SushiSwap</small>
+                            </a>
+                          </td>
+                          <td className="number">
+                            $
+                            <NumberFormat
+                              className="number"
+                              value={daiLiquidity}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>{" "}
+                          <td className="number">
+                            <Button
+                              variant="primary"
+                              className=""
+                              target="_blank"
+                              href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                            >
+                              Pool
+                            </Button>
+                          </td>
+                        </tr>
+                        {phase > 3 && (
+                          <tr>
+                            <td>
+                              <CtxIcon className="ctx-neon" />
+                              <WETHIcon className="weth" />{" "}
+                            </td>
+                            <td>
+                              <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
+                              >
+                                CTX/ETH Pool <br />
+                                <small>SushiSwap</small>
+                              </a>
+                            </td>
+                            <td className="number">
+                              N/A
+                              {/* <NumberFormat
                           className="number"
                           value={1}
                           displayType="text"
@@ -285,18 +291,21 @@ const Farm = () => {
                           prefix=""
                           decimalScale={2}
                         />{" "} */}
-                      </td>{" "}
-                      <td className="number">
-                        <Button
-                          variant="primary"
-                          className=""
-                          target="_blank"
-                          href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
-                        >
-                          Pool
-                        </Button>
-                      </td>
-                    </tr>
+                            </td>{" "}
+                            <td className="number">
+                              <Button
+                                variant="primary"
+                                className=""
+                                target="_blank"
+                                href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                              >
+                                Pool
+                              </Button>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    )}
                   </tbody>
                 </Table>
               </Card>

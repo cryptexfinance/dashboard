@@ -65,6 +65,7 @@ const Farm = () => {
   const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
 
   const lpURL = process.env.REACT_APP_LP_URL;
+  const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
   const USER_VAULTS = gql`
     query getVault($owner: String!) {
@@ -135,66 +136,84 @@ const Farm = () => {
         const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
         setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
-        const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
+        if (phase > 1) {
+          const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
 
-        const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
-        setEthPoolRewards(
-          ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(currentAddress);
-        setVEthPoolRewards(
-          ethers.utils.formatEther(
-            currentVEthPoolReward.add(currentEthPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
-        setWbtcPoolRewards(
-          ethers.utils.formatEther(currentWbtcPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVWbtcPoolReward = await rewards.wbtcPoolReward?.vestingAmounts(currentAddress);
-        setVWbtcPoolRewards(
-          ethers.utils.formatEther(
-            currentVWbtcPoolReward.add(currentWbtcPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
-        setDaiPoolRewards(
-          ethers.utils.formatEther(currentDaiPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVDaiPoolReward = await rewards.daiPoolReward?.vestingAmounts(currentAddress);
-        setVDaiPoolRewards(
-          ethers.utils.formatEther(
-            currentVDaiPoolReward.add(currentDaiPoolReward.mul(vestingRatio).div(100))
-          )
-        );
-        const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
-        setCtxPoolRewards(
-          ethers.utils.formatEther(currentCtxPoolReward.mul(100 - vestingRatio).div(100))
-        );
-        const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(currentAddress);
-        setVCtxPoolRewards(
-          ethers.utils.formatEther(
-            currentVCtxPoolReward.add(currentCtxPoolReward.mul(vestingRatio).div(100))
-          )
-        );
+          const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
+          setEthPoolRewards(
+            ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))
+          );
+          const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(
+            currentAddress
+          );
+          setVEthPoolRewards(
+            ethers.utils.formatEther(
+              currentVEthPoolReward.add(currentEthPoolReward.mul(vestingRatio).div(100))
+            )
+          );
 
-        const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
-        setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
-        const currentWbtcPoolStake = await rewards.wbtcPoolReward?.balanceOf(currentAddress);
-        setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
-        const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
-        setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
-        const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
-        setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+          const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
+          setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
+          const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
+          setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
 
-        const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
-        setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
-        const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
-        setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
-        const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
-        setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
-        const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
-        setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
+          if (phase > 2) {
+            const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
+            setWbtcPoolRewards(
+              ethers.utils.formatEther(currentWbtcPoolReward.mul(100 - vestingRatio).div(100))
+            );
+            const currentVWbtcPoolReward = await rewards.wbtcPoolReward?.vestingAmounts(
+              currentAddress
+            );
+            setVWbtcPoolRewards(
+              ethers.utils.formatEther(
+                currentVWbtcPoolReward.add(currentWbtcPoolReward.mul(vestingRatio).div(100))
+              )
+            );
+            const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
+            setDaiPoolRewards(
+              ethers.utils.formatEther(currentDaiPoolReward.mul(100 - vestingRatio).div(100))
+            );
+            const currentVDaiPoolReward = await rewards.daiPoolReward?.vestingAmounts(
+              currentAddress
+            );
+            setVDaiPoolRewards(
+              ethers.utils.formatEther(
+                currentVDaiPoolReward.add(currentDaiPoolReward.mul(vestingRatio).div(100))
+              )
+            );
+
+            const currentWbtcPoolStake = await rewards.wbtcPoolReward?.balanceOf(currentAddress);
+            setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
+            const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
+            setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
+            const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
+            setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+
+            const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
+            setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
+            const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
+            setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
+          }
+
+          if (phase > 3) {
+            const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
+            setCtxPoolRewards(
+              ethers.utils.formatEther(currentCtxPoolReward.mul(100 - vestingRatio).div(100))
+            );
+            const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(
+              currentAddress
+            );
+            setVCtxPoolRewards(
+              ethers.utils.formatEther(
+                currentVCtxPoolReward.add(currentCtxPoolReward.mul(vestingRatio).div(100))
+              )
+            );
+
+            const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
+            setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
+          }
+        }
       }
       setIsLoading(false);
     };
@@ -479,454 +498,465 @@ const Farm = () => {
                   </tbody>
                 </Table>
               </Card>
-              <Card className="diamond mt-4">
-                <h2>Liquidity Rewards </h2>
-                <Table hover className="mt-2">
-                  <thead>
-                    <tr>
-                      <th />
-                      <th>Description</th>
-                      <th>Balance</th>
-                      <th>Stake</th>
-                      <th>
-                        <div className="rewards">
-                          <div className="title">Vested Reward</div>
-                          <div className="button">
-                            <OverlayTrigger
-                              key="top"
-                              placement="auto"
-                              trigger={["hover", "click"]}
-                              overlay={
-                                <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                  The total amount of CTX for the initial 6 month liquidity provider
-                                  rewards is 20% of the protocol or 2,000,000 CTX. Assuming
-                                  approximately 6500 Ethereum blocks per day over 6 months
-                                  (1,170,000 blocks), this would result in 1.7094 CTX issued per
-                                  block. Newly rewarded CTX tokens shall be subjected to a vesting
-                                  period of 6 months where 30% of the reward is immediately
-                                  available while the remaining 70% reward will not be accessible
-                                  until 6 months vesting period has been reached.
-                                </Tooltip>
-                              }
-                            >
-                              <Button variant="dark">?</Button>
-                            </OverlayTrigger>
+
+              {phase > 1 && (
+                <Card className="diamond mt-4">
+                  <h2>Liquidity Rewards </h2>
+                  <Table hover className="mt-2">
+                    <thead>
+                      <tr>
+                        <th />
+                        <th>Description</th>
+                        <th>Balance</th>
+                        <th>Stake</th>
+                        <th>
+                          <div className="rewards">
+                            <div className="title">Vested Reward</div>
+                            <div className="button">
+                              <OverlayTrigger
+                                key="top"
+                                placement="auto"
+                                trigger={["hover", "click"]}
+                                overlay={
+                                  <Tooltip id="ttip-vreward" className="farm-tooltip">
+                                    The total amount of CTX for the initial 6 month liquidity
+                                    provider rewards is 20% of the protocol or 2,000,000 CTX.
+                                    Assuming approximately 6500 Ethereum blocks per day over 6
+                                    months (1,170,000 blocks), this would result in 1.7094 CTX
+                                    issued per block. Newly rewarded CTX tokens shall be subjected
+                                    to a vesting period of 6 months where 30% of the reward is
+                                    immediately available while the remaining 70% reward will not be
+                                    accessible until 6 months vesting period has been reached.
+                                  </Tooltip>
+                                }
+                              >
+                                <Button variant="dark">?</Button>
+                              </OverlayTrigger>
+                            </div>
                           </div>
-                        </div>
-                      </th>
-                      <th>
-                        <div className="rewards">
-                          <div className="title">Unvested Reward</div>
-                          <div className="button">
-                            <OverlayTrigger
-                              key="top"
-                              placement="auto"
-                              trigger={["hover", "click"]}
-                              overlay={
-                                <Tooltip id="tooltip-top" className="farm-tooltip">
-                                  The total amount of CTX for the initial 6 month liquidity provider
-                                  rewards is 20% of the protocol or 2,000,000 CTX. Assuming
-                                  approximately 6500 Ethereum blocks per day over 6 months
-                                  (1,170,000 blocks), this would result in 1.7094 CTX issued per
-                                  block. Newly rewarded CTX tokens shall be subjected to a vesting
-                                  period of 6 months where 30% of the reward is immediately
-                                  available while the remaining 70% reward will not be accessible
-                                  until 6 months vesting period has been reached.
-                                </Tooltip>
-                              }
-                            >
-                              <Button variant="dark">?</Button>
-                            </OverlayTrigger>
+                        </th>
+                        <th>
+                          <div className="rewards">
+                            <div className="title">Unvested Reward</div>
+                            <div className="button">
+                              <OverlayTrigger
+                                key="top"
+                                placement="auto"
+                                trigger={["hover", "click"]}
+                                overlay={
+                                  <Tooltip id="tooltip-top" className="farm-tooltip">
+                                    The total amount of CTX for the initial 6 month liquidity
+                                    provider rewards is 20% of the protocol or 2,000,000 CTX.
+                                    Assuming approximately 6500 Ethereum blocks per day over 6
+                                    months (1,170,000 blocks), this would result in 1.7094 CTX
+                                    issued per block. Newly rewarded CTX tokens shall be subjected
+                                    to a vesting period of 6 months where 30% of the reward is
+                                    immediately available while the remaining 70% reward will not be
+                                    accessible until 6 months vesting period has been reached.
+                                  </Tooltip>
+                                }
+                              >
+                                <Button variant="dark">?</Button>
+                              </OverlayTrigger>
+                            </div>
                           </div>
-                        </div>
-                      </th>
-                      <th />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <WETHIcon className="weth" />
-                        <TcapIcon className="tcap" />
-                      </td>
-                      <td>
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
-                        >
-                          SushiSwap ETH/TCAP Pool
-                        </a>
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ethPoolBalance}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ethPoolStake}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ethPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={vethPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td align="right">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            setStakeBalance(ethPoolBalance);
-                            setSelectedPoolTitle("SushiSwap ETH/TCAP Pool");
-                            if (rewards.wethPoolReward) {
-                              setSelectedPool(rewards.wethPoolReward);
-                              setSelectedPoolToken(tokens.wethPoolToken);
-                            }
-                            setStakeShow(true);
-                          }}
-                        >
-                          Stake
-                        </Button>
+                        </th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <WETHIcon className="weth" />
+                          <TcapIcon className="tcap" />
+                        </td>
+                        <td>
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                          >
+                            SushiSwap ETH/TCAP Pool
+                          </a>
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ethPoolBalance}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ethPoolStake}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ethPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={vethPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </td>
+                        <td align="right">
+                          <Button
+                            variant="primary"
+                            className=""
+                            onClick={() => {
+                              setStakeBalance(ethPoolBalance);
+                              setSelectedPoolTitle("SushiSwap ETH/TCAP Pool");
+                              if (rewards.wethPoolReward) {
+                                setSelectedPool(rewards.wethPoolReward);
+                                setSelectedPoolToken(tokens.wethPoolToken);
+                              }
+                              setStakeShow(true);
+                            }}
+                          >
+                            Stake
+                          </Button>
 
-                        <Button
-                          variant="success"
-                          className=" ml-4"
-                          onClick={() => {
-                            claimRewards("ETHPOOL");
-                          }}
-                        >
-                          Claim
-                        </Button>
+                          <Button
+                            variant="success"
+                            className=" ml-4"
+                            onClick={() => {
+                              claimRewards("ETHPOOL");
+                            }}
+                          >
+                            Claim
+                          </Button>
 
-                        <Button
-                          variant="warning"
-                          className=" ml-4"
-                          onClick={() => {
-                            exitRewards("ETHPOOL");
-                          }}
-                        >
-                          Exit
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <WBTCIcon className="wbtc" />
-                        <TcapIcon className="tcap" />{" "}
-                      </td>
-                      <td>
-                        {" "}
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
-                        >
-                          SushiSwap WBTC/TCAP Pool
-                        </a>
-                      </td>{" "}
-                      <td className="number">
-                        {" "}
-                        <NumberFormat
-                          className="number"
-                          value={wbtcPoolBalance}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        {" "}
-                        <NumberFormat
-                          className="number"
-                          value={wbtcPoolStake}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>{" "}
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={wbtcPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={vwbtcPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td align="right">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            setStakeBalance(wbtcPoolBalance);
-                            setSelectedPoolTitle("SushiSwap WBTC/TCAP Pool");
-                            if (rewards.wbtcPoolReward) {
-                              setSelectedPool(rewards.wbtcPoolReward);
-                              setSelectedPoolToken(tokens.wbtcPoolToken);
-                            }
-                            setStakeShow(true);
-                          }}
-                        >
-                          Stake
-                        </Button>
+                          <Button
+                            variant="warning"
+                            className=" ml-4"
+                            onClick={() => {
+                              exitRewards("ETHPOOL");
+                            }}
+                          >
+                            Exit
+                          </Button>
+                        </td>
+                      </tr>
+                      {phase > 2 && (
+                        <>
+                          {" "}
+                          <tr>
+                            <td>
+                              <WBTCIcon className="wbtc" />
+                              <TcapIcon className="tcap" />{" "}
+                            </td>
+                            <td>
+                              {" "}
+                              <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
+                              >
+                                SushiSwap WBTC/TCAP Pool
+                              </a>
+                            </td>{" "}
+                            <td className="number">
+                              {" "}
+                              <NumberFormat
+                                className="number"
+                                value={wbtcPoolBalance}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                            </td>
+                            <td className="number">
+                              {" "}
+                              <NumberFormat
+                                className="number"
+                                value={wbtcPoolStake}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                            </td>{" "}
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={wbtcPoolRewards}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                              CTX
+                            </td>
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={vwbtcPoolRewards}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                              CTX
+                            </td>
+                            <td align="right">
+                              <Button
+                                variant="primary"
+                                className=""
+                                onClick={() => {
+                                  setStakeBalance(wbtcPoolBalance);
+                                  setSelectedPoolTitle("SushiSwap WBTC/TCAP Pool");
+                                  if (rewards.wbtcPoolReward) {
+                                    setSelectedPool(rewards.wbtcPoolReward);
+                                    setSelectedPoolToken(tokens.wbtcPoolToken);
+                                  }
+                                  setStakeShow(true);
+                                }}
+                              >
+                                Stake
+                              </Button>
 
-                        <Button
-                          variant="success"
-                          className=" ml-4"
-                          onClick={() => {
-                            claimRewards("WBTCPOOL");
-                          }}
-                        >
-                          Claim
-                        </Button>
+                              <Button
+                                variant="success"
+                                className=" ml-4"
+                                onClick={() => {
+                                  claimRewards("WBTCPOOL");
+                                }}
+                              >
+                                Claim
+                              </Button>
 
-                        <Button
-                          variant="warning"
-                          className="ml-4"
-                          onClick={() => {
-                            exitRewards("WBTCPOOL");
-                          }}
-                        >
-                          Exit
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <DAIIcon className="dai" />
-                        <TcapIcon className="tcap" />{" "}
-                      </td>
-                      <td>
-                        {" "}
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
-                        >
-                          SushiSwap DAI/TCAP Pool
-                        </a>
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={daiPoolBalance}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>{" "}
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={daiPoolStake}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={daiPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={vdaiPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td align="right">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            setStakeBalance(daiPoolBalance);
-                            setSelectedPoolTitle("SushiSwap DAI/TCAP Pool");
-                            if (rewards.daiPoolReward) {
-                              setSelectedPool(rewards.daiPoolReward);
-                              setSelectedPoolToken(tokens.daiPoolToken);
-                            }
-                            setStakeShow(true);
-                          }}
-                        >
-                          Stake
-                        </Button>
+                              <Button
+                                variant="warning"
+                                className="ml-4"
+                                onClick={() => {
+                                  exitRewards("WBTCPOOL");
+                                }}
+                              >
+                                Exit
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <DAIIcon className="dai" />
+                              <TcapIcon className="tcap" />{" "}
+                            </td>
+                            <td>
+                              {" "}
+                              <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                              >
+                                SushiSwap DAI/TCAP Pool
+                              </a>
+                            </td>
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={daiPoolBalance}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                            </td>{" "}
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={daiPoolStake}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                            </td>
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={daiPoolRewards}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                              CTX
+                            </td>
+                            <td className="number">
+                              <NumberFormat
+                                className="number"
+                                value={vdaiPoolRewards}
+                                displayType="text"
+                                thousandSeparator
+                                prefix=""
+                                decimalScale={2}
+                              />{" "}
+                              CTX
+                            </td>
+                            <td align="right">
+                              <Button
+                                variant="primary"
+                                className=""
+                                onClick={() => {
+                                  setStakeBalance(daiPoolBalance);
+                                  setSelectedPoolTitle("SushiSwap DAI/TCAP Pool");
+                                  if (rewards.daiPoolReward) {
+                                    setSelectedPool(rewards.daiPoolReward);
+                                    setSelectedPoolToken(tokens.daiPoolToken);
+                                  }
+                                  setStakeShow(true);
+                                }}
+                              >
+                                Stake
+                              </Button>
 
-                        <Button
-                          variant="success"
-                          className=" ml-4"
-                          onClick={() => {
-                            claimRewards("DAIPOOL");
-                          }}
-                        >
-                          Claim
-                        </Button>
+                              <Button
+                                variant="success"
+                                className=" ml-4"
+                                onClick={() => {
+                                  claimRewards("DAIPOOL");
+                                }}
+                              >
+                                Claim
+                              </Button>
 
-                        <Button
-                          variant="warning"
-                          className=" ml-4"
-                          onClick={() => {
-                            exitRewards("DAIPOOL");
-                          }}
-                        >
-                          Exit
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <CtxIcon className="ctx-neon" />
-                        <WETHIcon className="weth" />{" "}
-                      </td>
-                      <td>
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
-                        >
-                          SushiSwap CTX/ETH Pool
-                        </a>
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ctxPoolBalance}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>{" "}
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ctxPoolStake}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ctxPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>{" "}
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={vctxPoolRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td align="right">
-                        <Button
-                          variant="primary"
-                          className=""
-                          onClick={() => {
-                            setStakeBalance(ctxPoolBalance);
-                            setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
-                            if (rewards.ctxPoolReward) {
-                              setSelectedPool(rewards.ctxPoolReward);
-                              setSelectedPoolToken(tokens.ctxPoolToken);
-                            }
-                            setStakeShow(true);
-                          }}
-                        >
-                          Stake
-                        </Button>
+                              <Button
+                                variant="warning"
+                                className=" ml-4"
+                                onClick={() => {
+                                  exitRewards("DAIPOOL");
+                                }}
+                              >
+                                Exit
+                              </Button>
+                            </td>
+                          </tr>
+                        </>
+                      )}
 
-                        <Button
-                          variant="success"
-                          className=" ml-4"
-                          onClick={() => {
-                            claimRewards("CTXPOOL");
-                          }}
-                        >
-                          Claim
-                        </Button>
+                      {phase > 3 && (
+                        <tr>
+                          <td>
+                            <CtxIcon className="ctx-neon" />
+                            <WETHIcon className="weth" />{" "}
+                          </td>
+                          <td>
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                            >
+                              SushiSwap CTX/ETH Pool
+                            </a>
+                          </td>
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={ctxPoolBalance}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>{" "}
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={ctxPoolStake}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={ctxPoolRewards}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                            CTX
+                          </td>{" "}
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={vctxPoolRewards}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                            CTX
+                          </td>
+                          <td align="right">
+                            <Button
+                              variant="primary"
+                              className=""
+                              onClick={() => {
+                                setStakeBalance(ctxPoolBalance);
+                                setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
+                                if (rewards.ctxPoolReward) {
+                                  setSelectedPool(rewards.ctxPoolReward);
+                                  setSelectedPoolToken(tokens.ctxPoolToken);
+                                }
+                                setStakeShow(true);
+                              }}
+                            >
+                              Stake
+                            </Button>
 
-                        <Button
-                          variant="warning"
-                          className=" ml-4"
-                          onClick={() => {
-                            exitRewards("CTXPOOL");
-                          }}
-                        >
-                          Exit
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimRewards("CTXPOOL");
+                              }}
+                            >
+                              Claim
+                            </Button>
+
+                            <Button
+                              variant="warning"
+                              className=" ml-4"
+                              onClick={() => {
+                                exitRewards("CTXPOOL");
+                              }}
+                            >
+                              Exit
+                            </Button>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </Card>
+              )}
             </>
           )}
         </Row>
