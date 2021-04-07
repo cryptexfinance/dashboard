@@ -151,15 +151,11 @@ const Farm = () => {
               currentVEthPoolReward.add(currentEthPoolReward.mul(vestingRatio).div(100))
             )
           );
-          console.log(tokens);
 
           const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
           setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
           const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
-          console.log(
-            "🚀 ~ file: Farm.tsx ~ line 158 ~ loadAddress ~ currentEthPoolBalance",
-            currentEthPoolBalance
-          );
+
           setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
 
           if (phase > 2) {

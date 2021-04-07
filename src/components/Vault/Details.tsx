@@ -191,7 +191,10 @@ const Details = ({ address }: props) => {
         }
       });
 
-      const currentBalance = ethers.utils.formatEther(balance);
+      // const currentBalance = ethers.utils.formatEther(balance);
+      const decimals = await currentToken.decimals();
+      const currentBalance = balance.div(BigNumber.from(10).pow(decimals)).toString();
+
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
       }
