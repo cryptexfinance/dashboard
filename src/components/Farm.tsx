@@ -574,7 +574,7 @@ const Farm = () => {
                           <a
                             target="_blank"
                             rel="noreferrer"
-                            href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                            href={`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`}
                           >
                             SushiSwap ETH/TCAP Pool
                           </a>
