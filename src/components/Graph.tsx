@@ -74,7 +74,9 @@ const Graph = () => {
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
 
-        const formatWBTC = currentWBTCStake.div(BigNumber.from(10).pow(8)).toString();
+        const formatWBTC = BigNumber.from(currentWBTCStake)
+          .div(BigNumber.from(10).pow(8))
+          .toString();
         setWBTCStake(formatWBTC);
 
         const formatETH = ethers.utils.formatEther(currentWETHStake);
