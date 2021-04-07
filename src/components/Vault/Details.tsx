@@ -87,6 +87,7 @@ const Details = ({ address }: props) => {
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
+  const [selectedVaultDecimals, setSelectedVaultDecimals] = useState(18);
 
   // General Data
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
@@ -193,6 +194,7 @@ const Details = ({ address }: props) => {
 
       // const currentBalance = ethers.utils.formatEther(balance);
       const decimals = await currentToken.decimals();
+      setSelectedVaultDecimals(decimals);
       const currentBalance = balance.div(BigNumber.from(10).pow(decimals)).toString();
 
       if (parseFloat(currentBalance) < 0.09) {
@@ -389,7 +391,11 @@ const Details = ({ address }: props) => {
 
   const addCollateral = async () => {
     if (addCollateralTxt) {
-      const amount = ethers.utils.parseEther(addCollateralTxt);
+      // fix decimals
+      const value = BigNumber.from(addCollateralTxt);
+      const amount = value.mul(BigNumber.from(10).pow(selectedVaultDecimals)).toString();
+
+      // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.addCollateralETH({
@@ -423,10 +429,11 @@ const Details = ({ address }: props) => {
         infura: process.env.REACT_APP_INFURA_ID,
         alchemy: process.env.REACT_APP_ALCHEMY_KEY,
       });
-      // setIsApproved(true);
+
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
-      balance = ethers.utils.formatEther(await selectedCollateralContract.balanceOf(address));
+      const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
+      balance = value.div(BigNumber.from(10).pow(selectedVaultDecimals)).toString();
     }
     setAddCollateralTxt(balance);
     let usd = toUSD(collateralPrice, balance);
@@ -441,7 +448,9 @@ const Details = ({ address }: props) => {
 
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
-      const amount = ethers.utils.parseEther(removeCollateralTxt);
+      const value = BigNumber.from(removeCollateralTxt);
+      const amount = value.mul(BigNumber.from(10).pow(selectedVaultDecimals)).toString();
+
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.removeCollateralETH(amount);
