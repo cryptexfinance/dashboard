@@ -226,7 +226,9 @@ const Details = ({ address }: props) => {
             setVaultStatus("danger");
           }
 
-          const parsedCollateral = collateral.div(BigNumber.from(10).pow(decimals)).toString();
+          const parsedCollateral = BigNumber.from(collateral)
+            .div(BigNumber.from(10).pow(decimals))
+            .toString();
 
           // const parsedCollateral = ethers.utils.formatEther(collateral);
           setVaultCollateral(parsedCollateral);
