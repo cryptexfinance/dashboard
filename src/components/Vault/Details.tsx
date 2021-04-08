@@ -196,6 +196,7 @@ const Details = ({ address }: props) => {
       const decimals = await currentToken.decimals();
       setSelectedVaultDecimals(decimals);
       const currentBalance = balance.div(BigNumber.from(10).pow(decimals)).toString();
+      console.log("🚀 ~ file: Details.tsx ~ line 199 ~ loadVault ~ currentBalance", currentBalance);
 
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
