@@ -114,7 +114,12 @@ export const getSafeMint = async (
   const d = parseFloat(debt);
   if (r === 0 || tp === 0) return 0;
   const safeMint = (c * cp * 100) / (r * tp);
-  return safeMint - d;
+
+  const result = safeMint - d;
+  if (result < 0) {
+    return 0;
+  }
+  return result;
 };
 
 export const getSafeRemoveCollateral = async (
@@ -131,7 +136,12 @@ export const getSafeRemoveCollateral = async (
   const d = parseFloat(debt);
   if (cp === 0) return 0;
   const n = (r * d * tp) / (cp * 100);
-  return c - n;
+
+  const result = c - n;
+  if (result < 0) {
+    return 0;
+  }
+  return result;
 };
 
 export const getProposalStatus = (
