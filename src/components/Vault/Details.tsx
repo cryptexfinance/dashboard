@@ -649,7 +649,7 @@ const Details = ({ address }: props) => {
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
             <option value="ETH">ETH</option>
             <option>WETH</option>
-            <option>WBTC</option>
+            {/* <option>WBTC</option> */}
             <option>DAI</option>
           </Form.Control>
           <p className="number">
