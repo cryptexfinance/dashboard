@@ -30,7 +30,7 @@ const Farm = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [ethRewards, setEthRewards] = useState("0");
-  const [wbtcRewards, setWbtcRewards] = useState("0");
+  // const [wbtcRewards, setWbtcRewards] = useState("0");
   const [daiRewards, setDaiRewards] = useState("0");
   const [ethPoolRewards, setEthPoolRewards] = useState("0.0");
   const [wbtcPoolRewards, setWbtcPoolRewards] = useState("0.0");
@@ -41,7 +41,7 @@ const Farm = () => {
   const [vdaiPoolRewards, setVDaiPoolRewards] = useState("0.0");
   const [vctxPoolRewards, setVCtxPoolRewards] = useState("0.0");
   const [ethDebt, setEthDebt] = useState("0.0");
-  const [wbtcDebt, setWbtcDebt] = useState("0.0");
+  // const [wbtcDebt, setWbtcDebt] = useState("0.0");
   const [daiDebt, setDaiDebt] = useState("0.0");
   const [ethPoolStake, setEthPoolStake] = useState("0.0");
   const [wbtcPoolStake, setWbtcPoolStake] = useState("0.0");
@@ -89,7 +89,7 @@ const Farm = () => {
           setEthDebt(ethers.utils.formatEther(v.debt));
           break;
         case vaults?.wbtcVault?.address.toLowerCase():
-          setWbtcDebt(ethers.utils.formatEther(v.debt));
+          // setWbtcDebt(ethers.utils.formatEther(v.debt));
           break;
         case vaults?.daiVault?.address.toLowerCase():
           setDaiDebt(ethers.utils.formatEther(v.debt));
@@ -131,8 +131,8 @@ const Farm = () => {
         setAddress(currentAddress);
         const currentEthReward = await rewards?.wethReward?.earned(currentAddress);
         setEthRewards(ethers.utils.formatEther(currentEthReward));
-        const currentWbtcReward = await rewards?.wbtcReward?.earned(currentAddress);
-        setWbtcRewards(ethers.utils.formatEther(currentWbtcReward));
+        // const currentWbtcReward = await rewards?.wbtcReward?.earned(currentAddress);
+        // setWbtcRewards(ethers.utils.formatEther(currentWbtcReward));
         const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
         setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
@@ -406,7 +406,7 @@ const Farm = () => {
                         </Button>
                       </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <td>
                         <WBTCIcon className="wbtc" />
                       </td>
@@ -450,7 +450,7 @@ const Farm = () => {
                           Claim
                         </Button>
                       </td>{" "}
-                    </tr>
+                    </tr> */}
                     <tr>
                       <td>
                         <DAIIcon className="dai" />
