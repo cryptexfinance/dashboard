@@ -33,7 +33,7 @@ import governanceContext from "./state/GovernanceContext";
 import rewardsContext from "./state/RewardsContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
 import WETHVault from "./contracts/WETHVaultHandler.json";
-import WBTCVault from "./contracts/BTCVaultHandler.json";
+import WBTCVault from "./contracts/WBTCVaultHandler.json";
 import DAIVault from "./contracts/DAIVaultHandler.json";
 import WETHOracle from "./contracts/WETHOracle.json";
 import WBTCOracle from "./contracts/BTCOracle.json";
@@ -47,7 +47,7 @@ import CTXToken from "./contracts/Ctx.json";
 import GovernorAlpha from "./contracts/GovernorAlpha.json";
 import Timelock from "./contracts/Timelock.json";
 import WETHReward from "./contracts/WETHRewardHandler.json";
-import WBTCReward from "./contracts/BTCRewardHandler.json";
+import WBTCReward from "./contracts/WBTCRewardHandler.json";
 import DAIReward from "./contracts/DAIRewardHandler.json";
 import WETHPoolReward from "./contracts/ETHLiquidityReward.json";
 import WBTCPoolReward from "./contracts/WBTCLiquidityReward.json";
@@ -94,18 +94,29 @@ const App = () => {
     const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
     tokens.setCurrentTCAPToken(currentTCAPToken);
 
-    // Set Pool Tokens
+    // TODO:remove this once other pools work
+    if (process.env.REACT_APP_POOL_ETH) {
+      const currentWETHPoolToken = new ethers.Contract(
+        process.env.REACT_APP_POOL_ETH,
+        DAIToken.abi,
+        currentSigner
+      );
+
+      tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
+    }
     if (
       process.env.REACT_APP_POOL_ETH &&
       process.env.REACT_APP_POOL_WBTC &&
       process.env.REACT_APP_POOL_DAI &&
       process.env.REACT_APP_POOL_CTX
     ) {
+      // Set Pool Tokens
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
         DAIToken.abi,
         currentSigner
       );
+
       tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
 
       const currentDAIPoolToken = new ethers.Contract(

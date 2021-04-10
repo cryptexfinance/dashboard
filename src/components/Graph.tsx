@@ -10,10 +10,10 @@ import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
+// import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import WETHVault from "../contracts/WETHVaultHandler.json";
-import WBTCVault from "../contracts/BTCVaultHandler.json";
+import WBTCVault from "../contracts/WBTCVaultHandler.json";
 import DAIVault from "../contracts/DAIVaultHandler.json";
 import { toUSD } from "../utils/utils";
 import Loading from "./Loading";
@@ -25,7 +25,7 @@ const Graph = () => {
   const [tcapPrice, setTcapPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
-  const [WBTCStake, setWBTCStake] = useState("0");
+  // const [WBTCStake, setWBTCStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -58,13 +58,13 @@ const Graph = () => {
         await data.states.forEach((s: any) => {
           switch (s.id.toLowerCase()) {
             case DAIVault.address.toLowerCase():
-              currentDAIStake = s.amountStaked ? s.amountStaked : 0;
+              currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             case WETHVault.address.toLowerCase():
-              currentWETHStake = s.amountStaked ? s.amountStaked : 0;
+              currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             case WBTCVault.address.toLowerCase():
-              currentWBTCStake = s.amountStaked ? s.amountStaked : 0;
+              currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             default:
               break;
@@ -74,8 +74,9 @@ const Graph = () => {
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
 
-        const formatWBTC = ethers.utils.formatEther(currentWBTCStake);
-        setWBTCStake(formatWBTC);
+        const formatWBTC = ethers.utils.formatUnits(currentWBTCStake, 8);
+
+        // setWBTCStake(formatWBTC);
 
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
@@ -155,14 +156,14 @@ const Graph = () => {
             ETH
           </h5>
         </Card>
-        <Card>
+        {/* <Card>
           <WBTCIcon className="wbtc" />
           <h4>Total Staked in WBTC</h4>
           <h5 className="number neon-yellow">
             <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
             WBTC
           </h5>
-        </Card>
+        </Card> */}
         <Card>
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>

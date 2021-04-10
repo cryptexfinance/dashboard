@@ -19,10 +19,6 @@ type props = {
 };
 
 export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refresh }: props) => {
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ balance", balance);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ pool", pool);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ poolToken", poolToken);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ poolTitle", poolTitle);
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
   const signer = useContext(SignerContext);
@@ -32,7 +28,6 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
 
   useEffect(() => {
     async function load() {
-      console.log(poolToken);
       if (poolToken && signer.signer) {
         const currentAddress = await signer.signer.getAddress();
         const approved = await poolToken.allowance(currentAddress, pool?.address);
