@@ -32,27 +32,49 @@ import oraclesContext from "./state/OraclesContext";
 import governanceContext from "./state/GovernanceContext";
 import rewardsContext from "./state/RewardsContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
-import WETHVault from "./contracts/WETHVaultHandler.json";
-import WBTCVault from "./contracts/WBTCVaultHandler.json";
-import DAIVault from "./contracts/DAIVaultHandler.json";
-import WETHOracle from "./contracts/WETHOracle.json";
-import WBTCOracle from "./contracts/BTCOracle.json";
-import DAIOracle from "./contracts/DAIOracle.json";
-import TCAPOracle from "./contracts/TCAPOracle.json";
-import WETHToken from "./contracts/WETH.json";
-import WBTCToken from "./contracts/WBTC.json";
-import DAIToken from "./contracts/DAI.json";
-import TCAPToken from "./contracts/TCAP.json";
-import CTXToken from "./contracts/Ctx.json";
-import GovernorAlpha from "./contracts/GovernorAlpha.json";
-import Timelock from "./contracts/Timelock.json";
-import WETHReward from "./contracts/WETHRewardHandler.json";
-import WBTCReward from "./contracts/WBTCRewardHandler.json";
-import DAIReward from "./contracts/DAIRewardHandler.json";
-import WETHPoolReward from "./contracts/ETHLiquidityReward.json";
-import WBTCPoolReward from "./contracts/WBTCLiquidityReward.json";
-import DAIPoolReward from "./contracts/DAILiquidityReward.json";
-import CTXPoolReward from "./contracts/CTXLiquidityReward.json";
+import WETHVault from "./contracts/mainnet/WETHVaultHandler.json";
+import WBTCVault from "./contracts/mainnet/WBTCVaultHandler.json";
+import DAIVault from "./contracts/mainnet/DAIVaultHandler.json";
+import WETHOracle from "./contracts/mainnet/WETHOracle.json";
+import WBTCOracle from "./contracts/mainnet/BTCOracle.json";
+import DAIOracle from "./contracts/mainnet/DAIOracle.json";
+import TCAPOracle from "./contracts/mainnet/TCAPOracle.json";
+import WETHToken from "./contracts/mainnet/WETH.json";
+import WBTCToken from "./contracts/mainnet/WBTC.json";
+import DAIToken from "./contracts/mainnet/DAI.json";
+import TCAPToken from "./contracts/mainnet/TCAP.json";
+import CTXToken from "./contracts/mainnet/Ctx.json";
+import GovernorAlpha from "./contracts/mainnet/GovernorAlpha.json";
+import Timelock from "./contracts/mainnet/Timelock.json";
+import WETHReward from "./contracts/mainnet/WETHRewardHandler.json";
+import WBTCReward from "./contracts/mainnet/WBTCRewardHandler.json";
+import DAIReward from "./contracts/mainnet/DAIRewardHandler.json";
+import WETHPoolReward from "./contracts/mainnet/ETHLiquidityReward.json";
+import WBTCPoolReward from "./contracts/mainnet/WBTCLiquidityReward.json";
+import DAIPoolReward from "./contracts/mainnet/DAILiquidityReward.json";
+import CTXPoolReward from "./contracts/mainnet/CTXLiquidityReward.json";
+
+import rWETHVault from "./contracts/rinkeby/WETHVaultHandler.json";
+import rWBTCVault from "./contracts/rinkeby/WBTCVaultHandler.json";
+import rDAIVault from "./contracts/rinkeby/DAIVaultHandler.json";
+import rWETHOracle from "./contracts/rinkeby/WETHOracle.json";
+import rWBTCOracle from "./contracts/rinkeby/BTCOracle.json";
+import rDAIOracle from "./contracts/rinkeby/DAIOracle.json";
+import rTCAPOracle from "./contracts/rinkeby/TCAPOracle.json";
+import rWETHToken from "./contracts/rinkeby/WETH.json";
+import rWBTCToken from "./contracts/rinkeby/WBTC.json";
+import rDAIToken from "./contracts/rinkeby/DAI.json";
+import rTCAPToken from "./contracts/rinkeby/TCAP.json";
+import rCTXToken from "./contracts/rinkeby/Ctx.json";
+import rGovernorAlpha from "./contracts/rinkeby/GovernorAlpha.json";
+import rTimelock from "./contracts/rinkeby/Timelock.json";
+import rWETHReward from "./contracts/rinkeby/WETHRewardHandler.json";
+import rWBTCReward from "./contracts/rinkeby/WBTCRewardHandler.json";
+import rDAIReward from "./contracts/rinkeby/DAIRewardHandler.json";
+// import rWETHPoolReward from "./contracts/rinkeby/ETHLiquidityReward.json";
+// import rWBTCPoolReward from "./contracts/rinkeby/WBTCLiquidityReward.json";
+// import rDAIPoolReward from "./contracts/rinkeby/DAILiquidityReward.json";
+// import rCTXPoolReward from "./contracts/rinkeby/CTXLiquidityReward.json";
 
 const clientOracle = new ApolloClient({
   uri: process.env.REACT_APP_GRAPH_URL,
@@ -77,21 +99,88 @@ const App = () => {
   const location = useLocation();
 
   const setContracts = (currentSigner: ethers.Signer) => {
+    let cWETHVault;
+    let cDAIVault;
+    let cWBTCVault;
+    let cWETHToken;
+    let cDAIToken;
+    let cWBTCToken;
+    let cTCAPToken;
+    let cWBTCReward;
+    let cWETHReward;
+    let cDAIReward;
+    let cWETHPoolReward;
+    let cDAIPoolReward;
+    let cWBTCPoolReward;
+    let cCTXPoolReward;
+    let cWETHOracle;
+    let cDAIOracle;
+    let cWBTCOracle;
+    let cTCAPOracle;
+    let cGovernorAlpha;
+    let cCTXToken;
+    let cTimelock;
+    if (process.env.REACT_APP_NETWORK_NAME === "mainnet") {
+      cWETHVault = WETHVault;
+      cDAIVault = DAIVault;
+      cWBTCVault = WBTCVault;
+      cWETHToken = WETHToken;
+      cDAIToken = DAIToken;
+      cWBTCToken = WBTCToken;
+      cTCAPToken = TCAPToken;
+      cWBTCReward = WBTCReward;
+      cWETHReward = WETHReward;
+      cDAIReward = DAIReward;
+      cWETHPoolReward = WETHPoolReward;
+      cDAIPoolReward = DAIPoolReward;
+      cWBTCPoolReward = WBTCPoolReward;
+      cCTXPoolReward = CTXPoolReward;
+      cWETHOracle = WETHOracle;
+      cDAIOracle = DAIOracle;
+      cWBTCOracle = WBTCOracle;
+      cTCAPOracle = TCAPOracle;
+      cGovernorAlpha = GovernorAlpha;
+      cCTXToken = CTXToken;
+      cTimelock = Timelock;
+    } else {
+      cWETHVault = rWETHVault;
+      cDAIVault = rDAIVault;
+      cWBTCVault = rWBTCVault;
+      cWETHToken = rWETHToken;
+      cDAIToken = rDAIToken;
+      cWBTCToken = rWBTCToken;
+      cTCAPToken = rTCAPToken;
+      cWBTCReward = rWBTCReward;
+      cWETHReward = rWETHReward;
+      cDAIReward = rDAIReward;
+      // TODO update pools
+      cWETHPoolReward = WETHPoolReward;
+      cDAIPoolReward = DAIPoolReward;
+      cWBTCPoolReward = WBTCPoolReward;
+      cCTXPoolReward = CTXPoolReward;
+      cWETHOracle = rWETHOracle;
+      cDAIOracle = rDAIOracle;
+      cWBTCOracle = rWBTCOracle;
+      cTCAPOracle = rTCAPOracle;
+      cGovernorAlpha = rGovernorAlpha;
+      cCTXToken = rCTXToken;
+      cTimelock = rTimelock;
+    }
     // Set Vaults
-    const currentWETHVault = new ethers.Contract(WETHVault.address, WETHVault.abi, currentSigner);
+    const currentWETHVault = new ethers.Contract(cWETHVault.address, cWETHVault.abi, currentSigner);
     vaults.setCurrentWETHVault(currentWETHVault);
-    const currentDAIVault = new ethers.Contract(DAIVault.address, DAIVault.abi, currentSigner);
+    const currentDAIVault = new ethers.Contract(cDAIVault.address, cDAIVault.abi, currentSigner);
     vaults.setCurrentDAIVault(currentDAIVault);
-    const currentWBTCVault = new ethers.Contract(WBTCVault.address, WBTCVault.abi, currentSigner);
+    const currentWBTCVault = new ethers.Contract(cWBTCVault.address, WBTCVault.abi, currentSigner);
     vaults.setCurrentWBTCVault(currentWBTCVault);
     // Set Tokens
-    const currentWETHToken = new ethers.Contract(WETHToken.address, WETHToken.abi, currentSigner);
+    const currentWETHToken = new ethers.Contract(cWETHToken.address, cWETHToken.abi, currentSigner);
     tokens.setCurrentWETHToken(currentWETHToken);
-    const currentDAIToken = new ethers.Contract(DAIToken.address, DAIToken.abi, currentSigner);
+    const currentDAIToken = new ethers.Contract(cDAIToken.address, cDAIToken.abi, currentSigner);
     tokens.setCurrentDAIToken(currentDAIToken);
-    const currentWBTCToken = new ethers.Contract(WBTCToken.address, WBTCToken.abi, currentSigner);
+    const currentWBTCToken = new ethers.Contract(cWBTCToken.address, cWBTCToken.abi, currentSigner);
     tokens.setCurrentWBTCToken(currentWBTCToken);
-    const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
+    const currentTCAPToken = new ethers.Contract(cTCAPToken.address, cTCAPToken.abi, currentSigner);
     tokens.setCurrentTCAPToken(currentTCAPToken);
 
     // TODO:remove this once other pools work
@@ -143,69 +232,69 @@ const App = () => {
 
     // Set Rewards
     const currentWETHReward = new ethers.Contract(
-      WETHReward.address,
-      WETHReward.abi,
+      cWETHReward.address,
+      cWETHReward.abi,
       currentSigner
     );
     rewards.setCurrentWETHReward(currentWETHReward);
 
-    const currentDAIReward = new ethers.Contract(DAIReward.address, DAIReward.abi, currentSigner);
+    const currentDAIReward = new ethers.Contract(cDAIReward.address, cDAIReward.abi, currentSigner);
     rewards.setCurrentDAIReward(currentDAIReward);
 
     const currentWBTCReward = new ethers.Contract(
-      WBTCReward.address,
-      WBTCReward.abi,
+      cWBTCReward.address,
+      cWBTCReward.abi,
       currentSigner
     );
     rewards.setCurrentWBTCReward(currentWBTCReward);
 
     // Set Liquidity Rewards
     const currentWETHPoolReward = new ethers.Contract(
-      WETHPoolReward.address,
-      WETHPoolReward.abi,
+      cWETHPoolReward.address,
+      cWETHPoolReward.abi,
       currentSigner
     );
     rewards.setCurrentWETHPoolReward(currentWETHPoolReward);
 
     const currentDAIPoolReward = new ethers.Contract(
-      DAIPoolReward.address,
-      DAIPoolReward.abi,
+      cDAIPoolReward.address,
+      cDAIPoolReward.abi,
       currentSigner
     );
     rewards.setCurrentDAIPoolReward(currentDAIPoolReward);
 
     const currentWBTCPoolReward = new ethers.Contract(
-      WBTCPoolReward.address,
-      WBTCPoolReward.abi,
+      cWBTCPoolReward.address,
+      cWBTCPoolReward.abi,
       currentSigner
     );
     rewards.setCurrentWBTCPoolReward(currentWBTCPoolReward);
 
     const currentCTXPoolReward = new ethers.Contract(
-      CTXPoolReward.address,
-      CTXPoolReward.abi,
+      cCTXPoolReward.address,
+      cCTXPoolReward.abi,
       currentSigner
     );
     rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
 
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
-      WETHOracle.address,
-      WETHOracle.abi,
+      cWETHOracle.address,
+      cWETHOracle.abi,
       currentSigner
     );
     oracles.setCurrentWETHOracle(currentWETHOracle);
     const currentDAIOracle = new ethers.Contract(DAIOracle.address, DAIOracle.abi, currentSigner);
     oracles.setCurrentDAIOracle(currentDAIOracle);
     const currentWBTCOracle = new ethers.Contract(
-      WBTCOracle.address,
-      WBTCOracle.abi,
+      cWBTCOracle.address,
+      cWBTCOracle.abi,
       currentSigner
     );
     oracles.setCurrentWBTCOracle(currentWBTCOracle);
     const currentTCAPOracle = new ethers.Contract(
-      TCAPOracle.address,
-      TCAPOracle.abi,
+      cTCAPOracle.address,
+      cTCAPOracle.abi,
       currentSigner
     );
     oracles.setCurrentTCAPOracle(currentTCAPOracle);
@@ -214,8 +303,8 @@ const App = () => {
     const currentCtx = new ethers.Contract(CTXToken.address, CTXToken.abi, currentSigner);
     governance.setCurrentCtxToken(currentCtx);
     const currentGovernorAlpha = new ethers.Contract(
-      GovernorAlpha.address,
-      GovernorAlpha.abi,
+      cGovernorAlpha.address,
+      cGovernorAlpha.abi,
       currentSigner
     );
     governance.setCurrentGovernorAlpha(currentGovernorAlpha);

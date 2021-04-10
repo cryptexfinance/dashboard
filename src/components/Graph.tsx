@@ -12,9 +12,12 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
-import WETHVault from "../contracts/WETHVaultHandler.json";
-import WBTCVault from "../contracts/WBTCVaultHandler.json";
-import DAIVault from "../contracts/DAIVaultHandler.json";
+import WETHVault from "../contracts/mainnet/WETHVaultHandler.json";
+import WBTCVault from "../contracts/mainnet/WBTCVaultHandler.json";
+import DAIVault from "../contracts/mainnet/DAIVaultHandler.json";
+import rWETHVault from "../contracts/rinkeby/WETHVaultHandler.json";
+import rWBTCVault from "../contracts/rinkeby/WBTCVaultHandler.json";
+import rDAIVault from "../contracts/rinkeby/DAIVaultHandler.json";
 import { toUSD } from "../utils/utils";
 import Loading from "./Loading";
 
