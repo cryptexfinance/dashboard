@@ -59,7 +59,8 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "wbtc":
-      currency = "WBTC";
+      currency = "WETH";
+      history?.push(`/vault/WETH`);
       break;
     default:
       currency = "ETH";
