@@ -35,7 +35,6 @@ const Welcome = () => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
-  const lpURL = process.env.REACT_APP_LP_URL;
 
   const TCAP_PRICE = gql`
     query {
@@ -211,7 +210,7 @@ const Welcome = () => {
                     className="neon-pink"
                     onClick={() => {
                       window.open(
-                        `${lpURL}/#/swap?outputCurrency=${tokens.tcapToken?.address}`,
+                        `https://app.sushi.com/pair/0xa87e2c5d5964955242989b954474ff2eb08dd2f5`,
                         "_blank"
                       );
                     }}

@@ -129,7 +129,7 @@ const Graph = () => {
               value={totalSupply}
               displayType="text"
               thousandSeparator
-              decimalScale={4}
+              decimalScale={2}
             />{" "}
             TCAP
           </h5>
@@ -151,7 +151,7 @@ const Graph = () => {
           <WETHIcon className="weth" />
           <h4>Total Staked in ETH</h4>
           <h5 className="number neon-highlight">
-            <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             ETH
           </h5>
         </Card>
@@ -159,7 +159,7 @@ const Graph = () => {
           <WBTCIcon className="wbtc" />
           <h4>Total Staked in WBTC</h4>
           <h5 className="number neon-yellow">
-            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             WBTC
           </h5>
         </Card>
@@ -167,7 +167,7 @@ const Graph = () => {
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>
           <h5 className="number neon-orange">
-            <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
           </h5>
         </Card>
