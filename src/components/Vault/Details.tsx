@@ -119,7 +119,6 @@ const Details = ({ address }: props) => {
         owner
         collateral
         debt
-        currentRatio
         address
         owner
       }
@@ -210,7 +209,8 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
-        const { vaultId, collateral, debt, currentRatio } = currentVaultData;
+        const { vaultId, collateral, debt } = currentVaultData;
+        const currentRatio = (await currentVault.getVaultRatio(vaultId)).toString();
         setSelectedVaultId(vaultId);
         if (!allowance.isZero() || vaultType === "ETH") {
           const currentMinRatio = (await currentVault.ratio()).toString();
