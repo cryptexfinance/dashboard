@@ -59,7 +59,8 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "wbtc":
-      currency = "WBTC";
+      currency = "WETH";
+      history?.push(`/vault/WETH`);
       break;
     default:
       currency = "ETH";
@@ -87,6 +88,7 @@ const Details = ({ address }: props) => {
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
+  const [selectedVaultDecimals, setSelectedVaultDecimals] = useState(18);
 
   // General Data
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
@@ -117,7 +119,6 @@ const Details = ({ address }: props) => {
         owner
         collateral
         debt
-        currentRatio
         address
         owner
       }
@@ -191,7 +192,11 @@ const Details = ({ address }: props) => {
         }
       });
 
-      const currentBalance = ethers.utils.formatEther(balance);
+      // const currentBalance = ethers.utils.formatEther(balance);
+      const decimals = await currentToken.decimals();
+      setSelectedVaultDecimals(decimals);
+      const currentBalance = ethers.utils.formatUnits(balance, decimals);
+
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
       }
@@ -204,7 +209,8 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
-        const { vaultId, collateral, debt, currentRatio } = currentVaultData;
+        const { vaultId, collateral, debt } = currentVaultData;
+        const currentRatio = (await currentVault.getVaultRatio(vaultId)).toString();
         setSelectedVaultId(vaultId);
         if (!allowance.isZero() || vaultType === "ETH") {
           const currentMinRatio = (await currentVault.ratio()).toString();
@@ -220,7 +226,10 @@ const Details = ({ address }: props) => {
           } else {
             setVaultStatus("danger");
           }
-          const parsedCollateral = ethers.utils.formatEther(collateral);
+
+          const parsedCollateral = ethers.utils.formatUnits(collateral, decimals);
+
+          // const parsedCollateral = ethers.utils.formatEther(collateral);
           setVaultCollateral(parsedCollateral);
           usd = toUSD(currentPrice, parsedCollateral);
           setVaultCollateralUSD(usd.toString());
@@ -386,7 +395,10 @@ const Details = ({ address }: props) => {
 
   const addCollateral = async () => {
     if (addCollateralTxt) {
-      const amount = ethers.utils.parseEther(addCollateralTxt);
+      // fix decimals
+      const amount = ethers.utils.parseUnits(addCollateralTxt, selectedVaultDecimals);
+
+      // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.addCollateralETH({
@@ -420,10 +432,11 @@ const Details = ({ address }: props) => {
         infura: process.env.REACT_APP_INFURA_ID,
         alchemy: process.env.REACT_APP_ALCHEMY_KEY,
       });
-      // setIsApproved(true);
+
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
-      balance = ethers.utils.formatEther(await selectedCollateralContract.balanceOf(address));
+      const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
+      balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
     setAddCollateralTxt(balance);
     let usd = toUSD(collateralPrice, balance);
@@ -438,7 +451,8 @@ const Details = ({ address }: props) => {
 
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
-      const amount = ethers.utils.parseEther(removeCollateralTxt);
+      const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
+
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.removeCollateralETH(amount);
@@ -636,7 +650,7 @@ const Details = ({ address }: props) => {
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
             <option value="ETH">ETH</option>
             <option>WETH</option>
-            <option>WBTC</option>
+            {/* <option>WBTC</option> */}
             <option>DAI</option>
           </Form.Control>
           <p className="number">
