@@ -17,7 +17,7 @@ import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
+// import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
 
@@ -25,7 +25,6 @@ const Farm = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [ethLiquidity, setEthLiquidity] = useState("0");
-  const [wbtcLiquidity, setWbtcLiquidity] = useState("0");
   const [daiLiquidity, setDaiLiquidity] = useState("0");
   // const [ctxLiquidty, setCtxLiquidty] = useState("0.0");
 
@@ -59,9 +58,7 @@ const Farm = () => {
         const daiUSD = ethers.utils.formatEther(
           (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
         );
-        const wbtcUSD = ethers.utils.formatEther(
-          (await oracles.wbtcOracle?.getLatestAnswer()).mul(10000000000)
-        );
+
         const tcapUSD = ethers.utils.formatEther(await oracles.tcapOracle?.getLatestAnswer());
 
         const currentPoolWeth = await tokens.wethToken?.balanceOf(process?.env?.REACT_APP_POOL_ETH);
@@ -76,12 +73,6 @@ const Farm = () => {
             process?.env?.REACT_APP_POOL_WBTC
           );
           formatPair1 = ethers.utils.formatEther(currentPoolWbtc);
-          const currentWbtcTCAP = await tokens.tcapToken?.balanceOf(
-            process?.env?.REACT_APP_POOL_WBTC
-          );
-          formatPair2 = ethers.utils.formatEther(currentWbtcTCAP);
-          totalUSD = toUSD(formatPair1, wbtcUSD) + toUSD(formatPair2, tcapUSD);
-          setWbtcLiquidity(totalUSD.toString());
 
           const currentPoolDai = await tokens.daiToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
           formatPair1 = ethers.utils.formatEther(currentPoolDai);
@@ -184,7 +175,7 @@ const Farm = () => {
                           variant="primary"
                           className=""
                           target="_blank"
-                          href={`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`}
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                         >
                           Pool
                         </Button>
@@ -193,44 +184,6 @@ const Farm = () => {
 
                     {phase > 2 && (
                       <>
-                        <tr>
-                          <td>
-                            <WBTCIcon className="wbtc" />
-                            <TcapIcon className="tcap" />{" "}
-                          </td>
-                          <td>
-                            {" "}
-                            <a
-                              target="_blank"
-                              rel="noreferrer"
-                              href={`${visionURL}/${process?.env?.REACT_APP_POOL_WBTC}`}
-                            >
-                              WBTC/TCAP <br />
-                              <small>SushiSwap</small>
-                            </a>
-                          </td>{" "}
-                          <td className="number">
-                            $
-                            <NumberFormat
-                              className="number"
-                              value={wbtcLiquidity}
-                              displayType="text"
-                              thousandSeparator
-                              prefix=""
-                              decimalScale={2}
-                            />{" "}
-                          </td>
-                          <td className="number">
-                            <Button
-                              variant="primary"
-                              className=""
-                              target="_blank"
-                              href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
-                            >
-                              Pool
-                            </Button>
-                          </td>
-                        </tr>
                         <tr>
                           <td>
                             <DAIIcon className="dai" />
