@@ -34,6 +34,11 @@ export const parseUint = (value: string) => {
 
 export const toUSD = (amount: string, price: string) => parseFloat(amount) * parseFloat(price);
 
+export const tsToDateString = (ts: number) => {
+  const dt = new Date(ts * 1000);
+  return dt.toLocaleDateString();
+};
+
 export const sendNotification = async (
   title: string,
   body: string,
@@ -78,7 +83,7 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     notificationBody = "All set, please wait for another confirmation";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
-    await tx.wait(2);
+    await tx.wait(3);
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
@@ -100,21 +105,48 @@ export const getRatio = async (
   return ratio;
 };
 
-export const getMaxMint = async (
+export const getSafeMint = async (
   ratio: string,
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
   debt: string
 ) => {
-  const r = parseFloat(ratio);
+  const r = parseFloat(ratio) + 50;
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);
   const d = parseFloat(debt);
   if (r === 0 || tp === 0) return 0;
-  const maxMint = (c * cp * 100) / (r * tp);
-  return maxMint - d;
+  const safeMint = (c * cp * 100) / (r * tp);
+
+  const result = safeMint - d;
+  if (result < 0) {
+    return 0;
+  }
+  return result;
+};
+
+export const getSafeRemoveCollateral = async (
+  ratio: string,
+  collateral: string,
+  collateralPrice: string,
+  tcapPrice: string,
+  debt: string
+) => {
+  const r = parseFloat(ratio) + 50;
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const tp = parseFloat(tcapPrice);
+  const d = parseFloat(debt);
+  if (cp === 0) return 0;
+  const n = (r * d * tp) / (cp * 100);
+
+  const result = c - n;
+  if (result < 0) {
+    return 0;
+  }
+  return result;
 };
 
 export const getProposalStatus = (

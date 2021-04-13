@@ -22,7 +22,14 @@ import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { notifyUser, toUSD, errorNotification, getRatio, getMaxMint } from "../../utils/utils";
+import {
+  notifyUser,
+  toUSD,
+  errorNotification,
+  getRatio,
+  getSafeRemoveCollateral,
+  getSafeMint,
+} from "../../utils/utils";
 import Loading from "../Loading";
 
 type props = {
@@ -52,7 +59,8 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "wbtc":
-      currency = "WBTC";
+      currency = "WETH";
+      history?.push(`/vault/WETH`);
       break;
     default:
       currency = "ETH";
@@ -80,6 +88,7 @@ const Details = ({ address }: props) => {
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
+  const [selectedVaultDecimals, setSelectedVaultDecimals] = useState(18);
 
   // General Data
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
@@ -110,7 +119,6 @@ const Details = ({ address }: props) => {
         owner
         collateral
         debt
-        currentRatio
         address
         owner
       }
@@ -122,14 +130,11 @@ const Details = ({ address }: props) => {
       signer.signer &&
       oracles.wethOracle &&
       oracles.daiOracle &&
-      oracles.wbtcOracle &&
       oracles.tcapOracle &&
       vaults.wethVault &&
       vaults.daiVault &&
-      vaults.wbtcVault &&
       tokens.wethToken &&
       tokens.daiToken &&
-      tokens.wbtcToken &&
       vaultData
     ) {
       let currentVault: any;
@@ -142,7 +147,7 @@ const Details = ({ address }: props) => {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = "rinkeby";
+          const network = process.env.REACT_APP_NETWORK_NAME;
           const provider = ethers.getDefaultProvider(network, {
             infura: process.env.REACT_APP_INFURA_ID,
             alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -163,12 +168,6 @@ const Details = ({ address }: props) => {
           currentToken = tokens.daiToken;
           balance = await currentToken.balanceOf(address);
           break;
-        case "WBTC":
-          currentVault = vaults.wbtcVault;
-          currentOracle = oracles.wbtcOracle;
-          currentToken = tokens.wbtcToken;
-          balance = await currentToken.balanceOf(address);
-          break;
         default:
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
@@ -178,13 +177,30 @@ const Details = ({ address }: props) => {
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
-      await vaultData.vaults.forEach((v: any) => {
-        if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-          currentVaultData = v;
+      // if data is empty load vault data from contract
+      if (vaultData.lenght > 0) {
+        await vaultData.vaults.forEach((v: any) => {
+          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+            currentVaultData = v;
+          }
+        });
+      } else {
+        const vaultID = await currentVault.userToVault(address);
+        if (vaultID !== 0) {
+          const vault = await currentVault.vaults(vaultID);
+          currentVaultData = {
+            vaultId: vaultID,
+            collateral: vault.Collateral,
+            debt: vault.Debt,
+          };
         }
-      });
+      }
 
-      const currentBalance = ethers.utils.formatEther(balance);
+      // const currentBalance = ethers.utils.formatEther(balance);
+      const decimals = await currentToken.decimals();
+      setSelectedVaultDecimals(decimals);
+      const currentBalance = ethers.utils.formatUnits(balance, decimals);
+
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
       }
@@ -197,7 +213,8 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
-        const { vaultId, collateral, debt, currentRatio } = currentVaultData;
+        const { vaultId, collateral, debt } = currentVaultData;
+        const currentRatio = (await currentVault.getVaultRatio(vaultId)).toString();
         setSelectedVaultId(vaultId);
         if (!allowance.isZero() || vaultType === "ETH") {
           const currentMinRatio = (await currentVault.ratio()).toString();
@@ -213,7 +230,10 @@ const Details = ({ address }: props) => {
           } else {
             setVaultStatus("danger");
           }
-          const parsedCollateral = ethers.utils.formatEther(collateral);
+
+          const parsedCollateral = ethers.utils.formatUnits(collateral, decimals);
+
+          // const parsedCollateral = ethers.utils.formatEther(collateral);
           setVaultCollateral(parsedCollateral);
           usd = toUSD(currentPrice, parsedCollateral);
           setVaultCollateralUSD(usd.toString());
@@ -245,6 +265,7 @@ const Details = ({ address }: props) => {
 
   const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
     variables: { owner: address },
+    pollInterval: 200000,
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     onCompleted: () => {
@@ -378,7 +399,10 @@ const Details = ({ address }: props) => {
 
   const addCollateral = async () => {
     if (addCollateralTxt) {
-      const amount = ethers.utils.parseEther(addCollateralTxt);
+      // fix decimals
+      const amount = ethers.utils.parseUnits(addCollateralTxt, selectedVaultDecimals);
+
+      // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.addCollateralETH({
@@ -407,15 +431,16 @@ const Details = ({ address }: props) => {
     e.preventDefault();
     let balance = "0";
     if (selectedVault === "ETH") {
-      const network = "rinkeby";
+      const network = process.env.REACT_APP_NETWORK_NAME;
       const provider = ethers.getDefaultProvider(network, {
         infura: process.env.REACT_APP_INFURA_ID,
         alchemy: process.env.REACT_APP_ALCHEMY_KEY,
       });
-      // setIsApproved(true);
+
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
-      balance = ethers.utils.formatEther(await selectedCollateralContract.balanceOf(address));
+      const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
+      balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
     setAddCollateralTxt(balance);
     let usd = toUSD(collateralPrice, balance);
@@ -430,7 +455,8 @@ const Details = ({ address }: props) => {
 
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
-      const amount = ethers.utils.parseEther(removeCollateralTxt);
+      const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
+
       try {
         if (selectedVault === "ETH") {
           const tx = await selectedVaultContract?.removeCollateralETH(amount);
@@ -453,14 +479,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxRemoveCollateral = async (e: React.MouseEvent) => {
+  const safeRemoveCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setRemoveCollateralTxt(vaultCollateral);
-    let usd = toUSD(collateralPrice, vaultCollateral);
+    const collateralToRemove = await getSafeRemoveCollateral(
+      minRatio,
+      vaultCollateral,
+      collateralPrice,
+      tcapPrice,
+      vaultDebt
+    );
+    setRemoveCollateralTxt(collateralToRemove.toString());
+    let usd = toUSD(collateralPrice, collateralToRemove.toString());
     if (!usd) {
       usd = 0;
     }
-    const newCollateral = parseFloat(vaultCollateral) - parseFloat(vaultCollateral);
+    const newCollateral = parseFloat(vaultCollateral) - collateralToRemove;
     const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
     changeVault(r);
     setRemoveCollateralUSD(usd.toString());
@@ -486,21 +519,21 @@ const Details = ({ address }: props) => {
     }
   };
 
-  const maxMintTCAP = async (e: React.MouseEvent) => {
+  const safeMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const maxMint = await getMaxMint(
+    const safeMint = await getSafeMint(
       minRatio,
       vaultCollateral,
       collateralPrice,
       tcapPrice,
       vaultDebt
     );
-    setMintTxt(maxMint.toString());
-    let usd = toUSD(tcapPrice, maxMint.toString());
+    setMintTxt(safeMint.toString());
+    let usd = toUSD(tcapPrice, safeMint.toString());
     if (!usd) {
       usd = 0;
     }
-    const newDebt = maxMint + parseFloat(vaultDebt);
+    const newDebt = safeMint + parseFloat(vaultDebt);
     const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
     changeVault(r);
     setMintUSD(usd.toString());
@@ -557,6 +590,7 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
+      console.log(selectedCollateralContract);
       const tx = await selectedVaultContract?.createVault();
       notifyUser(tx, refresh);
     } else {
@@ -621,7 +655,7 @@ const Details = ({ address }: props) => {
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
             <option value="ETH">ETH</option>
             <option>WETH</option>
-            <option>WBTC</option>
+            {/* <option>WBTC</option> */}
             <option>DAI</option>
           </Form.Control>
           <p className="number">
@@ -803,8 +837,8 @@ const Details = ({ address }: props) => {
                   <Form.Group className="remove">
                     <Form.Label>Remove Collateral</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number orange" onClick={maxRemoveCollateral}>
-                        MAX
+                      <a href="/" className="number orange" onClick={safeRemoveCollateral}>
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>
@@ -868,8 +902,8 @@ const Details = ({ address }: props) => {
                   <Form.Group>
                     <Form.Label>Mint TCAP</Form.Label>
                     <Form.Label className="max">
-                      <a href="/" className="number" onClick={maxMintTCAP}>
-                        MAX
+                      <a href="/" className="number" onClick={safeMintTCAP}>
+                        MAX SAFE
                       </a>
                     </Form.Label>
                     <InputGroup>

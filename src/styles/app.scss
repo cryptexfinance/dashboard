@@ -207,6 +207,13 @@ html,
   height: 100%;
 }
 
+.farm-tooltip > .tooltip-inner {
+  max-width: 300px;
+  width: 300px;
+  text-align: left;
+  padding: 0.8rem;
+}
+
 #WEB3_CONNECT_MODAL_ID {
   .web3modal-provider-container {
     transition: background-color 0s ease-in-out 0s;
@@ -235,5 +242,8 @@ html,
 @media (max-width: 600px) {
   .wrapper {
     padding-left: 0rem;
+  }
+  .alert {
+    margin-top: 4rem;
   }
 }

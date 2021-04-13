@@ -19,10 +19,6 @@ type props = {
 };
 
 export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refresh }: props) => {
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ balance", balance);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ pool", pool);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ poolToken", poolToken);
-  console.log("🚀 ~ file: Stake.tsx ~ line 22 ~ Stake ~ poolTitle", poolTitle);
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
   const signer = useContext(SignerContext);
@@ -32,7 +28,6 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
 
   useEffect(() => {
     async function load() {
-      console.log(poolToken);
       if (poolToken && signer.signer) {
         const currentAddress = await signer.signer.getAddress();
         const approved = await poolToken.allowance(currentAddress, pool?.address);
@@ -65,28 +60,6 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
             errorNotification("Transaction rejected");
           } else {
             errorNotification("Token not Approved");
-          }
-        }
-      } else {
-        errorNotification("Field can't be empty");
-      }
-    }
-  };
-
-  const approveTokens = async (event: React.MouseEvent) => {
-    event.preventDefault();
-    if (poolToken) {
-      if (stakeText) {
-        try {
-          const tx = await poolToken.approve(pool?.address, ethers.utils.parseEther(stakeText));
-          notifyUser(tx, refresh);
-          setStakeText("");
-          setIsApproved(true);
-        } catch (error) {
-          if (error.code === 4001) {
-            errorNotification("Transaction rejected");
-          } else {
-            console.log(error);
           }
         }
       } else {
@@ -138,19 +111,25 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         </p>
         <Form>
           <Form.Group>
-            <Form.Label>Amount to {isApproved ? <>Stake</> : <>Approve</>}</Form.Label>
-            <Form.Label className="max">
-              <a href="/" className="number" onClick={maxStake}>
-                MAX
-              </a>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="0"
-              className="neon-green"
-              value={stakeText}
-              onChange={onChangeStake}
-            />
+            {isApproved ? (
+              <>
+                <Form.Label>Amount to Stake</Form.Label>
+                <Form.Label className="max">
+                  <a href="/" className="number" onClick={maxStake}>
+                    MAX
+                  </a>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="0"
+                  className="neon-green"
+                  value={stakeText}
+                  onChange={onChangeStake}
+                />
+              </>
+            ) : (
+              <></>
+            )}
           </Form.Group>
         </Form>
       </Modal.Body>
@@ -163,10 +142,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           </>
         ) : (
           <>
-            <Button variant="primary" className="neon-highlight" onClick={approveTokens}>
-              Approve Tokens
-            </Button>
-            <Button variant="primary" className="neon-green mt-4" onClick={infiniteApproveTokens}>
+            <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
               Infinite Approve
             </Button>
           </>
