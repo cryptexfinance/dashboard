@@ -130,14 +130,11 @@ const Details = ({ address }: props) => {
       signer.signer &&
       oracles.wethOracle &&
       oracles.daiOracle &&
-      oracles.wbtcOracle &&
       oracles.tcapOracle &&
       vaults.wethVault &&
       vaults.daiVault &&
-      vaults.wbtcVault &&
       tokens.wethToken &&
       tokens.daiToken &&
-      tokens.wbtcToken &&
       vaultData
     ) {
       let currentVault: any;
@@ -171,12 +168,6 @@ const Details = ({ address }: props) => {
           currentToken = tokens.daiToken;
           balance = await currentToken.balanceOf(address);
           break;
-        case "WBTC":
-          currentVault = vaults.wbtcVault;
-          currentOracle = oracles.wbtcOracle;
-          currentToken = tokens.wbtcToken;
-          balance = await currentToken.balanceOf(address);
-          break;
         default:
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
@@ -186,11 +177,24 @@ const Details = ({ address }: props) => {
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
-      await vaultData.vaults.forEach((v: any) => {
-        if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-          currentVaultData = v;
+      // if data is empty load vault data from contract
+      if (vaultData.lenght > 0) {
+        await vaultData.vaults.forEach((v: any) => {
+          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+            currentVaultData = v;
+          }
+        });
+      } else {
+        const vaultID = await currentVault.userToVault(address);
+        if (vaultID !== 0) {
+          const vault = await currentVault.vaults(vaultID);
+          currentVaultData = {
+            vaultId: vaultID,
+            collateral: vault.Collateral,
+            debt: vault.Debt,
+          };
         }
-      });
+      }
 
       // const currentBalance = ethers.utils.formatEther(balance);
       const decimals = await currentToken.decimals();
@@ -586,6 +590,7 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
+      console.log(selectedCollateralContract);
       const tx = await selectedVaultContract?.createVault();
       notifyUser(tx, refresh);
     } else {
