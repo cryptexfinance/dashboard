@@ -177,24 +177,25 @@ const Details = ({ address }: props) => {
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
+      // Removed GRAPH
       // if data is empty load vault data from contract
-      if (vaultData.lenght > 0) {
-        await vaultData.vaults.forEach((v: any) => {
-          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-            currentVaultData = v;
-          }
-        });
-      } else {
-        const vaultID = await currentVault.userToVault(address);
-        if (vaultID !== 0) {
-          const vault = await currentVault.vaults(vaultID);
-          currentVaultData = {
-            vaultId: vaultID,
-            collateral: vault.Collateral,
-            debt: vault.Debt,
-          };
-        }
+      // if (vaultData.lenght > 0) {
+      //   await vaultData.vaults.forEach((v: any) => {
+      //     if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+      //       currentVaultData = v;
+      //     }
+      //   });
+      // } else {
+      const vaultID = await currentVault.userToVault(address);
+      if (vaultID !== 0) {
+        const vault = await currentVault.vaults(vaultID);
+        currentVaultData = {
+          vaultId: vaultID,
+          collateral: vault.Collateral,
+          debt: vault.Debt,
+        };
       }
+      // }
 
       // const currentBalance = ethers.utils.formatEther(balance);
       const decimals = await currentToken.decimals();

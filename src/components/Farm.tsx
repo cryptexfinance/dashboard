@@ -343,7 +343,7 @@ const Farm = () => {
                           <div className="button-current">
                             <OverlayTrigger
                               key="top"
-                              placement="auto"
+                              placement="right"
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="ttip-current-reward" className="farm-tooltip">
@@ -519,7 +519,7 @@ const Farm = () => {
                             <div className="button">
                               <OverlayTrigger
                                 key="top"
-                                placement="auto"
+                                placement="top"
                                 trigger={["hover", "click"]}
                                 overlay={
                                   <Tooltip id="ttip-vreward" className="farm-tooltip">
@@ -538,7 +538,7 @@ const Farm = () => {
                             <div className="button">
                               <OverlayTrigger
                                 key="top"
-                                placement="auto"
+                                placement="top"
                                 trigger={["hover", "click"]}
                                 overlay={
                                   <Tooltip id="tooltip-top" className="farm-tooltip">
@@ -615,7 +615,7 @@ const Farm = () => {
                           <div>
                             <OverlayTrigger
                               key="top"
-                              placement="auto"
+                              placement="top"
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="tooltip-top" className="farm-tooltip">

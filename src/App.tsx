@@ -88,13 +88,13 @@ const App = () => {
     vaults.setCurrentDAIVault(currentDAIVault);
     // Set Tokens
     const currentWETHToken = new ethers.Contract(
-      process.env.REACT_APP_DAI_ADDRESS || "",
+      process.env.REACT_APP_WETH_ADDRESS || "",
       ERC20.abi,
       currentSigner
     );
     tokens.setCurrentWETHToken(currentWETHToken);
     const currentDAIToken = new ethers.Contract(
-      process.env.REACT_APP_WETH_ADDRESS || "",
+      process.env.REACT_APP_DAI_ADDRESS || "",
       WETH.abi,
       currentSigner
     );
