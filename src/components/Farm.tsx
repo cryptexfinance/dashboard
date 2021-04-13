@@ -542,7 +542,7 @@ const Farm = () => {
                                 trigger={["hover", "click"]}
                                 overlay={
                                   <Tooltip id="tooltip-top" className="farm-tooltip">
-                                    Locked until rewards period is completed.
+                                    Rewards are unlocked 6 months after the start of the pool.
                                   </Tooltip>
                                 }
                               >
