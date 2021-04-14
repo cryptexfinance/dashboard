@@ -144,7 +144,6 @@ const Details = ({ address }: props) => {
       tokens.daiToken &&
       vaultData
     ) {
-      console.log("🚀 ~ file: Details.tsx ~ line 147 ~ loadVault ~ vaultData", vaultData);
       let currentVault: any;
       let currentOracle;
       let currentToken;
@@ -194,7 +193,6 @@ const Details = ({ address }: props) => {
         !vaultData._meta.hasIndexingErrors &&
         graphBlock >= currentBlock
       ) {
-        console.log("graph!");
         await vaultData.vaults.forEach((v: any) => {
           if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
             currentVaultData = v;
@@ -606,7 +604,6 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
-      console.log(selectedCollateralContract);
       const tx = await selectedVaultContract?.createVault();
       notifyUser(tx, refresh);
     } else {
@@ -635,7 +632,8 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
-      if (networkStatus === NetworkStatus.ready) {
+      // TODO : if stuck at pending do something
+      if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
         // await loadVault(selectedVault);
         setIsLoading(false);
       }

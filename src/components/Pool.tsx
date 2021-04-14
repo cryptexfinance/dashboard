@@ -67,23 +67,15 @@ const Farm = () => {
         const currentPoolWethUNI = await tokens.wethToken?.balanceOf(
           process?.env?.REACT_APP_POOL_ETH_UNI
         );
-        console.log(process?.env?.REACT_APP_POOL_ETH_UNI);
-        console.log(
-          "🚀 ~ file: Pool.tsx ~ line 70 ~ loadAddress ~ currentPoolWethUNI",
-          currentPoolWethUNI
-        );
 
         formatPair1 = ethers.utils.formatEther(currentPoolWethUNI);
         const currentWethTCAPUNI = await tokens.tcapToken?.balanceOf(
           process?.env?.REACT_APP_POOL_ETH_UNI
         );
         formatPair2 = ethers.utils.formatEther(currentWethTCAPUNI);
-        console.log(
-          "🚀 ~ file: Pool.tsx ~ line 76 ~ loadAddress ~ currentWethTCAPUNI",
-          currentWethTCAPUNI
-        );
+
         totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
-        console.log("🚀 ~ file: Pool.tsx ~ line 76 ~ loadAddress ~ totalUSD", totalUSD);
+
         setEthLiquidityUNI(totalUSD.toString());
 
         if (phase > 2) {
