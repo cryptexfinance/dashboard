@@ -122,6 +122,13 @@ const Details = ({ address }: props) => {
         address
         owner
       }
+      _meta {
+        block {
+          number
+          hash
+        }
+        hasIndexingErrors
+      }
     }
   `;
 
@@ -137,21 +144,21 @@ const Details = ({ address }: props) => {
       tokens.daiToken &&
       vaultData
     ) {
+      console.log("🚀 ~ file: Details.tsx ~ line 147 ~ loadVault ~ vaultData", vaultData);
       let currentVault: any;
       let currentOracle;
       let currentToken;
       let balance;
-
+      const network = process.env.REACT_APP_NETWORK_NAME;
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = process.env.REACT_APP_NETWORK_NAME;
-          const provider = ethers.getDefaultProvider(network, {
-            infura: process.env.REACT_APP_INFURA_ID,
-            alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-          });
           // setIsApproved(true);
           balance = await provider.getBalance(address);
           break;
@@ -179,23 +186,31 @@ const Details = ({ address }: props) => {
       let currentVaultData: any;
       // Removed GRAPH
       // if data is empty load vault data from contract
-      // if (vaultData.lenght > 0) {
-      //   await vaultData.vaults.forEach((v: any) => {
-      //     if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-      //       currentVaultData = v;
-      //     }
-      //   });
-      // } else {
-      const vaultID = await currentVault.userToVault(address);
-      if (vaultID !== 0) {
-        const vault = await currentVault.vaults(vaultID);
-        currentVaultData = {
-          vaultId: vaultID,
-          collateral: vault.Collateral,
-          debt: vault.Debt,
-        };
+      const graphBlock = vaultData._meta.block.number;
+      let currentBlock = await provider.getBlockNumber();
+      currentBlock -= 10;
+      if (
+        vaultData.vaults.length > 0 &&
+        !vaultData._meta.hasIndexingErrors &&
+        graphBlock >= currentBlock
+      ) {
+        console.log("graph!");
+        await vaultData.vaults.forEach((v: any) => {
+          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+            currentVaultData = v;
+          }
+        });
+      } else {
+        const vaultID = await currentVault.userToVault(address);
+        if (vaultID !== 0) {
+          const vault = await currentVault.vaults(vaultID);
+          currentVaultData = {
+            vaultId: vaultID,
+            collateral: vault.Collateral,
+            debt: vault.Debt,
+          };
+        }
       }
-      // }
 
       // const currentBalance = ethers.utils.formatEther(balance);
       const decimals = await currentToken.decimals();
