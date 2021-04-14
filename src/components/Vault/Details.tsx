@@ -122,6 +122,13 @@ const Details = ({ address }: props) => {
         address
         owner
       }
+      _meta {
+        block {
+          number
+          hash
+        }
+        hasIndexingErrors
+      }
     }
   `;
 
@@ -130,31 +137,27 @@ const Details = ({ address }: props) => {
       signer.signer &&
       oracles.wethOracle &&
       oracles.daiOracle &&
-      oracles.wbtcOracle &&
       oracles.tcapOracle &&
       vaults.wethVault &&
       vaults.daiVault &&
-      vaults.wbtcVault &&
       tokens.wethToken &&
       tokens.daiToken &&
-      tokens.wbtcToken &&
       vaultData
     ) {
       let currentVault: any;
       let currentOracle;
       let currentToken;
       let balance;
-
+      const network = process.env.REACT_APP_NETWORK_NAME;
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = process.env.REACT_APP_NETWORK_NAME;
-          const provider = ethers.getDefaultProvider(network, {
-            infura: process.env.REACT_APP_INFURA_ID,
-            alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-          });
           // setIsApproved(true);
           balance = await provider.getBalance(address);
           break;
@@ -171,12 +174,6 @@ const Details = ({ address }: props) => {
           currentToken = tokens.daiToken;
           balance = await currentToken.balanceOf(address);
           break;
-        case "WBTC":
-          currentVault = vaults.wbtcVault;
-          currentOracle = oracles.wbtcOracle;
-          currentToken = tokens.wbtcToken;
-          balance = await currentToken.balanceOf(address);
-          break;
         default:
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
@@ -186,11 +183,32 @@ const Details = ({ address }: props) => {
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
-      await vaultData.vaults.forEach((v: any) => {
-        if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-          currentVaultData = v;
+      // Removed GRAPH
+      // if data is empty load vault data from contract
+      const graphBlock = vaultData._meta.block.number;
+      let currentBlock = await provider.getBlockNumber();
+      currentBlock -= 10;
+      if (
+        vaultData.vaults.length > 0 &&
+        !vaultData._meta.hasIndexingErrors &&
+        graphBlock >= currentBlock
+      ) {
+        await vaultData.vaults.forEach((v: any) => {
+          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
+            currentVaultData = v;
+          }
+        });
+      } else {
+        const vaultID = await currentVault.userToVault(address);
+        if (vaultID !== 0) {
+          const vault = await currentVault.vaults(vaultID);
+          currentVaultData = {
+            vaultId: vaultID,
+            collateral: vault.Collateral,
+            debt: vault.Debt,
+          };
         }
-      });
+      }
 
       // const currentBalance = ethers.utils.formatEther(balance);
       const decimals = await currentToken.decimals();
@@ -614,7 +632,8 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
-      if (networkStatus === NetworkStatus.ready) {
+      // TODO : if stuck at pending do something
+      if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
         // await loadVault(selectedVault);
         setIsLoading(false);
       }

@@ -12,9 +12,7 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
-import WETHVault from "../contracts/WETHVaultHandler.json";
-import WBTCVault from "../contracts/WBTCVaultHandler.json";
-import DAIVault from "../contracts/DAIVaultHandler.json";
+import cryptexJson from "../contracts/cryptex.json";
 import { toUSD } from "../utils/utils";
 import Loading from "./Loading";
 
@@ -52,19 +50,29 @@ const Graph = () => {
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
-        let currentWBTCStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
+          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
+          let contracts;
+
+          switch (networkId) {
+            case 1:
+              contracts = cryptexJson[1].mainnet.contracts;
+              break;
+            case 4:
+              contracts = cryptexJson[4].rinkeby.contracts;
+              break;
+            default:
+              contracts = cryptexJson[4].rinkeby.contracts;
+              break;
+          }
           switch (s.id.toLowerCase()) {
-            case DAIVault.address.toLowerCase():
+            case contracts.DAIVaultHandler.address.toLowerCase():
               currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
-            case WETHVault.address.toLowerCase():
+            case contracts.WETHVaultHandler.address.toLowerCase():
               currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
-            case WBTCVault.address.toLowerCase():
-              currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             default:
               break;
@@ -74,10 +82,6 @@ const Graph = () => {
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
 
-        const formatWBTC = ethers.utils.formatUnits(currentWBTCStake, 8);
-
-        // setWBTCStake(formatWBTC);
-
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
         const ethUSD = ethers.utils.formatEther(
@@ -86,11 +90,7 @@ const Graph = () => {
         const daiUSD = ethers.utils.formatEther(
           (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
         );
-        const wbtcUSD = ethers.utils.formatEther(
-          (await oracles.wbtcOracle?.getLatestAnswer()).mul(10000000000)
-        );
-        const totalUSD =
-          toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI) + toUSD(wbtcUSD, formatWBTC);
+        const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
         setTotalStake(totalUSD.toString());
 
         const currentTotalSupply = await tokens.tcapToken?.totalSupply();
@@ -130,7 +130,7 @@ const Graph = () => {
               value={totalSupply}
               displayType="text"
               thousandSeparator
-              decimalScale={4}
+              decimalScale={2}
             />{" "}
             TCAP
           </h5>
@@ -152,7 +152,7 @@ const Graph = () => {
           <WETHIcon className="weth" />
           <h4>Total Staked in ETH</h4>
           <h5 className="number neon-highlight">
-            <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             ETH
           </h5>
         </Card>
@@ -160,7 +160,7 @@ const Graph = () => {
           <WBTCIcon className="wbtc" />
           <h4>Total Staked in WBTC</h4>
           <h5 className="number neon-yellow">
-            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             WBTC
           </h5>
         </Card> */}
@@ -168,7 +168,7 @@ const Graph = () => {
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>
           <h5 className="number neon-orange">
-            <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={4} />{" "}
+            <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
           </h5>
         </Card>

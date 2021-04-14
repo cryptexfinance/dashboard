@@ -23,7 +23,7 @@ import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import { notifyUser, errorNotification } from "../utils/utils";
+import { notifyUser, errorNotification, tsToDateString } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
 const Farm = () => {
@@ -51,6 +51,7 @@ const Farm = () => {
   const [wbtcPoolBalance, setWbtcPoolBalance] = useState("0.0");
   const [daiPoolBalance, setDaiPoolBalance] = useState("0.0");
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
+  const [vestingEndTime, setVestingEndTime] = useState(0);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const tokens = useContext(TokensContext);
@@ -138,6 +139,8 @@ const Farm = () => {
 
         if (phase > 1) {
           const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
+          const vestingTime = await rewards.wethPoolReward?.vestingEnd();
+          setVestingEndTime(vestingTime);
 
           const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
           setEthPoolRewards(
@@ -340,7 +343,7 @@ const Farm = () => {
                           <div className="button-current">
                             <OverlayTrigger
                               key="top"
-                              placement="auto"
+                              placement="right"
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="ttip-current-reward" className="farm-tooltip">
@@ -512,22 +515,15 @@ const Farm = () => {
                         <th>Stake</th>
                         <th>
                           <div className="rewards">
-                            <div className="title">Vested Reward</div>
+                            <div className="title">Unlocked Reward</div>
                             <div className="button">
                               <OverlayTrigger
                                 key="top"
-                                placement="auto"
+                                placement="top"
                                 trigger={["hover", "click"]}
                                 overlay={
                                   <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                    The total amount of CTX for the initial 6 month liquidity
-                                    provider rewards is 20% of the protocol or 2,000,000 CTX.
-                                    Assuming approximately 6500 Ethereum blocks per day over 6
-                                    months (1,170,000 blocks), this would result in 1.7094 CTX
-                                    issued per block. Newly rewarded CTX tokens shall be subjected
-                                    to a vesting period of 6 months where 30% of the reward is
-                                    immediately available while the remaining 70% reward will not be
-                                    accessible until 6 months vesting period has been reached.
+                                    Available to claim immediately.
                                   </Tooltip>
                                 }
                               >
@@ -538,22 +534,15 @@ const Farm = () => {
                         </th>
                         <th>
                           <div className="rewards">
-                            <div className="title">Unvested Reward</div>
+                            <div className="title">Locked Reward</div>
                             <div className="button">
                               <OverlayTrigger
                                 key="top"
-                                placement="auto"
+                                placement="top"
                                 trigger={["hover", "click"]}
                                 overlay={
                                   <Tooltip id="tooltip-top" className="farm-tooltip">
-                                    The total amount of CTX for the initial 6 month liquidity
-                                    provider rewards is 20% of the protocol or 2,000,000 CTX.
-                                    Assuming approximately 6500 Ethereum blocks per day over 6
-                                    months (1,170,000 blocks), this would result in 1.7094 CTX
-                                    issued per block. Newly rewarded CTX tokens shall be subjected
-                                    to a vesting period of 6 months where 30% of the reward is
-                                    immediately available while the remaining 70% reward will not be
-                                    accessible until 6 months vesting period has been reached.
+                                    Rewards are unlocked 6 months after the start of the pool.
                                   </Tooltip>
                                 }
                               >
@@ -575,7 +564,7 @@ const Farm = () => {
                           <a
                             target="_blank"
                             rel="noreferrer"
-                            href={`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`}
+                            href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                           >
                             SushiSwap ETH/TCAP Pool
                           </a>
@@ -611,16 +600,32 @@ const Farm = () => {
                           />{" "}
                           CTX
                         </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={vethPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
+                        <td className="number vested-reward">
+                          <div>
+                            <NumberFormat
+                              className="number"
+                              value={vethPoolRewards}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                            CTX
+                          </div>
+                          <div>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={
+                                <Tooltip id="tooltip-top" className="farm-tooltip">
+                                  The date the ETH/TCAP pool reward will be unlocked.
+                                </Tooltip>
+                              }
+                            >
+                              <span className="end-date">{tsToDateString(vestingEndTime)}</span>
+                            </OverlayTrigger>
+                          </div>
                         </td>
                         <td align="right">
                           <Button
