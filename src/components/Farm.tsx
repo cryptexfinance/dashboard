@@ -69,6 +69,8 @@ const Farm = () => {
   const [daiVaultAPY, setDaiVaultAPY] = useState("0");
   const [ethPoolAPY] = useState("0");
 
+  const oneYear = 60 * 60 * 24 * 365;
+
   const lpURL = process.env.REACT_APP_LP_URL;
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
@@ -87,7 +89,20 @@ const Farm = () => {
     }
   `;
 
+  async function getAPYFromVaultRewards(
+    reward: ethers.Contract,
+    ctxPrice: number,
+    tcapPrice: number
+  ) {
+    const totalTcapDebt = await reward.totalSupply();
+    const rate = await reward.rewardRate();
+
+    const apy = ((rate * oneYear * ctxPrice) / (tcapPrice * totalTcapDebt)) * 100;
+    return apy.toString();
+  }
+
   async function setDebt(vaultData: any) {
+    // TODO: fix if no graph
     await vaultData.vaults.forEach((v: any) => {
       switch (v.address.toLowerCase()) {
         case vaults?.wethVault?.address.toLowerCase():
@@ -130,7 +145,9 @@ const Farm = () => {
         oracles.tcapOracle &&
         governance.ctxToken &&
         governance.governorAlpha &&
-        governance.timelock
+        governance.timelock &&
+        rewards.wethReward &&
+        rewards.daiReward
       ) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(currentAddress);
@@ -154,21 +171,22 @@ const Farm = () => {
         const currentPriceCTX = 10;
 
         // ETH VAULT APY
-        const rewardTCAPBalance = ethers.utils.formatEther(await rewards.wethReward?.totalSupply());
-        const TOTAL_DEBT_ETH_VAULT = toUSD(currentPriceTCAP, rewardTCAPBalance);
-        request = ethers.utils.formatEther(await rewards.wethReward?.rewardRate());
-        const ethAPY = request * (60 * 60 * 24 * 365) * currentPriceCTX;
-        setEthVaultAPY(((ethAPY * 100) / TOTAL_DEBT_ETH_VAULT).toString());
+        setEthVaultAPY(
+          await getAPYFromVaultRewards(
+            rewards.wethReward,
+            currentPriceCTX,
+            parseFloat(currentPriceTCAP)
+          )
+        );
 
         // DAI VAULT APY
-        const rewardTCAPBalanceDAI = ethers.utils.formatEther(
-          await rewards.daiReward?.totalSupply()
+        setDaiVaultAPY(
+          await getAPYFromVaultRewards(
+            rewards.daiReward,
+            currentPriceCTX,
+            parseFloat(currentPriceTCAP)
+          )
         );
-        const TOTAL_DEBT_DAI_VAULT = toUSD(currentPriceTCAP, rewardTCAPBalanceDAI);
-
-        request = ethers.utils.formatEther(await rewards.daiReward?.rewardRate());
-        const daiAPY = request * (60 * 60 * 24 * 365) * currentPriceCTX;
-        setDaiVaultAPY(((daiAPY * 100) / TOTAL_DEBT_DAI_VAULT).toString());
 
         if (phase > 1) {
           const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
@@ -392,7 +410,8 @@ const Farm = () => {
                             </OverlayTrigger>
                           </div>
                         </div>
-                      </th>
+                      </th>{" "}
+                      <th>APY</th>
                       <th />
                     </tr>
                   </thead>
@@ -609,7 +628,8 @@ const Farm = () => {
                               </OverlayTrigger>
                             </div>
                           </div>
-                        </th>
+                        </th>{" "}
+                        <th>APY</th>
                         <th />
                       </tr>
                     </thead>
@@ -625,7 +645,7 @@ const Farm = () => {
                             rel="noreferrer"
                             href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                           >
-                            SushiSwap ETH/TCAP Pool
+                            ETH/TCAP Pool <br /> <small> SushiSwap </small>
                           </a>
                         </td>
                         <td className="number">
@@ -659,7 +679,7 @@ const Farm = () => {
                           />{" "}
                           CTX
                         </td>
-                        <td className="number vested-reward">
+                        <td className="vested-reward">
                           <div>
                             <NumberFormat
                               className="number"
@@ -672,18 +692,9 @@ const Farm = () => {
                             CTX
                           </div>
                           <div>
-                            <OverlayTrigger
-                              key="top"
-                              placement="top"
-                              trigger={["hover", "click"]}
-                              overlay={
-                                <Tooltip id="tooltip-top" className="farm-tooltip">
-                                  The date the ETH/TCAP pool reward will be unlocked.
-                                </Tooltip>
-                              }
-                            >
+                            <small>
                               <span className="end-date">{tsToDateString(vestingEndTime)}</span>
-                            </OverlayTrigger>
+                            </small>
                           </div>
                         </td>
                         <td>
