@@ -23,7 +23,7 @@ import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import { notifyUser, errorNotification, tsToDateString, toUSD } from "../utils/utils";
+import { notifyUser, errorNotification, tsToDateString } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
 const Farm = () => {
