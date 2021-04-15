@@ -192,6 +192,15 @@
         small {
           color: white;
         }
+
+        .incentive {
+          margin-top: -22px;
+          margin-left: 20px;
+          height: 20px;
+          & > path {
+            fill: $white !important;
+          }
+        }
       }
       &.diamond {
         padding-bottom: 1rem;
@@ -219,6 +228,18 @@
             a {
               font-weight: bold;
               color: $purple;
+            }
+
+            a.uniswap {
+              color: #ff007a;
+            }
+
+            .end-date {
+              font-size: 0.8rem;
+              color: $light;
+            }
+            &.vested-reward {
+              padding-top: 2.2rem;
             }
           }
 

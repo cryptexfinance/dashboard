@@ -34,6 +34,11 @@ export const parseUint = (value: string) => {
 
 export const toUSD = (amount: string, price: string) => parseFloat(amount) * parseFloat(price);
 
+export const tsToDateString = (ts: number) => {
+  const dt = new Date(ts * 1000);
+  return dt.toLocaleDateString();
+};
+
 export const sendNotification = async (
   title: string,
   body: string,

@@ -32,27 +32,9 @@ import oraclesContext from "./state/OraclesContext";
 import governanceContext from "./state/GovernanceContext";
 import rewardsContext from "./state/RewardsContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
-import WETHVault from "./contracts/WETHVaultHandler.json";
-import WBTCVault from "./contracts/WBTCVaultHandler.json";
-import DAIVault from "./contracts/DAIVaultHandler.json";
-import WETHOracle from "./contracts/WETHOracle.json";
-import WBTCOracle from "./contracts/BTCOracle.json";
-import DAIOracle from "./contracts/DAIOracle.json";
-import TCAPOracle from "./contracts/TCAPOracle.json";
-import WETHToken from "./contracts/WETH.json";
-import WBTCToken from "./contracts/WBTC.json";
-import DAIToken from "./contracts/DAI.json";
-import TCAPToken from "./contracts/TCAP.json";
-import CTXToken from "./contracts/Ctx.json";
-import GovernorAlpha from "./contracts/GovernorAlpha.json";
-import Timelock from "./contracts/Timelock.json";
-import WETHReward from "./contracts/WETHRewardHandler.json";
-import WBTCReward from "./contracts/WBTCRewardHandler.json";
-import DAIReward from "./contracts/DAIRewardHandler.json";
-import WETHPoolReward from "./contracts/ETHLiquidityReward.json";
-import WBTCPoolReward from "./contracts/WBTCLiquidityReward.json";
-import DAIPoolReward from "./contracts/DAILiquidityReward.json";
-import CTXPoolReward from "./contracts/CTXLiquidityReward.json";
+import cryptexJson from "./contracts/cryptex.json";
+import ERC20 from "./contracts/ERC20.json";
+import WETH from "./contracts/WETH.json";
 
 const clientOracle = new ApolloClient({
   uri: process.env.REACT_APP_GRAPH_URL,
@@ -77,28 +59,58 @@ const App = () => {
   const location = useLocation();
 
   const setContracts = (currentSigner: ethers.Signer) => {
+    const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
+    let contracts;
+    switch (networkId) {
+      case 1:
+        contracts = cryptexJson[1].mainnet.contracts;
+        break;
+      case 4:
+        contracts = cryptexJson[4].rinkeby.contracts;
+        break;
+      default:
+        contracts = cryptexJson[4].rinkeby.contracts;
+        break;
+    }
+
     // Set Vaults
-    const currentWETHVault = new ethers.Contract(WETHVault.address, WETHVault.abi, currentSigner);
+    const currentWETHVault = new ethers.Contract(
+      contracts.WETHVaultHandler.address,
+      contracts.WETHVaultHandler.abi,
+      currentSigner
+    );
     vaults.setCurrentWETHVault(currentWETHVault);
-    const currentDAIVault = new ethers.Contract(DAIVault.address, DAIVault.abi, currentSigner);
+    const currentDAIVault = new ethers.Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi,
+      currentSigner
+    );
     vaults.setCurrentDAIVault(currentDAIVault);
-    const currentWBTCVault = new ethers.Contract(WBTCVault.address, WBTCVault.abi, currentSigner);
-    vaults.setCurrentWBTCVault(currentWBTCVault);
     // Set Tokens
-    const currentWETHToken = new ethers.Contract(WETHToken.address, WETHToken.abi, currentSigner);
+    const currentWETHToken = new ethers.Contract(
+      process.env.REACT_APP_WETH_ADDRESS || "",
+      ERC20.abi,
+      currentSigner
+    );
     tokens.setCurrentWETHToken(currentWETHToken);
-    const currentDAIToken = new ethers.Contract(DAIToken.address, DAIToken.abi, currentSigner);
+    const currentDAIToken = new ethers.Contract(
+      process.env.REACT_APP_DAI_ADDRESS || "",
+      WETH.abi,
+      currentSigner
+    );
     tokens.setCurrentDAIToken(currentDAIToken);
-    const currentWBTCToken = new ethers.Contract(WBTCToken.address, WBTCToken.abi, currentSigner);
-    tokens.setCurrentWBTCToken(currentWBTCToken);
-    const currentTCAPToken = new ethers.Contract(TCAPToken.address, TCAPToken.abi, currentSigner);
+    const currentTCAPToken = new ethers.Contract(
+      contracts.TCAP.address,
+      contracts.TCAP.abi,
+      currentSigner
+    );
     tokens.setCurrentTCAPToken(currentTCAPToken);
 
     // TODO:remove this once other pools work
     if (process.env.REACT_APP_POOL_ETH) {
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        DAIToken.abi,
+        ERC20.abi,
         currentSigner
       );
 
@@ -106,14 +118,13 @@ const App = () => {
     }
     if (
       process.env.REACT_APP_POOL_ETH &&
-      process.env.REACT_APP_POOL_WBTC &&
       process.env.REACT_APP_POOL_DAI &&
       process.env.REACT_APP_POOL_CTX
     ) {
       // Set Pool Tokens
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        DAIToken.abi,
+        ERC20.abi,
         currentSigner
       );
 
@@ -121,21 +132,14 @@ const App = () => {
 
       const currentDAIPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_DAI,
-        DAIToken.abi,
+        ERC20.abi,
         currentSigner
       );
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
 
-      const currentWBTCPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_WBTC,
-        DAIToken.abi,
-        currentSigner
-      );
-      tokens.setCurrentWBTCPoolToken(currentWBTCPoolToken);
-
       const currentCTXPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_CTX,
-        DAIToken.abi,
+        ERC20.abi,
         currentSigner
       );
       tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
@@ -143,86 +147,66 @@ const App = () => {
 
     // Set Rewards
     const currentWETHReward = new ethers.Contract(
-      WETHReward.address,
-      WETHReward.abi,
+      contracts.WETHRewardHandler.address,
+      contracts.WETHRewardHandler.abi,
       currentSigner
     );
     rewards.setCurrentWETHReward(currentWETHReward);
 
-    const currentDAIReward = new ethers.Contract(DAIReward.address, DAIReward.abi, currentSigner);
-    rewards.setCurrentDAIReward(currentDAIReward);
-
-    const currentWBTCReward = new ethers.Contract(
-      WBTCReward.address,
-      WBTCReward.abi,
+    const currentDAIReward = new ethers.Contract(
+      contracts.DAIRewardHandler.address,
+      contracts.DAIRewardHandler.abi,
       currentSigner
     );
-    rewards.setCurrentWBTCReward(currentWBTCReward);
+    rewards.setCurrentDAIReward(currentDAIReward);
 
     // Set Liquidity Rewards
     const currentWETHPoolReward = new ethers.Contract(
-      WETHPoolReward.address,
-      WETHPoolReward.abi,
+      // @ts-ignore
+      contracts.ETHLiquidityReward.address,
+      // @ts-ignore
+      contracts.ETHLiquidityReward.abi,
       currentSigner
     );
     rewards.setCurrentWETHPoolReward(currentWETHPoolReward);
 
-    const currentDAIPoolReward = new ethers.Contract(
-      DAIPoolReward.address,
-      DAIPoolReward.abi,
-      currentSigner
-    );
-    rewards.setCurrentDAIPoolReward(currentDAIPoolReward);
-
-    const currentWBTCPoolReward = new ethers.Contract(
-      WBTCPoolReward.address,
-      WBTCPoolReward.abi,
-      currentSigner
-    );
-    rewards.setCurrentWBTCPoolReward(currentWBTCPoolReward);
-
-    const currentCTXPoolReward = new ethers.Contract(
-      CTXPoolReward.address,
-      CTXPoolReward.abi,
-      currentSigner
-    );
-    rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
-
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
-      WETHOracle.address,
-      WETHOracle.abi,
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi,
       currentSigner
     );
     oracles.setCurrentWETHOracle(currentWETHOracle);
-    const currentDAIOracle = new ethers.Contract(DAIOracle.address, DAIOracle.abi, currentSigner);
-    oracles.setCurrentDAIOracle(currentDAIOracle);
-    const currentWBTCOracle = new ethers.Contract(
-      WBTCOracle.address,
-      WBTCOracle.abi,
+    const currentDAIOracle = new ethers.Contract(
+      contracts.DAIOracle.address,
+      contracts.DAIOracle.abi,
       currentSigner
     );
-    oracles.setCurrentWBTCOracle(currentWBTCOracle);
+    oracles.setCurrentDAIOracle(currentDAIOracle);
+
     const currentTCAPOracle = new ethers.Contract(
-      TCAPOracle.address,
-      TCAPOracle.abi,
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi,
       currentSigner
     );
     oracles.setCurrentTCAPOracle(currentTCAPOracle);
 
     // Set Governance
-    const currentCtx = new ethers.Contract(CTXToken.address, CTXToken.abi, currentSigner);
+    const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
     governance.setCurrentCtxToken(currentCtx);
     const currentGovernorAlpha = new ethers.Contract(
-      GovernorAlpha.address,
-      GovernorAlpha.abi,
+      contracts.GovernorAlpha.address,
+      contracts.GovernorAlpha.abi,
       currentSigner
     );
     governance.setCurrentGovernorAlpha(currentGovernorAlpha);
-    const currentTimelock = new ethers.Contract(Timelock.address, Timelock.abi, currentSigner);
+    const currentTimelock = new ethers.Contract(
+      contracts.Timelock.address,
+      contracts.Timelock.abi,
+      currentSigner
+    );
     governance.setCurrentTimelock(currentTimelock);
   };
-
   web3Modal.on("connect", async (networkProvider) => {
     setloading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
