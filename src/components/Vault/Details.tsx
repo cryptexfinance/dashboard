@@ -200,7 +200,7 @@ const Details = ({ address }: props) => {
         });
       } else {
         const vaultID = await currentVault.userToVault(address);
-        if (vaultID !== 0) {
+        if (!vaultID.eq(0)) {
           const vault = await currentVault.vaults(vaultID);
           currentVaultData = {
             vaultId: vaultID,
