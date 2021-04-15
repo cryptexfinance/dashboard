@@ -72,8 +72,6 @@ const Farm = () => {
   const lpURL = process.env.REACT_APP_LP_URL;
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
-  // TODO: Fix if no graph
-
   const USER_VAULTS = gql`
     query getVault($owner: String!) {
       vaults(where: { owner: $owner }) {
@@ -90,8 +88,6 @@ const Farm = () => {
   `;
 
   async function setDebt(vaultData: any) {
-    // TODO: fix if no graph
-
     await vaultData.vaults.forEach((v: any) => {
       switch (v.address.toLowerCase()) {
         case vaults?.wethVault?.address.toLowerCase():
@@ -397,7 +393,6 @@ const Farm = () => {
                           </div>
                         </div>
                       </th>
-                      <th>APY</th>
                       <th />
                     </tr>
                   </thead>
@@ -615,7 +610,6 @@ const Farm = () => {
                             </div>
                           </div>
                         </th>
-                        <th>APY</th>
                         <th />
                       </tr>
                     </thead>
@@ -631,7 +625,7 @@ const Farm = () => {
                             rel="noreferrer"
                             href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                           >
-                            ETH/TCAP Pool <br /> <small> SushiSwap </small>
+                            SushiSwap ETH/TCAP Pool
                           </a>
                         </td>
                         <td className="number">
@@ -665,7 +659,7 @@ const Farm = () => {
                           />{" "}
                           CTX
                         </td>
-                        <td className=" vested-reward">
+                        <td className="number vested-reward">
                           <div>
                             <NumberFormat
                               className="number"
@@ -678,9 +672,18 @@ const Farm = () => {
                             CTX
                           </div>
                           <div>
-                            <small>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={
+                                <Tooltip id="tooltip-top" className="farm-tooltip">
+                                  The date the ETH/TCAP pool reward will be unlocked.
+                                </Tooltip>
+                              }
+                            >
                               <span className="end-date">{tsToDateString(vestingEndTime)}</span>
-                            </small>
+                            </OverlayTrigger>
                           </div>
                         </td>
                         <td>
