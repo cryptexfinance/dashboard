@@ -17,6 +17,7 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 import Loading from "./Loading";
 
 const Farm = () => {
@@ -143,6 +144,9 @@ const Farm = () => {
                       >
                         ETH/TCAP <br />
                         <small>SushiSwap</small>
+                      </a>
+                      <a href="/farm">
+                        <FarmIcon className="incentive" />
                       </a>
                     </td>
                     <td className="number">
