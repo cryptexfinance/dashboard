@@ -66,7 +66,7 @@ const Farm = () => {
   const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
   // APY
   const [ethVaultAPY, setEthVaultAPY] = useState("0");
-  const [daiVaultAPY] = useState("0");
+  const [daiVaultAPY, setDaiVaultAPY] = useState("0");
   const [ethPoolAPY] = useState("0");
 
   const lpURL = process.env.REACT_APP_LP_URL;
@@ -157,15 +157,22 @@ const Farm = () => {
 
         const currentPriceCTX = 10;
 
+        // ETH VAULT APY
         const rewardTCAPBalance = ethers.utils.formatEther(await rewards.wethReward?.totalSupply());
-
         const TOTAL_DEBT_ETH_VAULT = toUSD(currentPriceTCAP, rewardTCAPBalance);
-
         request = ethers.utils.formatEther(await rewards.wethReward?.rewardRate());
         const ethAPY = request * (60 * 60 * 24 * 365) * currentPriceCTX;
+        setEthVaultAPY(((ethAPY * 100) / TOTAL_DEBT_ETH_VAULT).toString());
 
-        setEthVaultAPY((ethAPY / TOTAL_DEBT_ETH_VAULT).toString());
-        // let ethUSD = toUSD(currentPrice, currentBalance);
+        // DAI VAULT APY
+        const rewardTCAPBalanceDAI = ethers.utils.formatEther(
+          await rewards.daiReward?.totalSupply()
+        );
+        const TOTAL_DEBT_DAI_VAULT = toUSD(currentPriceTCAP, rewardTCAPBalanceDAI);
+
+        request = ethers.utils.formatEther(await rewards.daiReward?.rewardRate());
+        const daiAPY = request * (60 * 60 * 24 * 365) * currentPriceCTX;
+        setDaiVaultAPY(((daiAPY * 100) / TOTAL_DEBT_DAI_VAULT).toString());
 
         if (phase > 1) {
           const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
@@ -425,7 +432,17 @@ const Farm = () => {
                         CTX
                       </td>
                       <td>
-                        <b className="fire">{ethVaultAPY}%</b>
+                        <b className="fire">
+                          <NumberFormat
+                            className=""
+                            value={ethVaultAPY}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={0}
+                          />
+                          %
+                        </b>
                       </td>
                       <td align="right">
                         <Button variant="primary" className="" href="vault/ETH">
@@ -518,7 +535,17 @@ const Farm = () => {
                         CTX
                       </td>
                       <td>
-                        <b className="fire">{daiVaultAPY}%</b>
+                        <b className="fire">
+                          <NumberFormat
+                            className=""
+                            value={daiVaultAPY}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={0}
+                          />
+                          %
+                        </b>
                       </td>
                       <td align="right">
                         <Button variant="primary" className="" href="vault/DAI">
@@ -657,7 +684,17 @@ const Farm = () => {
                           </div>
                         </td>
                         <td>
-                          <b className="fire">{ethPoolAPY}%</b>
+                          <b className="fire">
+                            <NumberFormat
+                              className=""
+                              value={ethPoolAPY}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={0}
+                            />
+                            %
+                          </b>
                         </td>
                         <td align="right">
                           <Button
