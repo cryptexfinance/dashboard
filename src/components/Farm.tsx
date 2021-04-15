@@ -23,7 +23,7 @@ import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import { notifyUser, errorNotification, tsToDateString, toUSD } from "../utils/utils";
+import { notifyUser, errorNotification, tsToDateString } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
 const Farm = () => {
@@ -64,15 +64,9 @@ const Farm = () => {
   const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
   const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
   const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
-  // APY
-  const [ethVaultAPY, setEthVaultAPY] = useState("0");
-  const [daiVaultAPY] = useState("0");
-  const [ethPoolAPY] = useState("0");
 
   const lpURL = process.env.REACT_APP_LP_URL;
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
-
-  // TODO: Fix if no graph
 
   const USER_VAULTS = gql`
     query getVault($owner: String!) {
@@ -90,8 +84,6 @@ const Farm = () => {
   `;
 
   async function setDebt(vaultData: any) {
-    // TODO: fix if no graph
-
     await vaultData.vaults.forEach((v: any) => {
       switch (v.address.toLowerCase()) {
         case vaults?.wethVault?.address.toLowerCase():
@@ -144,28 +136,6 @@ const Farm = () => {
         // setWbtcRewards(ethers.utils.formatEther(currentWbtcReward));
         const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
         setDaiRewards(ethers.utils.formatEther(currentDaiReward));
-
-        // Calculates APY
-        let request = await oracles.wethOracle?.getLatestAnswer();
-        // const currentPriceETH = ethers.utils.formatEther(request.mul(10000000000));
-
-        request = await oracles.tcapOracle?.getLatestAnswer();
-        const currentPriceTCAP = ethers.utils.formatEther(request);
-
-        request = await oracles.daiOracle?.getLatestAnswer();
-        // const currentPriceDAI = ethers.utils.formatEther(request.mul(10000000000));
-
-        const currentPriceCTX = 10;
-
-        const rewardTCAPBalance = ethers.utils.formatEther(await rewards.wethReward?.totalSupply());
-
-        const TOTAL_DEBT_ETH_VAULT = toUSD(currentPriceTCAP, rewardTCAPBalance);
-
-        request = ethers.utils.formatEther(await rewards.wethReward?.rewardRate());
-        const ethAPY = request * (60 * 60 * 24 * 365) * currentPriceCTX;
-
-        setEthVaultAPY((ethAPY / TOTAL_DEBT_ETH_VAULT).toString());
-        // let ethUSD = toUSD(currentPrice, currentBalance);
 
         if (phase > 1) {
           const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
@@ -390,7 +360,6 @@ const Farm = () => {
                           </div>
                         </div>
                       </th>
-                      <th>APY</th>
                       <th />
                     </tr>
                   </thead>
@@ -423,9 +392,6 @@ const Farm = () => {
                           decimalScale={2}
                         />{" "}
                         CTX
-                      </td>
-                      <td>
-                        <b className="fire">{ethVaultAPY}%</b>
                       </td>
                       <td align="right">
                         <Button variant="primary" className="" href="vault/ETH">
@@ -517,9 +483,6 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td>
-                        <b className="fire">{daiVaultAPY}%</b>
-                      </td>
                       <td align="right">
                         <Button variant="primary" className="" href="vault/DAI">
                           Mint
@@ -588,7 +551,6 @@ const Farm = () => {
                             </div>
                           </div>
                         </th>
-                        <th>APY</th>
                         <th />
                       </tr>
                     </thead>
@@ -604,7 +566,7 @@ const Farm = () => {
                             rel="noreferrer"
                             href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                           >
-                            ETH/TCAP Pool <br /> <small> SushiSwap </small>
+                            SushiSwap ETH/TCAP Pool
                           </a>
                         </td>
                         <td className="number">
@@ -638,7 +600,7 @@ const Farm = () => {
                           />{" "}
                           CTX
                         </td>
-                        <td className=" vested-reward">
+                        <td className="number vested-reward">
                           <div>
                             <NumberFormat
                               className="number"
@@ -651,13 +613,19 @@ const Farm = () => {
                             CTX
                           </div>
                           <div>
-                            <small>
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={
+                                <Tooltip id="tooltip-top" className="farm-tooltip">
+                                  The date the ETH/TCAP pool reward will be unlocked.
+                                </Tooltip>
+                              }
+                            >
                               <span className="end-date">{tsToDateString(vestingEndTime)}</span>
-                            </small>
+                            </OverlayTrigger>
                           </div>
-                        </td>
-                        <td>
-                          <b className="fire">{ethPoolAPY}%</b>
                         </td>
                         <td align="right">
                           <Button
