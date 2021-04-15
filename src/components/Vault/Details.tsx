@@ -122,6 +122,13 @@ const Details = ({ address }: props) => {
         address
         owner
       }
+      _meta {
+        block {
+          number
+          hash
+        }
+        hasIndexingErrors
+      }
     }
   `;
 
@@ -141,17 +148,16 @@ const Details = ({ address }: props) => {
       let currentOracle;
       let currentToken;
       let balance;
-
+      const network = process.env.REACT_APP_NETWORK_NAME;
+      const provider = ethers.getDefaultProvider(network, {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
           currentOracle = oracles.wethOracle;
           currentToken = tokens.wethToken;
-          const network = process.env.REACT_APP_NETWORK_NAME;
-          const provider = ethers.getDefaultProvider(network, {
-            infura: process.env.REACT_APP_INFURA_ID,
-            alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-          });
           // setIsApproved(true);
           balance = await provider.getBalance(address);
           break;
@@ -177,8 +183,16 @@ const Details = ({ address }: props) => {
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
       let currentVaultData: any;
+      // Removed GRAPH
       // if data is empty load vault data from contract
-      if (vaultData.lenght > 0) {
+      const graphBlock = vaultData._meta.block.number;
+      let currentBlock = await provider.getBlockNumber();
+      currentBlock -= 10;
+      if (
+        vaultData.vaults.length > 0 &&
+        !vaultData._meta.hasIndexingErrors &&
+        graphBlock >= currentBlock
+      ) {
         await vaultData.vaults.forEach((v: any) => {
           if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
             currentVaultData = v;
@@ -186,7 +200,7 @@ const Details = ({ address }: props) => {
         });
       } else {
         const vaultID = await currentVault.userToVault(address);
-        if (vaultID !== 0) {
+        if (!vaultID.eq(0)) {
           const vault = await currentVault.vaults(vaultID);
           currentVaultData = {
             vaultId: vaultID,
@@ -590,7 +604,6 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
-      console.log(selectedCollateralContract);
       const tx = await selectedVaultContract?.createVault();
       notifyUser(tx, refresh);
     } else {
@@ -619,7 +632,8 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
-      if (networkStatus === NetworkStatus.ready) {
+      // TODO : if stuck at pending do something
+      if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
         // await loadVault(selectedVault);
         setIsLoading(false);
       }
