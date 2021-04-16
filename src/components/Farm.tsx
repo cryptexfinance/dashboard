@@ -124,7 +124,7 @@ const Farm = () => {
         signer.signer &&
         tokens.tcapToken &&
         oracles.tcapOracle &&
-        governance.ctxToken &&
+        tokens.ctxToken &&
         governance.governorAlpha &&
         governance.timelock
       ) {
@@ -873,7 +873,7 @@ const Farm = () => {
                             <a
                               target="_blank"
                               rel="noreferrer"
-                              href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                              href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
                             >
                               SushiSwap CTX/ETH Pool
                             </a>

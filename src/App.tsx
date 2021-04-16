@@ -193,7 +193,7 @@ const App = () => {
 
     // Set Governance
     const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
-    governance.setCurrentCtxToken(currentCtx);
+    tokens.setCurrentCtxToken(currentCtx);
     const currentGovernorAlpha = new ethers.Contract(
       contracts.GovernorAlpha.address,
       contracts.GovernorAlpha.abi,

@@ -12,7 +12,6 @@ import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
-import GovernanceContext from "../state/GovernanceContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import { makeShortAddress } from "../utils/utils";
 import "../styles/welcome.scss";
@@ -34,7 +33,6 @@ const Welcome = () => {
   const history = useHistory();
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
-  const governance = useContext(GovernanceContext);
   const lpURL = process.env.REACT_APP_LP_URL;
 
   const TCAP_PRICE = gql`
@@ -49,13 +47,13 @@ const Welcome = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && governance.ctxToken && oracles.tcapOracle) {
+      if (signer.signer && tokens.tcapToken && tokens.ctxToken && oracles.tcapOracle) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(makeShortAddress(currentAddress));
         const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
         const tcapString = ethers.utils.formatEther(currentTcapBalance);
         setTcapBalance(tcapString);
-        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const currentCtxBalance = await tokens.ctxToken.balanceOf(currentAddress);
         const ctxString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(ctxString);
       }

@@ -44,8 +44,8 @@ const Farm = () => {
       if (
         signer.signer &&
         tokens.tcapToken &&
+        tokens.ctxToken &&
         oracles.tcapOracle &&
-        governance.ctxToken &&
         governance.governorAlpha &&
         governance.timelock
       ) {
@@ -281,7 +281,7 @@ const Farm = () => {
                               variant="primary"
                               className=""
                               target="_blank"
-                              href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                              href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
                             >
                               Pool
                             </Button>
