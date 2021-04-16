@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
-import Col from "react-bootstrap/esm/Col";
+
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
@@ -15,7 +15,7 @@ import VaultsContext from "../state/VaultsContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
 import RewardsContext from "../state/RewardsContext";
-import { Web3ModalContext } from "../state/Web3ModalContext";
+
 import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -53,7 +53,7 @@ const Farm = () => {
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
   const [vestingEndTime, setVestingEndTime] = useState(0);
   const signer = useContext(SignerContext);
-  const web3Modal = useContext(Web3ModalContext);
+
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
   const oracles = useContext(OraclesContext);
@@ -414,126 +414,116 @@ const Farm = () => {
       <div>
         <h3>Farming </h3>{" "}
         <Row className="card-wrapper">
-          {address === "" ? (
-            <Col xs={12} lg={6}>
-              <Card className="balance">
-                <div className="">
-                  <h2>Connect Your Account</h2>
-                  <p>Claim and see your CTX tokens connecting your account</p>
-                </div>
-                <Row className="">
-                  <Col>
-                    <Button
-                      variant="primary"
-                      id="connect"
-                      className="neon-pink mt-2"
-                      onClick={() => {
-                        web3Modal.toggleModal();
-                      }}
-                    >
-                      Connect Wallet
-                    </Button>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          ) : (
-            <>
-              <Card className="diamond mb-2">
-                <h2>Minting Rewards </h2>
-                <Table hover className="mt-2">
-                  <thead>
-                    <tr>
-                      <th />
-                      <th>Description</th>
-                      <th>Current Mint</th>
-                      <th>
-                        <div className="rewards">
-                          <div className="title-current">Current Reward</div>
-                          <div className="button-current">
-                            <OverlayTrigger
-                              key="top"
-                              placement="right"
-                              trigger={["hover", "click"]}
-                              overlay={
-                                <Tooltip id="ttip-current-reward" className="farm-tooltip">
-                                  Early adopters rewards are issued over 14 days for a total of
-                                  500,000 CTX. Assuming approximately 6500 Ethereum blocks per day
-                                  over 14 days (91,000 Ethereum blocks), the per block reward would
-                                  be 5.4945 CTX split across the debtors at that point in time. 100%
-                                  of the reward is immediately available.
-                                </Tooltip>
-                              }
-                            >
-                              <Button variant="dark">?</Button>
-                            </OverlayTrigger>
-                          </div>
+          <Row>
+            <Card className="diamond mb-2">
+              <h2>Minting Rewards </h2>
+              <Table hover className="mt-2">
+                <thead>
+                  <tr>
+                    <th />
+                    <th>Description</th>
+                    <th>Current Mint</th>
+                    <th>
+                      <div className="rewards">
+                        <div className="title-current">Current Reward</div>
+                        <div className="button-current">
+                          <OverlayTrigger
+                            key="top"
+                            placement="right"
+                            trigger={["hover", "click"]}
+                            overlay={
+                              <Tooltip id="ttip-current-reward" className="farm-tooltip">
+                                Early adopters rewards are issued over 14 days for a total of
+                                500,000 CTX. Assuming approximately 6500 Ethereum blocks per day
+                                over 14 days (91,000 Ethereum blocks), the per block reward would be
+                                5.4945 CTX split across the debtors at that point in time. 100% of
+                                the reward is immediately available.
+                              </Tooltip>
+                            }
+                          >
+                            <Button variant="dark">?</Button>
+                          </OverlayTrigger>
                         </div>
-                      </th>{" "}
-                      <th>APY</th>
-                      <th />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <WETHIcon className="weth" />
-                      </td>
-                      <td>
-                        <a href="vault/ETH">ETH Vault</a>
-                      </td>
-                      <td className="number">
+                      </div>
+                    </th>{" "}
+                    <th>APY</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <WETHIcon className="weth" />
+                    </td>
+                    <td>
+                      <a href="vault/ETH">ETH Vault</a>
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ethDebt}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      TCAP
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={ethRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
+                    <td>
+                      <b className="fire">
                         <NumberFormat
-                          className="number"
-                          value={ethDebt}
+                          className=""
+                          value={ethVaultAPY}
                           displayType="text"
                           thousandSeparator
                           prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        TCAP
-                      </td>
-                      <td className="number">
-                        <NumberFormat
-                          className="number"
-                          value={ethRewards}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "}
-                        CTX
-                      </td>
-                      <td>
-                        <b className="fire">
-                          <NumberFormat
-                            className=""
-                            value={ethVaultAPY}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={0}
-                          />
-                          %
-                        </b>
-                      </td>
-                      <td align="right">
-                        <Button variant="primary" className="" href="vault/ETH">
-                          Mint
-                        </Button>
+                          decimalScale={0}
+                        />
+                        %
+                      </b>
+                    </td>
+                    <td align="right">
+                      {address === "" ? (
+                        <>
+                          <Button variant="dark" className="" disabled>
+                            Mint
+                          </Button>
 
-                        <Button
-                          variant="success"
-                          className=" ml-4"
-                          onClick={() => {
-                            claimRewards("ETH");
-                          }}
-                        >
-                          Claim
-                        </Button>
-                      </td>
-                    </tr>
-                    {/* <tr>
+                          <Button variant="dark" className="ml-4" disabled>
+                            Claim
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="primary" className="" href="vault/ETH">
+                            Mint
+                          </Button>
+
+                          <Button
+                            variant="success"
+                            className=" ml-4"
+                            onClick={() => {
+                              claimRewards("ETH");
+                            }}
+                          >
+                            Claim
+                          </Button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                  {/* <tr>
                       <td>
                         <WBTCIcon className="wbtc" />
                       </td>
@@ -578,28 +568,173 @@ const Farm = () => {
                         </Button>
                       </td>{" "}
                     </tr> */}
+                  <tr>
+                    <td>
+                      <DAIIcon className="dai" />
+                    </td>
+                    <td>
+                      <a href="vault/DAI">DAI Vault</a>
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={daiDebt}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      TCAP
+                    </td>
+                    <td className="number">
+                      <NumberFormat
+                        className="number"
+                        value={daiRewards}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                      CTX
+                    </td>
+                    <td>
+                      <b className="fire">
+                        <NumberFormat
+                          className=""
+                          value={daiVaultAPY}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={0}
+                        />
+                        %
+                      </b>
+                    </td>
+                    <td align="right">
+                      {address === "" ? (
+                        <>
+                          <Button variant="dark" className="" disabled>
+                            Mint
+                          </Button>
+
+                          <Button variant="dark" className="ml-4" disabled>
+                            Claim
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="primary" className="" href="vault/DAI">
+                            Mint
+                          </Button>
+
+                          <Button
+                            variant="success"
+                            className="ml-4"
+                            onClick={() => {
+                              claimRewards("DAI");
+                            }}
+                          >
+                            Claim
+                          </Button>
+                        </>
+                      )}
+                    </td>{" "}
+                  </tr>
+                </tbody>
+              </Table>
+            </Card>
+
+            {phase > 1 && (
+              <Card className="diamond mt-4">
+                <h2>Liquidity Rewards </h2>
+                <Table hover className="mt-2">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Description</th>
+                      <th>Balance</th>
+                      <th>Stake</th>
+                      <th>
+                        <div className="rewards">
+                          <div className="title">Unlocked Reward</div>
+                          <div className="button">
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={
+                                <Tooltip id="ttip-vreward" className="farm-tooltip">
+                                  Available to claim immediately.
+                                </Tooltip>
+                              }
+                            >
+                              <Button variant="dark">?</Button>
+                            </OverlayTrigger>
+                          </div>
+                        </div>
+                      </th>
+                      <th>
+                        <div className="rewards">
+                          <div className="title">Locked Reward</div>
+                          <div className="button">
+                            <OverlayTrigger
+                              key="top"
+                              placement="top"
+                              trigger={["hover", "click"]}
+                              overlay={
+                                <Tooltip id="tooltip-top" className="farm-tooltip">
+                                  Rewards are unlocked 6 months after the start of the pool.
+                                </Tooltip>
+                              }
+                            >
+                              <Button variant="dark">?</Button>
+                            </OverlayTrigger>
+                          </div>
+                        </div>
+                      </th>{" "}
+                      <th>APY</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
                     <tr>
                       <td>
-                        <DAIIcon className="dai" />
+                        <WETHIcon className="weth" />
+                        <TcapIcon className="tcap" />
                       </td>
                       <td>
-                        <a href="vault/DAI">DAI Vault</a>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                        >
+                          ETH/TCAP Pool <br /> <small> SushiSwap </small>
+                        </a>
                       </td>
                       <td className="number">
                         <NumberFormat
                           className="number"
-                          value={daiDebt}
+                          value={ethPoolBalance}
                           displayType="text"
                           thousandSeparator
                           prefix=""
                           decimalScale={2}
                         />{" "}
-                        TCAP
                       </td>
                       <td className="number">
                         <NumberFormat
                           className="number"
-                          value={daiRewards}
+                          value={ethPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ethPoolRewards}
                           displayType="text"
                           thousandSeparator
                           prefix=""
@@ -607,11 +742,29 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
+                      <td className="vested-reward">
+                        <div>
+                          <NumberFormat
+                            className="number"
+                            value={vethPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </div>
+                        <div>
+                          <small>
+                            <span className="end-date">{tsToDateString(vestingEndTime)}</span>
+                          </small>
+                        </div>
+                      </td>
                       <td>
                         <b className="fire">
                           <NumberFormat
                             className=""
-                            value={daiVaultAPY}
+                            value={ethPoolAPY}
                             displayType="text"
                             thousandSeparator
                             prefix=""
@@ -621,409 +774,91 @@ const Farm = () => {
                         </b>
                       </td>
                       <td align="right">
-                        <Button variant="primary" className="" href="vault/DAI">
-                          Mint
-                        </Button>
+                        {address === "" ? (
+                          <>
+                            <Button variant="dark" className="" disabled>
+                              Mint
+                            </Button>
 
-                        <Button
-                          variant="success"
-                          className="ml-4"
-                          onClick={() => {
-                            claimRewards("DAI");
-                          }}
-                        >
-                          Claim
-                        </Button>
-                      </td>{" "}
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
-
-              {phase > 1 && (
-                <Card className="diamond mt-4">
-                  <h2>Liquidity Rewards </h2>
-                  <Table hover className="mt-2">
-                    <thead>
-                      <tr>
-                        <th />
-                        <th>Description</th>
-                        <th>Balance</th>
-                        <th>Stake</th>
-                        <th>
-                          <div className="rewards">
-                            <div className="title">Unlocked Reward</div>
-                            <div className="button">
-                              <OverlayTrigger
-                                key="top"
-                                placement="top"
-                                trigger={["hover", "click"]}
-                                overlay={
-                                  <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                    Available to claim immediately.
-                                  </Tooltip>
-                                }
-                              >
-                                <Button variant="dark">?</Button>
-                              </OverlayTrigger>
-                            </div>
-                          </div>
-                        </th>
-                        <th>
-                          <div className="rewards">
-                            <div className="title">Locked Reward</div>
-                            <div className="button">
-                              <OverlayTrigger
-                                key="top"
-                                placement="top"
-                                trigger={["hover", "click"]}
-                                overlay={
-                                  <Tooltip id="tooltip-top" className="farm-tooltip">
-                                    Rewards are unlocked 6 months after the start of the pool.
-                                  </Tooltip>
-                                }
-                              >
-                                <Button variant="dark">?</Button>
-                              </OverlayTrigger>
-                            </div>
-                          </div>
-                        </th>{" "}
-                        <th>APY</th>
-                        <th />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <WETHIcon className="weth" />
-                          <TcapIcon className="tcap" />
-                        </td>
-                        <td>
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
-                          >
-                            ETH/TCAP Pool <br /> <small> SushiSwap </small>
-                          </a>
-                        </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ethPoolBalance}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                        </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ethPoolStake}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                        </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ethPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
-                        </td>
-                        <td className="vested-reward">
-                          <div>
-                            <NumberFormat
-                              className="number"
-                              value={vethPoolRewards}
-                              displayType="text"
-                              thousandSeparator
-                              prefix=""
-                              decimalScale={2}
-                            />{" "}
-                            CTX
-                          </div>
-                          <div>
-                            <small>
-                              <span className="end-date">{tsToDateString(vestingEndTime)}</span>
-                            </small>
-                          </div>
-                        </td>
-                        <td>
-                          <b className="fire">
-                            <NumberFormat
+                            <Button variant="dark" className="ml-4" disabled>
+                              Claim
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              variant="primary"
                               className=""
-                              value={ethPoolAPY}
-                              displayType="text"
-                              thousandSeparator
-                              prefix=""
-                              decimalScale={0}
-                            />
-                            %
-                          </b>
-                        </td>
-                        <td align="right">
-                          <Button
-                            variant="primary"
-                            className=""
-                            onClick={() => {
-                              setStakeBalance(ethPoolBalance);
-                              setSelectedPoolTitle("SushiSwap ETH/TCAP Pool");
-                              if (rewards.wethPoolReward) {
-                                setSelectedPool(rewards.wethPoolReward);
-                                setSelectedPoolToken(tokens.wethPoolToken);
-                              }
-                              setStakeShow(true);
-                            }}
-                          >
-                            Stake
-                          </Button>
+                              onClick={() => {
+                                setStakeBalance(ethPoolBalance);
+                                setSelectedPoolTitle("SushiSwap ETH/TCAP Pool");
+                                if (rewards.wethPoolReward) {
+                                  setSelectedPool(rewards.wethPoolReward);
+                                  setSelectedPoolToken(tokens.wethPoolToken);
+                                }
+                                setStakeShow(true);
+                              }}
+                            >
+                              Stake
+                            </Button>
 
-                          <Button
-                            variant="success"
-                            className=" ml-4"
-                            onClick={() => {
-                              claimRewards("ETHPOOL");
-                            }}
-                          >
-                            Claim
-                          </Button>
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimRewards("ETHPOOL");
+                              }}
+                            >
+                              Claim
+                            </Button>
 
-                          <Button
-                            variant="warning"
-                            className=" ml-4"
-                            onClick={() => {
-                              exitRewards("ETHPOOL");
-                            }}
-                          >
-                            Exit
-                          </Button>
-                        </td>
-                      </tr>
-                      {phase > 2 && (
-                        <>
-                          {" "}
-                          <tr>
-                            <td>
-                              <WBTCIcon className="wbtc" />
-                              <TcapIcon className="tcap" />{" "}
-                            </td>
-                            <td>
-                              {" "}
-                              <a
-                                target="_blank"
-                                rel="noreferrer"
-                                href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
-                              >
-                                SushiSwap WBTC/TCAP Pool
-                              </a>
-                            </td>{" "}
-                            <td className="number">
-                              {" "}
-                              <NumberFormat
-                                className="number"
-                                value={wbtcPoolBalance}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                            </td>
-                            <td className="number">
-                              {" "}
-                              <NumberFormat
-                                className="number"
-                                value={wbtcPoolStake}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                            </td>{" "}
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={wbtcPoolRewards}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                              CTX
-                            </td>
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={vwbtcPoolRewards}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                              CTX
-                            </td>
-                            <td align="right">
-                              <Button
-                                variant="primary"
-                                className=""
-                                onClick={() => {
-                                  setStakeBalance(wbtcPoolBalance);
-                                  setSelectedPoolTitle("SushiSwap WBTC/TCAP Pool");
-                                  if (rewards.wbtcPoolReward) {
-                                    setSelectedPool(rewards.wbtcPoolReward);
-                                    setSelectedPoolToken(tokens.wbtcPoolToken);
-                                  }
-                                  setStakeShow(true);
-                                }}
-                              >
-                                Stake
-                              </Button>
-
-                              <Button
-                                variant="success"
-                                className=" ml-4"
-                                onClick={() => {
-                                  claimRewards("WBTCPOOL");
-                                }}
-                              >
-                                Claim
-                              </Button>
-
-                              <Button
-                                variant="warning"
-                                className="ml-4"
-                                onClick={() => {
-                                  exitRewards("WBTCPOOL");
-                                }}
-                              >
-                                Exit
-                              </Button>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <DAIIcon className="dai" />
-                              <TcapIcon className="tcap" />{" "}
-                            </td>
-                            <td>
-                              {" "}
-                              <a
-                                target="_blank"
-                                rel="noreferrer"
-                                href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
-                              >
-                                SushiSwap DAI/TCAP Pool
-                              </a>
-                            </td>
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={daiPoolBalance}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                            </td>{" "}
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={daiPoolStake}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                            </td>
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={daiPoolRewards}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                              CTX
-                            </td>
-                            <td className="number">
-                              <NumberFormat
-                                className="number"
-                                value={vdaiPoolRewards}
-                                displayType="text"
-                                thousandSeparator
-                                prefix=""
-                                decimalScale={2}
-                              />{" "}
-                              CTX
-                            </td>
-                            <td align="right">
-                              <Button
-                                variant="primary"
-                                className=""
-                                onClick={() => {
-                                  setStakeBalance(daiPoolBalance);
-                                  setSelectedPoolTitle("SushiSwap DAI/TCAP Pool");
-                                  if (rewards.daiPoolReward) {
-                                    setSelectedPool(rewards.daiPoolReward);
-                                    setSelectedPoolToken(tokens.daiPoolToken);
-                                  }
-                                  setStakeShow(true);
-                                }}
-                              >
-                                Stake
-                              </Button>
-
-                              <Button
-                                variant="success"
-                                className=" ml-4"
-                                onClick={() => {
-                                  claimRewards("DAIPOOL");
-                                }}
-                              >
-                                Claim
-                              </Button>
-
-                              <Button
-                                variant="warning"
-                                className=" ml-4"
-                                onClick={() => {
-                                  exitRewards("DAIPOOL");
-                                }}
-                              >
-                                Exit
-                              </Button>
-                            </td>
-                          </tr>
-                        </>
-                      )}
-
-                      {phase > 3 && (
+                            <Button
+                              variant="warning"
+                              className=" ml-4"
+                              onClick={() => {
+                                exitRewards("ETHPOOL");
+                              }}
+                            >
+                              Exit
+                            </Button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                    {phase > 2 && (
+                      <>
+                        {" "}
                         <tr>
                           <td>
-                            <CtxIcon className="ctx-neon" />
-                            <WETHIcon className="weth" />{" "}
+                            <WBTCIcon className="wbtc" />
+                            <TcapIcon className="tcap" />{" "}
                           </td>
                           <td>
+                            {" "}
                             <a
                               target="_blank"
                               rel="noreferrer"
-                              href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                              href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.wbtcToken?.address}`}
                             >
-                              SushiSwap CTX/ETH Pool
+                              SushiSwap WBTC/TCAP Pool
                             </a>
-                          </td>
+                          </td>{" "}
                           <td className="number">
+                            {" "}
                             <NumberFormat
                               className="number"
-                              value={ctxPoolBalance}
+                              value={wbtcPoolBalance}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>
+                          <td className="number">
+                            {" "}
+                            <NumberFormat
+                              className="number"
+                              value={wbtcPoolStake}
                               displayType="text"
                               thousandSeparator
                               prefix=""
@@ -1033,28 +868,18 @@ const Farm = () => {
                           <td className="number">
                             <NumberFormat
                               className="number"
-                              value={ctxPoolStake}
-                              displayType="text"
-                              thousandSeparator
-                              prefix=""
-                              decimalScale={2}
-                            />{" "}
-                          </td>
-                          <td className="number">
-                            <NumberFormat
-                              className="number"
-                              value={ctxPoolRewards}
+                              value={wbtcPoolRewards}
                               displayType="text"
                               thousandSeparator
                               prefix=""
                               decimalScale={2}
                             />{" "}
                             CTX
-                          </td>{" "}
+                          </td>
                           <td className="number">
                             <NumberFormat
                               className="number"
-                              value={vctxPoolRewards}
+                              value={vwbtcPoolRewards}
                               displayType="text"
                               thousandSeparator
                               prefix=""
@@ -1067,11 +892,11 @@ const Farm = () => {
                               variant="primary"
                               className=""
                               onClick={() => {
-                                setStakeBalance(ctxPoolBalance);
-                                setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
-                                if (rewards.ctxPoolReward) {
-                                  setSelectedPool(rewards.ctxPoolReward);
-                                  setSelectedPoolToken(tokens.ctxPoolToken);
+                                setStakeBalance(wbtcPoolBalance);
+                                setSelectedPoolTitle("SushiSwap WBTC/TCAP Pool");
+                                if (rewards.wbtcPoolReward) {
+                                  setSelectedPool(rewards.wbtcPoolReward);
+                                  setSelectedPoolToken(tokens.wbtcPoolToken);
                                 }
                                 setStakeShow(true);
                               }}
@@ -1083,7 +908,102 @@ const Farm = () => {
                               variant="success"
                               className=" ml-4"
                               onClick={() => {
-                                claimRewards("CTXPOOL");
+                                claimRewards("WBTCPOOL");
+                              }}
+                            >
+                              Claim
+                            </Button>
+
+                            <Button
+                              variant="warning"
+                              className="ml-4"
+                              onClick={() => {
+                                exitRewards("WBTCPOOL");
+                              }}
+                            >
+                              Exit
+                            </Button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <DAIIcon className="dai" />
+                            <TcapIcon className="tcap" />{" "}
+                          </td>
+                          <td>
+                            {" "}
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
+                            >
+                              SushiSwap DAI/TCAP Pool
+                            </a>
+                          </td>
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={daiPoolBalance}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>{" "}
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={daiPoolStake}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                          </td>
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={daiPoolRewards}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                            CTX
+                          </td>
+                          <td className="number">
+                            <NumberFormat
+                              className="number"
+                              value={vdaiPoolRewards}
+                              displayType="text"
+                              thousandSeparator
+                              prefix=""
+                              decimalScale={2}
+                            />{" "}
+                            CTX
+                          </td>
+                          <td align="right">
+                            <Button
+                              variant="primary"
+                              className=""
+                              onClick={() => {
+                                setStakeBalance(daiPoolBalance);
+                                setSelectedPoolTitle("SushiSwap DAI/TCAP Pool");
+                                if (rewards.daiPoolReward) {
+                                  setSelectedPool(rewards.daiPoolReward);
+                                  setSelectedPoolToken(tokens.daiPoolToken);
+                                }
+                                setStakeShow(true);
+                              }}
+                            >
+                              Stake
+                            </Button>
+
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimRewards("DAIPOOL");
                               }}
                             >
                               Claim
@@ -1093,20 +1013,117 @@ const Farm = () => {
                               variant="warning"
                               className=" ml-4"
                               onClick={() => {
-                                exitRewards("CTXPOOL");
+                                exitRewards("DAIPOOL");
                               }}
                             >
                               Exit
                             </Button>
                           </td>
                         </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                </Card>
-              )}
-            </>
-          )}
+                      </>
+                    )}
+
+                    {phase > 3 && (
+                      <tr>
+                        <td>
+                          <CtxIcon className="ctx-neon" />
+                          <WETHIcon className="weth" />{" "}
+                        </td>
+                        <td>
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`${lpURL}/#/add/ETH/${governance.ctxToken?.address}`}
+                          >
+                            SushiSwap CTX/ETH Pool
+                          </a>
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ctxPoolBalance}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                        </td>{" "}
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ctxPoolStake}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                        </td>
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={ctxPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </td>{" "}
+                        <td className="number">
+                          <NumberFormat
+                            className="number"
+                            value={vctxPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </td>
+                        <td align="right">
+                          <Button
+                            variant="primary"
+                            className=""
+                            onClick={() => {
+                              setStakeBalance(ctxPoolBalance);
+                              setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
+                              if (rewards.ctxPoolReward) {
+                                setSelectedPool(rewards.ctxPoolReward);
+                                setSelectedPoolToken(tokens.ctxPoolToken);
+                              }
+                              setStakeShow(true);
+                            }}
+                          >
+                            Stake
+                          </Button>
+
+                          <Button
+                            variant="success"
+                            className=" ml-4"
+                            onClick={() => {
+                              claimRewards("CTXPOOL");
+                            }}
+                          >
+                            Claim
+                          </Button>
+
+                          <Button
+                            variant="warning"
+                            className=" ml-4"
+                            onClick={() => {
+                              exitRewards("CTXPOOL");
+                            }}
+                          >
+                            Exit
+                          </Button>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </Card>
+            )}
+          </Row>
         </Row>
       </div>
       <Stake
