@@ -334,7 +334,7 @@ const Farm = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [data]);
+  }, []);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;

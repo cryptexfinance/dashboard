@@ -16,7 +16,10 @@ export const isValidAddress = async (address: string) => {
     return currentAddress;
   } catch (error) {
     try {
-      const tempProvider = ethers.getDefaultProvider("mainnet");
+      const tempProvider = ethers.getDefaultProvider("mainnet", {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
       const currentAddress = await tempProvider.resolveName(address);
       return currentAddress;
     } catch (e) {
