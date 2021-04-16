@@ -35,6 +35,7 @@ import { Web3ModalContext } from "./state/Web3ModalContext";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
+import UniV2Pair from "./contracts/UniswapV2Pair.json";
 
 const clientOracle = new ApolloClient({
   uri: process.env.REACT_APP_GRAPH_URL,
@@ -110,7 +111,7 @@ const App = () => {
     if (process.env.REACT_APP_POOL_ETH) {
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
 
@@ -124,7 +125,7 @@ const App = () => {
       // Set Pool Tokens
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
 
@@ -132,14 +133,14 @@ const App = () => {
 
       const currentDAIPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_DAI,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
 
       const currentCTXPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_CTX,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
       tokens.setCurrentCTXPoolToken(currentCTXPoolToken);

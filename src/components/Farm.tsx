@@ -67,7 +67,7 @@ const Farm = () => {
   // APY
   const [ethVaultAPY, setEthVaultAPY] = useState("0");
   const [daiVaultAPY, setDaiVaultAPY] = useState("0");
-  const [ethPoolAPY] = useState("0");
+  const [ethPoolAPY, setEthPoolAPY] = useState("0");
 
   const oneYear = 60 * 60 * 24 * 365;
 
@@ -89,15 +89,61 @@ const Farm = () => {
     }
   `;
 
+  const one = ethers.utils.parseEther("1");
+
+  async function getPriceOfETHInUSD(oracle: ethers.Contract) {
+    return ethers.utils.formatEther((await oracle.getLatestAnswer()).mul(10000000000));
+  }
+
+  async function getPriceInUSDFromPair(pair: ethers.Contract, oracle: ethers.Contract) {
+    // if ((await pair.token1()) != WETH) {
+    //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
+    // }
+
+    // (uint Res0, uint Res1,) = pair.getReserves();
+    const resp = await pair.getReserves();
+    const reserves0 = resp[0];
+    const reservesWETH = resp[1];
+
+    // amount of token0 required to by 1 WETH
+    const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
+    const oraclePrice = parseFloat(await getPriceOfETHInUSD(oracle));
+    return oraclePrice / amt;
+  }
+
   async function getAPYFromVaultRewards(
-    reward: ethers.Contract,
+    rewardHandler: ethers.Contract,
     ctxPrice: number,
     tcapPrice: number
   ) {
-    const totalTcapDebt = await reward.totalSupply();
-    const rate = await reward.rewardRate();
+    const totalTcapDebt = await rewardHandler.totalSupply();
+    const rate = await rewardHandler.rewardRate();
 
     const apy = ((rate * oneYear * ctxPrice) / (tcapPrice * totalTcapDebt)) * 100;
+    return apy.toString();
+  }
+
+  async function getAPYFromLPRewards(
+    rewardHandler: ethers.Contract,
+    poolToken: ethers.Contract,
+    ctxPrice: number,
+    oracle: ethers.Contract
+  ) {
+    // if ((await poolToken.token1()) !== "WETH") {
+    //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
+    // }
+
+    const token0Price = await getPriceInUSDFromPair(poolToken, oracle);
+    const res = await poolToken.getReserves();
+    const ethPrice = await getPriceOfETHInUSD(oracle);
+    const valuePerLPToken =
+      (token0Price * res[0] + parseFloat(ethPrice) * res[1]) / (await poolToken.totalSupply());
+
+    const rate = await rewardHandler.rewardRate();
+    const LPsStaked = await rewardHandler.totalSupply();
+
+    const apy = ((rate * oneYear * ctxPrice) / (valuePerLPToken * LPsStaked)) * 100;
+
     return apy.toString();
   }
 
@@ -142,12 +188,15 @@ const Farm = () => {
       if (
         signer.signer &&
         tokens.tcapToken &&
+        tokens.wethPoolToken &&
         oracles.tcapOracle &&
+        oracles.wethOracle &&
         governance.ctxToken &&
         governance.governorAlpha &&
         governance.timelock &&
         rewards.wethReward &&
-        rewards.daiReward
+        rewards.daiReward &&
+        rewards.wethPoolReward
       ) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(currentAddress);
@@ -185,6 +234,16 @@ const Farm = () => {
             rewards.daiReward,
             currentPriceCTX,
             parseFloat(currentPriceTCAP)
+          )
+        );
+
+        // ETH Pool APY
+        setEthPoolAPY(
+          await getAPYFromLPRewards(
+            rewards.wethPoolReward,
+            tokens.wethPoolToken,
+            currentPriceCTX,
+            oracles.wethOracle
           )
         );
 
