@@ -16,7 +16,6 @@ export interface GovernanceContext {
 export const GOVERNANCE_DEFAULT_VALUE = {
   setCurrentGovernorAlpha: () => {},
   setCurrentTimelock: () => {},
-
   setCurrentGovernorAlphaRead: () => {},
   setCurrentTimelockRead: () => {},
 };
