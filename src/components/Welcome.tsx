@@ -208,7 +208,10 @@ const Welcome = () => {
                     variant="primary"
                     className="neon-pink"
                     onClick={() => {
-                      window.open(`${lpURL}/pair/${process?.env?.REACT_APP_POOL_ETH}`, "_blank");
+                      window.open(
+                        `${lpURL}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
+                        "_blank"
+                      );
                     }}
                   >
                     Trade
