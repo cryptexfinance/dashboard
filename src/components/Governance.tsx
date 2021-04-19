@@ -97,19 +97,19 @@ const Governance = () => {
 
   const refresh = async () => {
     try {
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && governance.ctxToken) {
+      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.ctxToken) {
         const currentAddress = await signer.signer.getAddress();
-        const delegateAddress = await governance.ctxToken.delegates(currentAddress);
+        const delegateAddress = await tokens.ctxToken.delegates(currentAddress);
         if (delegateAddress === ethers.constants.AddressZero) {
           setNoDelegate(true);
         } else {
           setNoDelegate(false);
         }
         setAddress(makeShortAddress(delegateAddress));
-        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const currentCtxBalance = await tokens.ctxToken.balanceOf(currentAddress);
         const tcapString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(tcapString);
-        const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
+        const votes = await tokens.ctxToken.getCurrentVotes(currentAddress);
         setCurrentVotes(votes.toString());
       }
     } catch (error) {
@@ -123,23 +123,23 @@ const Governance = () => {
         signer.signer &&
         tokens.tcapToken &&
         oracles.tcapOracle &&
-        governance.ctxToken &&
+        tokens.ctxToken &&
         governance.governorAlpha &&
         governance.timelock
       ) {
         const currentAddress = await signer.signer.getAddress();
 
-        const delegateAddress = await governance.ctxToken.delegates(currentAddress);
+        const delegateAddress = await tokens.ctxToken.delegates(currentAddress);
         if (delegateAddress === ethers.constants.AddressZero) {
           setNoDelegate(true);
         } else {
           setNoDelegate(false);
         }
         setAddress(makeShortAddress(delegateAddress));
-        const currentCtxBalance = await governance.ctxToken.balanceOf(currentAddress);
+        const currentCtxBalance = await tokens.ctxToken.balanceOf(currentAddress);
         const tcapString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(tcapString);
-        const votes = await governance.ctxToken.getCurrentVotes(currentAddress);
+        const votes = await tokens.ctxToken.getCurrentVotes(currentAddress);
         setCurrentVotes(ethers.utils.formatEther(votes));
         const currentThreshold = await governance.governorAlpha.proposalThreshold();
         setProposerThreshold(ethers.utils.formatEther(currentThreshold));
