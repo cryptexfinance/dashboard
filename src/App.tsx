@@ -130,7 +130,7 @@ const App = () => {
     tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
 
     // TODO:remove this once other pools work
-    if (process.env.REACT_APP_POOL_ETH) {
+    if (process.env.REACT_APP_POOL_ETH && process.env.REACT_APP_POOL_CTX) {
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
         UniV2Pair.abi,
@@ -140,7 +140,18 @@ const App = () => {
 
       const currentWETHPoolTokenRead = new Contract(process.env.REACT_APP_POOL_ETH, UniV2Pair.abi);
       tokens.setCurrentWETHPoolTokenRead(currentWETHPoolTokenRead);
+
+      const currentCTXPoolToken = new ethers.Contract(
+        process.env.REACT_APP_POOL_CTX,
+        UniV2Pair.abi,
+        currentSigner
+      );
+      tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
+
+      const currentCTXPoolTokenRead = new Contract(process.env.REACT_APP_POOL_CTX, UniV2Pair.abi);
+      tokens.setCurrentCTXPoolTokenRead(currentCTXPoolTokenRead);
     }
+
     if (
       process.env.REACT_APP_POOL_ETH &&
       process.env.REACT_APP_POOL_DAI &&
@@ -161,13 +172,6 @@ const App = () => {
         currentSigner
       );
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
-
-      const currentCTXPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_CTX,
-        UniV2Pair.abi,
-        currentSigner
-      );
-      tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
     }
 
     // Set Rewards
@@ -210,6 +214,20 @@ const App = () => {
       contracts.ETHLiquidityReward.abi
     );
     rewards.setCurrentWETHPoolRewardRead(currentWETHPoolRewardRead);
+
+    // TODO: Here goes the CTX POOL REWARDS CONTRACT
+    const currentCTXPoolReward = new ethers.Contract(
+      contracts.ETHLiquidityReward.address,
+      contracts.ETHLiquidityReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
+
+    const currentCTXPoolRewardRead = new Contract(
+      contracts.ETHLiquidityReward.address,
+      contracts.ETHLiquidityReward.abi
+    );
+    rewards.setCurrentCTXPoolRewardRead(currentCTXPoolRewardRead);
 
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(

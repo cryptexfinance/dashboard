@@ -52,6 +52,7 @@ const Farm = () => {
   const [daiPoolBalance, setDaiPoolBalance] = useState("0.0");
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
   const [vestingEndTime, setVestingEndTime] = useState(0);
+  const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
   const signer = useContext(SignerContext);
 
   const tokens = useContext(TokensContext);
@@ -68,6 +69,7 @@ const Farm = () => {
   const [ethVaultAPY, setEthVaultAPY] = useState("0");
   const [daiVaultAPY, setDaiVaultAPY] = useState("0");
   const [ethPoolAPY, setEthPoolAPY] = useState("0");
+  const [ctxPoolAPY, setCtxPoolAPY] = useState("0");
 
   const oneYear = 60 * 60 * 24 * 365;
 
@@ -96,6 +98,10 @@ const Farm = () => {
     reservesWETH: BigNumber,
     ethPrice: number
   ) {
+    // if ((await pair.token1()) != WETH) {
+    //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
+    // }
+
     // const reserves0 = resp[0];
     // const reservesWETH = resp[1];
 
@@ -192,6 +198,10 @@ const Farm = () => {
         const totalSupplyEthPoolCall = await tokens.wethPoolTokenRead?.totalSupply();
         const rateEthPoolCall = await rewards.wethPoolRewardRead?.rewardRate();
         const LPsStakedCall = await rewards.wethPoolRewardRead?.totalSupply();
+        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+        const totalSupplyCtxPoolCall = await tokens.ctxPoolTokenRead?.totalSupply();
+        const rateCtxPoolCall = await rewards.ctxPoolRewardRead?.rewardRate();
+        const ctxLPsStakedCall = await rewards.ctxPoolRewardRead?.totalSupply();
 
         // @ts-ignore
         const [
@@ -205,6 +215,10 @@ const Farm = () => {
           totalSupplyEthPool,
           rateEthPool,
           LPsStaked,
+          reservesCtxPool,
+          totalSupplyCtxPool,
+          rateCtxPool,
+          ctxLPsStaked,
         ] = await signer.ethcallProvider?.all([
           wethOracleCall,
           tcapOracleCall,
@@ -216,14 +230,23 @@ const Farm = () => {
           totalSupplyEthPoolCall,
           rateEthPoolCall,
           LPsStakedCall,
+          reservesCtxPoolCall,
+          totalSupplyCtxPoolCall,
+          rateCtxPoolCall,
+          ctxLPsStakedCall,
         ]);
-        // const currentPriceETH = ethers.utils.formatEther(request.mul(10000000000));
+
         const currentPriceTCAP = ethers.utils.formatEther(tcapPrice);
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
         // const currentPriceDAI = ethers.utils.formatEther(request.mul(10000000000));
+        // REACT_APP_POOL_CTX
 
-        const currentPriceCTX = 10;
+        const currentPriceCTX = await getPriceInUSDFromPair(
+          reservesCtxPool[0],
+          reservesCtxPool[1],
+          parseFloat(currentPriceETH)
+        );
 
         // ETH VAULT APY
         setEthVaultAPY(
@@ -256,6 +279,19 @@ const Farm = () => {
             parseFloat(currentPriceETH)
           )
         );
+
+        // CTX Pool APY
+        setCtxPoolAPY(
+          await getAPYFromLPRewards(
+            rateCtxPool,
+            ctxLPsStaked,
+            reservesCtxPool,
+
+            totalSupplyCtxPool,
+            currentPriceCTX,
+            parseFloat(currentPriceETH)
+          )
+        );
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
@@ -270,6 +306,10 @@ const Farm = () => {
             const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
             const vestingTime = await rewards.wethPoolReward?.vestingEnd();
             setVestingEndTime(vestingTime);
+
+            const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
+            const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
+            setCtxVestingEndTime(ctxVestingTime);
 
             const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
             setEthPoolRewards(
@@ -289,6 +329,22 @@ const Farm = () => {
             const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
 
             setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
+
+            const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
+            setCtxPoolRewards(
+              ethers.utils.formatEther(currentCtxPoolReward.mul(100 - ctxVestingRatio).div(100))
+            );
+            const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(
+              currentAddress
+            );
+            setVCtxPoolRewards(
+              ethers.utils.formatEther(
+                currentVCtxPoolReward.add(currentCtxPoolReward.mul(ctxVestingRatio).div(100))
+              )
+            );
+
+            const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
+            setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
 
             if (phase > 2) {
               const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
@@ -327,24 +383,6 @@ const Farm = () => {
               setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
               const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
               setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
-            }
-
-            if (phase > 3) {
-              const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
-              setCtxPoolRewards(
-                ethers.utils.formatEther(currentCtxPoolReward.mul(100 - vestingRatio).div(100))
-              );
-              const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(
-                currentAddress
-              );
-              setVCtxPoolRewards(
-                ethers.utils.formatEther(
-                  currentVCtxPoolReward.add(currentCtxPoolReward.mul(vestingRatio).div(100))
-                )
-              );
-
-              const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
-              setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
             }
           }
         }
@@ -845,6 +883,134 @@ const Farm = () => {
                         )}
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <CtxIcon className="ctx-neon" />
+                        <WETHIcon className="weth" />{" "}
+                      </td>
+                      <td>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`${lpURL}/#/add/${tokens.ctxToken?.address}/ETH`}
+                        >
+                          CTX/ETH Pool <br /> <small> SushiSwap </small>
+                        </a>
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>{" "}
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolStake}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                      </td>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={ctxPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
+                      </td>{" "}
+                      <td className="vested-reward">
+                        <div>
+                          <NumberFormat
+                            className="number"
+                            value={vctxPoolRewards}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={2}
+                          />{" "}
+                          CTX
+                        </div>
+                        <div>
+                          <small>
+                            <span className="end-date">{tsToDateString(ctxVestingEndTime)}</span>
+                          </small>
+                        </div>
+                      </td>
+                      <td>
+                        <b className="fire">
+                          <NumberFormat
+                            className=""
+                            value={ctxPoolAPY}
+                            displayType="text"
+                            thousandSeparator
+                            prefix=""
+                            decimalScale={0}
+                          />
+                          %
+                        </b>
+                      </td>
+                      <td align="right">
+                        {address === "" ? (
+                          <>
+                            <Button variant="dark" className="" disabled>
+                              Mint
+                            </Button>
+
+                            <Button variant="dark" className="ml-4" disabled>
+                              Claim
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              variant="primary"
+                              className=""
+                              onClick={() => {
+                                setStakeBalance(ctxPoolBalance);
+                                setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
+                                if (rewards.ctxPoolReward) {
+                                  setSelectedPool(rewards.ctxPoolReward);
+                                  setSelectedPoolToken(tokens.ctxPoolToken);
+                                }
+                                setStakeShow(true);
+                              }}
+                            >
+                              Stake
+                            </Button>
+
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimRewards("CTXPOOL");
+                              }}
+                            >
+                              Claim
+                            </Button>
+
+                            <Button
+                              variant="warning"
+                              className=" ml-4"
+                              onClick={() => {
+                                exitRewards("CTXPOOL");
+                              }}
+                            >
+                              Exit
+                            </Button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
                     {phase > 2 && (
                       <>
                         {" "}
@@ -1041,103 +1207,6 @@ const Farm = () => {
                           </td>
                         </tr>
                       </>
-                    )}
-
-                    {phase > 3 && (
-                      <tr>
-                        <td>
-                          <CtxIcon className="ctx-neon" />
-                          <WETHIcon className="weth" />{" "}
-                        </td>
-                        <td>
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
-                          >
-                            SushiSwap CTX/ETH Pool
-                          </a>
-                        </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ctxPoolBalance}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                        </td>{" "}
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ctxPoolStake}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                        </td>
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={ctxPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
-                        </td>{" "}
-                        <td className="number">
-                          <NumberFormat
-                            className="number"
-                            value={vctxPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
-                        </td>
-                        <td align="right">
-                          <Button
-                            variant="primary"
-                            className=""
-                            onClick={() => {
-                              setStakeBalance(ctxPoolBalance);
-                              setSelectedPoolTitle("SushiSwap ETH/CTX Pool");
-                              if (rewards.ctxPoolReward) {
-                                setSelectedPool(rewards.ctxPoolReward);
-                                setSelectedPoolToken(tokens.ctxPoolToken);
-                              }
-                              setStakeShow(true);
-                            }}
-                          >
-                            Stake
-                          </Button>
-
-                          <Button
-                            variant="success"
-                            className=" ml-4"
-                            onClick={() => {
-                              claimRewards("CTXPOOL");
-                            }}
-                          >
-                            Claim
-                          </Button>
-
-                          <Button
-                            variant="warning"
-                            className=" ml-4"
-                            onClick={() => {
-                              exitRewards("CTXPOOL");
-                            }}
-                          >
-                            Exit
-                          </Button>
-                        </td>
-                      </tr>
                     )}
                   </tbody>
                 </Table>
