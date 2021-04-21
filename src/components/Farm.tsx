@@ -237,7 +237,6 @@ const Farm = () => {
           reservesCtxPool[1],
           parseFloat(currentPriceETH)
         );
-
         // ETH VAULT APY
         setEthVaultAPY(
           await getAPYFromVaultRewards(

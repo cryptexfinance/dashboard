@@ -13,7 +13,7 @@ import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress } from "../utils/utils";
+import { makeShortAddress, getPriceInUSDFromPair } from "../utils/utils";
 import "../styles/welcome.scss";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
@@ -26,6 +26,7 @@ const Welcome = () => {
   const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
   const [totalPrice, setTotalPrice] = useState("0.0");
   const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [ctxUSDBalance, setCtxUSDBalance] = useState("0.0");
   const [ctxBalance, setCtxBalance] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
   const signer = useContext(SignerContext);
@@ -56,6 +57,21 @@ const Welcome = () => {
         const currentCtxBalance = await tokens.ctxToken.balanceOf(currentAddress);
         const ctxString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(ctxString);
+        const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
+        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+        // @ts-ignore
+        const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
+          wethOracleCall,
+          reservesCtxPoolCall,
+        ]);
+        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        const currentPriceCTX = await getPriceInUSDFromPair(
+          reservesCtxPool[0],
+          reservesCtxPool[1],
+          parseFloat(currentPriceETH)
+        );
+        const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
+        setCtxUSDBalance(ctxUSD.toString());
       }
       if (data) {
         const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
@@ -161,17 +177,31 @@ const Welcome = () => {
                     <p className="title tcap">TCAP Balance</p>
                   </Col>
                   <Col>
-                    <h3 className="number neon-dark-blue">
+                    <div className="tcap-balance">
                       <CtxIcon className="tcap-neon" />
-                      <NumberFormat
-                        className="number"
-                        value={ctxBalance}
-                        displayType="text"
-                        thousandSeparator
-                        decimalScale={2}
-                      />
-                    </h3>
-                    <p className="title ctx">CTX Balance</p>
+                      <div>
+                        <h3 className="number neon-dark-blue">
+                          <NumberFormat
+                            className="number"
+                            value={ctxBalance}
+                            displayType="text"
+                            thousandSeparator
+                            decimalScale={2}
+                          />
+                        </h3>
+                        <p className="number usd-balance">
+                          <NumberFormat
+                            className="number"
+                            value={ctxUSDBalance}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={parseFloat(ctxUSDBalance) > 1000 ? 0 : 2}
+                          />
+                        </p>
+                      </div>
+                    </div>
+                    <p className="title tcap">CTX Balance</p>
                   </Col>
                 </Row>
               </Card>
