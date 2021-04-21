@@ -119,6 +119,25 @@ body {
   text-shadow: 3px 3px 15px $pink;
 }
 
+.fire {
+  text-shadow: 0px -0px 4px $purple, 0px -0px 10px $yellow, 0px -0px 20px $orange,
+    0px -10px 40px #c33;
+  font-size: 15px;
+  animation: fire 2s infinite alternate;
+  color: $white !important;
+}
+
+@keyframes fire {
+  80% {
+    text-shadow: 0px -2px 8px $purple, 0px -2px 10px $yellow, 0px -5px 20px $orange,
+      0px -20px 40px #c33;
+  }
+  100% {
+    text-shadow: 0px -2px 4px $purple, 0px -2px 10px $yellow, 0px -5px 20px $orange,
+      0px -20px 40px #c33;
+  }
+}
+
 .table thead th {
   border-top: 2px solid $highlight;
   border-bottom: 2px solid $highlight;
