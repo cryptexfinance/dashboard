@@ -68,6 +68,7 @@ const Farm = () => {
         governance.governorAlpha &&
         governance.timelock
       ) {
+        console.log("calls");
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
         // @ts-ignore
@@ -137,7 +138,7 @@ const Farm = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, []);
+  }, [tokens]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
@@ -203,7 +204,8 @@ const Farm = () => {
                   </tr>{" "}
                   <tr>
                     <td>
-                      <WETHIcon className="weth" /> <CtxIcon className="ctx-neon" />
+                      <WETHIcon className="weth" />
+                      <CtxIcon className="ctx-neon" />
                     </td>
                     <td>
                       <a
@@ -211,7 +213,7 @@ const Farm = () => {
                         rel="noreferrer"
                         href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
                       >
-                        CTX/ETH <br />
+                        ETH/CTX <br />
                         <small>SushiSwap</small>
                       </a>
                       <a href="/farm">

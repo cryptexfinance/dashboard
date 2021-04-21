@@ -889,8 +889,8 @@ const Farm = () => {
                     </tr>
                     <tr>
                       <td>
+                        <WETHIcon className="weth" />
                         <CtxIcon className="ctx-neon" />
-                        <WETHIcon className="weth" />{" "}
                       </td>
                       <td>
                         <a
@@ -898,7 +898,7 @@ const Farm = () => {
                           rel="noreferrer"
                           href={`${lpURL}/#/add/${tokens.ctxToken?.address}/ETH`}
                         >
-                          CTX/ETH Pool <br /> <small> SushiSwap </small>
+                          ETH/CTX Pool <br /> <small> SushiSwap </small>
                         </a>
                       </td>
                       <td className="number">

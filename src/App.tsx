@@ -424,7 +424,7 @@ const App = () => {
                       dismissible
                     >
                       <b>
-                        ⚠️ Make sure to always have a ratio above the minimun ratio to avoid getting
+                        ⚠️ Make sure to always have a ratio above the minimum ratio to avoid getting
                         liquidated.
                       </b>
                     </Alert>
