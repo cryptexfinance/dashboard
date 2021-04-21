@@ -132,6 +132,10 @@ const Farm = () => {
     const valuePerLPToken = (token0Price * reserves[0] + ethPrice * reserves[1]) / totalSupplyPool;
     const apy = ((rate * oneYear * ctxPrice) / (valuePerLPToken * LPsStaked)) * 100;
 
+    if (Number.isNaN(apy)) {
+      return "0";
+    }
+
     return apy.toString();
   }
 
@@ -286,12 +290,20 @@ const Farm = () => {
             rateCtxPool,
             ctxLPsStaked,
             reservesCtxPool,
-
             totalSupplyCtxPool,
             currentPriceCTX,
             parseFloat(currentPriceETH)
           )
         );
+
+        const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
+        const vestingTime = await rewards.wethPoolReward?.vestingEnd();
+        setVestingEndTime(vestingTime);
+
+        const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
+        const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
+        setCtxVestingEndTime(ctxVestingTime);
+
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
@@ -303,14 +315,6 @@ const Farm = () => {
           setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
           if (phase > 1) {
-            const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
-            const vestingTime = await rewards.wethPoolReward?.vestingEnd();
-            setVestingEndTime(vestingTime);
-
-            const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
-            const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
-            setCtxVestingEndTime(ctxVestingTime);
-
             const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
             setEthPoolRewards(
               ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))

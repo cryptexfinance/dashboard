@@ -223,9 +223,9 @@ const App = () => {
     );
     rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
 
-    const currentCTXPoolRewardRead = new Contract(
-      contracts.ETHLiquidityReward.address,
-      contracts.ETHLiquidityReward.abi
+    const currentCTXPoolRewardRead = new Contract( // @ts-ignore
+      contracts.CTXLiquidityReward.address, // @ts-ignore
+      contracts.CTXLiquidityReward.abi
     );
     rewards.setCurrentCTXPoolRewardRead(currentCTXPoolRewardRead);
 
