@@ -846,6 +846,10 @@ const Farm = () => {
                             <Button variant="dark" className="ml-4" disabled>
                               Claim
                             </Button>
+
+                            <Button variant="dark" className="ml-4" disabled>
+                              Exit
+                            </Button>
                           </>
                         ) : (
                           <>
@@ -973,6 +977,10 @@ const Farm = () => {
 
                             <Button variant="dark" className="ml-4" disabled>
                               Claim
+                            </Button>
+
+                            <Button variant="dark" className="ml-4" disabled>
+                              Exit
                             </Button>
                           </>
                         ) : (
