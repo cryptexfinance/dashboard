@@ -215,7 +215,6 @@ const App = () => {
     );
     rewards.setCurrentWETHPoolRewardRead(currentWETHPoolRewardRead);
 
-    // TODO: Here goes the CTX POOL REWARDS CONTRACT
     const currentCTXPoolReward = new ethers.Contract(
       // @ts-ignore
       contracts.CTXLiquidityReward.address, // @ts-ignore
