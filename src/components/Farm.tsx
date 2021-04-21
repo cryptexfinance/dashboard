@@ -303,7 +303,10 @@ const Farm = () => {
         const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
         const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
         setCtxVestingEndTime(ctxVestingTime);
-
+        console.log(
+          "🚀 ~ file: Farm.tsx ~ line 308 ~ loadAddress ~ ctxVestingTime",
+          ctxVestingTime.toString()
+        );
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
