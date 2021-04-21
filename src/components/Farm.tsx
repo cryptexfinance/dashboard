@@ -303,10 +303,7 @@ const Farm = () => {
         const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
         const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
         setCtxVestingEndTime(ctxVestingTime);
-        console.log(
-          "🚀 ~ file: Farm.tsx ~ line 308 ~ loadAddress ~ ctxVestingTime",
-          ctxVestingTime.toString()
-        );
+
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
@@ -350,6 +347,9 @@ const Farm = () => {
               )
             );
 
+            const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
+            setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+
             const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
             setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
 
@@ -383,8 +383,6 @@ const Farm = () => {
               setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
               const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
               setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
-              const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
-              setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
 
               const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
               setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));

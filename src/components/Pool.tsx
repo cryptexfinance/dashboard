@@ -68,7 +68,6 @@ const Farm = () => {
         governance.governorAlpha &&
         governance.timelock
       ) {
-        console.log("calls");
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
         // @ts-ignore
