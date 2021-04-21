@@ -25,7 +25,7 @@ const Farm = () => {
   const [ethLiquidity, setEthLiquidity] = useState("0");
   const [ethLiquidityUNI, setEthLiquidityUNI] = useState("0");
   const [daiLiquidity, setDaiLiquidity] = useState("0");
-  // const [ctxLiquidty, setCtxLiquidty] = useState("0.0");
+  const [ctxLiquidity, setCtxLiquidity] = useState("0");
 
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -39,6 +39,25 @@ const Farm = () => {
 
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
+  const one = ethers.utils.parseEther("1");
+
+  async function getPriceInUSDFromPair(
+    reserves0: ethers.BigNumber,
+    reservesWETH: ethers.BigNumber,
+    ethPrice: number
+  ) {
+    // if ((await pair.token1()) != WETH) {
+    //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
+    // }
+
+    // const reserves0 = resp[0];
+    // const reservesWETH = resp[1];
+
+    // amount of token0 required to by 1 WETH
+    const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
+    return ethPrice / amt;
+  }
+
   useEffect(() => {
     const loadAddress = async () => {
       if (
@@ -49,11 +68,22 @@ const Farm = () => {
         governance.governorAlpha &&
         governance.timelock
       ) {
+        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+
+        // @ts-ignore
+        const [reservesCtxPool] = await signer.ethcallProvider?.all([reservesCtxPoolCall]);
+
         const ethUSD = ethers.utils.formatEther(
           (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
         );
         const daiUSD = ethers.utils.formatEther(
           (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
+        );
+
+        const currentPriceCTX = await getPriceInUSDFromPair(
+          reservesCtxPool[0],
+          reservesCtxPool[1],
+          parseFloat(ethUSD)
         );
 
         const tcapUSD = ethers.utils.formatEther(await oracles.tcapOracle?.getLatestAnswer());
@@ -65,10 +95,18 @@ const Farm = () => {
         let totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
         setEthLiquidity(totalUSD.toString());
 
+        const currentPoolWethCtx = await tokens.wethToken?.balanceOf(
+          process?.env?.REACT_APP_POOL_CTX
+        );
+        formatPair1 = ethers.utils.formatEther(currentPoolWethCtx);
+        const currentPoolCtx = await tokens.ctxToken?.balanceOf(process?.env?.REACT_APP_POOL_CTX);
+        formatPair2 = ethers.utils.formatEther(currentPoolCtx);
+        totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, currentPriceCTX.toString());
+        setCtxLiquidity(totalUSD.toString());
+
         const currentPoolWethUNI = await tokens.wethToken?.balanceOf(
           process?.env?.REACT_APP_POOL_ETH_UNI
         );
-
         formatPair1 = ethers.utils.formatEther(currentPoolWethUNI);
         const currentWethTCAPUNI = await tokens.tcapToken?.balanceOf(
           process?.env?.REACT_APP_POOL_ETH_UNI
@@ -76,7 +114,6 @@ const Farm = () => {
         formatPair2 = ethers.utils.formatEther(currentWethTCAPUNI);
 
         totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
-
         setEthLiquidityUNI(totalUSD.toString());
 
         if (phase > 2) {
@@ -94,13 +131,6 @@ const Farm = () => {
           totalUSD = toUSD(formatPair1, daiUSD) + toUSD(formatPair2, tcapUSD);
           setDaiLiquidity(totalUSD.toString());
         }
-
-        // const currentPoolCtx = await governance.ctxToken?.balanceOf(
-        //   process?.env?.REACT_APP_POOL_CTX
-        // );
-        // const currentPoolWethCtx = await tokens.wethToken?.balanceOf(
-        //   process?.env?.REACT_APP_POOL_CTX
-        // );
       }
       setIsLoading(false);
     };
@@ -166,6 +196,45 @@ const Farm = () => {
                         className=""
                         target="_blank"
                         href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
+                      >
+                        Pool
+                      </Button>
+                    </td>
+                  </tr>{" "}
+                  <tr>
+                    <td>
+                      <WETHIcon className="weth" /> <CtxIcon className="ctx-neon" />
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
+                      >
+                        CTX/ETH <br />
+                        <small>SushiSwap</small>
+                      </a>
+                      <a href="/farm">
+                        <FarmIcon className="incentive" />
+                      </a>
+                    </td>
+                    <td className="number">
+                      $
+                      <NumberFormat
+                        className="number"
+                        value={ctxLiquidity}
+                        displayType="text"
+                        thousandSeparator
+                        prefix=""
+                        decimalScale={2}
+                      />{" "}
+                    </td>{" "}
+                    <td className="number">
+                      <Button
+                        variant="primary"
+                        className=""
+                        target="_blank"
+                        href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
                       >
                         Pool
                       </Button>
@@ -249,45 +318,6 @@ const Farm = () => {
                           </Button>
                         </td>
                       </tr>
-                      {phase > 3 && (
-                        <tr>
-                          <td>
-                            <CtxIcon className="ctx-neon" />
-                            <WETHIcon className="weth" />{" "}
-                          </td>
-                          <td>
-                            <a
-                              target="_blank"
-                              rel="noreferrer"
-                              href={`${visionURL}/${process?.env?.REACT_APP_POOL_CTX}`}
-                            >
-                              CTX/ETH Pool <br />
-                              <small>SushiSwap</small>
-                            </a>
-                          </td>
-                          <td className="number">
-                            N/A
-                            {/* <NumberFormat
-                          className="number"
-                          value={1}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={2}
-                        />{" "} */}
-                          </td>{" "}
-                          <td className="number">
-                            <Button
-                              variant="primary"
-                              className=""
-                              target="_blank"
-                              href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
-                            >
-                              Pool
-                            </Button>
-                          </td>
-                        </tr>
-                      )}
                     </>
                   )}
                 </tbody>
