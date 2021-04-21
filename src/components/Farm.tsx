@@ -6,7 +6,7 @@ import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers, { BigNumber } from "ethers";
+import ethers from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
@@ -23,7 +23,12 @@ import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import { notifyUser, errorNotification, tsToDateString } from "../utils/utils";
+import {
+  notifyUser,
+  errorNotification,
+  tsToDateString,
+  getPriceInUSDFromPair,
+} from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
 const Farm = () => {
@@ -90,25 +95,6 @@ const Farm = () => {
       }
     }
   `;
-
-  const one = ethers.utils.parseEther("1");
-
-  async function getPriceInUSDFromPair(
-    reserves0: BigNumber,
-    reservesWETH: BigNumber,
-    ethPrice: number
-  ) {
-    // if ((await pair.token1()) != WETH) {
-    //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
-    // }
-
-    // const reserves0 = resp[0];
-    // const reservesWETH = resp[1];
-
-    // amount of token0 required to by 1 WETH
-    const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
-    return ethPrice / amt;
-  }
 
   async function getAPYFromVaultRewards(
     totalTcapDebt: number,
