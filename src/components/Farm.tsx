@@ -347,6 +347,9 @@ const Farm = () => {
               )
             );
 
+            const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
+            setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
+
             const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
             setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
 
@@ -380,8 +383,6 @@ const Farm = () => {
               setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
               const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
               setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
-              const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
-              setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
 
               const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
               setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
