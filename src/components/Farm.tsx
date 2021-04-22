@@ -545,15 +545,7 @@ const Farm = () => {
                     </td>
                     <td>
                       <b className="fire">
-                        <NumberFormat
-                          className=""
-                          value={ethVaultAPY}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={0}
-                        />
-                        %
+                     Inactive
                       </b>
                     </td>
                     <td align="right">
@@ -662,15 +654,7 @@ const Farm = () => {
                     </td>
                     <td>
                       <b className="fire">
-                        <NumberFormat
-                          className=""
-                          value={daiVaultAPY}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={0}
-                        />
-                        %
+                      Inactive
                       </b>
                     </td>
                     <td align="right">
