@@ -66,8 +66,8 @@ const Farm = () => {
   const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
   const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
   // APY
-  const [ethVaultAPY, setEthVaultAPY] = useState("0");
-  const [daiVaultAPY, setDaiVaultAPY] = useState("0");
+  const [, setEthVaultAPY] = useState("0");
+  const [, setDaiVaultAPY] = useState("0");
   const [ethPoolAPY, setEthPoolAPY] = useState("0");
   const [ctxPoolAPY, setCtxPoolAPY] = useState("0");
 
