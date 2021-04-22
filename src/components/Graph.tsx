@@ -5,6 +5,7 @@ import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import TokensContext from "../state/TokensContext";
+import SignerContext from "../state/SignerContext";
 import OraclesContext from "../state/OraclesContext";
 import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
@@ -12,15 +13,18 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { toUSD } from "../utils/utils";
+import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
 import Loading from "./Loading";
 
 const Graph = () => {
   const tokens = useContext(TokensContext);
+  const signer = useContext(SignerContext);
   const oracles = useContext(OraclesContext);
 
   const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
   // const [WBTCStake, setWBTCStake] = useState("0");
@@ -95,6 +99,22 @@ const Graph = () => {
 
         const currentTotalSupply = await tokens.tcapToken?.totalSupply();
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
+        if (signer) {
+          const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
+          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          // @ts-ignore
+          const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
+            wethOracleCall,
+            reservesCtxPoolCall,
+          ]);
+          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+          const currentPriceCTX = await getPriceInUSDFromPair(
+            reservesCtxPool[0],
+            reservesCtxPool[1],
+            parseFloat(currentPriceETH)
+          );
+          setCtxPrice(currentPriceCTX.toString());
+        }
       }
       setLoading(false);
     };
@@ -170,6 +190,19 @@ const Graph = () => {
           <h5 className="number neon-orange">
             <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
+          </h5>
+        </Card>
+        <Card>
+          <CtxIcon className="ctx" />
+          <h4>CTX Price</h4>
+          <h5 className="number neon-blue">
+            <NumberFormat
+              value={ctxPrice}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+              prefix="$"
+            />{" "}
           </h5>
         </Card>
       </div>
