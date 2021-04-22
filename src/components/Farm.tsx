@@ -176,8 +176,6 @@ const Farm = () => {
         rewards.wethPoolReward
       ) {
         // Batch Calls
-
-        // const daiOracleCall = oracles.daiOracleRead?.getLatestAnswer();
         const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
         const tcapOracleCall = oracles.tcapOracleRead?.getLatestAnswer();
         const totalTcapDebtWethCall = await rewards.wethRewardRead?.totalSupply();
@@ -192,6 +190,10 @@ const Farm = () => {
         const totalSupplyCtxPoolCall = await tokens.ctxPoolTokenRead?.totalSupply();
         const rateCtxPoolCall = await rewards.ctxPoolRewardRead?.rewardRate();
         const ctxLPsStakedCall = await rewards.ctxPoolRewardRead?.totalSupply();
+        const wethPoolVestingRatioCall = await rewards.wethPoolRewardRead?.vestingRatio();
+        const wethPoolVestingTimeCall = await rewards.wethPoolRewardRead?.vestingEnd();
+        const ctxVestingRatioCall = await rewards.ctxPoolRewardRead?.vestingRatio();
+        const ctxVestingTimeCall = await rewards.ctxPoolRewardRead?.vestingEnd();
 
         // @ts-ignore
         const [
@@ -209,6 +211,10 @@ const Farm = () => {
           totalSupplyCtxPool,
           rateCtxPool,
           ctxLPsStaked,
+          wethPoolVestingRatio,
+          wethPoolVestingTime,
+          ctxVestingRatio,
+          ctxVestingTime,
         ] = await signer.ethcallProvider?.all([
           wethOracleCall,
           tcapOracleCall,
@@ -224,14 +230,16 @@ const Farm = () => {
           totalSupplyCtxPoolCall,
           rateCtxPoolCall,
           ctxLPsStakedCall,
+          wethPoolVestingRatioCall,
+          wethPoolVestingTimeCall,
+          ctxVestingRatioCall,
+          ctxVestingTimeCall,
         ]);
 
         const currentPriceTCAP = ethers.utils.formatEther(tcapPrice);
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
-        // const currentPriceDAI = ethers.utils.formatEther(request.mul(10000000000));
         // REACT_APP_POOL_CTX
-
         const currentPriceCTX = await getPriceInUSDFromPair(
           reservesCtxPool[0],
           reservesCtxPool[1],
@@ -281,99 +289,51 @@ const Farm = () => {
           )
         );
 
-        const vestingRatio = await rewards.wethPoolReward?.vestingRatio();
-        const vestingTime = await rewards.wethPoolReward?.vestingEnd();
-        setVestingEndTime(vestingTime);
-
-        const ctxVestingRatio = await rewards.ctxPoolReward?.vestingRatio();
-        const ctxVestingTime = await rewards.ctxPoolReward?.vestingEnd();
+        setVestingEndTime(wethPoolVestingTime);
         setCtxVestingEndTime(ctxVestingTime);
 
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
+
           const currentEthReward = await rewards?.wethReward?.earned(currentAddress);
-          setEthRewards(ethers.utils.formatEther(currentEthReward));
-          // const currentWbtcReward = await rewards?.wbtcReward?.earned(currentAddress);
-          // setWbtcRewards(ethers.utils.formatEther(currentWbtcReward));
           const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
+          const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
+          const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(
+            currentAddress
+          );
+          const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
+          const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
+          const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
+          const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(currentAddress);
+          const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
+          const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
+          setEthRewards(ethers.utils.formatEther(currentEthReward));
           setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
           if (phase > 1) {
-            const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
             setEthPoolRewards(
-              ethers.utils.formatEther(currentEthPoolReward.mul(100 - vestingRatio).div(100))
-            );
-            const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(
-              currentAddress
+              ethers.utils.formatEther(
+                currentEthPoolReward.mul(100 - wethPoolVestingRatio).div(100)
+              )
             );
             setVEthPoolRewards(
               ethers.utils.formatEther(
-                currentVEthPoolReward.add(currentEthPoolReward.mul(vestingRatio).div(100))
+                currentVEthPoolReward.add(currentEthPoolReward.mul(wethPoolVestingRatio).div(100))
               )
             );
-
-            const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
             setEthPoolStake(ethers.utils.formatEther(currentEthPoolStake));
-            const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
-
             setEthPoolBalance(ethers.utils.formatEther(currentEthPoolBalance));
-
-            const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
             setCtxPoolRewards(
               ethers.utils.formatEther(currentCtxPoolReward.mul(100 - ctxVestingRatio).div(100))
-            );
-            const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(
-              currentAddress
             );
             setVCtxPoolRewards(
               ethers.utils.formatEther(
                 currentVCtxPoolReward.add(currentCtxPoolReward.mul(ctxVestingRatio).div(100))
               )
             );
-
-            const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
             setCtxPoolStake(ethers.utils.formatEther(currentCtxPoolStake));
-
-            const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
             setCtxPoolBalance(ethers.utils.formatEther(currentCtxPoolBalance));
-
-            if (phase > 2) {
-              const currentWbtcPoolReward = await rewards.wbtcPoolReward?.earned(currentAddress);
-              setWbtcPoolRewards(
-                ethers.utils.formatEther(currentWbtcPoolReward.mul(100 - vestingRatio).div(100))
-              );
-              const currentVWbtcPoolReward = await rewards.wbtcPoolReward?.vestingAmounts(
-                currentAddress
-              );
-              setVWbtcPoolRewards(
-                ethers.utils.formatEther(
-                  currentVWbtcPoolReward.add(currentWbtcPoolReward.mul(vestingRatio).div(100))
-                )
-              );
-              const currentDaiPoolReward = await rewards.daiPoolReward?.earned(currentAddress);
-              setDaiPoolRewards(
-                ethers.utils.formatEther(currentDaiPoolReward.mul(100 - vestingRatio).div(100))
-              );
-              const currentVDaiPoolReward = await rewards.daiPoolReward?.vestingAmounts(
-                currentAddress
-              );
-              setVDaiPoolRewards(
-                ethers.utils.formatEther(
-                  currentVDaiPoolReward.add(currentDaiPoolReward.mul(vestingRatio).div(100))
-                )
-              );
-
-              const currentWbtcPoolStake = await rewards.wbtcPoolReward?.balanceOf(currentAddress);
-              setWbtcPoolStake(ethers.utils.formatEther(currentWbtcPoolStake));
-              const currentDaiPoolStake = await rewards.daiPoolReward?.balanceOf(currentAddress);
-              setDaiPoolStake(ethers.utils.formatEther(currentDaiPoolStake));
-
-              const currentWbtcPoolBalance = await tokens.wbtcPoolToken?.balanceOf(currentAddress);
-              setWbtcPoolBalance(ethers.utils.formatEther(currentWbtcPoolBalance));
-              const currentDaiPoolBalance = await tokens.daiPoolToken?.balanceOf(currentAddress);
-              setDaiPoolBalance(ethers.utils.formatEther(currentDaiPoolBalance));
-            }
           }
         }
       }
