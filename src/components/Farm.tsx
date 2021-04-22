@@ -285,18 +285,54 @@ const Farm = () => {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
 
-          const currentEthReward = await rewards?.wethReward?.earned(currentAddress);
-          const currentDaiReward = await rewards?.daiReward?.earned(currentAddress);
-          const currentEthPoolReward = await rewards.wethPoolReward?.earned(currentAddress);
-          const currentVEthPoolReward = await rewards.wethPoolReward?.vestingAmounts(
+          const currentEthRewardCall = await rewards?.wethRewardRead?.earned(currentAddress);
+          const currentDaiRewardCall = await rewards?.daiRewardRead?.earned(currentAddress);
+          const currentEthPoolRewardCall = await rewards.wethPoolRewardRead?.earned(currentAddress);
+          const currentVEthPoolRewardCall = await rewards.wethPoolRewardRead?.vestingAmounts(
             currentAddress
           );
-          const currentEthPoolStake = await rewards.wethPoolReward?.balanceOf(currentAddress);
-          const currentEthPoolBalance = await tokens.wethPoolToken?.balanceOf(currentAddress);
-          const currentCtxPoolReward = await rewards.ctxPoolReward?.earned(currentAddress);
-          const currentVCtxPoolReward = await rewards.ctxPoolReward?.vestingAmounts(currentAddress);
-          const currentCtxPoolStake = await rewards.ctxPoolReward?.balanceOf(currentAddress);
-          const currentCtxPoolBalance = await tokens.ctxPoolToken?.balanceOf(currentAddress);
+          const currentEthPoolStakeCall = await rewards.wethPoolRewardRead?.balanceOf(
+            currentAddress
+          );
+          const currentEthPoolBalanceCall = await tokens.wethPoolTokenRead?.balanceOf(
+            currentAddress
+          );
+          const currentCtxPoolRewardCall = await rewards.ctxPoolRewardRead?.earned(currentAddress);
+          const currentVCtxPoolRewardCall = await rewards.ctxPoolRewardRead?.vestingAmounts(
+            currentAddress
+          );
+          const currentCtxPoolStakeCall = await rewards.ctxPoolRewardRead?.balanceOf(
+            currentAddress
+          );
+          const currentCtxPoolBalanceCall = await tokens.ctxPoolTokenRead?.balanceOf(
+            currentAddress
+          );
+
+          // @ts-ignore
+          const [
+            currentEthReward,
+            currentDaiReward,
+            currentEthPoolReward,
+            currentVEthPoolReward,
+            currentEthPoolStake,
+            currentEthPoolBalance,
+            currentCtxPoolReward,
+            currentVCtxPoolReward,
+            currentCtxPoolStake,
+            currentCtxPoolBalance,
+          ] = await signer.ethcallProvider?.all([
+            currentEthRewardCall,
+            currentDaiRewardCall,
+            currentEthPoolRewardCall,
+            currentVEthPoolRewardCall,
+            currentEthPoolStakeCall,
+            currentEthPoolBalanceCall,
+            currentCtxPoolRewardCall,
+            currentVCtxPoolRewardCall,
+            currentCtxPoolStakeCall,
+            currentCtxPoolBalanceCall,
+          ]);
+
           setEthRewards(ethers.utils.formatEther(currentEthReward));
           setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
