@@ -544,9 +544,7 @@ const Farm = () => {
                       CTX
                     </td>
                     <td>
-                      <b className="fire">
-                     Inactive
-                      </b>
+                      <b className="fire">Inactive</b>
                     </td>
                     <td align="right">
                       {address === "" ? (
@@ -653,9 +651,7 @@ const Farm = () => {
                       CTX
                     </td>
                     <td>
-                      <b className="fire">
-                      Inactive
-                      </b>
+                      <b className="fire">Inactive</b>
                     </td>
                     <td align="right">
                       {address === "" ? (
