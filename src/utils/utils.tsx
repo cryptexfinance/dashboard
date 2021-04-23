@@ -184,7 +184,7 @@ export const getProposalStatus = (
   return "QUEUED";
 };
 
-export const getPriceInUSDFromPair = async (
+export const getPriceInUSDFromPair = (
   reserves0: ethers.BigNumber,
   reservesWETH: ethers.BigNumber,
   ethPrice: number

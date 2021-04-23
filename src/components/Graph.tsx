@@ -7,7 +7,6 @@ import { useQuery, gql } from "@apollo/client";
 import TokensContext from "../state/TokensContext";
 import SignerContext from "../state/SignerContext";
 import OraclesContext from "../state/OraclesContext";
-import SignerContext from "../state/SignerContext";
 import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -33,8 +32,6 @@ const Graph = () => {
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
 
-  const signer = useContext(SignerContext);
-
   const VAULTS_STATE = gql`
     {
       states {
@@ -57,6 +54,7 @@ const Graph = () => {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
+        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
         // @ts-ignore
         const [
@@ -64,11 +62,13 @@ const Graph = () => {
           wethOraclePrice,
           daiOraclePrice,
           currentTotalSupply,
+          reservesCtxPool,
         ] = await signer.ethcallProvider?.all([
           currentTotalPriceCall,
           wethOraclePriceCall,
           daiOraclePriceCall,
           currentTotalSupplyCall,
+          reservesCtxPoolCall,
         ]);
 
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
@@ -114,15 +114,8 @@ const Graph = () => {
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
-          const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
-          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-          // @ts-ignore
-          const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
-            wethOracleCall,
-            reservesCtxPoolCall,
-          ]);
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          const currentPriceCTX = await getPriceInUSDFromPair(
+          const currentPriceCTX = getPriceInUSDFromPair(
             reservesCtxPool[0],
             reservesCtxPool[1],
             parseFloat(currentPriceETH)
