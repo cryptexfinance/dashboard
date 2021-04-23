@@ -5,7 +5,6 @@ import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import ethers from "ethers";
 import NumberFormat from "react-number-format";
-
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
@@ -202,7 +201,7 @@ const Farm = () => {
                         Pool
                       </Button>
                     </td>
-                  </tr>{" "}
+                  </tr>
                   <tr>
                     <td>
                       <WETHIcon className="weth" />
