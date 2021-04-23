@@ -491,6 +491,7 @@ const Details = ({ address }: props) => {
         setBurnFee("0");
       }
     } catch (error) {
+      console.log(error);
       changeVault(0, true);
       setBurnUSD("0");
       setBurnFee("0");
@@ -514,6 +515,7 @@ const Details = ({ address }: props) => {
           notifyUser(tx, refresh);
         }
       } catch (error) {
+        console.log(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -568,6 +570,7 @@ const Details = ({ address }: props) => {
           notifyUser(tx, refresh);
         }
       } catch (error) {
+        console.log(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -610,6 +613,7 @@ const Details = ({ address }: props) => {
         const tx = await selectedVaultContract?.mint(amount);
         notifyUser(tx, refresh);
       } catch (error) {
+        console.log(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -655,6 +659,7 @@ const Details = ({ address }: props) => {
         const tx = await selectedVaultContract?.burn(amount, { value: currentBurnFee });
         notifyUser(tx, refresh);
       } catch (error) {
+        console.log(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
