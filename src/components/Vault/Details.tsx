@@ -483,7 +483,8 @@ const Details = ({ address }: props) => {
         const currentBurnFee = await selectedVaultContract?.getFee(
           ethers.utils.parseEther(event.target.value)
         );
-        const ethFee = ethers.utils.formatEther(currentBurnFee);
+        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const ethFee = ethers.utils.formatEther(increasedFee);
         setBurnFee(ethFee.toString());
       } else {
         changeVault(0, true);
@@ -654,9 +655,10 @@ const Details = ({ address }: props) => {
       try {
         const amount = ethers.utils.parseEther(burnTxt);
         const currentBurnFee = await selectedVaultContract?.getFee(amount);
-        const ethFee = ethers.utils.formatEther(currentBurnFee);
+        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const ethFee = ethers.utils.formatEther(increasedFee);
         setBurnFee(ethFee.toString());
-        const tx = await selectedVaultContract?.burn(amount, { value: currentBurnFee });
+        const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);
@@ -687,24 +689,29 @@ const Details = ({ address }: props) => {
       currentVaultDebtCall,
     ]);
 
-    let balance = "0";
+    let balanceFormat = "0";
+    let balance;
     if (currentBalance.lt(currentVault.Debt)) {
-      balance = ethers.utils.formatEther(currentBalance);
+      balanceFormat = ethers.utils.formatEther(currentBalance);
+      balance = currentBalance;
     } else {
-      balance = vaultDebt;
+      balanceFormat = vaultDebt;
+      balance = currentVault.Debt;
     }
-    setBurnTxt(balance);
-    let usd = toUSD(currentTcapPrice, balance);
+    setBurnTxt(balanceFormat);
+    let usd = toUSD(currentTcapPrice, balanceFormat);
     if (!usd) {
       usd = 0;
     }
-    const newDebt = parseFloat(balance) - parseFloat(balance);
+    const newDebt = parseFloat(balanceFormat) - parseFloat(balanceFormat);
     const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentTcapPrice);
     changeVault(r);
     setBurnUSD(usd.toString());
-    if (balance !== "0") {
+
+    if (balanceFormat !== "0") {
       const currentBurnFee = await selectedVaultContract?.getFee(balance);
-      const ethFee = ethers.utils.formatEther(currentBurnFee);
+      const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+      const ethFee = ethers.utils.formatEther(increasedFee);
       setBurnFee(ethFee.toString());
     } else {
       setBurnFee("0");
