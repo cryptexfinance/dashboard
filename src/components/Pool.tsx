@@ -5,7 +5,6 @@ import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import ethers from "ethers";
 import NumberFormat from "react-number-format";
-
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
@@ -15,8 +14,6 @@ import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-// import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
-import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 import Loading from "./Loading";
 
@@ -24,7 +21,6 @@ const Farm = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [ethLiquidity, setEthLiquidity] = useState("0");
   const [ethLiquidityUNI, setEthLiquidityUNI] = useState("0");
-  const [daiLiquidity, setDaiLiquidity] = useState("0");
   const [ctxLiquidity, setCtxLiquidity] = useState("0");
 
   const signer = useContext(SignerContext);
@@ -36,8 +32,6 @@ const Farm = () => {
   const lpUniURL = process.env.REACT_APP_LP_URL_UNI;
   const visionURL = process.env.REACT_APP_LP_VISION;
   const uniVisionURL = process.env.REACT_APP_LP_UNI_VISION;
-
-  const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
   const one = ethers.utils.parseEther("1");
 
@@ -61,24 +55,60 @@ const Farm = () => {
   useEffect(() => {
     const loadAddress = async () => {
       if (
-        signer.signer &&
+        signer &&
         tokens.tcapToken &&
         tokens.ctxToken &&
         oracles.tcapOracle &&
         governance.governorAlpha &&
-        governance.timelock
+        governance.timelock &&
+        tokens.ctxTokenRead
       ) {
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const tcapOraclePriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        const currentPoolWethCall = await tokens.wethTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_ETH
+        );
+        const currentWethTCAPCall = await tokens.tcapTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_ETH
+        );
+        const currentPoolWethCtxCall = await tokens.wethTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_CTX
+        );
+        const currentPoolCtxCall = await tokens.ctxTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_CTX
+        );
+        const currentPoolWethUNICall = await tokens.wethTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_ETH_UNI
+        );
+        const currentWethTCAPUNICall = await tokens.tcapTokenRead?.balanceOf(
+          process?.env?.REACT_APP_POOL_ETH_UNI
+        );
 
         // @ts-ignore
-        const [reservesCtxPool] = await signer.ethcallProvider?.all([reservesCtxPoolCall]);
+        const [
+          reservesCtxPool,
+          wethOraclePrice,
+          tcapOraclePrice,
+          currentPoolWeth,
+          currentWethTCAP,
+          currentPoolWethCtx,
+          currentPoolCtx,
+          currentPoolWethUNI,
+          currentWethTCAPUNI,
+        ] = await signer.ethcallProvider?.all([
+          reservesCtxPoolCall,
+          wethOraclePriceCall,
+          tcapOraclePriceCall,
+          currentPoolWethCall,
+          currentWethTCAPCall,
+          currentPoolWethCtxCall,
+          currentPoolCtxCall,
+          currentPoolWethUNICall,
+          currentWethTCAPUNICall,
+        ]);
 
-        const ethUSD = ethers.utils.formatEther(
-          (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
-        );
-        const daiUSD = ethers.utils.formatEther(
-          (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
-        );
+        const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
         const currentPriceCTX = await getPriceInUSDFromPair(
           reservesCtxPool[0],
@@ -86,51 +116,22 @@ const Farm = () => {
           parseFloat(ethUSD)
         );
 
-        const tcapUSD = ethers.utils.formatEther(await oracles.tcapOracle?.getLatestAnswer());
-
-        const currentPoolWeth = await tokens.wethToken?.balanceOf(process?.env?.REACT_APP_POOL_ETH);
+        const tcapUSD = ethers.utils.formatEther(tcapOraclePrice);
         let formatPair1 = ethers.utils.formatEther(currentPoolWeth);
-        const currentWethTCAP = await tokens.tcapToken?.balanceOf(process?.env?.REACT_APP_POOL_ETH);
         let formatPair2 = ethers.utils.formatEther(currentWethTCAP);
         let totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
         setEthLiquidity(totalUSD.toString());
 
-        const currentPoolWethCtx = await tokens.wethToken?.balanceOf(
-          process?.env?.REACT_APP_POOL_CTX
-        );
         formatPair1 = ethers.utils.formatEther(currentPoolWethCtx);
-        const currentPoolCtx = await tokens.ctxToken?.balanceOf(process?.env?.REACT_APP_POOL_CTX);
         formatPair2 = ethers.utils.formatEther(currentPoolCtx);
         totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, currentPriceCTX.toString());
         setCtxLiquidity(totalUSD.toString());
 
-        const currentPoolWethUNI = await tokens.wethToken?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH_UNI
-        );
         formatPair1 = ethers.utils.formatEther(currentPoolWethUNI);
-        const currentWethTCAPUNI = await tokens.tcapToken?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH_UNI
-        );
         formatPair2 = ethers.utils.formatEther(currentWethTCAPUNI);
 
         totalUSD = toUSD(formatPair1, ethUSD) + toUSD(formatPair2, tcapUSD);
         setEthLiquidityUNI(totalUSD.toString());
-
-        if (phase > 2) {
-          const currentPoolWbtc = await tokens.wbtcToken?.balanceOf(
-            process?.env?.REACT_APP_POOL_WBTC
-          );
-          formatPair1 = ethers.utils.formatEther(currentPoolWbtc);
-
-          const currentPoolDai = await tokens.daiToken?.balanceOf(process?.env?.REACT_APP_POOL_DAI);
-          formatPair1 = ethers.utils.formatEther(currentPoolDai);
-          const currentDaiTCAP = await tokens.tcapToken?.balanceOf(
-            process?.env?.REACT_APP_POOL_DAI
-          );
-          formatPair2 = ethers.utils.formatEther(currentDaiTCAP);
-          totalUSD = toUSD(formatPair1, daiUSD) + toUSD(formatPair2, tcapUSD);
-          setDaiLiquidity(totalUSD.toString());
-        }
       }
       setIsLoading(false);
     };
@@ -200,7 +201,7 @@ const Farm = () => {
                         Pool
                       </Button>
                     </td>
-                  </tr>{" "}
+                  </tr>
                   <tr>
                     <td>
                       <WETHIcon className="weth" />
@@ -279,48 +280,6 @@ const Farm = () => {
                       </Button>
                     </td>
                   </tr>
-                  {phase > 2 && (
-                    <>
-                      <tr>
-                        <td>
-                          <DAIIcon className="dai" />
-                          <TcapIcon className="tcap" />{" "}
-                        </td>
-                        <td>
-                          {" "}
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`${visionURL}/${process?.env?.REACT_APP_POOL_DAI}`}
-                          >
-                            DAI/TCAP <br />
-                            <small>SushiSwap</small>
-                          </a>
-                        </td>
-                        <td className="number">
-                          $
-                          <NumberFormat
-                            className="number"
-                            value={daiLiquidity}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                        </td>{" "}
-                        <td className="number">
-                          <Button
-                            variant="primary"
-                            className=""
-                            target="_blank"
-                            href={`${lpURL}/#/add/${tokens.tcapToken?.address}/${tokens.daiToken?.address}`}
-                          >
-                            Pool
-                          </Button>
-                        </td>
-                      </tr>
-                    </>
-                  )}
                 </tbody>
               </Table>
             </Card>

@@ -5,6 +5,7 @@ import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { Contract } from "ethers-multicall";
 import ethers, { BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
@@ -84,9 +85,10 @@ const Details = ({ address }: props) => {
   const [vaultRatio, setVaultRatio] = useState("0");
   const [tempRatio, setTempRatio] = useState("");
   const [minRatio, setMinRatio] = useState("0");
-  const [collateralPrice, setCollateralPrice] = useState("0");
   const [selectedVault, setSelectedVault] = useState(currency);
   const [selectedVaultContract, setSelectedVaultContract] = useState<ethers.Contract>();
+  const [selectedVaultRead, setSelectedVaultRead] = useState<Contract>();
+  const [selectedOracleRead, setSelectedOracleRead] = useState<Contract>();
   const [selectedCollateralContract, setSelectedCollateralContract] = useState<ethers.Contract>();
   const [selectedVaultDecimals, setSelectedVaultDecimals] = useState(18);
 
@@ -94,7 +96,6 @@ const Details = ({ address }: props) => {
   const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [tokenBalanceDecimals, setTokenBalanceDecimals] = useState(2);
-  const [tcapPrice, setTcapPrice] = useState("0");
 
   // Inputs
   const [addCollateralTxt, setAddCollateralTxt] = useState("");
@@ -132,21 +133,43 @@ const Details = ({ address }: props) => {
     }
   `;
 
+  const tcapPrice = async () => {
+    const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+
+    // @ts-ignore
+    const [currentTCAPPrice] = await signer.ethcallProvider?.all([currentTCAPPriceCall]);
+    return currentTCAPPrice;
+  };
+
+  const collateralPrice = async () => {
+    const collateralPriceCall = await selectedOracleRead?.getLatestAnswer();
+
+    // @ts-ignore
+    const [currentCollateralPrice] = await signer.ethcallProvider?.all([collateralPriceCall]);
+    return currentCollateralPrice;
+  };
+
   async function loadVault(vaultType: string, vaultData: any) {
     if (
       signer.signer &&
       oracles.wethOracle &&
       oracles.daiOracle &&
+      oracles.wethOracleRead &&
+      oracles.daiOracleRead &&
       oracles.tcapOracle &&
       vaults.wethVault &&
       vaults.daiVault &&
       tokens.wethToken &&
       tokens.daiToken &&
+      tokens.wethTokenRead &&
+      tokens.daiTokenRead &&
       vaultData
     ) {
       let currentVault: any;
-      let currentOracle;
+      let currentVaultRead: any;
       let currentToken;
+      let currentOracleRead;
+      let currentTokenRead;
       let balance;
       const network = process.env.REACT_APP_NETWORK_NAME;
       const provider = ethers.getDefaultProvider(network, {
@@ -156,32 +179,40 @@ const Details = ({ address }: props) => {
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
-          currentOracle = oracles.wethOracle;
+          currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
-          // setIsApproved(true);
+          currentOracleRead = oracles.wethOracleRead;
+          currentTokenRead = tokens.wethTokenRead;
           balance = await provider.getBalance(address);
           break;
         }
         case "WETH":
           currentVault = vaults.wethVault;
-          currentOracle = oracles.wethOracle;
+          currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
-          balance = await currentToken.balanceOf(address);
+          currentOracleRead = oracles.wethOracleRead;
+          currentTokenRead = tokens.wethTokenRead;
           break;
         case "DAI":
           currentVault = vaults.daiVault;
-          currentOracle = oracles.daiOracle;
+          currentVaultRead = vaults.daiVaultRead;
           currentToken = tokens.daiToken;
-          balance = await currentToken.balanceOf(address);
+          currentOracleRead = oracles.daiOracleRead;
+          currentTokenRead = tokens.daiTokenRead;
           break;
         default:
           currentVault = vaults.wethVault;
-          currentOracle = oracles.wethOracle;
+          currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
+          currentOracleRead = oracles.wethOracleRead;
+          currentTokenRead = tokens.wethTokenRead;
           break;
       }
       setSelectedVaultContract(currentVault);
       setSelectedCollateralContract(currentToken);
+      setSelectedVaultRead(currentVaultRead);
+      setSelectedOracleRead(currentOracleRead);
+
       let currentVaultData: any;
       // Removed GRAPH
       // if data is empty load vault data from contract
@@ -210,36 +241,51 @@ const Details = ({ address }: props) => {
         }
       }
 
-      // const currentBalance = ethers.utils.formatEther(balance);
-      const decimals = await currentToken.decimals();
-      setSelectedVaultDecimals(decimals);
-      const currentBalance = ethers.utils.formatUnits(balance, decimals);
-
-      if (parseFloat(currentBalance) < 0.09) {
-        setTokenBalanceDecimals(4);
+      if (vaultType !== "ETH") {
+        balance = await currentToken.balanceOf(address);
       }
-      setTokenBalance(currentBalance);
-      let currentPrice = await currentOracle.getLatestAnswer();
-      currentPrice = ethers.utils.formatEther(currentPrice.mul(10000000000));
-      setCollateralPrice(currentPrice);
-      let usd = toUSD(currentPrice, currentBalance);
-      setTokenBalanceUSD(usd.toString());
+
+      let decimals;
+      let currentPrice;
 
       if (currentVaultData) {
-        const allowance: BigNumber = await currentToken.allowance(address, currentVault.address);
         const { vaultId, collateral, debt } = currentVaultData;
-        const currentRatio = (await currentVault.getVaultRatio(vaultId)).toString();
+        const allowanceCall = await currentTokenRead.allowance(address, currentVault.address);
+        const currentRatioCall = await currentVaultRead.getVaultRatio(vaultId);
+        const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        const decimalsCall = await currentTokenRead.decimals();
+        const currentPriceCall = await currentOracleRead.getLatestAnswer();
+        const currentMinRatioCall = await currentVaultRead.ratio();
+
+        // @ts-ignore
+        const [
+          allowance,
+          currentRatio,
+          currentTCAPPrice,
+          decimalsVal,
+          currentPriceVal,
+          currentMinRatio,
+        ] = await signer.ethcallProvider?.all([
+          allowanceCall,
+          currentRatioCall,
+          currentTCAPPriceCall,
+          decimalsCall,
+          currentPriceCall,
+          currentMinRatioCall,
+        ]);
+
+        decimals = decimalsVal;
+        currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
         setSelectedVaultId(vaultId);
         if (!allowance.isZero() || vaultType === "ETH") {
-          const currentMinRatio = (await currentVault.ratio()).toString();
-          setMinRatio(currentMinRatio);
+          setMinRatio(currentMinRatio.toString());
           setIsApproved(true);
-          setVaultRatio(currentRatio);
-          if (currentRatio === "0") {
+          setVaultRatio(currentRatio.toString());
+          if (currentRatio.toString() === "0") {
             setVaultStatus("N/A");
-          } else if (currentRatio >= parseFloat(currentMinRatio) + 50) {
+          } else if (currentRatio.toString() >= parseFloat(currentMinRatio.toString()) + 50) {
             setVaultStatus("safe");
-          } else if (currentRatio >= parseFloat(currentMinRatio) + 30) {
+          } else if (currentRatio.toString() >= parseFloat(currentMinRatio.toString()) + 30) {
             setVaultStatus("warning");
           } else {
             setVaultStatus("danger");
@@ -249,16 +295,14 @@ const Details = ({ address }: props) => {
 
           // const parsedCollateral = ethers.utils.formatEther(collateral);
           setVaultCollateral(parsedCollateral);
-          usd = toUSD(currentPrice, parsedCollateral);
-          setVaultCollateralUSD(usd.toString());
+          const usdCollateral = toUSD(currentPrice, parsedCollateral);
+          setVaultCollateralUSD(usdCollateral.toString());
 
-          let currentTCAPPrice = await oracles.tcapOracle.getLatestAnswer();
-          currentTCAPPrice = ethers.utils.formatEther(currentTCAPPrice);
-          setTcapPrice(currentTCAPPrice);
+          const currentTCAPPriceFormat = ethers.utils.formatEther(currentTCAPPrice);
           const parsedDebt = ethers.utils.formatEther(debt);
           setVaultDebt(parsedDebt);
-          usd = toUSD(currentTCAPPrice, parsedDebt);
-          setVaultDebtUSD(usd.toString());
+          const usdTCAP = toUSD(currentTCAPPriceFormat, parsedDebt);
+          setVaultDebtUSD(usdTCAP.toString());
         } else {
           setText(
             "Vault not approved. Please approve your collateral to start minting TCAP tokens."
@@ -267,6 +311,18 @@ const Details = ({ address }: props) => {
           setIsApproved(false);
         }
       } else {
+        const decimalsCall = await currentTokenRead.decimals();
+        const currentPriceCall = await currentOracleRead.getLatestAnswer();
+
+        // @ts-ignore
+        const [decimalsVal, currentPriceVal] = await signer.ethcallProvider?.all([
+          decimalsCall,
+          currentPriceCall,
+        ]);
+
+        decimals = decimalsVal;
+        currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
+
         setSelectedVaultId("0");
         setText(
           "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
@@ -274,6 +330,17 @@ const Details = ({ address }: props) => {
         setTitle("Create Vault");
         setIsApproved(false);
       }
+
+      setSelectedVaultDecimals(decimals);
+      const currentBalance = ethers.utils.formatUnits(balance, decimals);
+
+      if (parseFloat(currentBalance) < 0.09) {
+        setTokenBalanceDecimals(4);
+      }
+      setTokenBalance(currentBalance);
+
+      const usdBalance = toUSD(currentPrice, currentBalance);
+      setTokenBalanceUSD(usdBalance.toString());
     }
   }
 
@@ -340,12 +407,14 @@ const Details = ({ address }: props) => {
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddCollateralTxt(event.target.value);
     if (event.target.value !== "") {
-      let usd = toUSD(collateralPrice, event.target.value);
+      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+      const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
+      let usd = toUSD(currentPrice, event.target.value);
       if (!usd) {
         usd = 0;
       }
       const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
-      const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+      const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentTcapPrice);
       changeVault(r);
       setAddCollateralUSD(usd.toString());
     } else {
@@ -357,12 +426,14 @@ const Details = ({ address }: props) => {
   const onChangeRemoveCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setRemoveCollateralTxt(event.target.value);
     if (event.target.value !== "") {
-      let usd = toUSD(collateralPrice, event.target.value);
+      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+      const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
+      let usd = toUSD(currentPrice, event.target.value);
       if (!usd) {
         usd = 0;
       }
       const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
-      const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+      const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentTcapPrice);
       changeVault(r);
       setRemoveCollateralUSD(usd.toString());
     } else {
@@ -374,12 +445,14 @@ const Details = ({ address }: props) => {
   const onChangeMint = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setMintTxt(event.target.value);
     if (event.target.value !== "") {
-      let usd = toUSD(tcapPrice, event.target.value);
+      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+      const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
+      let usd = toUSD(currentTcapPrice, event.target.value);
       if (!usd) {
         usd = 0;
       }
       const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
-      const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+      const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentTcapPrice);
       changeVault(r);
       setMintUSD(usd.toString());
     } else {
@@ -389,22 +462,37 @@ const Details = ({ address }: props) => {
   };
 
   const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBurnTxt(event.target.value);
-    if (event.target.value !== "") {
-      let usd = toUSD(tcapPrice, event.target.value);
-      if (!usd) {
-        usd = 0;
+    try {
+      setBurnTxt(event.target.value);
+      if (event.target.value !== "") {
+        const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+        const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
+        let usd = toUSD(currentTcapPrice, event.target.value);
+        if (!usd) {
+          usd = 0;
+        }
+        const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
+        const r = await getRatio(
+          vaultCollateral,
+          currentPrice,
+          newDebt.toString(),
+          currentTcapPrice
+        );
+        changeVault(r);
+        setBurnUSD(usd.toString());
+        const currentBurnFee = await selectedVaultContract?.getFee(
+          ethers.utils.parseEther(event.target.value)
+        );
+        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const ethFee = ethers.utils.formatEther(increasedFee);
+        setBurnFee(ethFee.toString());
+      } else {
+        changeVault(0, true);
+        setBurnUSD("0");
+        setBurnFee("0");
       }
-      const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
-      const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
-      changeVault(r);
-      setBurnUSD(usd.toString());
-      const currentBurnFee = await selectedVaultContract?.getFee(
-        ethers.utils.parseEther(event.target.value)
-      );
-      const ethFee = ethers.utils.formatEther(currentBurnFee);
-      setBurnFee(ethFee.toString());
-    } else {
+    } catch (error) {
+      console.error(error);
       changeVault(0, true);
       setBurnUSD("0");
       setBurnFee("0");
@@ -428,6 +516,7 @@ const Details = ({ address }: props) => {
           notifyUser(tx, refresh);
         }
       } catch (error) {
+        console.error(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -456,13 +545,15 @@ const Details = ({ address }: props) => {
       const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
       balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
+    const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+    const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
     setAddCollateralTxt(balance);
-    let usd = toUSD(collateralPrice, balance);
+    let usd = toUSD(currentPrice, balance);
     if (!usd) {
       usd = 0;
     }
     const newCollateral = parseFloat(balance) + parseFloat(vaultCollateral);
-    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentTcapPrice);
     changeVault(r);
     setAddCollateralUSD(usd.toString());
   };
@@ -480,6 +571,7 @@ const Details = ({ address }: props) => {
           notifyUser(tx, refresh);
         }
       } catch (error) {
+        console.error(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -495,20 +587,22 @@ const Details = ({ address }: props) => {
 
   const safeRemoveCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
+    const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+    const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
     const collateralToRemove = await getSafeRemoveCollateral(
       minRatio,
       vaultCollateral,
-      collateralPrice,
-      tcapPrice,
+      currentPrice,
+      currentTcapPrice,
       vaultDebt
     );
     setRemoveCollateralTxt(collateralToRemove.toString());
-    let usd = toUSD(collateralPrice, collateralToRemove.toString());
+    let usd = toUSD(currentPrice, collateralToRemove.toString());
     if (!usd) {
       usd = 0;
     }
     const newCollateral = parseFloat(vaultCollateral) - collateralToRemove;
-    const r = await getRatio(newCollateral.toString(), collateralPrice, vaultDebt, tcapPrice);
+    const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentTcapPrice);
     changeVault(r);
     setRemoveCollateralUSD(usd.toString());
   };
@@ -520,6 +614,7 @@ const Details = ({ address }: props) => {
         const tx = await selectedVaultContract?.mint(amount);
         notifyUser(tx, refresh);
       } catch (error) {
+        console.error(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -535,20 +630,22 @@ const Details = ({ address }: props) => {
 
   const safeMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
+    const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+    const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
     const safeMint = await getSafeMint(
       minRatio,
       vaultCollateral,
-      collateralPrice,
-      tcapPrice,
+      currentPrice,
+      currentTcapPrice,
       vaultDebt
     );
     setMintTxt(safeMint.toString());
-    let usd = toUSD(tcapPrice, safeMint.toString());
+    let usd = toUSD(currentTcapPrice, safeMint.toString());
     if (!usd) {
       usd = 0;
     }
     const newDebt = safeMint + parseFloat(vaultDebt);
-    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentTcapPrice);
     changeVault(r);
     setMintUSD(usd.toString());
   };
@@ -557,10 +654,14 @@ const Details = ({ address }: props) => {
     if (burnTxt) {
       try {
         const amount = ethers.utils.parseEther(burnTxt);
-        const fee = ethers.utils.parseEther(burnFee);
-        const tx = await selectedVaultContract?.burn(amount, { value: fee });
+        const currentBurnFee = await selectedVaultContract?.getFee(amount);
+        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const ethFee = ethers.utils.formatEther(increasedFee);
+        setBurnFee(ethFee.toString());
+        const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
         notifyUser(tx, refresh);
       } catch (error) {
+        console.error(error);
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
@@ -577,25 +678,40 @@ const Details = ({ address }: props) => {
 
   const maxBurnTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const currentBalance = ethers.utils.formatEther(await tokens.tcapToken?.balanceOf(address));
-    let balance = "0";
-    if (parseFloat(currentBalance) < parseFloat(vaultDebt)) {
+    const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+    const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
+    const currentBalanceCall = await tokens.tcapTokenRead?.balanceOf(address);
+    const currentVaultDebtCall = await selectedVaultRead?.vaults(selectedVaultId);
+
+    // @ts-ignore
+    const [currentBalance, currentVault] = await signer.ethcallProvider?.all([
+      currentBalanceCall,
+      currentVaultDebtCall,
+    ]);
+
+    let balanceFormat = "0";
+    let balance;
+    if (currentBalance.lt(currentVault.Debt)) {
+      balanceFormat = ethers.utils.formatEther(currentBalance);
       balance = currentBalance;
     } else {
-      balance = vaultDebt;
+      balanceFormat = vaultDebt;
+      balance = currentVault.Debt;
     }
-    setBurnTxt(balance);
-    let usd = toUSD(tcapPrice, balance);
+    setBurnTxt(balanceFormat);
+    let usd = toUSD(currentTcapPrice, balanceFormat);
     if (!usd) {
       usd = 0;
     }
-    const newDebt = parseFloat(balance) - parseFloat(balance);
-    const r = await getRatio(vaultCollateral, collateralPrice, newDebt.toString(), tcapPrice);
+    const newDebt = parseFloat(balanceFormat) - parseFloat(balanceFormat);
+    const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentTcapPrice);
     changeVault(r);
     setBurnUSD(usd.toString());
-    if (balance !== "") {
-      const currentBurnFee = await selectedVaultContract?.getFee(ethers.utils.parseEther(balance));
-      const ethFee = ethers.utils.formatEther(currentBurnFee);
+
+    if (balanceFormat !== "0") {
+      const currentBurnFee = await selectedVaultContract?.getFee(balance);
+      const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+      const ethFee = ethers.utils.formatEther(increasedFee);
       setBurnFee(ethFee.toString());
     } else {
       setBurnFee("0");
