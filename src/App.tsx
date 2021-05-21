@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Switch, Route, useRouteMatch, useLocation } from "react-router-dom";
 import { ethers } from "ethers";
+import { Provider, Contract } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,6 +36,7 @@ import { Web3ModalContext } from "./state/Web3ModalContext";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
+import UniV2Pair from "./contracts/UniswapV2Pair.json";
 
 const clientOracle = new ApolloClient({
   uri: process.env.REACT_APP_GRAPH_URL,
@@ -58,7 +60,9 @@ const App = () => {
   const match = useRouteMatch();
   const location = useLocation();
 
-  const setContracts = (currentSigner: ethers.Signer) => {
+  const setContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
     const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
     let contracts;
     switch (networkId) {
@@ -86,6 +90,18 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentDAIVault(currentDAIVault);
+
+    const currentWETHVaultRead = new Contract(
+      contracts.WETHVaultHandler.address,
+      contracts.WETHVaultHandler.abi
+    );
+    vaults.setCurrentWETHVaultRead(currentWETHVaultRead);
+    const currentDAIVaultRead = new Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi
+    );
+    vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
+
     // Set Tokens
     const currentWETHToken = new ethers.Contract(
       process.env.REACT_APP_WETH_ADDRESS || "",
@@ -106,16 +122,36 @@ const App = () => {
     );
     tokens.setCurrentTCAPToken(currentTCAPToken);
 
+    const currentWETHTokenRead = new Contract(process.env.REACT_APP_WETH_ADDRESS || "", ERC20.abi);
+    tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
+    const currentDAITokenRead = new Contract(process.env.REACT_APP_DAI_ADDRESS || "", WETH.abi);
+    tokens.setCurrentDAITokenRead(currentDAITokenRead);
+    const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
+    tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
+
     // TODO:remove this once other pools work
-    if (process.env.REACT_APP_POOL_ETH) {
+    if (process.env.REACT_APP_POOL_ETH && process.env.REACT_APP_POOL_CTX) {
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
-
       tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
+
+      const currentWETHPoolTokenRead = new Contract(process.env.REACT_APP_POOL_ETH, UniV2Pair.abi);
+      tokens.setCurrentWETHPoolTokenRead(currentWETHPoolTokenRead);
+
+      const currentCTXPoolToken = new ethers.Contract(
+        process.env.REACT_APP_POOL_CTX,
+        UniV2Pair.abi,
+        currentSigner
+      );
+      tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
+
+      const currentCTXPoolTokenRead = new Contract(process.env.REACT_APP_POOL_CTX, UniV2Pair.abi);
+      tokens.setCurrentCTXPoolTokenRead(currentCTXPoolTokenRead);
     }
+
     if (
       process.env.REACT_APP_POOL_ETH &&
       process.env.REACT_APP_POOL_DAI &&
@@ -124,7 +160,7 @@ const App = () => {
       // Set Pool Tokens
       const currentWETHPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_ETH,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
 
@@ -132,17 +168,10 @@ const App = () => {
 
       const currentDAIPoolToken = new ethers.Contract(
         process.env.REACT_APP_POOL_DAI,
-        ERC20.abi,
+        UniV2Pair.abi,
         currentSigner
       );
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
-
-      const currentCTXPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_CTX,
-        ERC20.abi,
-        currentSigner
-      );
-      tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
     }
 
     // Set Rewards
@@ -160,15 +189,45 @@ const App = () => {
     );
     rewards.setCurrentDAIReward(currentDAIReward);
 
+    const currentWETHRewardRead = new Contract(
+      contracts.WETHRewardHandler.address,
+      contracts.WETHRewardHandler.abi
+    );
+    rewards.setCurrentWETHRewardRead(currentWETHRewardRead);
+
+    const currentDAIRewardRead = new Contract(
+      contracts.DAIRewardHandler.address,
+      contracts.DAIRewardHandler.abi
+    );
+    rewards.setCurrentDAIRewardRead(currentDAIRewardRead);
+
     // Set Liquidity Rewards
     const currentWETHPoolReward = new ethers.Contract(
-      // @ts-ignore
       contracts.ETHLiquidityReward.address,
-      // @ts-ignore
       contracts.ETHLiquidityReward.abi,
       currentSigner
     );
     rewards.setCurrentWETHPoolReward(currentWETHPoolReward);
+
+    const currentWETHPoolRewardRead = new Contract(
+      contracts.ETHLiquidityReward.address,
+      contracts.ETHLiquidityReward.abi
+    );
+    rewards.setCurrentWETHPoolRewardRead(currentWETHPoolRewardRead);
+
+    const currentCTXPoolReward = new ethers.Contract(
+      // @ts-ignore
+      contracts.CTXLiquidityReward.address, // @ts-ignore
+      contracts.CTXLiquidityReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
+
+    const currentCTXPoolRewardRead = new Contract( // @ts-ignore
+      contracts.CTXLiquidityReward.address, // @ts-ignore
+      contracts.CTXLiquidityReward.abi
+    );
+    rewards.setCurrentCTXPoolRewardRead(currentCTXPoolRewardRead);
 
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
@@ -191,9 +250,23 @@ const App = () => {
     );
     oracles.setCurrentTCAPOracle(currentTCAPOracle);
 
+    const currentWETHOracleRead = new Contract(
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi
+    );
+    oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
+    const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
+    oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
+
+    const currentTCAPOracleRead = new Contract(
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi
+    );
+    oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
+
     // Set Governance
     const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
-    governance.setCurrentCtxToken(currentCtx);
+    tokens.setCurrentCtxToken(currentCtx);
     const currentGovernorAlpha = new ethers.Contract(
       contracts.GovernorAlpha.address,
       contracts.GovernorAlpha.abi,
@@ -206,7 +279,18 @@ const App = () => {
       currentSigner
     );
     governance.setCurrentTimelock(currentTimelock);
+
+    const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
+    tokens.setCurrentCtxTokenRead(currentCtxRead);
+    const currentGovernorAlphaRead = new Contract(
+      contracts.GovernorAlpha.address,
+      contracts.GovernorAlpha.abi
+    );
+    governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
+    const currentTimelockRead = new Contract(contracts.Timelock.address, contracts.Timelock.abi);
+    governance.setCurrentTimelockRead(currentTimelockRead);
   };
+
   web3Modal.on("connect", async (networkProvider) => {
     setloading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
@@ -222,7 +306,8 @@ const App = () => {
     }
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
-    setContracts(currentSigner);
+    const ethcallProvider = new Provider(currentProvider);
+    setContracts(currentSigner, ethcallProvider);
     setloading(false);
   });
 
@@ -247,7 +332,8 @@ const App = () => {
         }
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
-        setContracts(currentSigner);
+        const ethcallProvider = new Provider(currentProvider);
+        setContracts(currentSigner, ethcallProvider);
       } else {
         const network = process.env.REACT_APP_NETWORK_NAME;
         const provider = ethers.getDefaultProvider(network, {
@@ -255,7 +341,8 @@ const App = () => {
           alchemy: process.env.REACT_APP_ALCHEMY_KEY,
         });
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
-        setContracts(randomSigner);
+        const ethcallProvider = new Provider(randomSigner.provider);
+        setContracts(randomSigner, ethcallProvider);
       }
       setloading(false);
     }
@@ -337,7 +424,7 @@ const App = () => {
                       dismissible
                     >
                       <b>
-                        ⚠️ Make sure to always have a ratio above the minimun ratio to avoid getting
+                        ⚠️ Make sure to always have a ratio above the minimum ratio to avoid getting
                         liquidated.
                       </b>
                     </Alert>

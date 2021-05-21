@@ -5,6 +5,7 @@ import Form from "react-bootstrap/esm/Form";
 import "../../styles/modal.scss";
 import governanceContext from "../../state/GovernanceContext";
 import { isValidAddress, errorNotification, notifyUser } from "../../utils/utils";
+import tokensContext from "../../state/TokensContext";
 
 type props = {
   show: boolean;
@@ -14,6 +15,7 @@ type props = {
 
 export const Delegate = ({ show, onHide, refresh }: props) => {
   const governance = useContext(governanceContext);
+  const tokens = useContext(tokensContext);
   const [addressText, setAddressText] = useState("");
 
   const onChangeAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,11 +24,11 @@ export const Delegate = ({ show, onHide, refresh }: props) => {
 
   const delegateCTX = async (event: React.MouseEvent) => {
     event.preventDefault();
-    if (governance) {
+    if (governance && tokens) {
       const validAddress = await isValidAddress(addressText);
-      if (validAddress && governance.ctxToken) {
+      if (validAddress && tokens.ctxToken) {
         try {
-          const tx = await governance.ctxToken.delegate(validAddress);
+          const tx = await tokens.ctxToken.delegate(validAddress);
           notifyUser(tx, refresh);
           setAddressText("");
           onHide();
