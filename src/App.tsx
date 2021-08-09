@@ -46,7 +46,7 @@ const clientOracle = new ApolloClient({
 const App = () => {
   const signer = useSigner();
   const web3Modal = useContext(Web3ModalContext);
-  const [isLoading, setloading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const [show, setShow] = useState(true);
   const [vaultWarning, setVaultWarning] = useState(true);
@@ -292,7 +292,7 @@ const App = () => {
   };
 
   web3Modal.on("connect", async (networkProvider) => {
-    setloading(true);
+    setLoading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
     if (
@@ -308,7 +308,7 @@ const App = () => {
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
     setContracts(currentSigner, ethcallProvider);
-    setloading(false);
+    setLoading(false);
   });
 
   useEffect(() => {
@@ -344,7 +344,7 @@ const App = () => {
         const ethcallProvider = new Provider(randomSigner.provider);
         setContracts(randomSigner, ethcallProvider);
       }
-      setloading(false);
+      setLoading(false);
     }
     // Execute the created function directly
     loadProvider();
