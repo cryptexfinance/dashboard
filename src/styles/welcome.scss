@@ -152,15 +152,6 @@
         }
         p.title {
           margin-left: 0.35rem;
-          &.ctx {
-            margin-top: 3rem;
-            @media (max-width: 500px) {
-              margin-top: 0.3rem;
-            }
-            @media (min-width: 770px) and (max-width: 992px) {
-              margin-top: 0.3rem;
-            }
-          }
         }
       }
 
