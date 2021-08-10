@@ -48,22 +48,38 @@ const Welcome = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken && tokens.ctxToken && oracles.tcapOracle) {
+      if (
+        signer.signer &&
+        tokens.tcapToken &&
+        tokens.ctxToken &&
+        oracles.tcapOracle &&
+        tokens.tcapTokenRead
+      ) {
         const currentAddress = await signer.signer.getAddress();
         setAddress(makeShortAddress(currentAddress));
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
-        const tcapString = ethers.utils.formatEther(currentTcapBalance);
-        setTcapBalance(tcapString);
-        const currentCtxBalance = await tokens.ctxToken.balanceOf(currentAddress);
-        const ctxString = ethers.utils.formatEther(currentCtxBalance);
-        setCtxBalance(ctxString);
-        const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
+        const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
+        const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
+        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+
         // @ts-ignore
-        const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
-          wethOracleCall,
+        const [
+          currentTcapBalance,
+          currentCtxBalance,
+          wethOraclePrice,
+          reservesCtxPool,
+        ] = await signer.ethcallProvider?.all([
+          currentTcapBalanceCall,
+          currentCtxBalanceCall,
+          wethOraclePriceCall,
           reservesCtxPoolCall,
         ]);
+
+        const tcapString = ethers.utils.formatEther(currentTcapBalance);
+        setTcapBalance(tcapString);
+        const ctxString = ethers.utils.formatEther(currentCtxBalance);
+        setCtxBalance(ctxString);
+
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const currentPriceCTX = await getPriceInUSDFromPair(
           reservesCtxPool[0],

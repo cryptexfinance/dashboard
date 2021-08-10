@@ -49,15 +49,35 @@ const Graph = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data) {
-        const currentTotalPrice = await oracles.tcapOracle?.getLatestAnswer();
+      if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
+        const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
+        const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
+        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+
+        // @ts-ignore
+        const [
+          currentTotalPrice,
+          wethOraclePrice,
+          daiOraclePrice,
+          currentTotalSupply,
+          reservesCtxPool,
+        ] = await signer.ethcallProvider?.all([
+          currentTotalPriceCall,
+          wethOraclePriceCall,
+          daiOraclePriceCall,
+          currentTotalSupplyCall,
+          reservesCtxPoolCall,
+        ]);
+
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
-          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
+          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "1");
           let contracts;
 
           switch (networkId) {
@@ -88,27 +108,14 @@ const Graph = () => {
 
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
-        const ethUSD = ethers.utils.formatEther(
-          (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
-        );
-        const daiUSD = ethers.utils.formatEther(
-          (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
-        );
+        const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
         const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
         setTotalStake(totalUSD.toString());
-
-        const currentTotalSupply = await tokens.tcapToken?.totalSupply();
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
-          const wethOracleCall = oracles.wethOracleRead?.getLatestAnswer();
-          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-          // @ts-ignore
-          const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
-            wethOracleCall,
-            reservesCtxPoolCall,
-          ]);
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          const currentPriceCTX = await getPriceInUSDFromPair(
+          const currentPriceCTX = getPriceInUSDFromPair(
             reservesCtxPool[0],
             reservesCtxPool[1],
             parseFloat(currentPriceETH)
