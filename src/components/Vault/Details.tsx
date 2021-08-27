@@ -6,10 +6,11 @@ import InputGroup from "react-bootstrap/esm/InputGroup";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { Contract } from "ethers-multicall";
-import ethers, { BigNumber } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
+import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
 import VaultsContext from "../../state/VaultsContext";
@@ -30,6 +31,7 @@ import {
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
+  getDefaultProvider,
 } from "../../utils/utils";
 import Loading from "../Loading";
 
@@ -40,6 +42,7 @@ type props = {
 // TODO: Vault doesn't show if approve is 0 even if there is data in the vault
 
 const Details = ({ address }: props) => {
+  const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
@@ -149,6 +152,10 @@ const Details = ({ address }: props) => {
     return currentCollateralPrice;
   };
 
+  const isGasAsset = () =>
+    (currentNetwork.chainId !== 137 && selectedVault === "ETH") ||
+    (currentNetwork.chainId === 137 && selectedVault === "MATIC");
+
   async function loadVault(vaultType: string, vaultData: any) {
     if (
       signer.signer &&
@@ -165,17 +172,17 @@ const Details = ({ address }: props) => {
       tokens.daiTokenRead &&
       vaultData
     ) {
+      const provider = getDefaultProvider(
+        currentNetwork.chainId || 4,
+        currentNetwork.name || "rinkeby"
+      );
       let currentVault: any;
       let currentVaultRead: any;
       let currentToken;
       let currentOracleRead;
       let currentTokenRead;
       let balance;
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
+
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
@@ -199,6 +206,14 @@ const Details = ({ address }: props) => {
           currentToken = tokens.daiToken;
           currentOracleRead = oracles.daiOracleRead;
           currentTokenRead = tokens.daiTokenRead;
+          break;
+        case "MATIC":
+          currentVault = vaults.maticVault;
+          currentVaultRead = vaults.maticVaultRead;
+          currentToken = tokens.maticToken;
+          currentOracleRead = oracles.maticOracleRead;
+          currentTokenRead = tokens.maticTokenRead;
+          balance = await provider.getBalance(address);
           break;
         default:
           currentVault = vaults.wethVault;
@@ -241,7 +256,11 @@ const Details = ({ address }: props) => {
         }
       }
 
-      if (vaultType !== "ETH") {
+      if (
+        (vaultType !== "ETH" && currentNetwork.chainId !== 137) ||
+        (vaultType !== "MATIC" && currentNetwork.chainId === 137)
+      ) {
+        // @ts-ignore
         balance = await currentToken.balanceOf(address);
       }
 
@@ -250,10 +269,13 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const { vaultId, collateral, debt } = currentVaultData;
+        // @ts-ignore
         const allowanceCall = await currentTokenRead.allowance(address, currentVault.address);
         const currentRatioCall = await currentVaultRead.getVaultRatio(vaultId);
         const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
         const currentMinRatioCall = await currentVaultRead.ratio();
 
@@ -277,7 +299,7 @@ const Details = ({ address }: props) => {
         decimals = decimalsVal;
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
         setSelectedVaultId(vaultId);
-        if (!allowance.isZero() || vaultType === "ETH") {
+        if (!allowance.isZero() || isGasAsset()) {
           setMinRatio(currentMinRatio.toString());
           setIsApproved(true);
           setVaultRatio(currentRatio.toString());
@@ -311,15 +333,15 @@ const Details = ({ address }: props) => {
           setIsApproved(false);
         }
       } else {
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
-
         // @ts-ignore
         const [decimalsVal, currentPriceVal] = await signer.ethcallProvider?.all([
           decimalsCall,
           currentPriceCall,
         ]);
-
         decimals = decimalsVal;
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
 
@@ -506,10 +528,17 @@ const Details = ({ address }: props) => {
 
       // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
-        if (selectedVault === "ETH") {
-          const tx = await selectedVaultContract?.addCollateralETH({
-            value: amount,
-          });
+        if (isGasAsset()) {
+          let tx;
+          if (selectedVault === "ETH") {
+            tx = await selectedVaultContract?.addCollateralETH({
+              value: amount,
+            });
+          } else {
+            tx = await selectedVaultContract?.addCollateralMATIC({
+              value: amount,
+            });
+          }
           notifyUser(tx, refresh);
         } else {
           const tx = await selectedVaultContract?.addCollateral(amount);
@@ -533,16 +562,15 @@ const Details = ({ address }: props) => {
   const maxAddCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
     let balance = "0";
-    if (selectedVault === "ETH") {
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
-
+    if (isGasAsset()) {
+      const provider = getDefaultProvider(
+        currentNetwork.chainId || 4,
+        currentNetwork.name || "rinkeby"
+      );
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
       const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
+      console.log(value);
       balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
@@ -563,8 +591,13 @@ const Details = ({ address }: props) => {
       const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
 
       try {
-        if (selectedVault === "ETH") {
-          const tx = await selectedVaultContract?.removeCollateralETH(amount);
+        if (isGasAsset()) {
+          let tx;
+          if (selectedVault === "ETH") {
+            tx = await selectedVaultContract?.removeCollateralETH(amount);
+          } else {
+            tx = await selectedVaultContract?.removeCollateralMATIC(amount);
+          }
           notifyUser(tx, refresh);
         } else {
           const tx = await selectedVaultContract?.removeCollateral(amount);
@@ -611,6 +644,8 @@ const Details = ({ address }: props) => {
     if (mintTxt) {
       try {
         const amount = ethers.utils.parseEther(mintTxt);
+        console.log("Amount to mint");
+        console.log(amount.toString());
         const tx = await selectedVaultContract?.mint(amount);
         notifyUser(tx, refresh);
       } catch (error) {
@@ -784,9 +819,9 @@ const Details = ({ address }: props) => {
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
             <option value="ETH">ETH</option>
-            <option>WETH</option>
-            {/* <option>WBTC</option> */}
+            {currentNetwork.chainId !== 137 && <option>WETH</option>}
             <option>DAI</option>
+            {currentNetwork.chainId === 137 && <option>MATIC</option>}
           </Form.Control>
           <p className="number">
             <NumberFormat

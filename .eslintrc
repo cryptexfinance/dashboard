@@ -4,7 +4,7 @@
     "plugin:react/recommended",
     "plugin:jsx-a11y/strict",
     "plugin:prettier/recommended",
-    "prettier/react"
+    "prettier"
   ],
   "parser": "babel-eslint",
   "settings": {
@@ -37,8 +37,9 @@
     "no-unused-vars": [
       1,
       {
-        "ignoreSiblings": true,
-        "argsIgnorePattern": "res|next|^err"
+        "vars": "all",
+        "ignoreRestSiblings": true,
+        "args": "all"
       }
     ],
     "prefer-const": [

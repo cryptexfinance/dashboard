@@ -4,6 +4,7 @@ import Card from "react-bootstrap/esm/Card";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
+import NetworkContext from "../state/NetworkContext";
 import TokensContext from "../state/TokensContext";
 import SignerContext from "../state/SignerContext";
 import OraclesContext from "../state/OraclesContext";
@@ -19,6 +20,7 @@ import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
 import Loading from "./Loading";
 
 const Graph = () => {
+  const network = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
   const oracles = useContext(OraclesContext);
@@ -47,6 +49,21 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
+  const loadEthereum = async (currentPriceETH: string) => {
+    if (signer) {
+      const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+      // @ts-ignore
+      const [reservesCtxPool] = await signer.ethcallProvider?.all([reservesCtxPoolCall]);
+      const currentPriceCTX = getPriceInUSDFromPair(
+        // @ts-ignore
+        reservesCtxPool[0], // @ts-ignore
+        reservesCtxPool[1],
+        parseFloat(currentPriceETH)
+      );
+      setCtxPrice(currentPriceCTX.toString());
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
@@ -54,22 +71,15 @@ const Graph = () => {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
-        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
         // @ts-ignore
-        const [
-          currentTotalPrice,
-          wethOraclePrice,
-          daiOraclePrice,
-          currentTotalSupply,
-          reservesCtxPool,
-        ] = await signer.ethcallProvider?.all([
-          currentTotalPriceCall,
-          wethOraclePriceCall,
-          daiOraclePriceCall,
-          currentTotalSupplyCall,
-          reservesCtxPoolCall,
-        ]);
+        const [currentTotalPrice, wethOraclePrice, daiOraclePrice, currentTotalSupply] =
+          await signer.ethcallProvider?.all([
+            currentTotalPriceCall,
+            wethOraclePriceCall,
+            daiOraclePriceCall,
+            currentTotalSupplyCall,
+          ]);
 
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
@@ -77,15 +87,17 @@ const Graph = () => {
         let currentWETHStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
-          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "1");
           let contracts;
 
-          switch (networkId) {
+          switch (network.chainId) {
             case 1:
               contracts = cryptexJson[1].mainnet.contracts;
               break;
             case 4:
               contracts = cryptexJson[4].rinkeby.contracts;
+              break;
+            case 137:
+              contracts = cryptexJson[137].polygon.contracts;
               break;
             default:
               contracts = cryptexJson[4].rinkeby.contracts;
@@ -113,14 +125,10 @@ const Graph = () => {
         const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
-        if (signer) {
-          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          const currentPriceCTX = getPriceInUSDFromPair(
-            reservesCtxPool[0],
-            reservesCtxPool[1],
-            parseFloat(currentPriceETH)
-          );
-          setCtxPrice(currentPriceCTX.toString());
+
+        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        if (network.chainId !== 137) {
+          loadEthereum(currentPriceETH);
         }
       }
       setLoading(false);
@@ -183,14 +191,6 @@ const Graph = () => {
             ETH
           </h5>
         </Card>
-        {/* <Card>
-          <WBTCIcon className="wbtc" />
-          <h4>Total Staked in WBTC</h4>
-          <h5 className="number neon-yellow">
-            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            WBTC
-          </h5>
-        </Card> */}
         <Card>
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>
@@ -199,19 +199,21 @@ const Graph = () => {
             DAI
           </h5>
         </Card>
-        <Card>
-          <CtxIcon className="ctx" />
-          <h4>CTX Price</h4>
-          <h5 className="number neon-blue">
-            <NumberFormat
-              value={ctxPrice}
-              displayType="text"
-              thousandSeparator
-              decimalScale={2}
-              prefix="$"
-            />{" "}
-          </h5>
-        </Card>
+        {network.chainId !== 137 && (
+          <Card>
+            <CtxIcon className="ctx" />
+            <h4>CTX Price</h4>
+            <h5 className="number neon-blue">
+              <NumberFormat
+                value={ctxPrice}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+                prefix="$"
+              />{" "}
+            </h5>
+          </Card>
+        )}
       </div>
     </div>
   );

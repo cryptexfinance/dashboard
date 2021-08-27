@@ -25652,7 +25652,7 @@
             }
           ]
         },
-        "ETHOracle": {
+        "WETHOracle": {
           "address": "0x7B838c8839886ffaa4E3481c83cea7d38ae0f236",
           "abi": [
             {
@@ -25888,7 +25888,7 @@
             }
           ]
         },
-        "ETHVaultHandler": {
+        "WETHVaultHandler": {
           "address": "0xAe49Ed0a9796bF44879BC050e5113C058e590e1b",
           "abi": [
             {

@@ -13,6 +13,8 @@ export interface TokensContext {
   setCurrentTCAPToken: (currentToken: ethers.Contract) => void;
   ctxToken?: ethers.Contract;
   setCurrentCtxToken: (currentCtx: ethers.Contract) => void;
+  maticToken?: ethers.Contract;
+  setCurrentMATICToken: (currentMATIC: ethers.Contract) => void;
   wethPoolToken?: ethers.Contract;
   setCurrentWETHPoolToken: (currentPoolToken: ethers.Contract) => void;
   daiPoolToken?: ethers.Contract;
@@ -31,6 +33,8 @@ export interface TokensContext {
   setCurrentTCAPTokenRead: (currentTokenRead: Contract) => void;
   ctxTokenRead?: Contract;
   setCurrentCtxTokenRead: (currentCtx: Contract) => void;
+  maticTokenRead?: Contract;
+  setCurrentMATICTokenRead: (currentMATIC: Contract) => void;
   wethPoolTokenRead?: Contract;
   setCurrentWETHPoolTokenRead: (currentPoolTokenRead: Contract) => void;
   daiPoolTokenRead?: Contract;
@@ -47,7 +51,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWBTCToken: () => {},
   setCurrentTCAPToken: () => {},
   setCurrentCtxToken: () => {},
-
+  setCurrentMATICToken: () => {},
   setCurrentWETHPoolToken: () => {},
   setCurrentDAIPoolToken: () => {},
   setCurrentWBTCPoolToken: () => {},
@@ -57,6 +61,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWBTCTokenRead: () => {},
   setCurrentTCAPTokenRead: () => {},
   setCurrentCtxTokenRead: () => {},
+  setCurrentMATICTokenRead: () => {},
   setCurrentWETHPoolTokenRead: () => {},
   setCurrentDAIPoolTokenRead: () => {},
   setCurrentWBTCPoolTokenRead: () => {},
