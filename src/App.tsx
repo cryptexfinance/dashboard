@@ -61,7 +61,7 @@ const App = () => {
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
       process.env.REACT_APP_NETWORK_NAME === "mainnet"
-        ? GRAPHQL_ENDPOINT.polygon
+        ? GRAPHQL_ENDPOINT.mainnet
         : GRAPHQL_ENDPOINT.rinkeby
     )
   );
@@ -104,9 +104,15 @@ const App = () => {
 
   const setEthereumContracts = async (currentSigner: ethers.Signer) => {
     let contracts;
+    let ethPoolAddress = NETWORKS.rinkeby.ethPool;
+    let daiPoolAddress = NETWORKS.rinkeby.daiPool;
+    let ctxPoolAddress = NETWORKS.rinkeby.ctxPool;
     switch (currentNetwork.chainId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
+        ethPoolAddress = NETWORKS.mainnet.ethPool;
+        daiPoolAddress = NETWORKS.mainnet.daiPool;
+        ctxPoolAddress = NETWORKS.mainnet.ctxPool;
         break;
       case 4:
         contracts = cryptexJson[4].rinkeby.contracts;
@@ -201,46 +207,26 @@ const App = () => {
     governance.setCurrentTimelockRead(currentTimelockRead);
 
     // TODO:remove this once other pools work
-    if (process.env.REACT_APP_POOL_ETH && process.env.REACT_APP_POOL_CTX) {
+    if (ethPoolAddress && ctxPoolAddress) {
       const currentWETHPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_ETH,
+        ethPoolAddress,
         UniV2Pair.abi,
         currentSigner
       );
       tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
 
-      const currentWETHPoolTokenRead = new Contract(process.env.REACT_APP_POOL_ETH, UniV2Pair.abi);
+      const currentWETHPoolTokenRead = new Contract(ethPoolAddress, UniV2Pair.abi);
       tokens.setCurrentWETHPoolTokenRead(currentWETHPoolTokenRead);
 
-      const currentCTXPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_CTX,
-        UniV2Pair.abi,
-        currentSigner
-      );
+      const currentCTXPoolToken = new ethers.Contract(ctxPoolAddress, UniV2Pair.abi, currentSigner);
       tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
 
-      const currentCTXPoolTokenRead = new Contract(process.env.REACT_APP_POOL_CTX, UniV2Pair.abi);
+      const currentCTXPoolTokenRead = new Contract(ctxPoolAddress, UniV2Pair.abi);
       tokens.setCurrentCTXPoolTokenRead(currentCTXPoolTokenRead);
     }
 
-    if (
-      process.env.REACT_APP_POOL_ETH &&
-      process.env.REACT_APP_POOL_DAI &&
-      process.env.REACT_APP_POOL_CTX
-    ) {
-      // Set Pool Tokens
-      const currentWETHPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_ETH,
-        UniV2Pair.abi,
-        currentSigner
-      );
-      tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
-
-      const currentDAIPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_DAI,
-        UniV2Pair.abi,
-        currentSigner
-      );
+    if (daiPoolAddress) {
+      const currentDAIPoolToken = new ethers.Contract(daiPoolAddress, UniV2Pair.abi, currentSigner);
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
     }
   };
@@ -412,6 +398,7 @@ const App = () => {
     setContracts(currentSigner, ethcallProvider, network.chainId || 4);
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
+      // web3Modal.clearCachedProvider();
       window.location.reload();
     });
     setLoading(false);

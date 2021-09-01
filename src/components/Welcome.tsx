@@ -64,7 +64,7 @@ const Welcome = () => {
         setTcapBalance(tcapString);
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
-        if (currentNetwork.chainId !== 137) {
+        if (currentNetwork.chainId === 1) {
           const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
           // @ts-ignore
