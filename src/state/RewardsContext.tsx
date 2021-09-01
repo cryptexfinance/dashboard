@@ -1,5 +1,6 @@
 import React from "react";
 import { ethers } from "ethers";
+import { Contract } from "ethers-multicall";
 
 export interface RewardsContext {
   wethReward?: ethers.Contract;
@@ -16,6 +17,20 @@ export interface RewardsContext {
   setCurrentWBTCPoolReward: (currentPoolReward: ethers.Contract) => void;
   ctxPoolReward?: ethers.Contract;
   setCurrentCTXPoolReward: (currentPoolReward: ethers.Contract) => void;
+  wethRewardRead?: Contract;
+  setCurrentWETHRewardRead: (currentReward: Contract) => void;
+  daiRewardRead?: Contract;
+  setCurrentDAIRewardRead: (currentReward: Contract) => void;
+  wbtcRewardRead?: Contract;
+  setCurrentWBTCRewardRead: (currentReward: Contract) => void;
+  wethPoolRewardRead?: Contract;
+  setCurrentWETHPoolRewardRead: (currentPoolReward: Contract) => void;
+  daiPoolRewardRead?: Contract;
+  setCurrentDAIPoolRewardRead: (currentPoolReward: Contract) => void;
+  wbtcPoolRewardRead?: Contract;
+  setCurrentWBTCPoolRewardRead: (currentPoolReward: Contract) => void;
+  ctxPoolRewardRead?: Contract;
+  setCurrentCTXPoolRewardRead: (currentPoolReward: Contract) => void;
 }
 
 export const REWARDS_DEFAULT_VALUE = {
@@ -26,6 +41,13 @@ export const REWARDS_DEFAULT_VALUE = {
   setCurrentDAIPoolReward: () => {},
   setCurrentWBTCPoolReward: () => {},
   setCurrentCTXPoolReward: () => {},
+  setCurrentWETHRewardRead: () => {},
+  setCurrentDAIRewardRead: () => {},
+  setCurrentWBTCRewardRead: () => {},
+  setCurrentWETHPoolRewardRead: () => {},
+  setCurrentDAIPoolRewardRead: () => {},
+  setCurrentWBTCPoolRewardRead: () => {},
+  setCurrentCTXPoolRewardRead: () => {},
 };
 
 const rewardsContext = React.createContext<RewardsContext>(REWARDS_DEFAULT_VALUE);

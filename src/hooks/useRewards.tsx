@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
+import { Contract } from "ethers-multicall";
 import { RewardsContext } from "../state/RewardsContext";
 
 export const useRewards = (): RewardsContext => {
@@ -10,6 +11,13 @@ export const useRewards = (): RewardsContext => {
   const [daiPoolReward, setDAIPoolReward] = useState<ethers.Contract>();
   const [wbtcPoolReward, setWBTCPoolReward] = useState<ethers.Contract>();
   const [ctxPoolReward, setCTXPoolReward] = useState<ethers.Contract>();
+  const [wethRewardRead, setWETHRewardRead] = useState<Contract>();
+  const [daiRewardRead, setDAIRewardRead] = useState<Contract>();
+  const [wbtcRewardRead, setWBTCRewardRead] = useState<Contract>();
+  const [wethPoolRewardRead, setWETHPoolRewardRead] = useState<Contract>();
+  const [daiPoolRewardRead, setDAIPoolRewardRead] = useState<Contract>();
+  const [wbtcPoolRewardRead, setWBTCPoolRewardRead] = useState<Contract>();
+  const [ctxPoolRewardRead, setCTXPoolRewardRead] = useState<Contract>();
 
   const setCurrentWETHReward = React.useCallback((currentWETHReward: ethers.Contract): void => {
     setWETHReward(currentWETHReward);
@@ -44,6 +52,33 @@ export const useRewards = (): RewardsContext => {
     },
     []
   );
+  const setCurrentWETHRewardRead = React.useCallback((currentWETHReward: Contract): void => {
+    setWETHRewardRead(currentWETHReward);
+  }, []);
+  const setCurrentDAIRewardRead = React.useCallback((currentDAIReward: Contract): void => {
+    setDAIRewardRead(currentDAIReward);
+  }, []);
+  const setCurrentWBTCRewardRead = React.useCallback((currentWBTCReward: Contract): void => {
+    setWBTCRewardRead(currentWBTCReward);
+  }, []);
+  const setCurrentWETHPoolRewardRead = React.useCallback(
+    (currentWETHPoolReward: Contract): void => {
+      setWETHPoolRewardRead(currentWETHPoolReward);
+    },
+    []
+  );
+  const setCurrentDAIPoolRewardRead = React.useCallback((currentDAIPoolReward: Contract): void => {
+    setDAIPoolRewardRead(currentDAIPoolReward);
+  }, []);
+  const setCurrentWBTCPoolRewardRead = React.useCallback(
+    (currentWBTCPoolReward: Contract): void => {
+      setWBTCPoolRewardRead(currentWBTCPoolReward);
+    },
+    []
+  );
+  const setCurrentCTXPoolRewardRead = React.useCallback((currentCTXPoolReward: Contract): void => {
+    setCTXPoolRewardRead(currentCTXPoolReward);
+  }, []);
   return {
     wethReward,
     setCurrentWETHReward,
@@ -59,5 +94,19 @@ export const useRewards = (): RewardsContext => {
     setCurrentWBTCPoolReward,
     ctxPoolReward,
     setCurrentCTXPoolReward,
+    wethRewardRead,
+    setCurrentWETHRewardRead,
+    daiRewardRead,
+    setCurrentDAIRewardRead,
+    wbtcRewardRead,
+    setCurrentWBTCRewardRead,
+    wethPoolRewardRead,
+    setCurrentWETHPoolRewardRead,
+    daiPoolRewardRead,
+    setCurrentDAIPoolRewardRead,
+    wbtcPoolRewardRead,
+    setCurrentWBTCPoolRewardRead,
+    ctxPoolRewardRead,
+    setCurrentCTXPoolRewardRead,
   };
 };

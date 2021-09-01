@@ -20,6 +20,9 @@ switch (process.env.REACT_APP_NETWORK_ID) {
   case "5":
     network = "goerli";
     break;
+  case "137":
+    network = "polygon";
+    break;
   default:
     break;
 }

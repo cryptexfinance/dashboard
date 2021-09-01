@@ -4,26 +4,34 @@ import Card from "react-bootstrap/esm/Card";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
+import NetworkContext from "../state/NetworkContext";
 import TokensContext from "../state/TokensContext";
+import SignerContext from "../state/SignerContext";
 import OraclesContext from "../state/OraclesContext";
 import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
+import { ReactComponent as MATICIcon } from "../assets/images/graph/polygon.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { toUSD } from "../utils/utils";
+import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
+  const network = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
+  const signer = useContext(SignerContext);
   const oracles = useContext(OraclesContext);
 
   const [tcapPrice, setTcapPrice] = useState("0.0");
+  const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
-  // const [WBTCStake, setWBTCStake] = useState("0");
+  const [MATICStake, setMATICStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -43,25 +51,57 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
+  const loadEthereum = async (currentPriceETH: string) => {
+    if (signer) {
+      const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+      // @ts-ignore
+      const [reservesCtxPool] = await signer.ethcallProvider?.all([reservesCtxPoolCall]);
+      const currentPriceCTX = getPriceInUSDFromPair(
+        // @ts-ignore
+        reservesCtxPool[0], // @ts-ignore
+        reservesCtxPool[1],
+        parseFloat(currentPriceETH)
+      );
+      setCtxPrice(currentPriceCTX.toString());
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data) {
-        const currentTotalPrice = await oracles.tcapOracle?.getLatestAnswer();
+      if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
+        const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
+        const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
+
+        // @ts-ignore
+        const [currentTotalPrice, wethOraclePrice, daiOraclePrice, currentTotalSupply] =
+          await signer.ethcallProvider?.all([
+            currentTotalPriceCall,
+            wethOraclePriceCall,
+            daiOraclePriceCall,
+            currentTotalSupplyCall,
+          ]);
+
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
-
+        let currentMATICStake = BigNumber.from(0);
+        let maticVaultAddress = "";
         await data.states.forEach((s: any) => {
-          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
           let contracts;
 
-          switch (networkId) {
+          switch (network.chainId) {
             case 1:
               contracts = cryptexJson[1].mainnet.contracts;
               break;
             case 4:
               contracts = cryptexJson[4].rinkeby.contracts;
+              break;
+            case 137:
+              contracts = cryptexJson[137].polygon.contracts;
+              maticVaultAddress = contracts.MATICVaultHandler.address;
               break;
             default:
               contracts = cryptexJson[4].rinkeby.contracts;
@@ -74,6 +114,9 @@ const Graph = () => {
             case contracts.WETHVaultHandler.address.toLowerCase():
               currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
+            case maticVaultAddress.toLowerCase():
+              currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
             default:
               break;
           }
@@ -81,20 +124,20 @@ const Graph = () => {
 
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
-
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
-        const ethUSD = ethers.utils.formatEther(
-          (await oracles.wethOracle?.getLatestAnswer()).mul(10000000000)
-        );
-        const daiUSD = ethers.utils.formatEther(
-          (await oracles.daiOracle?.getLatestAnswer()).mul(10000000000)
-        );
+        const formatMATIC = ethers.utils.formatEther(currentMATICStake);
+        setMATICStake(formatMATIC);
+        const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
         const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
         setTotalStake(totalUSD.toString());
-
-        const currentTotalSupply = await tokens.tcapToken?.totalSupply();
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
+
+        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        if (network.chainId !== NETWORKS.polygon.chainId) {
+          loadEthereum(currentPriceETH);
+        }
       }
       setLoading(false);
     };
@@ -156,20 +199,34 @@ const Graph = () => {
             ETH
           </h5>
         </Card>
-        {/* <Card>
-          <WBTCIcon className="wbtc" />
-          <h4>Total Staked in WBTC</h4>
-          <h5 className="number neon-yellow">
-            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            WBTC
-          </h5>
-        </Card> */}
         <Card>
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>
           <h5 className="number neon-orange">
             <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
+          </h5>
+        </Card>
+        <Card>
+          {network.chainId !== 137 ? (
+            <>
+              <CtxIcon className="ctx" />
+              <h4>CTX Price</h4>
+            </>
+          ) : (
+            <>
+              <MATICIcon className="eth" />
+              <h4>Total Staked in MATIC</h4>
+            </>
+          )}
+          <h5 className="number neon-blue">
+            <NumberFormat
+              value={network.chainId !== 137 ? ctxPrice : MATICStake}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+              prefix="$"
+            />{" "}
           </h5>
         </Card>
       </div>

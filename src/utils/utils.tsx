@@ -1,5 +1,6 @@
-import { ethers } from "ethers";
 import React from "react";
+import { ethers, utils } from "ethers";
+import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
 
@@ -16,7 +17,10 @@ export const isValidAddress = async (address: string) => {
     return currentAddress;
   } catch (error) {
     try {
-      const tempProvider = ethers.getDefaultProvider("mainnet");
+      const tempProvider = ethers.getDefaultProvider("mainnet", {
+        infura: process.env.REACT_APP_INFURA_ID,
+        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+      });
       const currentAddress = await tempProvider.resolveName(address);
       return currentAddress;
     } catch (e) {
@@ -179,4 +183,60 @@ export const getProposalStatus = (
     return "READY";
   }
   return "QUEUED";
+};
+
+export const getPriceInUSDFromPair = (
+  reserves0: ethers.BigNumber,
+  reservesWETH: ethers.BigNumber,
+  ethPrice: number
+) => {
+  const one = ethers.utils.parseEther("1");
+  // if ((await pair.token1()) != WETH) {
+  //   throw "UniswapV2Pair must be paired with WETH"; // Being lazy for now.
+  // }
+
+  // const reserves0 = resp[0];
+  // const reservesWETH = resp[1];
+
+  // amount of token0 required to by 1 WETH
+  const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
+  return ethPrice / amt;
+};
+
+export function toFragment(abi: JsonFragment[] | string[] | Fragment[]): Fragment[] {
+  const abiFragment = abi.map((item: JsonFragment | string | Fragment) =>
+    utils.Fragment.from(item)
+  );
+
+  if (abiFragment.length > 0 && abiFragment[abiFragment.length - 1] == null) {
+    abiFragment.pop();
+  }
+
+  return abiFragment;
+}
+
+export const isValidNetwork = (chainId: number) => {
+  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  if (name === "mainnet") {
+    return chainId === 1 || chainId === 137;
+  }
+  return chainId === 4 || chainId === 137;
+};
+
+export const getDefaultProvider = (chainId: number, name: string) => {
+  let provider;
+  if (chainId === 137) {
+    provider = new ethers.providers.AlchemyProvider(
+      name,
+      process.env.REACT_APP_ALCHEMY_KEY_POLYGON
+    );
+  } else {
+    const alchemyKey =
+      chainId === 1 ? process.env.REACT_APP_ALCHEMY_KEY : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+    provider = ethers.getDefaultProvider(name, {
+      infura: process.env.REACT_APP_INFURA_ID,
+      alchemy: alchemyKey,
+    });
+  }
+  return provider;
 };
