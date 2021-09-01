@@ -12,11 +12,13 @@ import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
+import { ReactComponent as MATICIcon } from "../assets/images/graph/polygon.svg";
 // import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
 import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
@@ -29,7 +31,7 @@ const Graph = () => {
   const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
-  // const [WBTCStake, setWBTCStake] = useState("0");
+  const [MATICStake, setMATICStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -85,7 +87,8 @@ const Graph = () => {
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
-
+        let currentMATICStake = BigNumber.from(0);
+        let maticVaultAddress = "";
         await data.states.forEach((s: any) => {
           let contracts;
 
@@ -98,6 +101,7 @@ const Graph = () => {
               break;
             case 137:
               contracts = cryptexJson[137].polygon.contracts;
+              maticVaultAddress = contracts.MATICVaultHandler.address;
               break;
             default:
               contracts = cryptexJson[4].rinkeby.contracts;
@@ -110,6 +114,9 @@ const Graph = () => {
             case contracts.WETHVaultHandler.address.toLowerCase():
               currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
+            case maticVaultAddress.toLowerCase():
+              currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
             default:
               break;
           }
@@ -117,9 +124,10 @@ const Graph = () => {
 
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
-
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
+        const formatMATIC = ethers.utils.formatEther(currentMATICStake);
+        setMATICStake(formatMATIC);
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
         const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
@@ -127,7 +135,7 @@ const Graph = () => {
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
 
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        if (network.chainId !== 137) {
+        if (network.chainId !== NETWORKS.polygon.chainId) {
           loadEthereum(currentPriceETH);
         }
       }
@@ -199,21 +207,28 @@ const Graph = () => {
             DAI
           </h5>
         </Card>
-        {network.chainId !== 137 && (
-          <Card>
-            <CtxIcon className="ctx" />
-            <h4>CTX Price</h4>
-            <h5 className="number neon-blue">
-              <NumberFormat
-                value={ctxPrice}
-                displayType="text"
-                thousandSeparator
-                decimalScale={2}
-                prefix="$"
-              />{" "}
-            </h5>
-          </Card>
-        )}
+        <Card>
+          {network.chainId !== 137 ? (
+            <>
+              <CtxIcon className="ctx" />
+              <h4>CTX Price</h4>
+            </>
+          ) : (
+            <>
+              <MATICIcon className="eth" />
+              <h4>Total Staked in MATIC</h4>
+            </>
+          )}
+          <h5 className="number neon-blue">
+            <NumberFormat
+              value={network.chainId !== 137 ? ctxPrice : MATICStake}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+              prefix="$"
+            />{" "}
+          </h5>
+        </Card>
       </div>
     </div>
   );

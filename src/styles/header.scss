@@ -4,6 +4,7 @@
   padding-top: 1.25rem;
   flex-direction: row;
   justify-content: flex-end;
+  align-items: center;
   padding-right: 3rem;
 
   svg {
@@ -16,6 +17,21 @@
     width: 15rem;
     height: 3rem;
     border-radius: 0;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .btn-network {
+    height: 2.2rem;
+    width: 11rem;
+    margin-right: 1rem;
+  }
+
+  .btn-network-container{
+    padding-left: 1rem;
   }
 
   .address {

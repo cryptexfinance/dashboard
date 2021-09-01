@@ -58,9 +58,13 @@ const App = () => {
   const [vaultWarning, setVaultWarning] = useState(true);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
   const [showSidebar, setShowSidebar] = useState(true);
-  const [walletProvider, setWalletProvider] = useState();
-  const [walletConnected, setwalletConnected] = useState(false);
-  const [apolloClient, setApolloClient] = useState(clientOracle(GRAPHQL_ENDPOINT.mainnet));
+  const [apolloClient, setApolloClient] = useState(
+    clientOracle(
+      process.env.REACT_APP_NETWORK_NAME === "mainnet"
+        ? GRAPHQL_ENDPOINT.polygon
+        : GRAPHQL_ENDPOINT.rinkeby
+    )
+  );
   const currentNetwork = useContext(NetworkContext);
   const networks = useNetworks();
   const vaults = useVaults();
@@ -397,8 +401,6 @@ const App = () => {
   web3Modal.on("connect", async (networkProvider) => {
     setLoading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
-    setWalletProvider(networkProvider);
-    setwalletConnected(true);
     const network = await currentProvider.getNetwork();
     if (!isValidNetwork(network.chainId)) {
       setInvalidNetwork(true);
@@ -408,6 +410,10 @@ const App = () => {
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
     setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    // @ts-ignore
+    networkProvider.on("chainChanged", (chainId: number) => {
+      window.location.reload();
+    });
     setLoading(false);
   });
 
@@ -417,8 +423,6 @@ const App = () => {
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
         const networkProvider = await web3Modal.connect();
-        setWalletProvider(networkProvider);
-        setwalletConnected(true);
         const currentProvider = new ethers.providers.Web3Provider(networkProvider);
         const network = await currentProvider.getNetwork();
         if (!isValidNetwork(network.chainId)) {
@@ -444,19 +448,6 @@ const App = () => {
     loadProvider();
     // eslint-disable-next-line
   }, [web3Modal]);
-
-  useEffect(() => {
-    async function networkChanged() {
-      if (walletConnected) {
-        // @ts-ignore
-        walletProvider.on("chainChanged", (chainId: number) => {
-          web3Modal.clearCachedProvider();
-          window.location.reload();
-        });
-      }
-    }
-    networkChanged();
-  }, [walletConnected]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setShowSidebar(true),

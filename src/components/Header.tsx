@@ -67,28 +67,34 @@ const Header = () => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          <TcapIcon className="tcap-neon" />
-          <h5>
-            <NumberFormat
-              className="number mx-2 neon-pink"
-              value={tokenBalance}
-              displayType="text"
-              thousandSeparator
-              prefix=""
-              decimalScale={2}
-            />
-          </h5>
-          <h5>
-            <OverlayTrigger
-              key="bottom"
-              placement="bottom"
-              overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
-            >
-              <a href="/" onClick={copyCodeToClipboard} className="address">
-                {makeShortAddress(address)}
-              </a>
-            </OverlayTrigger>
-          </h5>
+          {/* <Button className="btn-network" onClick={() => setShowChangeNetwork(true)}>
+            {networkName()}
+          </Button>
+          */}
+          <div className="info">
+            <TcapIcon className="tcap-neon" />
+            <h5>
+              <NumberFormat
+                className="number mx-2 neon-pink"
+                value={tokenBalance}
+                displayType="text"
+                thousandSeparator
+                prefix=""
+                decimalScale={2}
+              />
+            </h5>
+            <h5>
+              <OverlayTrigger
+                key="bottom"
+                placement="bottom"
+                overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+              >
+                <a href="/" onClick={copyCodeToClipboard} className="address">
+                  {makeShortAddress(address)}
+                </a>
+              </OverlayTrigger>
+            </h5>
+          </div>
         </>
       ) : (
         <Button

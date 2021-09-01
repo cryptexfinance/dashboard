@@ -220,7 +220,7 @@ export const isValidNetwork = (chainId: number) => {
   if (name === "mainnet") {
     return chainId === 1 || chainId === 137;
   }
-  return chainId === 4;
+  return chainId === 4 || chainId === 137;
 };
 
 export const getDefaultProvider = (chainId: number, name: string) => {

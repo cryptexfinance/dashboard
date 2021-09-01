@@ -9,9 +9,9 @@ export const NETWORKS = {
   rinkeby: {
     chainId: 4,
     name: "rinkeby",
-    eth: "",
-    weth: "",
-    dai: "",
+    eth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
+    weth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
+    dai: "0x118a4238E4086FAE2621D0336C0E6cdC1257BE82",
   },
   polygon: {
     chainId: 137,
@@ -25,6 +25,6 @@ export const NETWORKS = {
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
-  rinkeby: "",
-  polygon: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
+  rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };
