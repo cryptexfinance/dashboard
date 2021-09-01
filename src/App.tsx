@@ -399,6 +399,7 @@ const App = () => {
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
       // web3Modal.clearCachedProvider();
+      setCurrentNetwork(chainId);
       window.location.reload();
     });
     setLoading(false);
