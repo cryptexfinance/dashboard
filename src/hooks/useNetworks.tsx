@@ -7,6 +7,7 @@ export const useNetworks = (): NetworkContext => {
   const [wethAddress, setWETHAddress] = useState<string>("");
   const [daiAddress, setDAIAddress] = useState<string>("");
   const [maticAddress, setMATICAddress] = useState<string>();
+  const [wallet, setWallet] = useState<string>();
 
   const setCurrentChainId = React.useCallback((currentChainId: number): void => {
     setChainId(currentChainId);
@@ -23,6 +24,9 @@ export const useNetworks = (): NetworkContext => {
   const setCurrentMATICAddress = React.useCallback((currentMATICAddress: string): void => {
     setMATICAddress(currentMATICAddress);
   }, []);
+  const setCurrentWallet = React.useCallback((currentWallet: string): void => {
+    setWallet(currentWallet);
+  }, []);
   return {
     chainId,
     setCurrentChainId,
@@ -34,5 +38,7 @@ export const useNetworks = (): NetworkContext => {
     setCurrentDAIAddress,
     maticAddress,
     setCurrentMATICAddress,
+    wallet,
+    setCurrentWallet,
   };
 };

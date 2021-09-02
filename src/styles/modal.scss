@@ -38,6 +38,7 @@
     &:hover {
       color: $white;
     }
+    margin-bottom: 0.5rem;
   }
 
   .close {
@@ -103,6 +104,22 @@
 
     .progress-bar {
       font-weight: bold;
+    }
+  }
+
+  .change-network {
+    .btn-polygon {
+      padding-left: 0rem;
+    }
+    svg {
+      height: 1.7rem;
+      width: 1.7rem;
+      margin-right: 1.1rem;
+      filter: brightness(1118%) drop-shadow(0px 0px 5px #a440f2);
+      
+      .polygon {
+        margin-right: 0.7rem;
+      }
     }
   }
 

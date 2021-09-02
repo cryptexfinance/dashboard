@@ -12,6 +12,8 @@ export interface NetworkContext {
   setCurrentDAIAddress: (address: string) => void;
   maticAddress?: string;
   setCurrentMATICAddress: (address: string) => void;
+  wallet?: string;
+  setCurrentWallet: (walletName: string) => void;
 }
 
 const NETWORK_DEFAULT_VALUE = {
@@ -25,6 +27,8 @@ const NETWORK_DEFAULT_VALUE = {
   setCurrentDAIAddress: () => {},
   maticAddress: "",
   setCurrentMATICAddress: () => {},
+  wallet: "",
+  setCurrentWallet: () => {},
 };
 
 const networkContext = React.createContext<NetworkContext>(NETWORK_DEFAULT_VALUE);

@@ -3,14 +3,20 @@ import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useMediaQuery } from "@react-hook/media-query";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
+import { ChangeNetwork } from "./modals/ChangeNetwork";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
+import NetworkContext from "../state/NetworkContext";
 import { makeShortAddress } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
+import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon.svg";
 
 // TODO: On change account reload page
 
@@ -18,8 +24,11 @@ const Header = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
+  const currentNetwork = useContext(NetworkContext);
+  const [showChangeNetwork, setShowChangeNetwork] = useState(false);
   const [address, setAddress] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  const isMobile = useMediaQuery("only screen and (max-width: 600px)");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,6 +46,15 @@ const Header = () => {
     // Remove temporary element
     document.body.removeChild(el);
   };
+
+  async function changeNetwork(newChainId: string) {
+    if (currentNetwork.wallet === "metamask") {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: newChainId }],
+      });
+    }
+  }
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -67,10 +85,6 @@ const Header = () => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          {/* <Button className="btn-network" onClick={() => setShowChangeNetwork(true)}>
-            {networkName()}
-          </Button>
-          */}
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>
@@ -95,6 +109,25 @@ const Header = () => {
               </OverlayTrigger>
             </h5>
           </div>
+          {!isMobile && (
+            <Button
+              className="btn-network"
+              onClick={
+                currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
+              }
+            >
+              {currentNetwork.chainId === NETWORKS.polygon.chainId ? (
+                <POLYGONIcon className="eth" />
+              ) : (
+                <ETHIcon className="eth" />
+              )}
+            </Button>
+          )}
+          <ChangeNetwork
+            show={showChangeNetwork}
+            onHide={() => setShowChangeNetwork(false)}
+            changeNetwork={changeNetwork}
+          />
         </>
       ) : (
         <Button

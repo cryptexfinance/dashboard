@@ -22,7 +22,7 @@ import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.sv
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
-import { ReactComponent as MATICIcon } from "../../assets/images/graph/polygon.svg";
+import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import {
@@ -854,7 +854,7 @@ const Details = ({ address }: props) => {
                     case "DAI":
                       return <DAIIcon className="eth" />;
                     case "MATIC":
-                      return <MATICIcon className="eth" />;
+                      return <POLYGONIcon className="eth" />;
                     default:
                       return <ETHIcon className="eth" />;
                   }
