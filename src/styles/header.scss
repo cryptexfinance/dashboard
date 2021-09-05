@@ -7,6 +7,40 @@
   align-items: center;
   padding-right: 3rem;
 
+  .network-container {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    padding-left: 3rem;
+    .btn {
+      height: 3.2rem;
+      width: 10.5rem;
+      border-radius: 0.3rem;
+      //border-width: 0px;
+      //background-color: transparent;
+
+      svg {
+        height: 2rem;
+      }
+
+      .title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;       
+      }
+
+      h6 {
+        margin-bottom: 0rem;
+      }
+    }
+    @media (max-width: 600px) {
+      margin-bottom: 1rem;
+      padding-left: 0rem;
+      justify-content: center;
+    }
+  }
+
   h5 {
     margin-bottom: 0rem;
   }
@@ -25,20 +59,10 @@
 
   .info {
     display: flex;
+    flex: 1;
     flex-direction: row;
     align-items: center;
-  }
-
-  .btn-network {
-    height: 3.2rem;
-    width: 5rem;
-    margin-left: 1rem;
-    border-width: 0px;
-    background-color: transparent;
-
-    svg {
-      height: 2.5rem;
-    }
+    justify-content: flex-end;
   }
 
   .btn-network-container{

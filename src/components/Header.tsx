@@ -16,7 +16,7 @@ import { makeShortAddress } from "../utils/utils";
 import { NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon.svg";
+import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
 // TODO: On change account reload page
 
@@ -28,7 +28,6 @@ const Header = () => {
   const [showChangeNetwork, setShowChangeNetwork] = useState(false);
   const [address, setAddress] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
-  const isMobile = useMediaQuery("only screen and (max-width: 600px)");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -49,10 +48,36 @@ const Header = () => {
 
   async function changeNetwork(newChainId: string) {
     if (currentNetwork.wallet === "metamask") {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: newChainId }],
-      });
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: newChainId }],
+        });
+      } catch (error) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (error.code === 4902 && newChainId === NETWORKS.polygon.hexChainId) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [
+                {
+                  chainId: newChainId,
+                  chainName: "Polygon Mainnet",
+                  nativeCurrency: {
+                    name: "Matic Token",
+                    symbol: "MATIC",
+                    decimals: 18,
+                  },
+                  rpcUrls: ["https://rpc-mainnet.maticvigil.com/"],
+                  blockExplorerUrls: ["https://polygonscan.com/"],
+                },
+              ],
+            });
+          } catch (addError) {
+            // handle "add" error
+          }
+        }
+      }
     }
   }
 
@@ -85,6 +110,24 @@ const Header = () => {
     <Nav className="header">
       {signer.signer ? (
         <>
+          <div className="network-container">
+            <Button
+              className="btn"
+              onClick={
+                currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
+              }
+            >
+              {currentNetwork.chainId === NETWORKS.polygon.chainId ? (
+                <div className="title">
+                  <POLYGONIcon className="eth" /> <h6>Polygon</h6>
+                </div>
+              ) : (
+                <div className="title">
+                  <ETHIcon className="eth" /> <h6>Ethereum</h6>
+                </div>
+              )}
+            </Button>
+          </div>
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>
@@ -109,20 +152,6 @@ const Header = () => {
               </OverlayTrigger>
             </h5>
           </div>
-          {!isMobile && (
-            <Button
-              className="btn-network"
-              onClick={
-                currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
-              }
-            >
-              {currentNetwork.chainId === NETWORKS.polygon.chainId ? (
-                <POLYGONIcon className="eth" />
-              ) : (
-                <ETHIcon className="eth" />
-              )}
-            </Button>
-          )}
           <ChangeNetwork
             show={showChangeNetwork}
             onHide={() => setShowChangeNetwork(false)}
