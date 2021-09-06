@@ -12,8 +12,7 @@ import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as MATICIcon } from "../assets/images/graph/polygon.svg";
-// import { ReactComponent as WBTCIcon } from "../assets/images/graph/WBTC.svg";
+import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon3.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
@@ -215,7 +214,7 @@ const Graph = () => {
             </>
           ) : (
             <>
-              <MATICIcon className="eth" />
+              <POLYGONIcon className="eth" />
               <h4>Total Staked in MATIC</h4>
             </>
           )}

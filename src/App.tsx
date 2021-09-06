@@ -36,7 +36,7 @@ import oraclesContext from "./state/OraclesContext";
 import governanceContext from "./state/GovernanceContext";
 import rewardsContext from "./state/RewardsContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
-import { toFragment, isValidNetwork } from "./utils/utils";
+import { toFragment, isValidNetwork, getDefaultProvider } from "./utils/utils";
 import { NETWORKS, GRAPHQL_ENDPOINT } from "./utils/constants";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
@@ -75,7 +75,7 @@ const App = () => {
   const match = useRouteMatch();
   const location = useLocation();
 
-  const setCurrentNetwork = (networkId: number) => {
+  const setCurrentNetwork = (networkId: number, walletName: string) => {
     let cNetwork;
     switch (networkId) {
       case 1:
@@ -100,6 +100,7 @@ const App = () => {
     networks.setCurrentName(cNetwork.name);
     networks.setCurrentWETHAddress(cNetwork.weth);
     networks.setCurrentDAIAddress(cNetwork.dai);
+    if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
   const setEthereumContracts = async (currentSigner: ethers.Signer) => {
@@ -391,7 +392,8 @@ const App = () => {
     if (!isValidNetwork(network.chainId)) {
       setInvalidNetwork(true);
     }
-    setCurrentNetwork(network.chainId);
+    const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
+    setCurrentNetwork(network.chainId, walletName);
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
@@ -399,7 +401,7 @@ const App = () => {
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
       // web3Modal.clearCachedProvider();
-      setCurrentNetwork(chainId);
+      setCurrentNetwork(chainId, "");
       window.location.reload();
     });
     setLoading(false);
@@ -412,6 +414,7 @@ const App = () => {
       if (web3Modal.cachedProvider && !signer.signer) {
         const networkProvider = await web3Modal.connect();
         const currentProvider = new ethers.providers.Web3Provider(networkProvider);
+
         const network = await currentProvider.getNetwork();
         if (!isValidNetwork(network.chainId)) {
           setInvalidNetwork(true);
@@ -421,11 +424,10 @@ const App = () => {
         const ethcallProvider = new Provider(currentProvider);
         setContracts(currentSigner, ethcallProvider, network.chainId || 4);
       } else {
-        const network = process.env.REACT_APP_NETWORK_NAME;
-        const provider = ethers.getDefaultProvider(network, {
-          infura: process.env.REACT_APP_INFURA_ID,
-          alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-        });
+        const provider = getDefaultProvider(
+          parseInt(process.env.REACT_APP_NETWORK_ID || "4"),
+          process.env.REACT_APP_NETWORK_NAME || "rinkeby"
+        );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         setContracts(randomSigner, ethcallProvider, 1);

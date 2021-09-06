@@ -1,6 +1,7 @@
 export const NETWORKS = {
   mainnet: {
     chainId: 1,
+    hexChainId: "0x1",
     name: "mainnet",
     eth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     weth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
@@ -11,6 +12,7 @@ export const NETWORKS = {
   },
   rinkeby: {
     chainId: 4,
+    hexChainId: "0x4",
     name: "rinkeby",
     eth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
     weth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
@@ -21,6 +23,7 @@ export const NETWORKS = {
   },
   polygon: {
     chainId: 137,
+    hexChainId: "0x89",
     name: "matic",
     eth: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
     weth: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
