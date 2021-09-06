@@ -3,7 +3,6 @@ import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import { useMediaQuery } from "@react-hook/media-query";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import NumberFormat from "react-number-format";

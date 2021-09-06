@@ -3,8 +3,6 @@ import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import { NETWORKS } from "../../utils/constants";
 import { useNetworks } from "../../hooks/useNetworks";
-import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
-import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon.svg";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 
