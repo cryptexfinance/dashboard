@@ -17,7 +17,6 @@ import VaultsContext from "../../state/VaultsContext";
 import SignerContext from "../../state/SignerContext";
 import "../../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
-import { ReactComponent as BTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
@@ -35,6 +34,7 @@ import {
   getDefaultProvider,
 } from "../../utils/utils";
 import Loading from "../Loading";
+import { NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -939,8 +939,8 @@ const Details = ({ address }: props) => {
                         switch (selectedVault) {
                           case "DAI":
                             return <DAIIconSmall className="dai" />;
-                          case "WBTC":
-                            return <BTCIconSmall className="btc" />;
+                          case "MATIC":
+                            return <POLYGONIconSmall className="polygon" />;
                           default:
                             return <ETHIconSmall className="weth" />;
                         }
@@ -1137,7 +1137,7 @@ const Details = ({ address }: props) => {
                         thousandSeparator
                         decimalScale={4}
                       />{" "}
-                      ETH
+                      {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
                     </Form.Text>
                   </Form.Group>
                 </Form>
