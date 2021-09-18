@@ -122,7 +122,12 @@ const Header = () => {
                 </div>
               ) : (
                 <div className="title">
-                  <ETHIcon className="eth" /> <h6>Ethereum</h6>
+                  <ETHIcon className="eth" />
+                  {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
+                    <h6>Ethereum</h6>
+                  ) : (
+                    <h6>Rinkeby</h6>
+                  )}
                 </div>
               )}
             </Button>
