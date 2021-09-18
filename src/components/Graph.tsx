@@ -65,6 +65,14 @@ const Graph = () => {
     }
   };
 
+  const getMaticUSD = async () => {
+    const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
+    // @ts-ignore
+    const [maticOraclePrice] = await signer.ethcallProvider?.all([maticOraclePriceCall]);
+    const maticUSD = ethers.utils.formatEther(maticOraclePrice.mul(10000000000));
+    return maticUSD;
+  };
+
   useEffect(() => {
     const load = async () => {
       if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
@@ -129,7 +137,11 @@ const Graph = () => {
         setMATICStake(formatMATIC);
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
-        const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
+        let totalMaticUSD = 0;
+        if (network.chainId === NETWORKS.polygon.chainId) {
+          totalMaticUSD = toUSD(await getMaticUSD(), formatMATIC);
+        }
+        const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI) + totalMaticUSD;
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
 
@@ -207,7 +219,7 @@ const Graph = () => {
           </h5>
         </Card>
         <Card>
-          {network.chainId !== 137 ? (
+          {network.chainId !== NETWORKS.polygon.chainId ? (
             <>
               <CtxIcon className="ctx" />
               <h4>CTX Price</h4>
@@ -220,12 +232,13 @@ const Graph = () => {
           )}
           <h5 className="number neon-blue">
             <NumberFormat
-              value={network.chainId !== 137 ? ctxPrice : MATICStake}
+              value={network.chainId !== NETWORKS.polygon.chainId ? ctxPrice : MATICStake}
               displayType="text"
               thousandSeparator
               decimalScale={2}
-              prefix="$"
-            />{" "}
+              prefix={network.chainId !== NETWORKS.polygon.chainId ? "$" : ""}
+            />
+            {network.chainId === NETWORKS.polygon.chainId ? " MATIC" : ""}
           </h5>
         </Card>
       </div>
