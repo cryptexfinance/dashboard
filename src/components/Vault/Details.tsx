@@ -49,7 +49,7 @@ const Details = ({ address }: props) => {
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
 
-  let currency = "ETH";
+  let currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
   // @ts-ignore
@@ -59,16 +59,27 @@ const Details = ({ address }: props) => {
       break;
     case "weth":
       currency = "WETH";
+      if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+        history?.push(`/vault/MATIC`);
+        currency = "MATIC";
+      }
       break;
     case "dai":
       currency = "DAI";
+      break;
+    case "matic":
+      currency = "MATIC";
+      if (currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+        history?.push(`/vault/ETH`);
+        currency = "ETH";
+      }
       break;
     case "wbtc":
       currency = "WETH";
       history?.push(`/vault/WETH`);
       break;
     default:
-      currency = "ETH";
+      currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
       break;
   }
 
@@ -154,8 +165,8 @@ const Details = ({ address }: props) => {
   };
 
   const isGasAsset = () =>
-    (currentNetwork.chainId !== 137 && selectedVault === "ETH") ||
-    (currentNetwork.chainId === 137 && selectedVault === "MATIC");
+    (currentNetwork.chainId !== NETWORKS.polygon.chainId && selectedVault === "ETH") ||
+    (currentNetwork.chainId === NETWORKS.polygon.chainId && selectedVault === "MATIC");
 
   async function loadVault(vaultType: string, vaultData: any) {
     if (
@@ -356,9 +367,10 @@ const Details = ({ address }: props) => {
 
       setSelectedVaultDecimals(decimals);
       const currentBalance = ethers.utils.formatUnits(balance, decimals);
-
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
+      } else {
+        setTokenBalanceDecimals(2);
       }
       setTokenBalance(currentBalance);
 
@@ -819,10 +831,10 @@ const Details = ({ address }: props) => {
 
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
+            {currentNetwork.chainId === NETWORKS.polygon.chainId && <option>MATIC</option>}
             <option value="ETH">ETH</option>
-            {currentNetwork.chainId !== 137 && <option>WETH</option>}
+            {currentNetwork.chainId !== NETWORKS.polygon.chainId && <option>WETH</option>}
             <option>DAI</option>
-            {currentNetwork.chainId === 137 && <option>MATIC</option>}
           </Form.Control>
           <p className="number">
             <NumberFormat
