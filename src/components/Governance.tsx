@@ -7,7 +7,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import Table from "react-bootstrap/esm/Table";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
