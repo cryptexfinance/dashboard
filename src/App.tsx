@@ -17,7 +17,7 @@ import Welcome from "./components/Welcome";
 import Graph from "./components/Graph";
 import Vault from "./components/Vault/Vault";
 import Pool from "./components/Pool";
-import Governance from "./components/Governance";
+import Delegators from "./components/Governance/Delegators";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import { useSigner } from "./hooks/useSigner";
@@ -52,6 +52,7 @@ const App = () => {
   const [vaultWarning, setVaultWarning] = useState(true);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
   const [showSidebar, setShowSidebar] = useState(true);
+  const [currentSignerAddress, setCurrentSignerAddress] = useState("");
   const vaults = useVaults();
   const tokens = useTokens();
   const oracles = useOracles();
@@ -267,6 +268,12 @@ const App = () => {
     // Set Governance
     const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
     tokens.setCurrentCtxToken(currentCtx);
+    const currentDelegatorFactory = new ethers.Contract(
+      contracts.DelegatorFactory.address,
+      contracts.DelegatorFactory.abi,
+      currentSigner
+    );
+    governance.setCurrentDelegatorFactory(currentDelegatorFactory);
     const currentGovernorAlpha = new ethers.Contract(
       contracts.GovernorAlpha.address,
       contracts.GovernorAlpha.abi,
@@ -282,6 +289,12 @@ const App = () => {
 
     const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
     tokens.setCurrentCtxTokenRead(currentCtxRead);
+    const currentDelegatorFactoryRead = new Contract(
+      contracts.DelegatorFactory.address,
+      contracts.DelegatorFactory.abi
+    );
+    governance.setCurrentDelegatorFactoryRead(currentDelegatorFactoryRead);
+
     const currentGovernorAlphaRead = new Contract(
       contracts.GovernorAlpha.address,
       contracts.GovernorAlpha.abi
@@ -332,6 +345,9 @@ const App = () => {
         }
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
+        const cAddress = await currentSigner.getAddress();
+        setCurrentSignerAddress(cAddress);
+
         const ethcallProvider = new Provider(currentProvider);
         setContracts(currentSigner, ethcallProvider);
       } else {
@@ -447,7 +463,7 @@ const App = () => {
                         <Farm />
                       </Route>
                       <Route path={`${match.url}governance`}>
-                        <Governance />
+                        <Delegators currentSignerAddress={currentSignerAddress} />
                       </Route>
                       <Route path={`${match.url}pools`}>
                         <Pool />

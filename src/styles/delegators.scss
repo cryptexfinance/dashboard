@@ -1,0 +1,295 @@
+@import "./colors";
+
+.delegation {
+  padding: 1rem 2rem;
+  margin-top: 0rem;
+  &.off { 
+    margin-top: 0rem;
+  }
+  
+  .create {
+    position: relative;
+    width: 15rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    grid-template-rows: none;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .card {
+    margin-top: 2rem;
+    width: 20rem;
+    border-radius: 2rem;
+
+    &-title {
+      margin-top: 1rem !important;
+      a {
+        color: $white;
+      }
+    }
+    &-text {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .diamond {
+    border-top-right-radius: 2rem;
+    border-top-left-radius: 2rem;
+    height: 10rem;
+    background-image: url("../assets/images/welcome/diamond.svg");
+    background-repeat: repeat-x;
+    background-position: right bottom;
+    background-size: 8rem;
+    background-color: $purple;
+  }
+
+  .badge-highlight {
+    //border: 1px solid $highlight;
+    border-radius: 25px;
+    height: 30px;
+    border-color: $off-white;
+    background-color: $off-white;
+    color: $darker;
+    padding: 10px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+  }
+
+  .avatar {
+    height: 100px;
+    width: 100px;
+    margin-top: -75px;
+    border-radius: 50%;
+  }
+
+  .blockie {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    margin-top: -75px;
+  }
+
+  .discord {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -2px;
+  }
+
+  .ethereum {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -2px;
+  }
+
+  .twitter {
+    height: 15px;
+    margin-right: 2px;
+    margin-top: -1px;
+  }
+
+  .github {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -2px;
+  }
+
+  h5 {
+    font-size: 1rem;
+    color: white;
+    clear: both;
+  }
+
+  .btn {
+    min-height: 3.375rem;
+    &:hover, &:active, &:focus {
+      color: white;
+    }
+  }
+
+  label{
+    color:$white;
+  }
+
+  .holder-stake {
+    &-content {
+      display: flex;
+      flex-direction: row;
+
+      .remove {
+        flex: 1;
+        padding-top: 0.3rem;
+        text-align: end;
+        a {
+          color: $orange;
+          font-size: 0.8rem;
+          font-family: "Nineteen Ninety Seven";
+        }        
+      }
+    }
+  }
+
+  .staker-wrapper {
+    margin-top: 2rem;
+    padding-left: 1rem;
+    h2 {
+      font-size: 1.375rem;
+      margin-bottom: 1.5625rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.875;
+    }
+
+    .btn {
+      background-color: $darker;
+      border-radius: 1px;
+    }
+
+    .staker {
+      background-color: $darker;
+      width: 100%;
+      padding: 2.125rem 2.8125rem;
+      border-radius: .25rem;
+      .table {
+        color: $white;
+        tr:hover {
+          color: $white;
+        }
+        td {
+          vertical-align: middle;
+
+          a {
+            font-weight: bold;
+            color: $purple;
+          }
+
+          a.uniswap {
+            color: #ff007a;
+          }
+
+          .end-date {
+            font-size: 0.8rem;
+            color: $light;
+          }
+          &.vested-reward {
+            padding-top: 2.2rem;
+          }
+        }
+        .btn {
+          width: 80%;
+          min-height: 2.5rem;
+          height: 2.5rem;
+          padding: 0rem;
+          width: 5rem;
+          margin-left: auto;
+          margin-right: auto;
+
+          &.question {
+            border-radius: 2px;
+            width: 20px;
+            height: 20px;
+            margin-right: 0px;
+            font-size: 10px;
+            padding: 2px;
+            margin-left: 5px;
+          }
+          thead {
+            .btn {
+              width: 37px;
+              min-width: 35px;
+              height: 35px;
+              border-radius: 0.25rem;
+              background-color: $dark;
+              margin-top: 5px;
+              margin-left: 7px;
+            }
+            .rewards {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.fullprofile {
+  .row {
+    margin-bottom: 1.4rem;
+  }
+  h4 {
+    font-size: 1.4rem;
+    color: white;
+    clear: both;
+  }
+  h5 {
+    font-size: 1rem;
+    color: white;
+    clear: both;
+  }
+  h6 {
+    font-size: 0.8rem;
+    color: white;
+    clear: both;
+  }
+  .content {
+    .row {
+      flex-direction: column;
+    }
+  }
+  .badge-highlight {
+    border-radius: 25px;
+    height: 30px;
+    border-color: $off-white;
+    background-color: $off-white;
+    color: $darker;
+    padding: 10px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+  }
+  .ethereum {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -2px;
+  }
+  .discord {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -2px;
+  }
+  .avatar {
+    height: 170px;
+    width: 170px;
+    border-radius: 50%;
+  }
+  .blockie {
+    height: 170px;
+    width: 170px;
+    border-radius: 50%;    
+  }  
+
+  .main-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    .badges {
+      display: flex;
+      flex-direction: row;
+
+      .accounts {
+        flex: 1;
+      }
+    }
+  }
+}

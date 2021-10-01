@@ -10,7 +10,12 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
       }
     }
   },
@@ -32,8 +37,16 @@
     "no-debugger": 0,
     "no-alert": 0,
     "no-await-in-loop": 0,
-    "no-return-assign": ["error", "except-parens"],
-    "no-restricted-syntax": [2, "ForInStatement", "LabeledStatement", "WithStatement"],
+    "no-return-assign": [
+      "error",
+      "except-parens"
+    ],
+    "no-restricted-syntax": [
+      2,
+      "ForInStatement",
+      "LabeledStatement",
+      "WithStatement"
+    ],
     "no-unused-vars": [
       1,
       {
@@ -47,7 +60,10 @@
         "destructuring": "all"
       }
     ],
-    "arrow-body-style": [2, "as-needed"],
+    "arrow-body-style": [
+      2,
+      "as-needed"
+    ],
     "no-unused-expressions": [
       2,
       {
@@ -81,7 +97,12 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
       }
     ],
     "radix": 0,
@@ -89,7 +110,14 @@
       2,
       {
         "hoist": "all",
-        "allow": ["resolve", "reject", "done", "next", "err", "error"]
+        "allow": [
+          "resolve",
+          "reject",
+          "done",
+          "next",
+          "err",
+          "error"
+        ]
       }
     ],
     "quotes": [
@@ -111,7 +139,9 @@
     "jsx-a11y/anchor-is-valid": [
       "warn",
       {
-        "aspects": ["invalidHref"]
+        "aspects": [
+          "invalidHref"
+        ]
       }
     ],
     "react-hooks/rules-of-hooks": "error",
@@ -121,9 +151,16 @@
       {
         "html": "enforce",
         "custom": "enforce",
-        "exceptions": ["Container"],  
+        "exceptions": [
+          "Container"
+        ],
       }
     ]
   },
-  "plugins": ["html", "prettier", "react-hooks", "@typescript-eslint"]
+  "plugins": [
+    "html",
+    "prettier",
+    "react-hooks",
+    "@typescript-eslint"
+  ]
 }
