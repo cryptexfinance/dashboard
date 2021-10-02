@@ -8,11 +8,10 @@ import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
 type props = {
-  currentSignerAddress: string;
   refresh: () => void;
 };
 
-const StakerStats = ({ currentSignerAddress, refresh }: props) => {
+const StakerStats = ({ refresh }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
   const [stake, setStake] = useState("0.0");
@@ -20,7 +19,8 @@ const StakerStats = ({ currentSignerAddress, refresh }: props) => {
 
   useEffect(() => {
     async function load() {
-      if (governance.delegatorFactoryRead) {
+      if (signer.signer && governance.delegatorFactoryRead) {
+        const currentSignerAddress = await signer.signer.getAddress();
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
           currentSignerAddress
         );
@@ -38,7 +38,7 @@ const StakerStats = ({ currentSignerAddress, refresh }: props) => {
     }
     load();
     // eslint-disable-next-line
-  }, [currentSignerAddress]);
+  }, [signer]);
 
   const claimRewards = async () => {
     if (governance.delegatorFactory) {
