@@ -80,7 +80,7 @@ const Profile = ({ delegator, info, show, onHide }: props) => {
                 <div className="accounts">
                   <Badge pill variant="highlight">
                     <img src={discordImg} className="discord" alt="discord logo" />
-                    {info.discord_username}
+                    {info.discord}
                   </Badge>
                 </div>
               </div>
@@ -91,28 +91,10 @@ const Profile = ({ delegator, info, show, onHide }: props) => {
             <p>{info?.why}</p>
           </Row>
           <div className="content">
-            {info.development && (
+            {info.expertise && (
               <Row>
                 <h5 className="mt-2">Development</h5>
-                <p>{info.development}</p>
-              </Row>
-            )}
-            {info.brand && (
-              <Row>
-                <h5 className="mt-2">Brand</h5>
-                <p>{info.brand}</p>
-              </Row>
-            )}
-            {info.operations && (
-              <Row>
-                <h5 className="mt-2">Operations</h5>
-                <p>{info.operations}</p>
-              </Row>
-            )}
-            {info.other && (
-              <Row>
-                <h5 className="mt-2">Other</h5>
-                <p>{info.other}</p>
+                <p>{info.expertise.join(", ")}</p>
               </Row>
             )}
           </div>

@@ -12,7 +12,6 @@ type badgeProps = {
 type imageProps = {
   address: string;
   image: string;
-  setShow: () => void;
 };
 
 const etherscanUrl = () => {
@@ -31,14 +30,13 @@ export const VoteBadge = ({ address, amount, label }: badgeProps) => (
   </Badge>
 );
 
-export const ProfileImage = ({ address, image, setShow }: imageProps) => (
+export const ProfileImage = ({ address, image }: imageProps) => (
   <>
     {image ? (
       <a
         href="/"
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          setShow();
         }}
       >
         <Image src={"images/".concat(image)} roundedCircle className="avatar" />
@@ -48,7 +46,6 @@ export const ProfileImage = ({ address, image, setShow }: imageProps) => (
         href="/"
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          setShow();
         }}
       >
         <Blockies

@@ -3,6 +3,11 @@
 .delegation {
   padding: 1rem 2rem;
   margin-top: 0rem;
+
+  .nodisplay{
+    display: none;
+  }
+
   &.off { 
     margin-top: 0rem;
   }
@@ -14,13 +19,18 @@
 
   .grid {
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto;
     grid-template-rows: none;
     gap: 2rem;
     margin-bottom: 2rem;
   }
-  
-  .card {
+  svg {
+    height: 22px;
+    margin-right: 10px;
+    margin-left: -5px;
+    margin-top: -5px;
+  }
+  /*.card {
     margin-top: 2rem;
     width: 20rem;
     border-radius: 2rem;
@@ -34,12 +44,90 @@
     &-text {
       margin-bottom: 1rem;
     }
+  }*/
+
+  .card {
+    margin-top: 2rem;
+    width: 35rem;
+    border-radius: 2rem;
+
+    &-title {
+      display: flex;
+      margin-top: 1rem !important;
+      a {
+        color: $white;
+      }
+      .title-names {
+        flex: 1
+      }
+    }
+    &-text {
+      margin-bottom: 1rem;
+    }
+    .votes {
+      display: flex;
+      margin-top: -50px;
+      justify-content: flex-end;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 0rem 0rem 0rem;
+
+      .why {
+        h5 {
+          flex: 1;
+        }
+        &-title {
+          display: flex;
+          flex: 1;
+          flex-direction: row;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+        .accounts {
+          display: flex;
+          flex: 2;
+          justify-content: flex-end;
+          .badge {
+            margin-bottom: 0rem;
+          } 
+        }
+        p {
+          text-align: justify;
+        }
+      }
+      .columns {
+        display: flex;
+        flex-direction: row;
+        div {
+          padding: 5px 0px;
+        }
+      }
+      &-col1 {
+        padding-right: 10px !important;
+      }
+      &-col2 {
+        text-align: end;
+      }
+    }
   }
+
+  /*.diamond {
+    border-top-right-radius: 2rem;
+    border-top-left-radius: 2rem;
+    height: 10rem;
+    background-image: url("../assets/images/welcome/diamond.svg");
+    background-repeat: repeat-x;
+    background-position: right bottom;
+    background-size: 8rem;
+    background-color: $purple;
+  }*/
 
   .diamond {
     border-top-right-radius: 2rem;
     border-top-left-radius: 2rem;
-    height: 10rem;
+    height: 9rem;
     background-image: url("../assets/images/welcome/diamond.svg");
     background-repeat: repeat-x;
     background-position: right bottom;
@@ -53,24 +141,47 @@
     height: 30px;
     border-color: $off-white;
     background-color: $off-white;
-    color: $darker;
+    color: #a440f2;
     padding: 10px;
     margin-right: 5px;
     margin-bottom: 10px;
   }
 
-  .avatar {
+  /* .avatar {
     height: 100px;
     width: 100px;
     margin-top: -75px;
+    border-radius: 50%;
+  } */
+
+  .avatar {
+    height: 130px;
+    width: 130px;
+    margin-top: -80px;
     border-radius: 50%;
   }
 
-  .blockie {
+  
+  /*.blockie {
     height: 100px;
     width: 100px;
     border-radius: 50%;
     margin-top: -75px;
+  }*/
+
+  .blockie {
+    height: 130px !important;
+    width: 130px !important;
+    border-radius: 50%;
+    margin-top: -80px;
+  }
+  
+  .continue {
+    text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+    font-size: 22px;
+    -webkit-animation: fire 2s infinite alternate;
+    animation: fire 2s infinite alternate;
+    color: #d9d7ea !important;
   }
 
   .discord {
@@ -103,6 +214,14 @@
     clear: both;
   }
 
+  /*
+  .btn {
+    min-height: 3.375rem;
+    &:hover, &:active, &:focus {
+      color: white;
+    }
+  }
+  */
   .btn {
     min-height: 3.375rem;
     &:hover, &:active, &:focus {

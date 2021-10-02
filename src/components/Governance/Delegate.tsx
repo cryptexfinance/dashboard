@@ -61,7 +61,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
     event.preventDefault();
     if (delegatorFactory && delegatorAddress) {
       if (stakeText) {
-        if (parseFloat(stakeText) <= parseFloat(ctxBalance)) {
+        if (parseFloat(stakeText) === 0 && parseFloat(stakeText) <= parseFloat(ctxBalance)) {
           try {
             const tx = await delegatorFactory.stake(
               delegatorAddress,
@@ -71,7 +71,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
             setStakeText("");
             onHide();
           } catch (error) {
-            errorNotification("Delegator for the address already exists.");
+            errorNotification("Not enough CTX balance.");
           }
         } else {
           errorNotification("Not enough CTX balance");
