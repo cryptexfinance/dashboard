@@ -60,8 +60,8 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
   const stake = async (event: React.MouseEvent) => {
     event.preventDefault();
     if (delegatorFactory && delegatorAddress) {
-      if (stakeText) {
-        if (parseFloat(stakeText) === 0 && parseFloat(stakeText) <= parseFloat(ctxBalance)) {
+      if (stakeText && parseFloat(stakeText) > 0) {
+        if (parseFloat(stakeText) <= parseFloat(ctxBalance)) {
           try {
             const tx = await delegatorFactory.stake(
               delegatorAddress,
