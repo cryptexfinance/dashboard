@@ -135,16 +135,6 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
                   </Badge>
                 )}
                 <Badge variant="highlight">
-                  <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
-                  <a
-                    href={`${etherscanUrl()}/address/${delegator.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {makeShortAddress(delegator.id)}
-                  </a>
-                </Badge>
-                <Badge variant="highlight">
                   <img src={tallyImg} className="tally" alt="tally logo" />
                   <a
                     href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
@@ -152,6 +142,16 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
                     rel="noreferrer"
                   >
                     History
+                  </a>
+                </Badge>
+                <Badge variant="highlight">
+                  <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
+                  <a
+                    href={`${etherscanUrl()}/address/${delegator.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {makeShortAddress(delegator.id)}
                   </a>
                 </Badge>
               </>

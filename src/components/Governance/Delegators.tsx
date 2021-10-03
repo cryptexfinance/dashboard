@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import Row from "react-bootstrap/esm/Row";
 import { useQuery, gql } from "@apollo/client";
-import ProfileCard2 from "./ProfileCard2";
+import ProfileCardWider from "./ProfileCardWider";
 import NewDelegator from "./NewDelegator";
 import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
@@ -109,7 +109,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           const dInfo = getDelegatorInfo(delegator.delegatee);
           if (dInfo) {
             return (
-              <ProfileCard2
+              <ProfileCardWider
                 key={delegator.id}
                 delegator={delegator}
                 info={dInfo}
