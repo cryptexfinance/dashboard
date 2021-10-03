@@ -31,7 +31,7 @@ type props = {
   action: string;
 };
 
-const ProfileCardWider2 = ({ delegator, info, openDelegate, openWithdraw, action }: props) => {
+const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: props) => {
   const [shortAddress, setShortAddress] = useState("");
   const [actionText, setActionText] = useState("");
   const [briefLength, setBriefLength] = useState(239);
@@ -111,6 +111,23 @@ const ProfileCardWider2 = ({ delegator, info, openDelegate, openWithdraw, action
       return info.why.slice(0, briefLength);
     }
     return "";
+  };
+
+  const copyDiscordToClipboard = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Create new element
+    const el = document.createElement("textarea");
+    // Set value (string to be copied)
+    el.value = info.discord;
+    // Set non-editable to avoid focus and move outside of view
+    el.setAttribute("readonly", "");
+    document.body.appendChild(el);
+    // Select text inside element
+    el.select();
+    // Copy text to clipboard
+    document.execCommand("copy");
+    // Remove temporary element
+    document.body.removeChild(el);
   };
 
   return (
@@ -200,15 +217,25 @@ const ProfileCardWider2 = ({ delegator, info, openDelegate, openWithdraw, action
             )}
             <div className="accounts">
               {info.discord && (
-                <Badge pill variant="highlight">
-                  <img src={discordImg} className="discord" alt="discord logo" />
-                  {info.discord}
-                </Badge>
+                <OverlayTrigger
+                  key="bottom"
+                  placement="bottom"
+                  overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+                >
+                  <Badge pill variant="highlight">
+                    <img src={discordImg} className="discord" alt="discord logo" />
+                    <a href="/" onClick={copyDiscordToClipboard} className="address">
+                      {info.discord}
+                    </a>
+                  </Badge>
+                </OverlayTrigger>
               )}
               {info.twitter && (
                 <Badge pill variant="highlight">
                   <img src={twitterImg} className="twitter" alt="twitter logo" />
-                  {info.twitter}
+                  <a href={`https://twitter.com/${info.twitter}`} target="_blank" rel="noreferrer">
+                    {info.twitter}
+                  </a>
                 </Badge>
               )}
             </div>
@@ -247,4 +274,4 @@ const ProfileCardWider2 = ({ delegator, info, openDelegate, openWithdraw, action
   );
 };
 
-export default ProfileCardWider2;
+export default ProfileCard;
