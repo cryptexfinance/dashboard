@@ -65,14 +65,14 @@
     &-title {
       display: flex;
       margin-top: 1rem !important;
-      //justify-content: flex-end; //...
+      justify-content: flex-end; //...
       a {
         color: $white;
       }
       .title-names {
         display: flex;
         flex-direction: column; 
-        //text-align: end; //..
+        text-align: end; //..
       }
     }
     &-text {
@@ -81,26 +81,26 @@
     .badges-container {
       display: flex;
       justify-content: flex-end;
-      margin-top: -60px;
-      //margin-top: 20px; //..
+      //margin-top: -60px;
+      margin-top: 20px; //..
       
-      .badges-container2 {
+      /**.badges-container2 {
         display: flex;
         justify-content: flex-end;
         flex-wrap: wrap;
         width: 75%;        
-      }
+      }**/
       
-      /*.badges-container2 {
+      .badges-container2 {
         display: flex;
         flex-wrap: wrap;        
-      }*/
+      }
     }
     .content {
       display: flex;
       flex-direction: column;
       padding: 1rem 0rem 0rem 0rem;
-      margin-top: -30px;
+      margin-top: -90px;
 
       .why {
         h5 {
