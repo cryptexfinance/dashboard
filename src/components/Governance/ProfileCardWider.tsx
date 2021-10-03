@@ -4,11 +4,13 @@ import { Button, Card, Badge } from "react-bootstrap";
 import Col from "react-bootstrap/esm/Col";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useMediaQuery } from "@react-hook/media-query";
 import "../../styles/delegators.scss";
 import { makeShortAddress } from "../../utils/utils";
 import ethereumImg from "../../assets/images/Ethereum-ETH-icon.png";
 import discordImg from "../../assets/images/discord-icon.jpg";
 import twitterImg from "../../assets/images/twitter.svg";
+import tallyImg from "../../assets/images/tally.png";
 import SignerContext from "../../state/SignerContext";
 import { VoteBadge, ProfileImage } from "./common";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
@@ -32,8 +34,10 @@ type props = {
 const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action }: props) => {
   const [shortAddress, setShortAddress] = useState("");
   const [actionText, setActionText] = useState("");
+  const [briefLength, setBriefLength] = useState(239);
   const [tokenOwnerStake, setTokenOwnerStake] = useState<{ stake: string; stakeRaw: string }>();
   const signer = useContext(SignerContext);
+  const mediaQuery = useMediaQuery("only screen and (max-height: 850px)");
 
   const edit = async () => {
     window.open(`https://app.ens.domains/address/${delegator.delegatee}`, "_blank");
@@ -50,6 +54,9 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     async function getProvider() {
+      if (mediaQuery) {
+        setBriefLength(143);
+      }
       const provider = ethers.getDefaultProvider();
       const ens = await provider.lookupAddress(delegator.delegatee);
       setShortAddress(makeShortAddress(delegator.delegatee));
@@ -74,14 +81,14 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
       }
       //  Set actions
       if (action === "delegate") {
-        setActionText("Keeper");
+        setActionText("Stake & Delegate");
       } else {
         setActionText("Edit in ENS");
       }
     }
 
     await getProvider();
-  }, [delegator, action]);
+  }, [delegator, action, mediaQuery]);
 
   const onRemoveClick = async () => {
     if (tokenOwnerStake) {
@@ -98,10 +105,10 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
 
   const whyBrief = (): string => {
     if (info) {
-      if (info.why.length <= 85) {
+      if (info.why.length <= briefLength) {
         return info.why;
       }
-      return info.why.slice(0, 86);
+      return info.why.slice(0, briefLength);
     }
     return "";
   };
@@ -111,23 +118,45 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
       <div className="diamond" />
       <Card.Body>
         <ProfileImage address={delegator.delegatee} image={info?.image} />
-        <div className="votes">
-          {shortAddress && (
-            <>
-              <VoteBadge address={delegator.id} amount={delegator.delegatedVotes} label="Votes" />
-              <VoteBadge
-                address={delegator.id}
-                amount={delegator.totalHoldersRepresented.toString()}
-                label="Represented"
-              />
-              {tokenOwnerStake && (
+        <div className="badges-container">
+          <div className="badges-container2">
+            {shortAddress && (
+              <>
+                <VoteBadge address={delegator.id} amount={delegator.delegatedVotes} label="Votes" />
+                <VoteBadge
+                  address={delegator.id}
+                  amount={delegator.totalHoldersRepresented.toString()}
+                  label="Represented"
+                />
+                {tokenOwnerStake && (
+                  <Badge variant="highlight">
+                    <CtxIcon className="tcap-neon" />
+                    <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
+                  </Badge>
+                )}
                 <Badge variant="highlight">
-                  <CtxIcon className="tcap-neon" />
-                  <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
+                  <img src={tallyImg} className="tally" alt="tally logo" />
+                  <a
+                    href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    History
+                  </a>
                 </Badge>
-              )}
-            </>
-          )}
+                <Badge variant="highlight">
+                  <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
+                  <a
+                    href={`${etherscanUrl()}/address/${delegator.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {makeShortAddress(delegator.id)}
+                  </a>
+                </Badge>
+              </>
+            )}
+          </div>
         </div>
         <Col md={12} lg={12} className="content">
           <Card.Title className="pb-2">
@@ -172,52 +201,47 @@ const ProfileCardWider = ({ delegator, info, openDelegate, openWithdraw, action 
             >
               <p>
                 {whyBrief()}
-                {info.why.length > 85 && <span className="continue">...</span>}
+                {info.why.length > briefLength && <span className="continue">...</span>}
               </p>
             </OverlayTrigger>
           </div>
           <div className="columns">
-            <Col md={6} lg={6} className="content-col1">
+            <Col md={12} lg={12} className="content-col1">
               <div>
                 <h5 className="mt-2">Expertise</h5>
                 <p>{info?.expertise.join(", ")}</p>
               </div>
-            </Col>
-            <Col md={6} lg={6} className="content-col2">
-              <h5 className="mt-2">Delegator Contract</h5>
-              <Badge variant="highlight">
-                <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
-                <a
-                  href={`${etherscanUrl()}/address/${delegator.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {makeShortAddress(delegator.id)}
-                </a>
-              </Badge>
             </Col>
           </div>
         </Col>
       </Card.Body>
       <Card.Footer>
         {signer.signer && (
-          <Button
-            variant="pink"
-            className="mt-3 mb-4 w-100"
-            onClick={async () => {
-              if (action === "delegate") {
-                openDelegate(delegator.id);
-              } else {
-                await edit();
-              }
-            }}
-          >
-            {actionText}
-          </Button>
+          <div className="buttons-container">
+            {tokenOwnerStake && (
+              <Col md={6} lg={6}>
+                <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
+                  Withdraw
+                </Button>
+              </Col>
+            )}
+            <Col md={tokenOwnerStake ? 6 : 12} lg={tokenOwnerStake ? 6 : 12}>
+              <Button
+                variant="pink"
+                className="mt-3 mb-4 w-100"
+                onClick={async () => {
+                  if (action === "delegate") {
+                    openDelegate(delegator.id);
+                  } else {
+                    await edit();
+                  }
+                }}
+              >
+                {actionText}
+              </Button>
+            </Col>
+          </div>
         )}
-        <Button className="nodisplay" onClick={() => onRemoveClick()}>
-          No display
-        </Button>
       </Card.Footer>
     </Card>
   );

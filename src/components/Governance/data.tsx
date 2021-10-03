@@ -84,4 +84,15 @@ export const delegatorsInfo = [
     discord: "MediumArchibald",
     twitter: "@MediumArchibald",
   },
+  {
+    address: "0x767D222a509D107522e50161CA17FfCF0e5AA3dE",
+    name: "Leo",
+    eth_name: "0x767D222a509D107522e50161CA17FfCF0e5AA3dE",
+    image: "leo.png",
+    expertise: ["Operations"],
+    why:
+      "I am a long-term crypto investor and builder. I am a big supporter of the cryptex project from the very beginning. I have promoted the project to a large Chinese crypto community with a few thousand people. I have initiated the debank.com integration and get it supported recently.\n\nI would like to represent the Chinese crypto investors in the project and continue supporting and promoting the cryptex project.",
+    discord: "",
+    twitter: "@leo_hao",
+  },
 ];

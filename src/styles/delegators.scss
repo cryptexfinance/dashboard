@@ -51,28 +51,56 @@
     width: 35rem;
     border-radius: 2rem;
 
+    &-body {
+      padding-bottom: 0rem;
+    }
+    &-footer{
+      padding-top: 0rem;
+      padding-bottom: 0rem;
+      .buttons-container {
+        display: flex;
+        flex-direction: row;
+      }
+    }
     &-title {
       display: flex;
       margin-top: 1rem !important;
+      //justify-content: flex-end; //...
       a {
         color: $white;
       }
       .title-names {
-        flex: 1
+        display: flex;
+        flex-direction: column; 
+        //text-align: end; //..
       }
     }
     &-text {
       margin-bottom: 1rem;
     }
-    .votes {
+    .badges-container {
       display: flex;
-      margin-top: -50px;
       justify-content: flex-end;
+      margin-top: -60px;
+      //margin-top: 20px; //..
+      
+      .badges-container2 {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        width: 75%;        
+      }
+      
+      /*.badges-container2 {
+        display: flex;
+        flex-wrap: wrap;        
+      }*/
     }
     .content {
       display: flex;
       flex-direction: column;
       padding: 1rem 0rem 0rem 0rem;
+      margin-top: -30px;
 
       .why {
         h5 {
@@ -111,23 +139,17 @@
         text-align: end;
       }
     }
+    @media (max-height: 850px) {
+      p {
+        margin-bottom: 0rem;
+      }
+    }
   }
-
-  /*.diamond {
-    border-top-right-radius: 2rem;
-    border-top-left-radius: 2rem;
-    height: 10rem;
-    background-image: url("../assets/images/welcome/diamond.svg");
-    background-repeat: repeat-x;
-    background-position: right bottom;
-    background-size: 8rem;
-    background-color: $purple;
-  }*/
 
   .diamond {
     border-top-right-radius: 2rem;
     border-top-left-radius: 2rem;
-    height: 9rem;
+    height: 7rem;
     background-image: url("../assets/images/welcome/diamond.svg");
     background-repeat: repeat-x;
     background-position: right bottom;
@@ -147,27 +169,12 @@
     margin-bottom: 10px;
   }
 
-  /* .avatar {
-    height: 100px;
-    width: 100px;
-    margin-top: -75px;
-    border-radius: 50%;
-  } */
-
   .avatar {
     height: 130px;
     width: 130px;
     margin-top: -80px;
     border-radius: 50%;
   }
-
-  
-  /*.blockie {
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    margin-top: -75px;
-  }*/
 
   .blockie {
     height: 130px !important;
@@ -195,7 +202,11 @@
     margin-right: 2px;
     margin-top: -2px;
   }
-
+  .tally {
+    width: 15px;
+    margin-right: 2px;
+    margin-top: -7px;
+  } 
   .twitter {
     height: 15px;
     margin-right: 2px;
