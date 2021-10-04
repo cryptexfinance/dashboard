@@ -45,7 +45,7 @@ export const delegatorsInfo = [
     address: "0x85Eb872c4274Df8b9e596B3BBa490B205D79122E",
     name: "TheyCallMeJim",
     eth_name: "0x85Eb872c4274Df8b9e596B3BBa490B205D79122E",
-    image: "",
+    image: "theycallmejim.png",
     expertise: ["Development", "Operations"],
     why: "Experienced crypto trader and audit analysis",
     discord: "PlayChessAndScrew#4369",
