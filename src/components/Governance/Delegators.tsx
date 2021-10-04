@@ -22,6 +22,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [currentDelegatorAddress, setCurrentDelegatorAddress] = useState("");
   const [currentOwnerStake, setCurrentOwnerStake] = useState("0");
+  const [updateData, setUpdateData] = useState(false);
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
 
@@ -58,13 +59,15 @@ const Delegators = ({ currentSignerAddress }: props) => {
     };
     loadDelegators();
     // eslint-disable-next-line
-  }, [data, currentSignerAddress]);
+  }, [updateData, data, currentSignerAddress]);
 
   const refresh = async () => {
     try {
       await refetch();
+      setUpdateData(!updateData);
     } catch (error) {
-      // catch error in case the vault screen is changed
+      console.log("Error refetching data");
+      console.log(error);
     }
   };
 
@@ -101,7 +104,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           </div>
           */}
           <Row className="staker-wrapper">
-            <StakerStats refresh={refresh} />
+            <StakerStats refresh={refresh} updateData={updateData} />
           </Row>
         </>
       )}

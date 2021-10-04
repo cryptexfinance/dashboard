@@ -9,9 +9,10 @@ import { errorNotification, notifyUser } from "../../utils/utils";
 
 type props = {
   refresh: () => void;
+  updateData: boolean;
 };
 
-const StakerStats = ({ refresh }: props) => {
+const StakerStats = ({ refresh, updateData }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
   const [stake, setStake] = useState("0.0");
@@ -38,7 +39,7 @@ const StakerStats = ({ refresh }: props) => {
     }
     load();
     // eslint-disable-next-line
-  }, [signer]);
+  }, [signer, updateData]);
 
   const claimRewards = async () => {
     if (governance.delegatorFactory) {
