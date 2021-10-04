@@ -106,7 +106,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         </>
       )}
       <div className="grid profiles">
-        {delegators.map((delegator) => {
+        {delegators.map((delegator, index) => {
           const dInfo = getDelegatorInfo(delegator.delegatee);
           if (dInfo) {
             return (

@@ -77,7 +77,10 @@ const Withdraw = ({
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            <p>Remove votes from this delegator</p>
+            <p>
+              Remove delegated votes from this Crypt Keeper. CTX must be staked and delegated for a
+              minimum of 7 days before you are eligible to withdraw.
+            </p>
             <Form.Label>Amount to remove</Form.Label>
             <Form.Label className="max">
               <a href="/" className="number orange" onClick={maxWithdraw}>

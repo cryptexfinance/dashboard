@@ -148,16 +148,88 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
               </a>
             </div>
           </Card.Title>
+          <div className="badges-container">
+            <div className="badges-container2">
+              {shortAddress && (
+                <>
+                  <VoteBadge
+                    address={delegator.id}
+                    amount={delegator.delegatedVotes}
+                    label="Votes"
+                  />
+                  <VoteBadge
+                    address={delegator.id}
+                    amount={delegator.totalHoldersRepresented.toString()}
+                    label="Represented"
+                  />
+                  {tokenOwnerStake && (
+                    <Badge variant="highlight">
+                      <CtxIcon className="tcap-neon" />
+                      <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
+                    </Badge>
+                  )}
+                  <Badge variant="highlight">
+                    <img src={tallyImg} className="tally" alt="tally logo" />
+                    <a
+                      href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      History
+                    </a>
+                  </Badge>
+                  <Badge variant="highlight">
+                    <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
+                    <a
+                      href={`${etherscanUrl()}/address/${delegator.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {makeShortAddress(delegator.id)}
+                    </a>
+                  </Badge>
+                </>
+              )}
+              <div className="accounts">
+                {info.discord && (
+                  <OverlayTrigger
+                    key="bottom"
+                    placement="bottom"
+                    overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+                  >
+                    <Badge pill variant="highlight">
+                      <img src={discordImg} className="discord" alt="discord logo" />
+                      <a href="/" onClick={copyDiscordToClipboard} className="address">
+                        {info.discord}
+                      </a>
+                    </Badge>
+                  </OverlayTrigger>
+                )}
+                {info.twitter && (
+                  <Badge pill variant="highlight">
+                    <img src={twitterImg} className="twitter" alt="twitter logo" />
+                    <a
+                      href={`https://twitter.com/${info.twitter}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {info.twitter}
+                    </a>
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="why">
             <div className="why-title">
               <h5 className="mt-2">Why me?</h5>
             </div>
             <OverlayTrigger
-              key="bottom"
-              placement="bottom"
+              key="auto"
+              placement="auto"
               trigger={["hover", "click"]}
               overlay={
-                <Tooltip id="ttip-current-reward" className="farm-tooltip">
+                <Tooltip id="tooltip-right" className="farm-tooltip">
                   {info.why}
                 </Tooltip>
               }
@@ -177,70 +249,6 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
             </Col>
           </div>
         </Col>
-        <div className="badges-container">
-          <div className="badges-container2">
-            {shortAddress && (
-              <>
-                <VoteBadge address={delegator.id} amount={delegator.delegatedVotes} label="Votes" />
-                <VoteBadge
-                  address={delegator.id}
-                  amount={delegator.totalHoldersRepresented.toString()}
-                  label="Represented"
-                />
-                {tokenOwnerStake && (
-                  <Badge variant="highlight">
-                    <CtxIcon className="tcap-neon" />
-                    <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
-                  </Badge>
-                )}
-                <Badge variant="highlight">
-                  <img src={tallyImg} className="tally" alt="tally logo" />
-                  <a
-                    href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    History
-                  </a>
-                </Badge>
-                <Badge variant="highlight">
-                  <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
-                  <a
-                    href={`${etherscanUrl()}/address/${delegator.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {makeShortAddress(delegator.id)}
-                  </a>
-                </Badge>
-              </>
-            )}
-            <div className="accounts">
-              {info.discord && (
-                <OverlayTrigger
-                  key="bottom"
-                  placement="bottom"
-                  overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
-                >
-                  <Badge pill variant="highlight">
-                    <img src={discordImg} className="discord" alt="discord logo" />
-                    <a href="/" onClick={copyDiscordToClipboard} className="address">
-                      {info.discord}
-                    </a>
-                  </Badge>
-                </OverlayTrigger>
-              )}
-              {info.twitter && (
-                <Badge pill variant="highlight">
-                  <img src={twitterImg} className="twitter" alt="twitter logo" />
-                  <a href={`https://twitter.com/${info.twitter}`} target="_blank" rel="noreferrer">
-                    {info.twitter}
-                  </a>
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
       </Card.Body>
       <Card.Footer>
         {signer.signer && (

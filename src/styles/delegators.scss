@@ -131,9 +131,9 @@
         div {
           padding: 5px 0px;
         }
-        /*@media (max-height: 850px) {
+        @media (max-height: 850px) {
           margin-bottom: 1rem;
-        }*/
+        }
       }
       &-col1 {
         padding-right: 10px !important;
@@ -153,10 +153,10 @@
     border-top-right-radius: 2rem;
     border-top-left-radius: 2rem;
     height: 7rem;
-    background-image: url("../assets/images/welcome/diamond.svg");
-    background-repeat: repeat-x;
+    background-image: url("../assets/images/profile-header.png");
+    background-repeat: repeat;
     background-position: right bottom;
-    background-size: 8rem;
+    background-size: contain;
     background-color: $purple;
   }
 
