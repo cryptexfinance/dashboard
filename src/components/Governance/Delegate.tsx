@@ -120,7 +120,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
           <Form.Group className="" controlId="">
             {isApproved ? (
               <>
-                <p>Delegate votes to this delegator.</p>
+                <p>Delegate votes to this Crypt Keeper.</p>
                 <Form.Label>Amount to Stake</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
@@ -136,7 +136,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
                 />
               </>
             ) : (
-              <p>Approve delegating CTX tokens. You only have to this once.</p>
+              <p>Approve delegating CTX tokens. You only have to do this once.</p>
             )}
           </Form.Group>
         </Form>
