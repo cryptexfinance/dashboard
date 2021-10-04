@@ -115,4 +115,15 @@ export const delegatorsInfo = [
     discord: "DogeDingus",
     twitter: "",
   },
+  {
+    address: "0xA36baB9f9e2392c00A2251caF382f5559C00f4De",
+    name: "DesertDwelr",
+    eth_name: "0xA36baB9f9e2392c00A2251caF382f5559C00f4De",
+    image: "desertdwelr.png",
+    expertise: ["Development", "Operations"],
+    why:
+      "Like many of you in this community, my CTX/TCAP holdings are modest but my enthusiasm is not. I'd be honored to be the voice of other modest holders and help guide the future of this exciting organization.\n\nMy approach will be to learn and listen. Learn about each proposal and be able to share the considerations of each option. Listen to your input and vote accordingly, even if that means going against the majority vote.\n\nA brief bio: I'm a software solution manager at a Fortune 50 company, leading my team throughout all stages of the product lifecycle. I'm a father of 3 boys, which is even more humbling. I am fascinated by crypto and the power of decentralization. I try to learn more every day.\n\nThanks for considering me! Regardless of who you select as your delegate, congratulations on staking and being part of this great community!",
+    discord: "DesertDwelr",
+    twitter: "DesertDwelr",
+  },
 ];
