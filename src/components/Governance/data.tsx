@@ -18,7 +18,7 @@ export const delegatorsInfo = [
     expertise: ["Development", "Operations"],
     why:
       "I'm a security expert who specializes in smart contract and operational security auditing.\n\nI will vote for incentivized liquidity and staking, expansion to new projects/networks, and supporting operations that will drive adoption of TCAP.",
-    discord: "#3132",
+    discord: " Indigo#3132",
     twitter: "",
   },
   {
@@ -28,8 +28,8 @@ export const delegatorsInfo = [
     image: "dnkta.png",
     expertise: ["Operations"],
     why: "Take decisions in best faith for the protocol.",
-    discord: "dnkta.eth",
-    twitter: "",
+    discord: "dnkta.eth#8499",
+    twitter: "dnkta",
   },
   {
     address: "0x332Ef2ADC9e6d980b05A89901F3f29D0464442c5",
@@ -38,7 +38,7 @@ export const delegatorsInfo = [
     image: "scottie.jpeg",
     expertise: ["Operations"],
     why: "I am super responsive, trustworthy, and  support Cryptex 100%.",
-    discord: "Scottie33",
+    discord: "Scottie33#4518",
     twitter: "",
   },
   {
@@ -59,7 +59,7 @@ export const delegatorsInfo = [
     expertise: ["Operations"],
     why:
       "Passionate about project, mission and vision. Multi-disciplinary background leading my own project and developments including a separate ERC-20 token.",
-    discord: "mrbrightside",
+    discord: "mrbrightside#1833",
     twitter: "",
   },
   {
@@ -81,8 +81,8 @@ export const delegatorsInfo = [
     expertise: ["Investigative journalist", "Freelance political/legal researcher"],
     why:
       "My profession is trust- and referral-based. I either present verifiable information, or I don’t get future clients.",
-    discord: "MediumArchibald",
-    twitter: "MediumArchibald",
+    discord: "MediumArchibald#4336",
+    twitter: "",
   },
   {
     address: "0x767D222a509D107522e50161CA17FfCF0e5AA3dE",
@@ -102,7 +102,7 @@ export const delegatorsInfo = [
     image: "david.png",
     expertise: ["Investor"],
     why: "Here to invest with ctx long term",
-    discord: "Djennings2129",
+    discord: "",
     twitter: "",
   },
   {
@@ -112,8 +112,8 @@ export const delegatorsInfo = [
     image: "joshua.png",
     expertise: ["Development", "Operations"],
     why: "Here to make Ctx better for the future",
-    discord: "DogeDingus",
-    twitter: "",
+    discord: "",
+    twitter: "doge_dingus",
   },
   {
     address: "0xA36baB9f9e2392c00A2251caF382f5559C00f4De",
@@ -122,8 +122,20 @@ export const delegatorsInfo = [
     image: "desertdwelr.png",
     expertise: ["Development", "Operations"],
     why:
-      "Like many of you in this community, my CTX/TCAP holdings are modest but my enthusiasm is not. I'd be honored to be the voice of other modest holders and help guide the future of this exciting organization.\n\nMy approach will be to learn and listen. Learn about each proposal and be able to share the considerations of each option. Listen to your input and vote accordingly, even if that means going against the majority vote.\n\nA brief bio: I'm a software solution manager at a Fortune 50 company, leading my team throughout all stages of the product lifecycle. I'm a father of 3 boys, which is even more humbling. I am fascinated by crypto and the power of decentralization. I try to learn more every day.\n\nThanks for considering me! Regardless of who you select as your delegate, congratulations on staking and being part of this great community!",
-    discord: "DesertDwelr",
+      "Like many of you in this community, my CTX/TCAP holdings are modest but my enthusiasm is not. I'd be honored to be the voice of other " +
+      "modest holders and help guide the future of this exciting organization. My approach will be to learn and listen.Learn about each proposal and be able to share the considerations of each option.Listen to your input and vote accordingly, even if that means going against the majority vote.\n\nA brief bio: I'm a software solution manager at a Fortune 50 company, leading my team throughout all stages of the product lifecycle. I'm a father of 3 boys, which is even more humbling.I am fascinated by crypto and the power of decentralization.I try to learn more every day.\n\nThanks for considering me! Regardless of who you select as your delegate, congratulations on staking and being part of this great community!",
+    discord: "DesertDwelr#1590",
     twitter: "DesertDwelr",
+  },
+  {
+    address: "0xD27e8256196d6f794c4329644C225b7b81a260f7",
+    name: "Huntsman",
+    eth_name: "0xD27e8256196d6f794c4329644C225b7b81a260f7",
+    image: "Huntsman.jpg",
+    expertise: ["Economics/Retail Investing"],
+    why:
+      "Huntsman is a relative newcomer to cryptocurrency investing, and while he only discovered Cryptex when it was listed on Gemini, his Cryptex journey has seen him allocate over 10% of his investment portfolio into collateralizing vaults, minting TCAP, and providing liquidity on Sushiswap. He is very excited about the potential of this DAO and its community, as well as its flagship TCAP. He is humbly asking for your delegation for those who want to place their stake with a retail everyman who can't wait for the Moon but wants to invest decades into this project to see it to its maximum potential.",
+    discord: "Huntsman202#2502",
+    twitter: "OGDavidGNowak",
   },
 ];

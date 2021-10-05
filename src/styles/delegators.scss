@@ -30,21 +30,6 @@
     margin-left: -5px;
     margin-top: -5px;
   }
-  /*.card {
-    margin-top: 2rem;
-    width: 20rem;
-    border-radius: 2rem;
-
-    &-title {
-      margin-top: 1rem !important;
-      a {
-        color: $white;
-      }
-    }
-    &-text {
-      margin-bottom: 1rem;
-    }
-  }*/
 
   .card {
     margin-top: 2rem;
@@ -81,15 +66,7 @@
     .badges-container {
       display: flex;
       justify-content: flex-end;
-      //margin-top: -60px;
-      margin-top: 10px; //..
-      
-      /**.badges-container2 {
-        display: flex;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        width: 75%;        
-      }**/
+      margin-top: 10px;
       
       .badges-container2 {
         display: flex;
@@ -158,6 +135,9 @@
     background-position: right bottom;
     background-size: contain;
     background-color: $purple;
+    @media (max-height: 850px) {
+      height: 6rem;
+    }
   }
 
   .badge-highlight {
@@ -177,6 +157,10 @@
     width: 130px;
     margin-top: -80px;
     border-radius: 50%;
+    @media (max-height: 850px) {
+      height: 120px;
+      width: 120px;
+    }
   }
 
   .blockie {
@@ -228,18 +212,13 @@
     clear: both;
   }
 
-  /*
   .btn {
     min-height: 3.375rem;
     &:hover, &:active, &:focus {
       color: white;
     }
-  }
-  */
-  .btn {
-    min-height: 3.375rem;
-    &:hover, &:active, &:focus {
-      color: white;
+    @media (max-height: 850px) {
+      min-height: 3rem;
     }
   }
 
@@ -351,77 +330,6 @@
             }
           }
         }
-      }
-    }
-  }
-}
-
-.fullprofile {
-  .row {
-    margin-bottom: 1.4rem;
-  }
-  h4 {
-    font-size: 1.4rem;
-    color: white;
-    clear: both;
-  }
-  h5 {
-    font-size: 1rem;
-    color: white;
-    clear: both;
-  }
-  h6 {
-    font-size: 0.8rem;
-    color: white;
-    clear: both;
-  }
-  .content {
-    .row {
-      flex-direction: column;
-    }
-  }
-  .badge-highlight {
-    border-radius: 25px;
-    height: 30px;
-    border-color: $off-white;
-    background-color: $off-white;
-    color: $darker;
-    padding: 10px;
-    margin-right: 5px;
-    margin-bottom: 10px;
-  }
-  .ethereum {
-    width: 15px;
-    margin-right: 2px;
-    margin-top: -2px;
-  }
-  .discord {
-    width: 15px;
-    margin-right: 2px;
-    margin-top: -2px;
-  }
-  .avatar {
-    height: 170px;
-    width: 170px;
-    border-radius: 50%;
-  }
-  .blockie {
-    height: 170px;
-    width: 170px;
-    border-radius: 50%;    
-  }  
-
-  .main-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-
-    .badges {
-      display: flex;
-      flex-direction: row;
-
-      .accounts {
-        flex: 1;
       }
     }
   }

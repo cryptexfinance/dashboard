@@ -113,6 +113,17 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
     return "";
   };
 
+  const whyHtml = (why: string) => {
+    const whyArray = why.split("\n\n");
+    return (
+      <>
+        {whyArray.map((parragraph, index) => (
+          <p key={index.toString()}>{parragraph}</p>
+        ))}
+      </>
+    );
+  };
+
   const copyDiscordToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
     // Create new element
@@ -152,6 +163,12 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
             <div className="badges-container2">
               {shortAddress && (
                 <>
+                  {tokenOwnerStake && (
+                    <Badge variant="highlight">
+                      <CtxIcon className="tcap-neon" />
+                      <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
+                    </Badge>
+                  )}
                   <VoteBadge
                     address={delegator.id}
                     amount={delegator.delegatedVotes}
@@ -162,12 +179,6 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
                     amount={delegator.totalHoldersRepresented.toString()}
                     label="Represented"
                   />
-                  {tokenOwnerStake && (
-                    <Badge variant="highlight">
-                      <CtxIcon className="tcap-neon" />
-                      <span className="staked-label">{tokenOwnerStake.stake} Staked</span>
-                    </Badge>
-                  )}
                   <Badge variant="highlight">
                     <img src={tallyImg} className="tally" alt="tally logo" />
                     <a
@@ -230,7 +241,7 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="tooltip-right" className="farm-tooltip">
-                  {info.why}
+                  {whyHtml(info.why)}
                 </Tooltip>
               }
             >
