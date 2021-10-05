@@ -196,7 +196,7 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {makeShortAddress(delegator.id)}
+                      Contract
                     </a>
                   </Badge>
                 </>
