@@ -147,7 +147,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       <Modal.Footer>
         {isApproved ? (
           <Button variant="pink" className="mt-3 mb-4 w-100" onClick={stake}>
-            Delegate
+            Delegate to Keeper
           </Button>
         ) : (
           <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
