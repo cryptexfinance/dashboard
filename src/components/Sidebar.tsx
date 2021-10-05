@@ -10,7 +10,7 @@ import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg"
 import { ReactComponent as PoolsIcon } from "../assets/images/welcome/pool.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
-import { ReactComponent as GovernanceIcon } from "../assets/images/welcome/governance.svg";
+import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
 type props = {
@@ -158,7 +158,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
                 setActive("governance");
               }}
             >
-              <GovernanceIcon className="governance" />
+              <StakeIcon className="governance" />
             </Link>
           ) : (
             <Link
@@ -167,7 +167,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
                 setActive("governance");
               }}
             >
-              <GovernanceIcon className="governance" />
+              <StakeIcon className="governance" />
             </Link>
           )}
         </Nav.Item>

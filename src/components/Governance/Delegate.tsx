@@ -112,7 +112,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Delegate</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Stake & Delegate</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
@@ -147,7 +147,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       <Modal.Footer>
         {isApproved ? (
           <Button variant="pink" className="mt-3 mb-4 w-100" onClick={stake}>
-            Stake & Delegate
+            Delegate
           </Button>
         ) : (
           <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
