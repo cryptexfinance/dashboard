@@ -120,7 +120,10 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
           <Form.Group className="" controlId="">
             {isApproved ? (
               <>
-                <p>Delegate votes to this Crypt Keeper.</p>
+                <p>
+                  Stake and Delegate CTX to this Crypt Keeper. Each time you Stake and Delegate, you
+                  must wait a minimum of 7 days before you can withdraw.
+                </p>
                 <Form.Label>Amount to Stake</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
@@ -144,7 +147,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       <Modal.Footer>
         {isApproved ? (
           <Button variant="pink" className="mt-3 mb-4 w-100" onClick={stake}>
-            Delegate
+            Stake & Delegate
           </Button>
         ) : (
           <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
