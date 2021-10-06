@@ -116,7 +116,9 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
               />{" "}
               CTX
             </td>
-            <td>{apy()}</td>
+            <td>
+              <b className="fire">{apy()}</b>
+            </td>
             <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
             <td align="right">
               <Button
