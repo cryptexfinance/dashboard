@@ -82,7 +82,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
   };
 
   const apy = (): string => {
-    if (parseFloat(stake) > 0) {
+    if (parseFloat(totalStaked) > 0) {
       const a = Math.round((2 * sixMonthCtxRewardAmount) / parseFloat(totalStaked));
       return a.toString().concat("%");
     }
