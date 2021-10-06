@@ -85,10 +85,10 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
       <Table hover className="mt-2">
         <thead>
           <tr>
-            <th>Stake</th>
+            <th>Staked</th>
+            <th>Last Staked</th>
             <th>Rewards</th>
             <th>APY</th>
-            <th>Last Stake</th>
             <th />
           </tr>
         </thead>
@@ -105,6 +105,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
               />{" "}
               CTX
             </td>
+            <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
             <td className="number">
               <NumberFormat
                 className="number"
@@ -119,7 +120,6 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
             <td>
               <b className="fire">{apy()}</b>
             </td>
-            <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
             <td align="right">
               <Button
                 variant="success"
