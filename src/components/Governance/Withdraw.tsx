@@ -102,7 +102,7 @@ const Withdraw = ({
               onChange={onChangeWithdraw}
             />
             {currentWithdrawTime !== 0 && (
-              <span className="warning-label">* Eligible to withdraw on {withdrawDate()}</span>
+              <span className="warning-span">* Eligible to withdraw on {withdrawDate()}</span>
             )}
           </Form.Group>
         </Form>
