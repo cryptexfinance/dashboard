@@ -49,7 +49,6 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
           currentWaitTimeCall,
         ]);
         setTotalStaked(ethers.utils.formatEther(totalSupply));
-        console.log(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
