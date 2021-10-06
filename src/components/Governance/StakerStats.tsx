@@ -17,6 +17,7 @@ type props = {
 const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
+  const [totalStaked, setTotalStaked] = useState("0.0");
   const [stake, setStake] = useState("0.0");
   const [rewards, setRewards] = useState("0.0");
   const [waitTime, setWaitTime] = useState(0);
@@ -27,6 +28,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
       let currentWT = waitTime;
       if (signer.signer && governance.delegatorFactoryRead) {
         const currentSignerAddress = await signer.signer.getAddress();
+        const totalSupplyCall = await governance.delegatorFactoryRead?.totalSupply();
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
           currentSignerAddress
         );
@@ -35,11 +37,19 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
         );
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
         // @ts-ignore
-        const [currentStake, currentReward, currentWaitTime] = await signer.ethcallProvider?.all([
+        const [
+          totalSupply,
+          currentStake,
+          currentReward,
+          currentWaitTime,
+        ] = await signer.ethcallProvider?.all([
+          totalSupplyCall,
           currentStakeCall,
           currentRewardCall,
           currentWaitTimeCall,
         ]);
+        setTotalStaked(ethers.utils.formatEther(totalSupply));
+        console.log(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
@@ -73,7 +83,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
 
   const apy = (): string => {
     if (parseFloat(stake) > 0) {
-      const a = Math.round((2 * sixMonthCtxRewardAmount) / parseFloat(stake));
+      const a = Math.round((2 * sixMonthCtxRewardAmount) / parseFloat(totalStaked));
       return a.toString().concat("%");
     }
     return "-";
