@@ -7,12 +7,20 @@ import NewDelegator from "./NewDelegator";
 import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
-import { infoType, delegatorsInfo } from "./data";
+import { delegatorsInfo } from "./data";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
 
 type props = {
   currentSignerAddress: string;
+};
+type delegatorType = {
+  id: string;
+  delegatee: string;
+  delegatedVotes: string;
+  delegatedVotesRaw: string;
+  tokenOwners: { stake: string; stakeRaw: string }[];
+  totalHoldersRepresented: Number;
 };
 
 const Delegators = ({ currentSignerAddress }: props) => {
@@ -22,6 +30,8 @@ const Delegators = ({ currentSignerAddress }: props) => {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [currentDelegatorAddress, setCurrentDelegatorAddress] = useState("");
   const [currentOwnerStake, setCurrentOwnerStake] = useState("0");
+  const [currentWithdrawTime, setCurrentWithdrawTime] = useState(0);
+  const [withdrawTimes, setWithdrawTimes] = useState<number[]>([]);
   const [updateData, setUpdateData] = useState(false);
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
@@ -76,13 +86,14 @@ const Delegators = ({ currentSignerAddress }: props) => {
     setShowDelegate(true);
   };
 
-  const openWithdraw = (cDelegator: string, ownerStake: string) => {
+  const openWithdraw = (cDelegator: string, ownerStake: string, withdrawTime: number) => {
     setCurrentDelegatorAddress(cDelegator);
     setCurrentOwnerStake(ownerStake);
+    setCurrentWithdrawTime(withdrawTime);
     setShowWithdraw(true);
   };
 
-  const getDelegatorInfo = (address: string): infoType | null => {
+  /* const getDelegatorInfo = (address: string): infoType | null => {
     const index = delegatorsInfo.findIndex(
       (item) => item.address.toLowerCase() === address.toLowerCase()
     );
@@ -90,6 +101,23 @@ const Delegators = ({ currentSignerAddress }: props) => {
       return delegatorsInfo[index];
     }
     return null;
+  }; */
+
+  const getDelegatorData = (address: string): delegatorType | null => {
+    const index = delegators.findIndex(
+      (item) => item.delegatee.toLowerCase() === address.toLowerCase()
+    );
+    if (index !== -1) {
+      return delegators[index];
+    }
+    return null;
+  };
+
+  const addWithdrawTime = (wTime: number) => {
+    const wtimes = withdrawTimes;
+    wtimes.push(wTime);
+    wtimes.sort((a, b) => b - a);
+    setWithdrawTimes(wtimes);
   };
 
   return (
@@ -104,14 +132,14 @@ const Delegators = ({ currentSignerAddress }: props) => {
           </div>
           */}
           <Row className="staker-wrapper">
-            <StakerStats refresh={refresh} updateData={updateData} />
+            <StakerStats refresh={refresh} updateData={updateData} withdrawTimes={withdrawTimes} />
           </Row>
         </>
       )}
       <div className="grid profiles">
-        {delegators.map((delegator) => {
-          const dInfo = getDelegatorInfo(delegator.delegatee);
-          if (dInfo) {
+        {delegatorsInfo.map((dInfo) => {
+          const delegator = getDelegatorData(dInfo.address);
+          if (delegator) {
             return (
               <ProfileCard
                 key={delegator.id}
@@ -119,6 +147,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
                 info={dInfo}
                 openDelegate={openDelegate}
                 openWithdraw={openWithdraw}
+                addWithdrawTime={addWithdrawTime}
                 action={
                   delegator.delegatee.toLowerCase() === currentSignerAddress.toLowerCase()
                     ? "edit"
@@ -152,6 +181,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         delegatorAddress={currentDelegatorAddress}
         delegatorFactory={governance.delegatorFactory}
         stakedAmount={currentOwnerStake}
+        currentWithdrawTime={currentWithdrawTime}
         onHide={() => {
           setCurrentDelegatorAddress("");
           setShowWithdraw(false);

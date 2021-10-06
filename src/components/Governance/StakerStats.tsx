@@ -7,19 +7,24 @@ import GovernanceContext from "../../state/GovernanceContext";
 import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
+const sixMonthCtxRewardAmount = 60000;
 type props = {
   refresh: () => void;
   updateData: boolean;
+  withdrawTimes: number[];
 };
 
-const StakerStats = ({ refresh, updateData }: props) => {
+const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
   const [stake, setStake] = useState("0.0");
   const [rewards, setRewards] = useState("0.0");
+  const [waitTime, setWaitTime] = useState(0);
+  const [lastStakeDate, setLastStakeDate] = useState<Date | null>();
 
   useEffect(() => {
     async function load() {
+      let currentWT = waitTime;
       if (signer.signer && governance.delegatorFactoryRead) {
         const currentSignerAddress = await signer.signer.getAddress();
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
@@ -28,18 +33,28 @@ const StakerStats = ({ refresh, updateData }: props) => {
         const currentRewardCall = await governance.delegatorFactoryRead?.earned(
           currentSignerAddress
         );
+        const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
         // @ts-ignore
-        const [currentStake, currentReward] = await signer.ethcallProvider?.all([
+        const [currentStake, currentReward, currentWaitTime] = await signer.ethcallProvider?.all([
           currentStakeCall,
           currentRewardCall,
+          currentWaitTimeCall,
         ]);
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
+        currentWT = parseInt(currentWaitTime.toString());
+        setWaitTime(currentWT);
+      }
+      if (currentWT !== 0 && withdrawTimes.length > 0) {
+        const wDate = new Date(withdrawTimes[0]);
+        const lastDate = new Date();
+        lastDate.setDate(wDate.getDate() - currentWT / 86400);
+        setLastStakeDate(lastDate);
       }
     }
     load();
     // eslint-disable-next-line
-  }, [signer, updateData]);
+  }, [signer, updateData, withdrawTimes]);
 
   const claimRewards = async () => {
     if (governance.delegatorFactory) {
@@ -56,6 +71,14 @@ const StakerStats = ({ refresh, updateData }: props) => {
     }
   };
 
+  const apy = (): string => {
+    if (parseFloat(stake) > 0) {
+      const a = Math.round((2 * sixMonthCtxRewardAmount) / parseFloat(stake));
+      return a.toString().concat("%");
+    }
+    return "-";
+  };
+
   return (
     <div className="mb-2 staker">
       <h2>Stake Reward </h2>
@@ -65,6 +88,7 @@ const StakerStats = ({ refresh, updateData }: props) => {
             <th>Stake</th>
             <th>Rewards</th>
             <th>APY</th>
+            <th>Last Stake</th>
             <th />
           </tr>
         </thead>
@@ -92,7 +116,8 @@ const StakerStats = ({ refresh, updateData }: props) => {
               />{" "}
               CTX
             </td>
-            <td>-</td>
+            <td>{apy()}</td>
+            <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
             <td align="right">
               <Button
                 variant="success"

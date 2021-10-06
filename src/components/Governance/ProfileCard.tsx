@@ -11,6 +11,7 @@ import discordImg from "../../assets/images/discord-icon.jpg";
 import twitterImg from "../../assets/images/twitter.svg";
 import tallyImg from "../../assets/images/tally.png";
 import SignerContext from "../../state/SignerContext";
+import GovernanceContext from "../../state/GovernanceContext";
 import { VoteBadge, ProfileImage } from "./common";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { infoType } from "./data";
@@ -26,16 +27,26 @@ type props = {
   };
   info: infoType;
   openDelegate: (currentDelegator: string) => void;
-  openWithdraw: (currentDelegator: string, ownerStake: string) => void;
+  openWithdraw: (currentDelegator: string, ownerStake: string, withdrawTime: number) => void;
+  addWithdrawTime: (waitingTime: number) => void;
   action: string;
 };
 
-const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: props) => {
+const ProfileCard = ({
+  delegator,
+  info,
+  openDelegate,
+  openWithdraw,
+  addWithdrawTime,
+  action,
+}: props) => {
   const [shortAddress, setShortAddress] = useState("");
   const [actionText, setActionText] = useState("");
   const [briefLength, setBriefLength] = useState(239);
   const [tokenOwnerStake, setTokenOwnerStake] = useState<{ stake: string; stakeRaw: string }>();
+  const [withdrawTime, setWithdrawTime] = useState(0);
   const signer = useContext(SignerContext);
+  const governance = useContext(GovernanceContext);
   const mediaQuery = useMediaQuery("only screen and (max-height: 850px)");
 
   const edit = async () => {
@@ -59,6 +70,18 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
       setShortAddress(makeShortAddress(delegator.delegatee));
       if (delegator.tokenOwners && delegator.tokenOwners.length > 0) {
         setTokenOwnerStake(delegator.tokenOwners[0]);
+
+        if (signer.signer) {
+          const currentSignerAddress = await signer.signer.getAddress();
+          const currentWaitTimeCall = await governance.delegatorFactoryRead?.stakerWaitTime(
+            currentSignerAddress,
+            delegator.id
+          );
+          // @ts-ignore
+          const [currentWaitTime] = await signer.ethcallProvider?.all([currentWaitTimeCall]);
+          setWithdrawTime(parseInt(currentWaitTime.toString()));
+          addWithdrawTime(parseInt(currentWaitTime.toString()) * 1000);
+        }
       }
       //  Set actions
       if (action === "delegate") {
@@ -69,11 +92,11 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
     }
 
     await getProvider();
-  }, [delegator, action, mediaQuery]);
+  }, [signer, action, delegator, governance, mediaQuery, addWithdrawTime]);
 
   const onRemoveClick = async () => {
     if (tokenOwnerStake) {
-      openWithdraw(delegator.id, tokenOwnerStake.stake);
+      openWithdraw(delegator.id, tokenOwnerStake.stake, withdrawTime);
     }
   };
 
