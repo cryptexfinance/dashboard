@@ -87,7 +87,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
     if (tokens.ctxToken) {
       try {
         const tx = await tokens.ctxToken.approve(delegatorFactory?.address, infiniteApproveValue);
-        notifyUser(tx, refresh);
+        await notifyUser(tx, refresh);
         setStakeText("");
         setIsApproved(true);
       } catch (error) {

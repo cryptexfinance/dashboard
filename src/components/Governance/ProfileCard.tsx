@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ethers } from "ethers";
 import { Button, Card, Badge } from "react-bootstrap";
 import Col from "react-bootstrap/esm/Col";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
@@ -57,33 +56,15 @@ const ProfileCard = ({ delegator, info, openDelegate, openWithdraw, action }: pr
       if (mediaQuery) {
         setBriefLength(143);
       }
-      const provider = ethers.getDefaultProvider();
-      const ens = await provider.lookupAddress(delegator.delegatee);
       setShortAddress(makeShortAddress(delegator.delegatee));
       if (delegator.tokenOwners && delegator.tokenOwners.length > 0) {
         setTokenOwnerStake(delegator.tokenOwners[0]);
-      }
-      if (ens) {
-        const resolver = await provider.getResolver(ens);
-        let twitterEns = await resolver.getText("com.twitter");
-        let descriptionEns = await resolver.getText("keywords");
-        let githubEns = await resolver.getText("com.github");
-
-        if (!twitterEns) {
-          twitterEns = await resolver.getText("vnd.twitter");
-        }
-        if (!githubEns) {
-          githubEns = await resolver.getText("vnd.github");
-        }
-        if (!descriptionEns) {
-          descriptionEns = await resolver.getText("description");
-        }
       }
       //  Set actions
       if (action === "delegate") {
         setActionText("Stake & Delegate");
       } else {
-        setActionText("Edit in ENS");
+        setActionText("Stake & Delegate");
       }
     }
 
