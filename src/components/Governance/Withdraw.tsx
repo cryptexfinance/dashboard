@@ -10,6 +10,7 @@ type props = {
   delegatorAddress: string;
   delegatorFactory?: ethers.Contract;
   stakedAmount: string;
+  currentWithdrawTime: number;
   onHide: () => void;
   refresh: () => void;
 };
@@ -19,6 +20,7 @@ const Withdraw = ({
   delegatorAddress,
   delegatorFactory,
   stakedAmount,
+  currentWithdrawTime,
   onHide,
   refresh,
 }: props) => {
@@ -59,6 +61,11 @@ const Withdraw = ({
     }
   };
 
+  const withdrawDate = (): string => {
+    const d = new Date(currentWithdrawTime * 1000);
+    return d.toLocaleString();
+  };
+
   return (
     <Modal
       show={show}
@@ -94,6 +101,9 @@ const Withdraw = ({
               value={withdrawText}
               onChange={onChangeWithdraw}
             />
+            {currentWithdrawTime !== 0 && (
+              <span className="warning-label">* Eligible to withdraw on {withdrawDate()}</span>
+            )}
           </Form.Group>
         </Form>
       </Modal.Body>

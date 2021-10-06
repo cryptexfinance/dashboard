@@ -105,10 +105,15 @@
       font-weight: bold;
     }
   }
+  .warning-label {
+    color: #f28040;
+    font-size: 13px;
+  }
 
   @media (max-width: 1000px) {
     .modal-body {
       overflow-x: scroll;
     }
   }
+
 }
