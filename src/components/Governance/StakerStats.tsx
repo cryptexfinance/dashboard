@@ -8,6 +8,7 @@ import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
 const sixMonthCtxRewardAmount = 60000;
+const apyShowDate = new Date(1633654800 * 1000);
 type props = {
   refresh: () => void;
   updateData: boolean;
@@ -81,7 +82,8 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
   };
 
   const apy = (): string => {
-    if (parseFloat(totalStaked) > 0) {
+    const currentDate = new Date();
+    if (parseFloat(totalStaked) > 0 && currentDate > apyShowDate) {
       const a = Math.round(((2 * sixMonthCtxRewardAmount) / parseFloat(totalStaked)) * 100);
       return a
         .toString()
