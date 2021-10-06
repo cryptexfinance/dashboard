@@ -3,7 +3,7 @@ import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";

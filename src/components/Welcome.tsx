@@ -5,7 +5,7 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers, { BigNumber } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";

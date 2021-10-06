@@ -6,7 +6,7 @@ import InputGroup from "react-bootstrap/esm/InputGroup";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { Contract } from "ethers-multicall";
-import ethers, { BigNumber } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";

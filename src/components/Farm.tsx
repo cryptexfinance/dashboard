@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
-
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
@@ -445,7 +444,7 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>Farming </h3>{" "}
+        <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
             <Card className="diamond mb-2">
