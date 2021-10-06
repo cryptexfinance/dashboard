@@ -87,7 +87,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
           <tr>
             <th>Staked</th>
             <th>Last Staked</th>
-            <th>Rewards</th>
+            <th>Staked Reward</th>
             <th>APY</th>
             <th />
           </tr>
