@@ -49,10 +49,6 @@ const ProfileCard = ({
   const governance = useContext(GovernanceContext);
   const mediaQuery = useMediaQuery("only screen and (max-height: 850px)");
 
-  const edit = async () => {
-    window.open(`https://app.ens.domains/address/${delegator.delegatee}`, "_blank");
-  };
-
   const etherscanUrl = () => {
     if (process.env.REACT_APP_NETWORK_NAME === "mainnet") {
       return "https://etherscan.io";
@@ -287,11 +283,7 @@ const ProfileCard = ({
                 variant="pink"
                 className="mt-3 mb-4 w-100"
                 onClick={async () => {
-                  if (action === "delegate") {
-                    openDelegate(delegator.id);
-                  } else {
-                    await edit();
-                  }
+                  openDelegate(delegator.id);
                 }}
               >
                 {actionText}
