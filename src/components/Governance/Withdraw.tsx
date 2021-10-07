@@ -25,6 +25,7 @@ const Withdraw = ({
   refresh,
 }: props) => {
   const [withdrawText, setWithdrawText] = useState("");
+  const [canWithdraw, setCanWithdraw] = useState(true);
 
   const onChangeWithdraw = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWithdrawText(event.target.value);
@@ -37,7 +38,8 @@ const Withdraw = ({
 
   const withdraw = async (event: React.MouseEvent) => {
     event.preventDefault();
-    if (delegatorFactory && delegatorAddress) {
+    if (delegatorFactory && delegatorAddress && canWithdraw) {
+      setCanWithdraw(false);
       if (withdrawText) {
         if (parseFloat(withdrawText) <= parseFloat(stakedAmount)) {
           try {
@@ -58,6 +60,7 @@ const Withdraw = ({
       } else {
         errorNotification("Field can't be empty");
       }
+      setCanWithdraw(true);
     }
   };
 
@@ -108,8 +111,13 @@ const Withdraw = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="pink" className="mt-3 mb-4 w-100" onClick={withdraw}>
-          Withdraw
+        <Button
+          variant="pink"
+          className="mt-3 mb-4 w-100"
+          onClick={withdraw}
+          disabled={!canWithdraw}
+        >
+          {canWithdraw ? "Withdraw" : "Withdrawing"}
         </Button>
       </Modal.Footer>
     </Modal>
