@@ -21,6 +21,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
   const [stakeText, setStakeText] = useState("");
   const [ctxBalance, setCtxBalance] = useState("");
   const [isApproved, setIsApproved] = useState(false);
+  const [canDelegate, setCanDelegate] = useState(true);
 
   // Infinite Approval
   const infiniteApproveValue = BigNumber.from("39614081250000000000000000000");
@@ -59,7 +60,8 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
 
   const stake = async (event: React.MouseEvent) => {
     event.preventDefault();
-    if (delegatorFactory && delegatorAddress) {
+    if (delegatorFactory && delegatorAddress && canDelegate) {
+      setCanDelegate(false);
       if (stakeText && parseFloat(stakeText) > 0) {
         if (parseFloat(stakeText) <= parseFloat(ctxBalance)) {
           try {
@@ -79,6 +81,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       } else {
         errorNotification("Field can't be empty");
       }
+      setCanDelegate(true);
     }
   };
 
@@ -146,8 +149,13 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
       </Modal.Body>
       <Modal.Footer>
         {isApproved ? (
-          <Button variant="pink" className="mt-3 mb-4 w-100" onClick={stake}>
-            Delegate to Keeper
+          <Button
+            variant="pink"
+            className="mt-3 mb-4 w-100"
+            onClick={stake}
+            disabled={!canDelegate}
+          >
+            {canDelegate ? "Delegate to Keeper" : "Delegating"}
           </Button>
         ) : (
           <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
