@@ -33,6 +33,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
   const [currentWithdrawTime, setCurrentWithdrawTime] = useState(0);
   const [withdrawTimes, setWithdrawTimes] = useState<number[]>([]);
   const [updateData, setUpdateData] = useState(false);
+  const [updateTimes, setUpdateTimes] = useState(false);
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
 
@@ -118,6 +119,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
     wtimes.push(wTime);
     wtimes.sort((a, b) => b - a);
     setWithdrawTimes(wtimes);
+    setUpdateTimes(!updateTimes);
   };
 
   return (
@@ -132,7 +134,12 @@ const Delegators = ({ currentSignerAddress }: props) => {
           </div>
           */}
           <Row className="staker-wrapper">
-            <StakerStats refresh={refresh} updateData={updateData} withdrawTimes={withdrawTimes} />
+            <StakerStats
+              refresh={refresh}
+              updateData={updateData}
+              withdrawTimes={withdrawTimes}
+              updateTimes={updateTimes}
+            />
           </Row>
         </>
       )}

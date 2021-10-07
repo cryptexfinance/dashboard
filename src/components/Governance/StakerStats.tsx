@@ -13,15 +13,16 @@ type props = {
   refresh: () => void;
   updateData: boolean;
   withdrawTimes: number[];
+  updateTimes: boolean;
 };
 
-const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
+const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
   const [totalStaked, setTotalStaked] = useState("0.0");
   const [stake, setStake] = useState("0.0");
   const [rewards, setRewards] = useState("0.0");
-  const [waitTime, setWaitTime] = useState(0);
+  const [waitTime, setWaitTime] = useState(604800);
   const [lastStakeDate, setLastStakeDate] = useState<Date | null>();
 
   useEffect(() => {
@@ -55,7 +56,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
         currentWT = parseInt(currentWaitTime.toString());
         setWaitTime(currentWT);
       }
-      if (currentWT !== 0 && withdrawTimes.length > 0) {
+      if (withdrawTimes.length > 0) {
         const wDate = new Date(withdrawTimes[0]);
         const lastDate = new Date();
         lastDate.setDate(wDate.getDate() - currentWT / 86400);
@@ -64,7 +65,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes }: props) => {
     }
     load();
     // eslint-disable-next-line
-  }, [signer, updateData, withdrawTimes]);
+  }, [signer, updateData, withdrawTimes, updateTimes]);
 
   const claimRewards = async () => {
     if (governance.delegatorFactory) {
