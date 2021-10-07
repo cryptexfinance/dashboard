@@ -175,7 +175,7 @@ const ProfileCard = ({
                   )}
                   <VoteBadge
                     address={delegator.id}
-                    amount={delegator.delegatedVotes}
+                    amount={Math.round(parseFloat(delegator.delegatedVotes)).toString()}
                     label="Votes"
                   />
                   <VoteBadge
