@@ -823,7 +823,7 @@ const Farm = () => {
                             </Button>
 
                             <Button
-                              variant="success"
+                              variant="warning"
                               className=" ml-4"
                               onClick={() => {
                                 claimVest("ETHPOOL");
@@ -832,15 +832,15 @@ const Farm = () => {
                               Claim Vest
                             </Button>
 
-                            <Button
-                              variant="warning"
-                              className=" ml-4"
-                              onClick={() => {
-                                exitRewards("ETHPOOL");
-                              }}
-                            >
-                              Exit
-                            </Button>
+                            {/*<Button*/}
+                            {/*  variant="warning"*/}
+                            {/*  className=" ml-4"*/}
+                            {/*  onClick={() => {*/}
+                            {/*    exitRewards("ETHPOOL");*/}
+                            {/*  }}*/}
+                            {/*>*/}
+                            {/*  Exit*/}
+                            {/*</Button>*/}
                           </>
                         )}
                       </td>
