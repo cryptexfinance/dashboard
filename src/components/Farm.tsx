@@ -580,16 +580,6 @@ const Farm = () => {
                           >
                             Claim
                           </Button>
-
-                          <Button
-                            variant="success"
-                            className=" ml-4"
-                            onClick={() => {
-                              claimVest("ETH");
-                            }}
-                          >
-                            Claim Vest
-                          </Button>
                         </>
                       )}
                     </td>
@@ -830,6 +820,16 @@ const Farm = () => {
                               }}
                             >
                               Claim
+                            </Button>
+
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimVest("ETHPOOL");
+                              }}
+                            >
+                              Claim Vest
                             </Button>
 
                             <Button
