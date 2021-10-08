@@ -791,7 +791,7 @@ const Farm = () => {
                             </Button>
 
                             <Button variant="dark" className="ml-4" disabled>
-                              Exit
+                              Claim Vest
                             </Button>
                           </>
                         ) : (
@@ -831,16 +831,6 @@ const Farm = () => {
                             >
                               Claim Vest
                             </Button>
-
-                            {/*<Button*/}
-                            {/*  variant="warning"*/}
-                            {/*  className=" ml-4"*/}
-                            {/*  onClick={() => {*/}
-                            {/*    exitRewards("ETHPOOL");*/}
-                            {/*  }}*/}
-                            {/*>*/}
-                            {/*  Exit*/}
-                            {/*</Button>*/}
                           </>
                         )}
                       </td>
