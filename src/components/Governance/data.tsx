@@ -17,7 +17,7 @@ export const delegatorsInfo = [
     image: "brajon.png",
     expertise: ["Development"],
     why:
-      "I’ve been a Cryptex supporter since Nov 2020 and see the vision Joe and the boys are trying to accomplish. My goal is to help this project reach its potential of creating institutional grade investment products that allow anyone to get exposure to currently nontradeable markets.",
+      "I’ve been a Cryptex supporter since Nov 2020 and see the vision Joe and the team are trying to accomplish. My goal is to help this project reach its potential of creating institutional grade investment products that allow anyone to get exposure to currently nontradeable markets.",
     discord: "brajon#4226",
     twitter: "yadfarms",
   },

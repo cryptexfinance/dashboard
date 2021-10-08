@@ -411,6 +411,45 @@ const Farm = () => {
     }
   };
 
+  const claimVest = async (vaultType: string) => {
+    try {
+      let tx: ethers.ContractTransaction;
+      switch (vaultType) {
+        case "ETH":
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+        case "WBTC":
+          tx = await rewards?.wbtcReward?.claimVest();
+          break;
+        case "DAI":
+          tx = await rewards?.daiReward?.claimVest();
+          break;
+        case "ETHPOOL":
+          tx = await rewards?.wethPoolReward?.claimVest();
+          break;
+        case "WBTCPOOL":
+          tx = await rewards?.wbtcPoolReward?.claimVest();
+          break;
+        case "DAIPOOL":
+          tx = await rewards?.daiPoolReward?.claimVest();
+          break;
+        case "CTXPOOL":
+          tx = await rewards?.ctxPoolReward?.claimVest();
+          break;
+        default:
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+      }
+      notifyUser(tx, refresh);
+    } catch (error) {
+      if (error.code === 4001) {
+        errorNotification("Transaction rejected");
+      } else {
+        errorNotification("Error claiming vest");
+      }
+    }
+  };
+
   const exitRewards = async (vaultType: string) => {
     try {
       let tx: ethers.ContractTransaction;
@@ -752,7 +791,7 @@ const Farm = () => {
                             </Button>
 
                             <Button variant="dark" className="ml-4" disabled>
-                              Exit
+                              Claim Vest
                             </Button>
                           </>
                         ) : (
@@ -787,10 +826,10 @@ const Farm = () => {
                               variant="warning"
                               className=" ml-4"
                               onClick={() => {
-                                exitRewards("ETHPOOL");
+                                claimVest("ETHPOOL");
                               }}
                             >
-                              Exit
+                              Claim Vest
                             </Button>
                           </>
                         )}
