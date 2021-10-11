@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
-
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import SignerContext from "../state/SignerContext";
@@ -412,6 +411,45 @@ const Farm = () => {
     }
   };
 
+  const claimVest = async (vaultType: string) => {
+    try {
+      let tx: ethers.ContractTransaction;
+      switch (vaultType) {
+        case "ETH":
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+        case "WBTC":
+          tx = await rewards?.wbtcReward?.claimVest();
+          break;
+        case "DAI":
+          tx = await rewards?.daiReward?.claimVest();
+          break;
+        case "ETHPOOL":
+          tx = await rewards?.wethPoolReward?.claimVest();
+          break;
+        case "WBTCPOOL":
+          tx = await rewards?.wbtcPoolReward?.claimVest();
+          break;
+        case "DAIPOOL":
+          tx = await rewards?.daiPoolReward?.claimVest();
+          break;
+        case "CTXPOOL":
+          tx = await rewards?.ctxPoolReward?.claimVest();
+          break;
+        default:
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+      }
+      notifyUser(tx, refresh);
+    } catch (error) {
+      if (error.code === 4001) {
+        errorNotification("Transaction rejected");
+      } else {
+        errorNotification("Error claiming vest");
+      }
+    }
+  };
+
   const exitRewards = async (vaultType: string) => {
     try {
       let tx: ethers.ContractTransaction;
@@ -445,7 +483,7 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>Farming </h3>{" "}
+        <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
             <Card className="diamond mb-2">
@@ -753,7 +791,7 @@ const Farm = () => {
                             </Button>
 
                             <Button variant="dark" className="ml-4" disabled>
-                              Exit
+                              Claim Vest
                             </Button>
                           </>
                         ) : (
@@ -788,10 +826,10 @@ const Farm = () => {
                               variant="warning"
                               className=" ml-4"
                               onClick={() => {
-                                exitRewards("ETHPOOL");
+                                claimVest("ETHPOOL");
                               }}
                             >
-                              Exit
+                              Claim Vest
                             </Button>
                           </>
                         )}
