@@ -45,7 +45,6 @@ const Farm = () => {
   const [ethPoolBalance, setEthPoolBalance] = useState("0.0");
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
   const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
-  const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [vestingEndTime, setVestingEndTime] = useState(0);
   const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
   const [updateData, setUpdateData] = useState(false);
@@ -339,7 +338,6 @@ const Farm = () => {
           setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
           setEthVestAmount(currentVEthPoolReward);
-          setCtxVestAmount(currentVCtxPoolReward);
           if (phase > 1) {
             setEthPoolRewards(
               ethers.utils.formatEther(
@@ -954,27 +952,15 @@ const Farm = () => {
                             >
                               Stake
                             </Button>
-                            {ctxVestAmount.eq(0) ? (
-                              <Button
-                                variant="success"
-                                className=" ml-4"
-                                onClick={() => {
-                                  claimRewards("CTXPOOL");
-                                }}
-                              >
-                                Claim
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="success"
-                                className=" ml-4"
-                                onClick={() => {
-                                  claimVest("CTXPOOL");
-                                }}
-                              >
-                                Claim Vest
-                              </Button>
-                            )}
+                            <Button
+                              variant="success"
+                              className=" ml-4"
+                              onClick={() => {
+                                claimRewards("CTXPOOL");
+                              }}
+                            >
+                              Claim
+                            </Button>
                             <Button
                               variant="warning"
                               className=" ml-4"
