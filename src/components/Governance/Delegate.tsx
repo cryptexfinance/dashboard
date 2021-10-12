@@ -11,11 +11,19 @@ type props = {
   show: boolean;
   delegatorAddress: string;
   delegatorFactory?: ethers.Contract;
+  addTodayWithdrawTime: () => void;
   onHide: () => void;
   refresh: () => void;
 };
 
-const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }: props) => {
+const Delegate = ({
+  show,
+  delegatorAddress,
+  delegatorFactory,
+  addTodayWithdrawTime,
+  onHide,
+  refresh,
+}: props) => {
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
   const [stakeText, setStakeText] = useState("");
@@ -72,6 +80,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
             notifyUser(tx, refresh);
             setStakeText("");
             onHide();
+            addTodayWithdrawTime();
           } catch (error) {
             errorNotification("Not enough CTX balance.");
           }
@@ -97,7 +106,7 @@ const Delegate = ({ show, delegatorAddress, delegatorFactory, onHide, refresh }:
         if (error.code === 4001) {
           errorNotification("Transaction rejected");
         } else {
-          console.log(error);
+          errorNotification("Transaction rejected");
         }
       }
     }

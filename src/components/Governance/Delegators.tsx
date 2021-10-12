@@ -78,7 +78,6 @@ const Delegators = ({ currentSignerAddress }: props) => {
       setUpdateData(!updateData);
     } catch (error) {
       console.log("Error refetching data");
-      console.log(error);
     }
   };
 
@@ -120,6 +119,12 @@ const Delegators = ({ currentSignerAddress }: props) => {
     wtimes.sort((a, b) => b - a);
     setWithdrawTimes(wtimes);
     setUpdateTimes(!updateTimes);
+  };
+
+  const addTodayWithdrawTime = () => {
+    const stakeDate = new Date();
+    stakeDate.setDate(stakeDate.getDate() - 7);
+    addWithdrawTime(stakeDate.getTime());
   };
 
   return (
@@ -177,6 +182,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         show={showDelegate}
         delegatorAddress={currentDelegatorAddress}
         delegatorFactory={governance.delegatorFactory}
+        addTodayWithdrawTime={() => addTodayWithdrawTime()}
         onHide={() => {
           setCurrentDelegatorAddress("");
           setShowDelegate(false);

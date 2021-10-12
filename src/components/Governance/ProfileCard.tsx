@@ -3,6 +3,7 @@ import { Button, Card, Badge } from "react-bootstrap";
 import Col from "react-bootstrap/esm/Col";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { ethers } from "ethers";
 import { useMediaQuery } from "@react-hook/media-query";
 import "../../styles/delegators.scss";
 import { makeShortAddress } from "../../utils/utils";
@@ -64,9 +65,9 @@ const ProfileCard = ({
         setBriefLength(143);
       }
       setShortAddress(makeShortAddress(delegator.delegatee));
+
       if (delegator.tokenOwners && delegator.tokenOwners.length > 0) {
         setTokenOwnerStake(delegator.tokenOwners[0]);
-
         if (signer.signer) {
           const currentSignerAddress = await signer.signer.getAddress();
           const currentWaitTimeCall = await governance.delegatorFactoryRead?.stakerWaitTime(
@@ -144,6 +145,14 @@ const ProfileCard = ({
   const round2 = (num: number): number => {
     const m = Number((Math.abs(num) * 100).toPrecision(15));
     return (Math.round(m) / 100) * Math.sign(num);
+  };
+
+  const isTokenOwner = (): boolean => {
+    if (tokenOwnerStake) {
+      const raw = ethers.BigNumber.from(tokenOwnerStake.stakeRaw);
+      return raw.gt(ethers.BigNumber.from(0));
+    }
+    return false;
   };
 
   return (
@@ -271,14 +280,14 @@ const ProfileCard = ({
       <Card.Footer>
         {signer.signer && (
           <div className="buttons-container">
-            {tokenOwnerStake && (
+            {isTokenOwner() && (
               <Col md={6} lg={6}>
                 <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
                   Withdraw
                 </Button>
               </Col>
             )}
-            <Col md={tokenOwnerStake ? 6 : 12} lg={tokenOwnerStake ? 6 : 12}>
+            <Col md={isTokenOwner() ? 6 : 12} lg={isTokenOwner() ? 6 : 12}>
               <Button
                 variant="pink"
                 className="mt-3 mb-4 w-100"

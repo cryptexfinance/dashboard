@@ -815,7 +815,7 @@ const Farm = () => {
                             {ethVestAmount.eq(0) ? (
                               <Button
                                 variant="success"
-                                className=" ml-4"
+                                className="ml-4"
                                 onClick={() => {
                                   claimRewards("ETHPOOL");
                                 }}
@@ -825,7 +825,7 @@ const Farm = () => {
                             ) : (
                               <Button
                                 variant="success"
-                                className=" ml-4"
+                                className="claim-vest ml-4"
                                 onClick={() => {
                                   claimVest("ETHPOOL");
                                 }}
