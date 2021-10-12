@@ -155,11 +155,6 @@ const ProfileCard = ({
     return false;
   };
 
-  const showStakeBtn = () => {
-    const a = "0x564BcA365D62BCC22dB53d032F8dbD35439C9206";
-    return a.toLocaleLowerCase() !== info.address.toLocaleLowerCase();
-  };
-
   return (
     <Card>
       <div className="diamond" />
@@ -286,25 +281,23 @@ const ProfileCard = ({
         {signer.signer && (
           <div className="buttons-container">
             {isTokenOwner() && (
-              <Col md={showStakeBtn() ? 6 : 12} lg={showStakeBtn() ? 6 : 12}>
+              <Col md={6} lg={6}>
                 <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
                   Withdraw
                 </Button>
               </Col>
             )}
-            {showStakeBtn() && (
-              <Col md={isTokenOwner() ? 6 : 12} lg={isTokenOwner() ? 6 : 12}>
-                <Button
-                  variant="pink"
-                  className="mt-3 mb-4 w-100"
-                  onClick={async () => {
-                    openDelegate(delegator.id);
-                  }}
-                >
-                  {actionText}
-                </Button>
-              </Col>
-            )}
+            <Col md={isTokenOwner() ? 6 : 12} lg={isTokenOwner() ? 6 : 12}>
+              <Button
+                variant="pink"
+                className="mt-3 mb-4 w-100"
+                onClick={async () => {
+                  openDelegate(delegator.id);
+                }}
+              >
+                {actionText}
+              </Button>
+            </Col>
           </div>
         )}
       </Card.Footer>
