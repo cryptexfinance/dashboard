@@ -91,9 +91,7 @@ const Welcome = () => {
       }
       if (data) {
         const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
-        console.log(`Current TOTAL: ${currentTotalPrice}`);
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
-        console.log(`Total TCAP: ${TotalTcapPrice}`);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         const tcapUSD = parseFloat(tcapBalance) * parseFloat(tcapPrice);

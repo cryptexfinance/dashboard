@@ -51,7 +51,6 @@ const Withdraw = ({
             setWithdrawText("");
             onHide();
           } catch (error) {
-            console.log(error);
             errorNotification("Need to wait the minimum staking period");
           }
         } else {
