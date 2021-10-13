@@ -275,6 +275,13 @@
             }
           }
 
+          .claim-vest {
+            font-size: 0.8rem;
+            @media (min-width: 1300px) {
+              width: 7rem;
+            }
+          }
+
           thead {
             .btn {
               width: 37px;

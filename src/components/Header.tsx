@@ -4,7 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import "../styles/header.scss";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";

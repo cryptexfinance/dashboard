@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import governanceContext from "../../state/GovernanceContext";
 import "../../styles/modal.scss";
 import { errorNotification, notifyUser } from "../../utils/utils";

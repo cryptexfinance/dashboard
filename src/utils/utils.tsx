@@ -82,11 +82,12 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     sendNotification(notificationTitle, notificationBody, false);
     await tx.wait(1);
     toast.dismiss();
+
     notificationTitle = "✔️ Transaction Confirmed!";
     notificationBody = "All set, please wait for another confirmation";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
-    await tx.wait(3);
+    await tx.wait(2);
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
