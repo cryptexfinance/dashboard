@@ -32,6 +32,18 @@ body {
   background-color: $primary;
 }
 
+.avatar {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+}
+
+.blockie{
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+}
+
 .alert {
   background-color: $purple;
   color: $white;

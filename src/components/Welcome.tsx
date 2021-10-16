@@ -13,7 +13,7 @@ import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress, getPriceInUSDFromPair } from "../utils/utils";
+import { makeShortAddress, getPriceInUSDFromPair, getENS } from "../utils/utils";
 import "../styles/welcome.scss";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
@@ -56,7 +56,13 @@ const Welcome = () => {
         tokens.tcapTokenRead
       ) {
         const currentAddress = await signer.signer.getAddress();
-        setAddress(makeShortAddress(currentAddress));
+        const ens = await getENS(currentAddress);
+        if (ens) {
+          setAddress(ens);
+        } else {
+          setAddress(makeShortAddress(currentAddress));
+        }
+
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
         const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
         const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();

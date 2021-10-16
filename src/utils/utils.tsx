@@ -10,6 +10,20 @@ export const makeShortAddress = (address: string) => {
   return shortAddress;
 };
 
+export const getENS = async (address: string) => {
+  const provider = ethers.getDefaultProvider();
+  const ens = await provider.lookupAddress(address);
+  if (ens) {
+    return ens;
+  }
+  return null;
+};
+
+export const getENSAvatar = async (resolver: ethers.providers.Resolver) => {
+  const avatar = await resolver.getText("avatar");
+  return avatar;
+};
+
 export const isValidAddress = async (address: string) => {
   try {
     const currentAddress = ethers.utils.getAddress(address);
