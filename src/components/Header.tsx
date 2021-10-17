@@ -1,17 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
-import { Image } from "react-bootstrap";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import "../styles/header.scss";
 import { ethers } from "ethers";
-import Blockies from "react-blockies";
+import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
-import { makeShortAddress, getENS, getENSAvatar } from "../utils/utils";
+import { makeShortAddress, getENS } from "../utils/utils";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
 // TODO: On change account reload page
@@ -20,9 +19,8 @@ const Header = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
-  const [avatar, setAvatar] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
@@ -63,10 +61,6 @@ const Header = () => {
         const ens = await getENS(currentAddress);
         if (ens) {
           setAddressField(ens);
-          const provider = ethers.getDefaultProvider();
-          const resolver = await provider.getResolver(ens);
-          const currentAvatar = await getENSAvatar(resolver);
-          setAvatar(currentAvatar);
         } else {
           setAddressField(makeShortAddress(currentAddress));
         }
@@ -92,19 +86,7 @@ const Header = () => {
               decimalScale={2}
             />
           </h5>
-          {avatar ? (
-            <Image src={avatar} roundedCircle className="avatar" />
-          ) : (
-            <Blockies
-              className="blockie"
-              seed={address}
-              size={5}
-              scale={5}
-              color="#ffffff"
-              bgColor="#e440f2"
-              spotColor="#7940f2"
-            />
-          )}
+          <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
           <h5 className="ml-2">
             <OverlayTrigger
               key="bottom"

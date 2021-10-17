@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Badge } from "react-bootstrap";
-import Blockies from "react-blockies";
+import Davatar from "@davatar/react";
 import ethereumImg from "../../assets/images/Ethereum-ETH-icon.png";
 
 type badgeProps = {
@@ -48,15 +48,7 @@ export const ProfileImage = ({ address, image }: imageProps) => (
           e.preventDefault();
         }}
       >
-        <Blockies
-          className="blockie"
-          seed={address}
-          size={10}
-          scale={10}
-          color="#ffffff"
-          bgColor="#e440f2"
-          spotColor="#7940f2"
-        />
+        <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
       </a>
     )}
   </>
