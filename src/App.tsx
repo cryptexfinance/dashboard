@@ -428,7 +428,7 @@ const App = () => {
                       }}
                       dismissible
                     >
-                      <b>💀 This project is on beta. Use at your own risk.</b>
+                      <b>💀 This project is in beta. Use at your own risk.</b>
                     </Alert>
                   )}
                   {vaultWarning && location.pathname === "/vault" && (
