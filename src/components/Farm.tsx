@@ -29,6 +29,8 @@ import {
 } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
+const ctxClaimVestShowDate = new Date(1634511235 * 1000);
+
 const Farm = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -371,11 +373,16 @@ const Farm = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [data]);
+  }, [data, updateData]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }
+
+  const showCtxClaimVest = (): boolean => {
+    const today = new Date();
+    return today > ctxClaimVestShowDate;
+  };
 
   const claimRewards = async (vaultType: string) => {
     try {
@@ -954,17 +961,7 @@ const Farm = () => {
                             >
                               Stake
                             </Button>
-                            {ctxVestAmount.eq(0) ? (
-                              <Button
-                                variant="success"
-                                className=" ml-4"
-                                onClick={() => {
-                                  claimRewards("CTXPOOL");
-                                }}
-                              >
-                                Claim
-                              </Button>
-                            ) : (
+                            {ctxVestAmount.gt(0) && showCtxClaimVest() ? (
                               <Button
                                 variant="success"
                                 className="claim-vest ml-4"
@@ -973,6 +970,16 @@ const Farm = () => {
                                 }}
                               >
                                 Claim Vest
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="success"
+                                className=" ml-4"
+                                onClick={() => {
+                                  claimRewards("CTXPOOL");
+                                }}
+                              >
+                                Claim
                               </Button>
                             )}
                             <Button
