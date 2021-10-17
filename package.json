@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.2.5",
+    "@davatar/react": "^1.8.1",
     "@portis/web3": "^2.0.0-beta.59",
     "@react-hook/media-query": "^1.1.1",
     "@testing-library/jest-dom": "^5.11.4",
