@@ -34,7 +34,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
           currentSignerAddress
         );
-        const currentRewardCall = await governance.delegatorFactoryRead?.rewards(
+        const currentRewardCall = await governance.delegatorFactoryRead?.earned(
           currentSignerAddress
         );
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
