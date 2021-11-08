@@ -18,6 +18,8 @@ import "../../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
 import { ReactComponent as BTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
+import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
+import { ReactComponent as AAVEIconSmall } from "../../assets/images/vault/aave.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
@@ -58,6 +60,12 @@ const Details = ({ address }: props) => {
       break;
     case "dai":
       currency = "DAI";
+      break;
+    case "aave":
+      currency = "AAVE";
+      break;
+    case "link":
+      currency = "LINK";
       break;
     case "wbtc":
       currency = "WETH";
@@ -154,15 +162,25 @@ const Details = ({ address }: props) => {
       signer.signer &&
       oracles.wethOracle &&
       oracles.daiOracle &&
+      oracles.tcapOracle &&
+      oracles.aaveOracle &&
+      oracles.linkOracle &&
       oracles.wethOracleRead &&
       oracles.daiOracleRead &&
-      oracles.tcapOracle &&
+      oracles.aaveOracleRead &&
+      oracles.linkOracleRead &&
       vaults.wethVault &&
       vaults.daiVault &&
+      vaults.aaveVault &&
+      vaults.linkVault &&
       tokens.wethToken &&
       tokens.daiToken &&
+      tokens.aaveToken &&
+      tokens.linkToken &&
       tokens.wethTokenRead &&
       tokens.daiTokenRead &&
+      tokens.aaveTokenRead &&
+      tokens.linkTokenRead &&
       vaultData
     ) {
       let currentVault: any;
@@ -199,6 +217,20 @@ const Details = ({ address }: props) => {
           currentToken = tokens.daiToken;
           currentOracleRead = oracles.daiOracleRead;
           currentTokenRead = tokens.daiTokenRead;
+          break;
+        case "AAVE":
+          currentVault = vaults.aaveVault;
+          currentVaultRead = vaults.aaveVaultRead;
+          currentToken = tokens.aaveToken;
+          currentOracleRead = oracles.aaveOracleRead;
+          currentTokenRead = tokens.aaveTokenRead;
+          break;
+        case "LINK":
+          currentVault = vaults.linkVault;
+          currentVaultRead = vaults.linkVaultRead;
+          currentToken = tokens.linkToken;
+          currentOracleRead = oracles.linkOracleRead;
+          currentTokenRead = tokens.linkTokenRead;
           break;
         default:
           currentVault = vaults.wethVault;
@@ -608,6 +640,16 @@ const Details = ({ address }: props) => {
   };
 
   const mintTCAP = async () => {
+    /* try {
+      const tx = await selectedCollateralContract?.mint(
+        "0xF6a16a48099497C59e8abEAa37Bb37B2F9B793d4",
+        ethers.utils.parseEther("20")
+      );
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.error(error);
+      errorNotification("Transaction rejected");
+    } */
     if (mintTxt) {
       try {
         const amount = ethers.utils.parseEther(mintTxt);
@@ -774,6 +816,10 @@ const Details = ({ address }: props) => {
           switch (selectedVault) {
             case "DAI":
               return <DAIIconSmall className="dai" />;
+            case "AAVE":
+              return <AAVEIconSmall className="btc" />;
+            case "LINK":
+              return <LINKIconSmall className="link" />;
             case "WBTC":
               return <BTCIconSmall className="btc" />;
             default:
@@ -785,8 +831,9 @@ const Details = ({ address }: props) => {
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
             <option value="ETH">ETH</option>
             <option>WETH</option>
-            {/* <option>WBTC</option> */}
             <option>DAI</option>
+            <option>AAVE</option>
+            <option>LINK</option>
           </Form.Control>
           <p className="number">
             <NumberFormat
@@ -817,6 +864,10 @@ const Details = ({ address }: props) => {
                   switch (selectedVault) {
                     case "DAI":
                       return <DAIIcon className="eth" />;
+                    case "AAVE":
+                      return <DAIIcon className="eth" />;
+                    case "LINK":
+                      return <DAIIcon className="eth" />;
                     case "WBTC":
                       return <WBTCIcon className="eth" />;
                     default:
@@ -831,8 +882,10 @@ const Details = ({ address }: props) => {
                         switch (selectedVault) {
                           case "DAI":
                             return <DAIIconSmall className="dai small" />;
-                          case "WBTC":
-                            return <BTCIconSmall className="btc small" />;
+                          case "AAVE":
+                            return <AAVEIconSmall className="btc small" />;
+                          case "LINK":
+                            return <LINKIconSmall className="link small" />;
                           default:
                             return <ETHIconSmall className="small" />;
                         }
@@ -903,7 +956,9 @@ const Details = ({ address }: props) => {
                         switch (selectedVault) {
                           case "DAI":
                             return <DAIIconSmall className="dai" />;
-                          case "WBTC":
+                          case "AAVE":
+                            return <BTCIconSmall className="btc" />;
+                          case "LINK":
                             return <BTCIconSmall className="btc" />;
                           default:
                             return <ETHIconSmall className="weth" />;
