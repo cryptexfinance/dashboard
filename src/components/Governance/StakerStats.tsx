@@ -54,12 +54,10 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
-        setWaitTime(currentWT);
       }
       if (withdrawTimes.length > 0) {
-        const wDate = new Date(withdrawTimes[0]);
         const lastDate = new Date();
-        lastDate.setDate(wDate.getDate() - currentWT / 86400);
+        lastDate.setTime(withdrawTimes[0] - currentWT * 1000);
         setLastStakeDate(lastDate);
       }
     }
