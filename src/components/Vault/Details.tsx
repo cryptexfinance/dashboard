@@ -18,10 +18,12 @@ import "../../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
 import { ReactComponent as BTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
-import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
 import { ReactComponent as AAVEIconSmall } from "../../assets/images/vault/aave.svg";
+import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
+import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
+import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
@@ -640,16 +642,6 @@ const Details = ({ address }: props) => {
   };
 
   const mintTCAP = async () => {
-    /* try {
-      const tx = await selectedCollateralContract?.mint(
-        "0xF6a16a48099497C59e8abEAa37Bb37B2F9B793d4",
-        ethers.utils.parseEther("20")
-      );
-      notifyUser(tx, refresh);
-    } catch (error) {
-      console.error(error);
-      errorNotification("Transaction rejected");
-    } */
     if (mintTxt) {
       try {
         const amount = ethers.utils.parseEther(mintTxt);
@@ -865,9 +857,9 @@ const Details = ({ address }: props) => {
                     case "DAI":
                       return <DAIIcon className="eth" />;
                     case "AAVE":
-                      return <DAIIcon className="eth" />;
+                      return <AAVEIcon className="eth" />;
                     case "LINK":
-                      return <DAIIcon className="eth" />;
+                      return <LINKIcon className="eth" />;
                     case "WBTC":
                       return <WBTCIcon className="eth" />;
                     default:
@@ -883,7 +875,7 @@ const Details = ({ address }: props) => {
                           case "DAI":
                             return <DAIIconSmall className="dai small" />;
                           case "AAVE":
-                            return <AAVEIconSmall className="btc small" />;
+                            return <AAVEIconSmall className="aave small" />;
                           case "LINK":
                             return <LINKIconSmall className="link small" />;
                           default:
@@ -957,9 +949,9 @@ const Details = ({ address }: props) => {
                           case "DAI":
                             return <DAIIconSmall className="dai" />;
                           case "AAVE":
-                            return <BTCIconSmall className="btc" />;
+                            return <AAVEIconSmall className="aave" />;
                           case "LINK":
-                            return <BTCIconSmall className="btc" />;
+                            return <LINKIconSmall className="link" />;
                           default:
                             return <ETHIconSmall className="weth" />;
                         }
