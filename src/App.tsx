@@ -91,6 +91,18 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentDAIVault(currentDAIVault);
+    const currentAAVEVault = new ethers.Contract(
+      contracts.AaveVaultHandler.address,
+      contracts.AaveVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentAAVEVault(currentAAVEVault);
+    const currentLINKVault = new ethers.Contract(
+      contracts.LinkVaultHandler.address,
+      contracts.LinkVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentLINKVault(currentLINKVault);
 
     const currentWETHVaultRead = new Contract(
       contracts.WETHVaultHandler.address,
@@ -102,6 +114,16 @@ const App = () => {
       contracts.DAIVaultHandler.abi
     );
     vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
+    const currentAVEEVaultRead = new Contract(
+      contracts.AaveVaultHandler.address,
+      contracts.AaveVaultHandler.abi
+    );
+    vaults.setCurrentAAVEVaultRead(currentAVEEVaultRead);
+    const currentLINKVaultRead = new Contract(
+      contracts.LinkVaultHandler.address,
+      contracts.LinkVaultHandler.abi
+    );
+    vaults.setCurrentLINKVaultRead(currentLINKVaultRead);
 
     // Set Tokens
     const currentWETHToken = new ethers.Contract(
@@ -122,6 +144,18 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentTCAPToken(currentTCAPToken);
+    const currentAAVEToken = new ethers.Contract(
+      contracts.AAVE.address,
+      contracts.AAVE.abi,
+      currentSigner
+    );
+    tokens.setCurrentAAVEToken(currentAAVEToken);
+    const currentLINKToken = new ethers.Contract(
+      contracts.LINK.address,
+      contracts.LINK.abi,
+      currentSigner
+    );
+    tokens.setCurrentLINKToken(currentLINKToken);
 
     const currentWETHTokenRead = new Contract(process.env.REACT_APP_WETH_ADDRESS || "", ERC20.abi);
     tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
@@ -129,6 +163,10 @@ const App = () => {
     tokens.setCurrentDAITokenRead(currentDAITokenRead);
     const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
     tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
+    const currentAAVETokenRead = new Contract(contracts.AAVE.address, contracts.AAVE.abi);
+    tokens.setCurrentAAVETokenRead(currentAAVETokenRead);
+    const currentLINKTokenRead = new Contract(contracts.LINK.address, contracts.LINK.abi);
+    tokens.setCurrentLINKTokenRead(currentLINKTokenRead);
 
     // TODO:remove this once other pools work
     if (process.env.REACT_APP_POOL_ETH && process.env.REACT_APP_POOL_CTX) {
@@ -243,13 +281,25 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentDAIOracle(currentDAIOracle);
-
     const currentTCAPOracle = new ethers.Contract(
       contracts.TCAPOracle.address,
       contracts.TCAPOracle.abi,
       currentSigner
     );
     oracles.setCurrentTCAPOracle(currentTCAPOracle);
+
+    const currentAAVEOracle = new ethers.Contract(
+      contracts.AaveOracle.address,
+      contracts.AaveOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentAAVEOracle(currentAAVEOracle);
+    const currentLINKOracle = new ethers.Contract(
+      contracts.LinkOracle.address,
+      contracts.LinkOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentLINKOracle(currentLINKOracle);
 
     const currentWETHOracleRead = new Contract(
       contracts.WETHOracle.address,
@@ -258,12 +308,21 @@ const App = () => {
     oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
     const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
     oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
-
     const currentTCAPOracleRead = new Contract(
       contracts.TCAPOracle.address,
       contracts.TCAPOracle.abi
     );
     oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
+    const currentAAVEOracleRead = new Contract(
+      contracts.AaveOracle.address,
+      contracts.AaveOracle.abi
+    );
+    oracles.setCurrentAAVEOracleRead(currentAAVEOracleRead);
+    const currentLINKOracleRead = new Contract(
+      contracts.LinkOracle.address,
+      contracts.LinkOracle.abi
+    );
+    oracles.setCurrentLINKOracleRead(currentLINKOracleRead);
 
     // Set Governance
     const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);

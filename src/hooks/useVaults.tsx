@@ -7,9 +7,13 @@ export const useVaults = (): VaultsContext => {
   const [wethVault, setWETHVault] = useState<ethers.Contract>();
   const [daiVault, setDAIVault] = useState<ethers.Contract>();
   const [wbtcVault, setWBTCVault] = useState<ethers.Contract>();
+  const [aaveVault, setAAVEVault] = useState<ethers.Contract>();
+  const [linkVault, setLINKVault] = useState<ethers.Contract>();
   const [wethVaultRead, setWETHVaultRead] = useState<Contract>();
   const [daiVaultRead, setDAIVaultRead] = useState<Contract>();
   const [wbtcVaultRead, setWBTCVaultRead] = useState<Contract>();
+  const [aaveVaultRead, setAAVEVaultRead] = useState<Contract>();
+  const [linkVaultRead, setLINKVaultRead] = useState<Contract>();
 
   const setCurrentWETHVault = React.useCallback((currentWETHVault: ethers.Contract): void => {
     setWETHVault(currentWETHVault);
@@ -20,6 +24,12 @@ export const useVaults = (): VaultsContext => {
   const setCurrentWBTCVault = React.useCallback((currentWBTCVault: ethers.Contract): void => {
     setWBTCVault(currentWBTCVault);
   }, []);
+  const setCurrentAAVEVault = React.useCallback((currentAAVEVault: ethers.Contract): void => {
+    setAAVEVault(currentAAVEVault);
+  }, []);
+  const setCurrentLINKVault = React.useCallback((currentLINKVault: ethers.Contract): void => {
+    setLINKVault(currentLINKVault);
+  }, []);
   const setCurrentWETHVaultRead = React.useCallback((currentWETHVaultRead: Contract): void => {
     setWETHVaultRead(currentWETHVaultRead);
   }, []);
@@ -29,6 +39,12 @@ export const useVaults = (): VaultsContext => {
   const setCurrentWBTCVaultRead = React.useCallback((currentWBTCVaultRead: Contract): void => {
     setWBTCVaultRead(currentWBTCVaultRead);
   }, []);
+  const setCurrentAAVEVaultRead = React.useCallback((currentAAVEVaultRead: Contract): void => {
+    setAAVEVaultRead(currentAAVEVaultRead);
+  }, []);
+  const setCurrentLINKVaultRead = React.useCallback((currentLINKVaultRead: Contract): void => {
+    setLINKVaultRead(currentLINKVaultRead);
+  }, []);
   return {
     wethVault,
     setCurrentWETHVault,
@@ -36,11 +52,19 @@ export const useVaults = (): VaultsContext => {
     setCurrentDAIVault,
     wbtcVault,
     setCurrentWBTCVault,
+    aaveVault,
+    setCurrentAAVEVault,
+    linkVault,
+    setCurrentLINKVault,
     wethVaultRead,
     setCurrentWETHVaultRead,
     daiVaultRead,
     setCurrentDAIVaultRead,
     wbtcVaultRead,
     setCurrentWBTCVaultRead,
+    aaveVaultRead,
+    setCurrentAAVEVaultRead,
+    linkVaultRead,
+    setCurrentLINKVaultRead,
   };
 };
