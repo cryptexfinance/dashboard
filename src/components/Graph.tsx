@@ -12,6 +12,8 @@ import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
+import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
 import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
@@ -26,6 +28,8 @@ const Graph = () => {
   const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
+  const [aaveStake, setAaveStake] = useState("0");
+  const [linkStake, setLinkStake] = useState("0");
   // const [WBTCStake, setWBTCStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
@@ -52,6 +56,8 @@ const Graph = () => {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
+        const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
+        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
@@ -60,12 +66,16 @@ const Graph = () => {
           currentTotalPrice,
           wethOraclePrice,
           daiOraclePrice,
+          aaveOraclePrice,
+          linkOraclePrice,
           currentTotalSupply,
           reservesCtxPool,
         ] = await signer.ethcallProvider?.all([
           currentTotalPriceCall,
           wethOraclePriceCall,
           daiOraclePriceCall,
+          aaveOraclePriceCall,
+          linkOraclePriceCall,
           currentTotalSupplyCall,
           reservesCtxPoolCall,
         ]);
@@ -74,6 +84,8 @@ const Graph = () => {
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
+        let currentAAVEStake = BigNumber.from(0);
+        let currentLINKStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
           const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "1");
@@ -97,6 +109,12 @@ const Graph = () => {
             case contracts.WETHVaultHandler.address.toLowerCase():
               currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
+            case contracts.AaveVaultHandler.address.toLowerCase():
+              currentAAVEStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
+            case contracts.LinkVaultHandler.address.toLowerCase():
+              currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
             default:
               break;
           }
@@ -104,12 +122,22 @@ const Graph = () => {
 
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
-
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
+        const formatAAVE = ethers.utils.formatEther(currentAAVEStake);
+        setAaveStake(formatAAVE);
+        const formatLINK = ethers.utils.formatEther(currentLINKStake);
+        setLinkStake(formatLINK);
+
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
-        const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI);
+        const aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
+        const linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+        const totalUSD =
+          toUSD(ethUSD, formatETH) +
+          toUSD(daiUSD, formatDAI) +
+          toUSD(aaveUSD, formatAAVE) +
+          toUSD(linkUSD, formatLINK);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
@@ -182,14 +210,6 @@ const Graph = () => {
             ETH
           </h5>
         </Card>
-        {/* <Card>
-          <WBTCIcon className="wbtc" />
-          <h4>Total Staked in WBTC</h4>
-          <h5 className="number neon-yellow">
-            <NumberFormat value={WBTCStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            WBTC
-          </h5>
-        </Card> */}
         <Card>
           <DAIIcon className="dai" />
           <h4>Total Staked in DAI</h4>
@@ -209,6 +229,22 @@ const Graph = () => {
               decimalScale={2}
               prefix="$"
             />{" "}
+          </h5>
+        </Card>
+        <Card>
+          <AAVEIcon className="ctx" />
+          <h4>Total Staked in AAVE</h4>
+          <h5 className="number neon-highlight">
+            <NumberFormat value={aaveStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
+            AAVE
+          </h5>
+        </Card>
+        <Card>
+          <LINKIcon className="ctx" />
+          <h4>Total Staked in LINK</h4>
+          <h5 className="number neon-highlight">
+            <NumberFormat value={linkStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
+            LINK
           </h5>
         </Card>
       </div>
