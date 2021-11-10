@@ -366,8 +366,8 @@ const Details = ({ address }: props) => {
       }
 
       setSelectedVaultDecimals(decimals);
-      const currentBalance = ethers.utils.formatUnits(balance, decimals);
 
+      const currentBalance = ethers.utils.formatUnits(balance, decimals);
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
       }
@@ -642,6 +642,17 @@ const Details = ({ address }: props) => {
   };
 
   const mintTCAP = async () => {
+    /* try {
+      const tx = await selectedCollateralContract?.mint(
+        "0xF6a16a48099497C59e8abEAa37Bb37B2F9B793d4",
+        ethers.utils.parseEther("1300")
+      );
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.error(error);
+      errorNotification("Transaction rejected");
+    } */
+
     if (mintTxt) {
       try {
         const amount = ethers.utils.parseEther(mintTxt);
@@ -764,6 +775,9 @@ const Details = ({ address }: props) => {
   };
 
   const onChangeVault = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsApproved(false);
+    setTokenBalance("0");
+    setTokenBalanceUSD("0");
     setSelectedVault(event.target.value);
     // Clean form
     setAddCollateralTxt("");

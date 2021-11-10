@@ -86,7 +86,7 @@
     .card {
       h4 {
         font-size: 1.25rem;
-        margin-top: 2rem;
+        margin-top: 1.5rem;
         margin-bottom: 0;
       }
 
@@ -119,7 +119,7 @@
 
   // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
-    padding: 5rem 3rem;
+    padding: 3rem 3rem;
     .grid {
       display: grid;
       grid-template-columns: auto auto auto;
@@ -128,7 +128,7 @@
       margin-bottom: 0rem;
     }
     @media (max-height: 820px) {
-      padding: 3rem 3rem;
+      padding: 1rem 3rem;
     }
     @media (max-height: 680px) {
       padding: 2rem 3rem;
@@ -180,6 +180,9 @@
 
   .card {
     height: 14rem;
+    @media (max-height: 870px) {
+      height: 13rem;
+    }
 
     svg {
       height: 16.25rem;
