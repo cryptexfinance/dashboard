@@ -55,7 +55,6 @@ const Welcome = () => {
         oracles.tcapOracle &&
         tokens.tcapTokenRead
       ) {
-        console.log("Welcome -  entra");
         const currentAddress = await signer.signer.getAddress();
         const ens = await getENS(currentAddress);
         if (ens) {
@@ -63,22 +62,11 @@ const Welcome = () => {
         } else {
           setAddress(makeShortAddress(currentAddress));
         }
-        console.log("Welcome -  instances");
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
         const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
-        console.log("tcapTokenRead addess: ");
-        console.log(tokens.tcapTokenRead?.address);
-        console.log("CTX addess: ");
-        console.log(tokens.ctxTokenRead?.address);
-        console.log("CTX Pool addess: ");
-        console.log(tokens.ctxPoolTokenRead?.address);
-        console.log("wethOracleRead addess: ");
-        console.log(oracles.wethOracleRead?.address);
-
-        console.log("Welcome -  signer.ethcallProvider?.all");
         // @ts-ignore
         const [
           currentTcapBalance,
@@ -97,21 +85,16 @@ const Welcome = () => {
         const ctxString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(ctxString);
 
-        console.log("Welcome -  formatEther(wethOraclePrice) ");
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        console.log("Welcome -  getPriceInUSDFromPair(reservesCtxPool[0], reservesCtxPool[1],eth)");
         const currentPriceCTX = await getPriceInUSDFromPair(
           reservesCtxPool[0],
           reservesCtxPool[1],
           parseFloat(currentPriceETH)
         );
-        console.log("Welcome -  parseFloat(ctxString) * currentPriceCTX ");
         const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
         setCtxUSDBalance(ctxUSD.toString());
       }
       if (data) {
-        console.log("Welcome -  enter if(data)");
-        console.log("Welcome -  data?.oracles[0].answer");
         const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
@@ -120,7 +103,6 @@ const Welcome = () => {
         setTcapUSDBalance(tcapUSD.toString());
         setIsLoading(false);
       }
-      console.log("Welcome - end load");
     };
 
     loadAddress();
