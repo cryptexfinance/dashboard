@@ -53,6 +53,8 @@ const Graph = () => {
   useEffect(() => {
     const load = async () => {
       if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
+        console.log("Graph -  Enter");
+        console.log("Graph -  Instances");
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
@@ -61,6 +63,7 @@ const Graph = () => {
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
+        console.log("Graph -  signer.ethcallProvider?.all");
         // @ts-ignore
         const [
           currentTotalPrice,
@@ -87,10 +90,11 @@ const Graph = () => {
         let currentAAVEStake = BigNumber.from(0);
         let currentLINKStake = BigNumber.from(0);
 
+        console.log("Graph - await data.states.forEach");
         await data.states.forEach((s: any) => {
           const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "1");
           let contracts;
-
+          console.log("Graph - switch (networkId)");
           switch (networkId) {
             case 1:
               contracts = cryptexJson[1].mainnet.contracts;
@@ -102,6 +106,7 @@ const Graph = () => {
               contracts = cryptexJson[4].rinkeby.contracts;
               break;
           }
+          console.log("Graph - s.id.toLowerCase()");
           switch (s.id.toLowerCase()) {
             case contracts.DAIVaultHandler.address.toLowerCase():
               currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
@@ -120,6 +125,7 @@ const Graph = () => {
           }
         });
 
+        console.log("Graph - setting stakes ether format");
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
         setDAIStake(formatDAI);
         const formatETH = ethers.utils.formatEther(currentWETHStake);
@@ -129,10 +135,15 @@ const Graph = () => {
         const formatLINK = ethers.utils.formatEther(currentLINKStake);
         setLinkStake(formatLINK);
 
+        console.log("Graph - formatEther(wethOraclePrice.mul(10000000000))");
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        console.log("Graph - formatEther(daiOraclePrice.mul(10000000000))");
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
+        console.log("Graph - formatEther(aaveOraclePrice.mul(10000000000))");
         const aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
+        console.log("Graph - formatEther(linkOraclePrice.mul(10000000000))");
         const linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+
         const totalUSD =
           toUSD(ethUSD, formatETH) +
           toUSD(daiUSD, formatDAI) +
@@ -140,8 +151,11 @@ const Graph = () => {
           toUSD(linkUSD, formatLINK);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
+        console.log("Graph - before if (signer) ");
         if (signer) {
+          console.log("Graph - ethers.utils.formatEther(wethOraclePrice.mul(10000000000)) ");
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+          console.log("Graph - getPriceInUSDFromPair(reservesCtxPool[0], reservesCtxPool[1], .) ");
           const currentPriceCTX = getPriceInUSDFromPair(
             reservesCtxPool[0],
             reservesCtxPool[1],
@@ -149,8 +163,10 @@ const Graph = () => {
           );
           setCtxPrice(currentPriceCTX.toString());
         }
+        console.log("Graph - after if (signer) ");
       }
       setLoading(false);
+      console.log("Graph - end load() ");
     };
     load();
     // eslint-disable-next-line
