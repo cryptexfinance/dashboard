@@ -73,6 +73,8 @@ const Welcome = () => {
         console.log(tokens.tcapTokenRead?.address);
         console.log("CTX addess: ");
         console.log(tokens.ctxTokenRead?.address);
+        console.log("CTX Pool addess: ");
+        console.log(tokens.ctxPoolTokenRead?.address);
         console.log("wethOracleRead addess: ");
         console.log(oracles.wethOracleRead?.address);
 
@@ -90,10 +92,8 @@ const Welcome = () => {
           reservesCtxPoolCall,
         ]);
 
-        console.log("Welcome -  formatEther(currentTcapBalance) ");
         const tcapString = ethers.utils.formatEther(currentTcapBalance);
         setTcapBalance(tcapString);
-        console.log("Welcome -  formatEther(currentCtxBalance) ");
         const ctxString = ethers.utils.formatEther(currentCtxBalance);
         setCtxBalance(ctxString);
 
