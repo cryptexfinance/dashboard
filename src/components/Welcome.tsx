@@ -69,6 +69,13 @@ const Welcome = () => {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
+        console.log("tcapTokenRead addess: ");
+        console.log(tokens.tcapTokenRead?.address);
+        console.log("CTX addess: ");
+        console.log(tokens.ctxTokenRead?.address);
+        console.log("wethOracleRead addess: ");
+        console.log(oracles.wethOracleRead?.address);
+
         console.log("Welcome -  signer.ethcallProvider?.all");
         // @ts-ignore
         const [
