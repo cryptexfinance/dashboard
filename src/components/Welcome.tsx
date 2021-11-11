@@ -66,7 +66,7 @@ const Welcome = () => {
         console.log("Welcome -  instances");
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
         const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
-        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
 
         console.log("Welcome -  signer.ethcallProvider?.all");
