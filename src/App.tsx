@@ -37,9 +37,11 @@ import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
+import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
 const clientOracle = new ApolloClient({
-  uri: process.env.REACT_APP_GRAPH_URL,
+  uri:
+    process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby,
   cache: new InMemoryCache(),
 });
 
@@ -64,11 +66,13 @@ const App = () => {
   const setContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
     await ethcallProvider.init();
     signer.setCurrentEthcallProvider(ethcallProvider);
+    let isMainnet = false;
     const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "4");
     let contracts;
     switch (networkId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
+        isMainnet = true;
         break;
       case 4:
         contracts = cryptexJson[4].rinkeby.contracts;
@@ -127,13 +131,13 @@ const App = () => {
 
     // Set Tokens
     const currentWETHToken = new ethers.Contract(
-      process.env.REACT_APP_WETH_ADDRESS || "",
+      isMainnet ? NETWORKS.mainnet.weth : NETWORKS.rinkeby.weth,
       ERC20.abi,
       currentSigner
     );
     tokens.setCurrentWETHToken(currentWETHToken);
     const currentDAIToken = new ethers.Contract(
-      process.env.REACT_APP_DAI_ADDRESS || "",
+      isMainnet ? NETWORKS.mainnet.dai : NETWORKS.rinkeby.dai,
       WETH.abi,
       currentSigner
     );
@@ -157,9 +161,15 @@ const App = () => {
     );
     tokens.setCurrentLINKToken(currentLINKToken);
 
-    const currentWETHTokenRead = new Contract(process.env.REACT_APP_WETH_ADDRESS || "", ERC20.abi);
+    const currentWETHTokenRead = new Contract(
+      isMainnet ? NETWORKS.mainnet.weth : NETWORKS.rinkeby.weth,
+      ERC20.abi
+    );
     tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
-    const currentDAITokenRead = new Contract(process.env.REACT_APP_DAI_ADDRESS || "", WETH.abi);
+    const currentDAITokenRead = new Contract(
+      isMainnet ? NETWORKS.mainnet.dai : NETWORKS.rinkeby.dai,
+      WETH.abi
+    );
     tokens.setCurrentDAITokenRead(currentDAITokenRead);
     const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
     tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
@@ -168,45 +178,40 @@ const App = () => {
     const currentLINKTokenRead = new Contract(contracts.LINK.address, contracts.LINK.abi);
     tokens.setCurrentLINKTokenRead(currentLINKTokenRead);
 
-    // TODO:remove this once other pools work
-    if (process.env.REACT_APP_POOL_ETH && process.env.REACT_APP_POOL_CTX) {
-      const currentWETHPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_ETH,
-        UniV2Pair.abi,
-        currentSigner
-      );
-      tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
+    // Set Pool Tokens
+    const currentWETHPoolToken = new ethers.Contract(
+      isMainnet ? NETWORKS.mainnet.ethPool : NETWORKS.rinkeby.ethPool,
+      UniV2Pair.abi,
+      currentSigner
+    );
+    tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
 
-      const currentWETHPoolTokenRead = new Contract(process.env.REACT_APP_POOL_ETH, UniV2Pair.abi);
-      tokens.setCurrentWETHPoolTokenRead(currentWETHPoolTokenRead);
+    const currentWETHPoolTokenRead = new Contract(
+      isMainnet ? NETWORKS.mainnet.ethPool : NETWORKS.rinkeby.ethPool,
+      UniV2Pair.abi
+    );
+    tokens.setCurrentWETHPoolTokenRead(currentWETHPoolTokenRead);
 
-      const currentCTXPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_CTX,
-        UniV2Pair.abi,
-        currentSigner
-      );
-      tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
+    const currentCTXPoolToken = new ethers.Contract(
+      isMainnet ? NETWORKS.mainnet.ctxPool : NETWORKS.rinkeby.ctxPool,
+      UniV2Pair.abi,
+      currentSigner
+    );
+    tokens.setCurrentCTXPoolToken(currentCTXPoolToken);
 
-      const currentCTXPoolTokenRead = new Contract(process.env.REACT_APP_POOL_CTX, UniV2Pair.abi);
-      tokens.setCurrentCTXPoolTokenRead(currentCTXPoolTokenRead);
-    }
+    const currentCTXPoolTokenRead = new Contract(
+      isMainnet ? NETWORKS.mainnet.ctxPool : NETWORKS.rinkeby.ctxPool,
+      UniV2Pair.abi
+    );
+    tokens.setCurrentCTXPoolTokenRead(currentCTXPoolTokenRead);
 
     if (
-      process.env.REACT_APP_POOL_ETH &&
-      process.env.REACT_APP_POOL_DAI &&
-      process.env.REACT_APP_POOL_CTX
+      (isMainnet && NETWORKS.mainnet.daiPool !== "") ||
+      (!isMainnet && NETWORKS.rinkeby.daiPool !== "")
     ) {
-      // Set Pool Tokens
-      const currentWETHPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_ETH,
-        UniV2Pair.abi,
-        currentSigner
-      );
-
-      tokens.setCurrentWETHPoolToken(currentWETHPoolToken);
-
+      // Set DAI Pool Tokens
       const currentDAIPoolToken = new ethers.Contract(
-        process.env.REACT_APP_POOL_DAI,
+        isMainnet ? NETWORKS.mainnet.daiPool : NETWORKS.rinkeby.daiPool,
         UniV2Pair.abi,
         currentSigner
       );
