@@ -6,6 +6,46 @@
   justify-content: flex-end;
   padding-right: 3rem;
 
+  .network-container {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    padding-left: 3rem;
+    .btn {
+      height: 3.2rem;
+      width: 10.5rem;
+      border-radius: 0.3rem;
+
+      .title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;       
+      }
+
+      h6 {
+        margin-bottom: 0rem;
+      }
+
+      svg {
+        height: 2rem;
+      }
+
+      .optimism {
+        width: 2rem;
+      }
+    }
+    @media (max-width: 600px) {
+      margin-bottom: 1rem;
+      padding-left: 0rem;
+      justify-content: center;
+    }
+  }
+
+  h5 {
+    margin-bottom: 0rem;
+  }
+
   svg {
     vertical-align: top;
     height: 1.5rem;
@@ -16,6 +56,18 @@
     width: 15rem;
     height: 3rem;
     border-radius: 0;
+  }
+
+  .info {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .btn-network-container{
+    padding-left: 1rem;
   }
 
   .address {

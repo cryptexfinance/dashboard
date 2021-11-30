@@ -3,6 +3,8 @@ import Nav from "react-bootstrap/esm/Nav";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
+import NetworkContext from "../state/NetworkContext";
+import { NETWORKS } from "../utils/constants";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
@@ -20,6 +22,7 @@ type props = {
 };
 
 const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
+  const currentNetwork = useContext(NetworkContext);
   const location = useLocation();
   let activeVal = "dashboard";
   switch (location.pathname) {
@@ -105,28 +108,30 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </Link>
           )}
         </Nav.Item>
-        <Nav.Item>
-          {active === "pools" ? (
-            <Link
-              to="/pools"
-              className="active"
-              onClick={() => {
-                setActive("pools");
-              }}
-            >
-              <PoolsIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/pools"
-              onClick={() => {
-                setActive("pools");
-              }}
-            >
-              <PoolsIcon />
-            </Link>
-          )}
-        </Nav.Item>
+        {currentNetwork.chainId !== NETWORKS.okovan.chainId && (
+          <Nav.Item>
+            {active === "pools" ? (
+              <Link
+                to="/pools"
+                className="active"
+                onClick={() => {
+                  setActive("pools");
+                }}
+              >
+                <PoolsIcon />
+              </Link>
+            ) : (
+              <Link
+                to="/pools"
+                onClick={() => {
+                  setActive("pools");
+                }}
+              >
+                <PoolsIcon />
+              </Link>
+            )}
+          </Nav.Item>
+        )}
         <Nav.Item>
           {active === "farm" ? (
             <Link
@@ -149,28 +154,30 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </Link>
           )}
         </Nav.Item>
-        <Nav.Item>
-          {active === "governance" ? (
-            <Link
-              to="/governance"
-              className="active"
-              onClick={() => {
-                setActive("governance");
-              }}
-            >
-              <StakeIcon className="governance" />
-            </Link>
-          ) : (
-            <Link
-              to="/governance"
-              onClick={() => {
-                setActive("governance");
-              }}
-            >
-              <StakeIcon className="governance" />
-            </Link>
-          )}
-        </Nav.Item>
+        {currentNetwork.chainId !== NETWORKS.okovan.chainId && (
+          <Nav.Item>
+            {active === "governance" ? (
+              <Link
+                to="/governance"
+                className="active"
+                onClick={() => {
+                  setActive("governance");
+                }}
+              >
+                <StakeIcon className="governance" />
+              </Link>
+            ) : (
+              <Link
+                to="/governance"
+                onClick={() => {
+                  setActive("governance");
+                }}
+              >
+                <StakeIcon className="governance" />
+              </Link>
+            )}
+          </Nav.Item>
+        )}
         <Nav.Item>
           {active === "graph" ? (
             <Link

@@ -7,6 +7,7 @@ import { useQuery, gql } from "@apollo/client";
 import TokensContext from "../state/TokensContext";
 import SignerContext from "../state/SignerContext";
 import OraclesContext from "../state/OraclesContext";
+import NetworkContext from "../state/NetworkContext";
 import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -16,10 +17,12 @@ import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
+import { getPriceInUSDFromPair, isUndefined, toUSD } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
+  const currentNetwork = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
   const oracles = useContext(OraclesContext);
@@ -50,35 +53,73 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
+  const validOracles = (): boolean => {
+    let valid =
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.daiOracleRead) &&
+      !isUndefined(oracles.tcapOracleRead) &&
+      !isUndefined(tokens.tcapTokenRead);
+
+    if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      valid =
+        valid &&
+        !isUndefined(oracles.aaveOracle) &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(tokens.ctxPoolTokenRead);
+    }
+    return valid;
+  };
+
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
+      if (oracles && tokens && data && signer && validOracles()) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
-        const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
-        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
-        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-
-        // @ts-ignore
-        const [
-          currentTotalPrice,
-          wethOraclePrice,
-          daiOraclePrice,
-          aaveOraclePrice,
-          linkOraclePrice,
-          currentTotalSupply,
-          reservesCtxPool,
-        ] = await signer.ethcallProvider?.all([
+        const ethcalls = [
           currentTotalPriceCall,
           wethOraclePriceCall,
           daiOraclePriceCall,
-          aaveOraclePriceCall,
-          linkOraclePriceCall,
           currentTotalSupplyCall,
-          reservesCtxPoolCall,
-        ]);
+        ];
+
+        if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+          const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
+          const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          ethcalls.push(aaveOraclePriceCall);
+          ethcalls.push(linkOraclePriceCall);
+          ethcalls.push(reservesCtxPoolCall);
+        }
+        let currentTotalPrice;
+        let wethOraclePrice;
+        let daiOraclePrice;
+        let currentTotalSupply;
+        let aaveOraclePrice;
+        let linkOraclePrice;
+        let reservesCtxPool;
+
+        if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+          // @ts-ignore
+          [
+            currentTotalPrice,
+            wethOraclePrice,
+            daiOraclePrice,
+            currentTotalSupply,
+            aaveOraclePrice,
+            linkOraclePrice,
+            reservesCtxPool,
+          ] = await signer.ethcallProvider?.all(ethcalls);
+        } else {
+          // @ts-ignore
+          [
+            currentTotalPrice,
+            wethOraclePrice,
+            daiOraclePrice,
+            currentTotalSupply,
+          ] = await signer.ethcallProvider?.all(ethcalls);
+        }
 
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
@@ -88,14 +129,17 @@ const Graph = () => {
         let currentLINKStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
-          const networkId = parseInt(process.env.REACT_APP_NETWORK_ID || "1");
+          const networkId = currentNetwork.chainId;
           let contracts;
           switch (networkId) {
-            case 1:
+            case NETWORKS.mainnet.chainId:
               contracts = cryptexJson[1].mainnet.contracts;
               break;
-            case 4:
+            case NETWORKS.rinkeby.chainId:
               contracts = cryptexJson[4].rinkeby.contracts;
+              break;
+            case NETWORKS.okovan.chainId:
+              contracts = cryptexJson[69].okovan.contracts;
               break;
             default:
               contracts = cryptexJson[4].rinkeby.contracts;
@@ -130,8 +174,12 @@ const Graph = () => {
 
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
-        const aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
-        const linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+        let aaveUSD = "0";
+        let linkUSD = "0";
+        if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+          aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
+          linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+        }
 
         const totalUSD =
           toUSD(ethUSD, formatETH) +
@@ -142,12 +190,14 @@ const Graph = () => {
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          const currentPriceCTX = getPriceInUSDFromPair(
-            reservesCtxPool[0],
-            reservesCtxPool[1],
-            parseFloat(currentPriceETH)
-          );
-          setCtxPrice(currentPriceCTX.toString());
+          if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+            const currentPriceCTX = getPriceInUSDFromPair(
+              reservesCtxPool[0],
+              reservesCtxPool[1],
+              parseFloat(currentPriceETH)
+            );
+            setCtxPrice(currentPriceCTX.toString());
+          }
         }
       }
       setLoading(false);
@@ -218,35 +268,49 @@ const Graph = () => {
             DAI
           </h5>
         </Card>
-        <Card>
-          <CtxIcon className="ctx" />
-          <h4>CTX Price</h4>
-          <h5 className="number neon-blue">
-            <NumberFormat
-              value={ctxPrice}
-              displayType="text"
-              thousandSeparator
-              decimalScale={2}
-              prefix="$"
-            />{" "}
-          </h5>
-        </Card>
-        <Card>
-          <AAVEIcon className="ctx" />
-          <h4>Total Staked in AAVE</h4>
-          <h5 className="number neon-highlight">
-            <NumberFormat value={aaveStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            AAVE
-          </h5>
-        </Card>
-        <Card>
-          <LINKIcon className="ctx" />
-          <h4>Total Staked in LINK</h4>
-          <h5 className="number neon-highlight">
-            <NumberFormat value={linkStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            LINK
-          </h5>
-        </Card>
+        {currentNetwork.chainId !== NETWORKS.okovan.chainId && (
+          <>
+            <Card>
+              <CtxIcon className="ctx" />
+              <h4>CTX Price</h4>
+              <h5 className="number neon-blue">
+                <NumberFormat
+                  value={ctxPrice}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                  prefix="$"
+                />{" "}
+              </h5>
+            </Card>
+            <Card>
+              <AAVEIcon className="ctx" />
+              <h4>Total Staked in AAVE</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={aaveStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                AAVE
+              </h5>
+            </Card>
+            <Card>
+              <LINKIcon className="ctx" />
+              <h4>Total Staked in LINK</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={linkStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                LINK
+              </h5>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );

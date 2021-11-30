@@ -1,7 +1,9 @@
-import { ethers } from "ethers";
 import React from "react";
+import { ethers, utils } from "ethers";
+import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
+import { NETWORKS } from "./constants";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -9,6 +11,8 @@ export const makeShortAddress = (address: string) => {
     .toString()}`;
   return shortAddress;
 };
+
+export const isUndefined = (value: any): boolean => typeof value === "undefined";
 
 export const getENS = async (address: string) => {
   const provider = ethers.getDefaultProvider();
@@ -215,4 +219,39 @@ export const getPriceInUSDFromPair = (
   // amount of token0 required to by 1 WETH
   const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
   return ethPrice / amt;
+};
+
+export function toFragment(abi: JsonFragment[]): Fragment[] {
+  const abiFragment = abi.map((item: JsonFragment) => utils.Fragment.from(item));
+
+  if (abiFragment.length > 0 && abiFragment[abiFragment.length - 1] == null) {
+    abiFragment.pop();
+  }
+
+  return abiFragment;
+}
+
+export const isValidNetwork = (chainId: number) => {
+  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  if (name === "mainnet") {
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.okovan.chainId;
+  }
+  return chainId === NETWORKS.rinkeby.chainId || chainId === NETWORKS.okovan.chainId;
+};
+
+export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+  let provider;
+  if (chainId === NETWORKS.okovan.chainId) {
+    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
+  } else {
+    const alchemyKey =
+      chainId === NETWORKS.mainnet.chainId
+        ? process.env.REACT_APP_ALCHEMY_KEY
+        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+    provider = ethers.getDefaultProvider(name, {
+      infura: process.env.REACT_APP_INFURA_ID,
+      alchemy: alchemyKey,
+    });
+  }
+  return provider;
 };
