@@ -10,6 +10,7 @@ import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
+import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
 import VaultsContext from "../../state/VaultsContext";
@@ -24,18 +25,20 @@ import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
-import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import {
   notifyUser,
   toUSD,
   errorNotification,
+  getDefaultProvider,
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
+  isUndefined,
 } from "../../utils/utils";
 import Loading from "../Loading";
+import { NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -44,6 +47,7 @@ type props = {
 // TODO: Vault doesn't show if approve is 0 even if there is data in the vault
 
 const Details = ({ address }: props) => {
+  const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
@@ -159,43 +163,47 @@ const Details = ({ address }: props) => {
     return currentCollateralPrice;
   };
 
+  const validVaults = (): boolean => {
+    let valid =
+      !isUndefined(oracles.wethOracle) &&
+      !isUndefined(oracles.daiOracle) &&
+      !isUndefined(oracles.tcapOracle) &&
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.daiOracleRead) &&
+      !isUndefined(vaults.wethVault) &&
+      !isUndefined(vaults.daiVault) &&
+      !isUndefined(tokens.wethTokenRead) &&
+      !isUndefined(tokens.daiTokenRead);
+
+    if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      valid =
+        valid &&
+        !isUndefined(oracles.aaveOracle) &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(oracles.aaveOracleRead) &&
+        !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(vaults.aaveVault) &&
+        !isUndefined(vaults.linkVault) &&
+        !isUndefined(tokens.aaveToken) &&
+        !isUndefined(tokens.linkToken) &&
+        !isUndefined(tokens.aaveTokenRead) &&
+        !isUndefined(tokens.linkTokenRead);
+    }
+    return valid;
+  };
+
   async function loadVault(vaultType: string, vaultData: any) {
-    if (
-      signer.signer &&
-      oracles.wethOracle &&
-      oracles.daiOracle &&
-      oracles.tcapOracle &&
-      oracles.aaveOracle &&
-      oracles.linkOracle &&
-      oracles.wethOracleRead &&
-      oracles.daiOracleRead &&
-      oracles.aaveOracleRead &&
-      oracles.linkOracleRead &&
-      vaults.wethVault &&
-      vaults.daiVault &&
-      vaults.aaveVault &&
-      vaults.linkVault &&
-      tokens.wethToken &&
-      tokens.daiToken &&
-      tokens.aaveToken &&
-      tokens.linkToken &&
-      tokens.wethTokenRead &&
-      tokens.daiTokenRead &&
-      tokens.aaveTokenRead &&
-      tokens.linkTokenRead &&
-      vaultData
-    ) {
+    if (signer.signer && validVaults() && vaultData) {
       let currentVault: any;
       let currentVaultRead: any;
       let currentToken;
       let currentOracleRead;
       let currentTokenRead;
       let balance;
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
+      const provider = getDefaultProvider(
+        currentNetwork.chainId || NETWORKS.rinkeby.chainId,
+        currentNetwork.name || NETWORKS.rinkeby.name
+      );
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
@@ -276,6 +284,7 @@ const Details = ({ address }: props) => {
       }
 
       if (vaultType !== "ETH") {
+        // @ts-ignore
         balance = await currentToken.balanceOf(address);
       }
 
@@ -284,10 +293,14 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const { vaultId, collateral, debt } = currentVaultData;
+        // @ts-ignore
         const allowanceCall = await currentTokenRead.allowance(address, currentVault.address);
         const currentRatioCall = await currentVaultRead.getVaultRatio(vaultId);
+        // @ts-ignore
         const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
         const currentMinRatioCall = await currentVaultRead.ratio();
 
@@ -311,6 +324,7 @@ const Details = ({ address }: props) => {
         decimals = decimalsVal;
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
         setSelectedVaultId(vaultId);
+
         if (!allowance.isZero() || vaultType === "ETH") {
           setMinRatio(currentMinRatio.toString());
           setIsApproved(true);
@@ -345,7 +359,9 @@ const Details = ({ address }: props) => {
           setIsApproved(false);
         }
       } else {
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
 
         // @ts-ignore
@@ -568,12 +584,7 @@ const Details = ({ address }: props) => {
     e.preventDefault();
     let balance = "0";
     if (selectedVault === "ETH") {
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
-
+      const provider = getDefaultProvider(currentNetwork.chainId, currentNetwork.name);
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
       const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
@@ -838,8 +849,12 @@ const Details = ({ address }: props) => {
             <option value="ETH">ETH</option>
             <option>WETH</option>
             <option>DAI</option>
-            <option>AAVE</option>
-            <option>LINK</option>
+            {currentNetwork.chainId !== NETWORKS.okovan.chainId && (
+              <>
+                <option>AAVE</option>
+                <option>LINK</option>
+              </>
+            )}
           </Form.Control>
           <p className="number">
             <NumberFormat
@@ -874,8 +889,6 @@ const Details = ({ address }: props) => {
                       return <AAVEIcon className="eth" />;
                     case "LINK":
                       return <LINKIcon className="eth" />;
-                    case "WBTC":
-                      return <WBTCIcon className="eth" />;
                     default:
                       return <ETHIcon className="eth" />;
                   }

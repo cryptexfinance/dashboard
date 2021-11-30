@@ -21,6 +21,14 @@ export const NETWORKS = {
     daiPool: "0xb9625c0ec3dd89b00d20d1e3ea03d5b4072f03b4",
     ctxPool: "0x9c4438470b1593cf4efe0f85108e7416c3b582f8",
   },
+  okovan: {
+    chainId: 69,
+    hexChainId: "0x45",
+    name: "opt-kovan",
+    eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
+    weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
+    dai: "0xf6252af194093adDbD03442D7dA186b8d272F296",
+  },
   polygon: {
     chainId: 137,
     hexChainId: "0x89",
@@ -35,5 +43,6 @@ export const NETWORKS = {
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };
