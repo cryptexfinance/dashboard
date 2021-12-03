@@ -93,6 +93,8 @@ export const errorNotification = async (body: string) => {
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
 
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
     let notificationTitle = "⏰ Transaction Sent!";

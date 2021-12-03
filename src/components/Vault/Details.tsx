@@ -68,10 +68,20 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      currency = "AAVE";
+      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+        currency = "AAVE";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
       break;
     case "link":
-      currency = "LINK";
+      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+        currency = "LINK";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
       break;
     case "wbtc":
       currency = "WETH";
@@ -262,6 +272,7 @@ const Details = ({ address }: props) => {
       let currentBlock = await provider.getBlockNumber();
       currentBlock -= 10;
       if (
+        currentNetwork.chainId !== NETWORKS.okovan.chainId &&
         vaultData.vaults.length > 0 &&
         !vaultData._meta.hasIndexingErrors &&
         graphBlock >= currentBlock
@@ -296,6 +307,7 @@ const Details = ({ address }: props) => {
         // @ts-ignore
         const allowanceCall = await currentTokenRead.allowance(address, currentVault.address);
         const currentRatioCall = await currentVaultRead.getVaultRatio(vaultId);
+
         // @ts-ignore
         const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         // @ts-ignore
@@ -394,11 +406,15 @@ const Details = ({ address }: props) => {
     }
   }
 
-  const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
+  const { data, error, refetch, networkStatus } = useQuery(USER_VAULT, {
     variables: { owner: address },
     pollInterval: 200000,
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
+    onError: () => {
+      console.log("Error ----- ");
+      console.log(error);
+    },
     onCompleted: () => {
       loadVault(selectedVault, data);
     },
@@ -406,8 +422,13 @@ const Details = ({ address }: props) => {
 
   const refresh = async () => {
     try {
-      await refetch();
+      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+        await refetch();
+      } else {
+        loadVault(selectedVault, data);
+      }
     } catch (error) {
+      console.log(error);
       // catch error in case the vault screen is changed
     }
   };
@@ -653,17 +674,6 @@ const Details = ({ address }: props) => {
   };
 
   const mintTCAP = async () => {
-    /* try {
-      const tx = await selectedCollateralContract?.mint(
-        "0xF6a16a48099497C59e8abEAa37Bb37B2F9B793d4",
-        ethers.utils.parseEther("1300")
-      );
-      notifyUser(tx, refresh);
-    } catch (error) {
-      console.error(error);
-      errorNotification("Transaction rejected");
-    } */
-
     if (mintTxt) {
       try {
         const amount = ethers.utils.parseEther(mintTxt);
