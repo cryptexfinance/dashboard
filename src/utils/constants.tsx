@@ -27,7 +27,7 @@ export const NETWORKS = {
     name: "opt-kovan",
     eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
     weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
-    dai: "0x550d3f16515cD570777c497BE6Babd2b52261851",
+    dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
   },
   polygon: {
     chainId: 137,
