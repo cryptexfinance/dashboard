@@ -212,7 +212,7 @@ const Details = ({ address }: props) => {
       let balance;
       const provider = getDefaultProvider(
         currentNetwork.chainId || NETWORKS.rinkeby.chainId,
-        currentNetwork.name || NETWORKS.rinkeby.name
+        NETWORKS.rinkeby.name
       );
       switch (vaultType) {
         case "ETH": {
