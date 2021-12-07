@@ -59,11 +59,13 @@ const Welcome = () => {
         tokens.tcapTokenRead
       ) {
         const currentAddress = await signer.signer.getAddress();
-        const ens = await getENS(currentAddress);
-        if (ens) {
-          setAddress(ens);
-        } else {
-          setAddress(makeShortAddress(currentAddress));
+        if (currentAddress !== address) {
+          const ens = await getENS(currentAddress);
+          if (ens) {
+            setAddress(ens);
+          } else {
+            setAddress(makeShortAddress(currentAddress));
+          }
         }
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
@@ -100,7 +102,6 @@ const Welcome = () => {
         const prices = await data?.oracles;
         if (prices.length > 0) {
           currentTotalPrice = BigNumber.from(prices[0].answer);
-          console.log(currentTotalPrice);
         }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
