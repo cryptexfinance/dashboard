@@ -15,7 +15,10 @@ export const makeShortAddress = (address: string) => {
 export const isUndefined = (value: any): boolean => typeof value === "undefined";
 
 export const getENS = async (address: string) => {
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const ens = await provider.lookupAddress(address);
   if (ens) {
     return ens;

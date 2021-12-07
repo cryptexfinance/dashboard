@@ -39,7 +39,7 @@ import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
-import { isValidNetwork, toFragment } from "./utils/utils";
+import { isValidNetwork, getDefaultProvider, toFragment } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
 const clientOracle = (graphqlEndpoint: string) =>
@@ -51,7 +51,7 @@ const clientOracle = (graphqlEndpoint: string) =>
 const App = () => {
   const signer = useSigner();
   const web3Modal = useContext(Web3ModalContext);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const [show, setShow] = useState(true);
   const [vaultWarning, setVaultWarning] = useState(true);
@@ -435,11 +435,13 @@ const App = () => {
       setInvalidNetwork(true);
     }
     const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
-    setCurrentNetwork(network.chainId, walletName);
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
-    setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    const cAddress = await currentSigner.getAddress();
+    setCurrentSignerAddress(cAddress);
+    setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
       // web3Modal.clearCachedProvider();
@@ -455,8 +457,11 @@ const App = () => {
 
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
-        const networkProvider = await web3Modal.connect();
-        const currentProvider = new ethers.providers.Web3Provider(networkProvider);
+        // const networkProvider =
+        if (!isLoading) {
+          await web3Modal.connect();
+        }
+        /* const currentProvider = new ethers.providers.Web3Provider(networkProvider);
         const network = await currentProvider.getNetwork();
         if (!isValidNetwork(network.chainId)) {
           setInvalidNetwork(true);
@@ -464,24 +469,22 @@ const App = () => {
 
         const currentSigner = currentProvider.getSigner();
         signer.setCurrentSigner(currentSigner);
-        const cAddress = await currentSigner.getAddress();
-        setCurrentSignerAddress(cAddress);
         const ethcallProvider = new Provider(currentProvider);
-        setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+        await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+        const cAddress = await currentSigner.getAddress();
+        setCurrentSignerAddress(cAddress); */
       } else {
-        const currentProvider = new ethers.providers.Web3Provider(window.ethereum);
-        /* const provider = getDefaultProvider(
-          NETWORKS.okovan.chainId,
+        setLoading(true);
+        const chainId = process.env.REACT_APP_NETWORK_ID || "4";
+        const provider = getDefaultProvider(
+          parseInt(chainId),
           process.env.REACT_APP_NETWORK_NAME || "rinkeby"
         );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
-        const ethcallProvider = new Provider(randomSigner.provider); */
-        const currentSigner = currentProvider.getSigner();
-        const ethcallProvider = new Provider(currentProvider);
-        // setContracts(randomSigner, ethcallProvider, NETWORKS.okovan.chainId);
-        setContracts(currentSigner, ethcallProvider, NETWORKS.okovan.chainId);
+        const ethcallProvider = new Provider(randomSigner.provider);
+        setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        setLoading(false);
       }
-      setLoading(false);
     }
     // Execute the created function directly
     loadProvider();
@@ -568,7 +571,7 @@ const App = () => {
                       </Alert>
                     )}
 
-                    <Header />
+                    <Header signerAddress={currentSignerAddress} />
                     <ToastContainer />
                     <Switch>
                       <Route path={`${match.url}/`}>

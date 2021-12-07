@@ -18,9 +18,11 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 
-// TODO: On change account reload page
+type props = {
+  signerAddress: string;
+};
 
-const Header = () => {
+const Header = ({ signerAddress }: props) => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -84,34 +86,34 @@ const Header = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken) {
-        const currentAddress = await signer.signer?.getAddress();
-        const filterMint = tokens.tcapToken.filters.Transfer(null, currentAddress);
-        const filterBurn = tokens.tcapToken.filters.Transfer(currentAddress, null);
+      if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
+        const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
+        const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
         tokens.tcapToken.on(filterMint, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
           setTokenBalance(ethers.utils.formatEther(currentBalance));
         });
 
         tokens.tcapToken.on(filterBurn, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
           setTokenBalance(ethers.utils.formatEther(currentBalance));
         });
-        setAddress(currentAddress);
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
-        setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
-        const ens = await getENS(currentAddress);
+        const ens = await getENS(signerAddress);
         if (ens) {
           setAddressField(ens);
         } else {
-          setAddressField(makeShortAddress(currentAddress));
+          setAddressField(makeShortAddress(signerAddress));
         }
+
+        setAddress(signerAddress);
+        const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
+        setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
       }
     };
 
     loadAddress();
     // eslint-disable-next-line
-  }, [signer]);
+  }, [signerAddress, currentNetwork.chainId]);
 
   return (
     <Nav className="header">
