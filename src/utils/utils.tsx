@@ -1,8 +1,9 @@
-import { ethers, utils } from "ethers";
 import React from "react";
+import { ethers, utils } from "ethers";
 import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
+import { NETWORKS } from "./constants";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -11,8 +12,13 @@ export const makeShortAddress = (address: string) => {
   return shortAddress;
 };
 
+export const isUndefined = (value: any): boolean => typeof value === "undefined";
+
 export const getENS = async (address: string) => {
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const ens = await provider.lookupAddress(address);
   if (ens) {
     return ens;
@@ -98,6 +104,8 @@ export const errorNotification = async (body: string) => {
   const title = "❌ Whoopsie!";
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
+
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
@@ -236,3 +244,28 @@ export function toFragment(abi: JsonFragment[]): Fragment[] {
 
   return abiFragment;
 }
+
+export const isValidNetwork = (chainId: number) => {
+  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  if (name === "mainnet") {
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.okovan.chainId;
+  }
+  return chainId === NETWORKS.rinkeby.chainId || chainId === NETWORKS.okovan.chainId;
+};
+
+export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+  let provider;
+  if (chainId === NETWORKS.okovan.chainId) {
+    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
+  } else {
+    const alchemyKey =
+      chainId === NETWORKS.mainnet.chainId
+        ? process.env.REACT_APP_ALCHEMY_KEY
+        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+    provider = ethers.getDefaultProvider(name, {
+      infura: process.env.REACT_APP_INFURA_ID,
+      alchemy: alchemyKey,
+    });
+  }
+  return provider;
+};

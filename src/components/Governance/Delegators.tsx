@@ -9,6 +9,7 @@ import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
+import { API_ENDPOINT } from "../../utils/constants";
 
 type props = {
   currentSignerAddress: string;
@@ -70,7 +71,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
       }
     };
     const loadKeepersFromDB = async () => {
-      await fetch(`http://${window.location.hostname}/cryptkeeper/all`, {
+      await fetch(`${API_ENDPOINT}/cryptkeeper/all`, {
         method: "GET",
       })
         .then((response) => response.json())
@@ -179,7 +180,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
                 openDelegate={openDelegate}
                 openWithdraw={openWithdraw}
                 addWithdrawTime={addWithdrawTime}
-                isSigner={delegator.delegatee.toLowerCase() === currentSignerAddress.toLowerCase()}
+                isSigner={delegator.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
               />
             );
           }

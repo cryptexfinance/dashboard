@@ -6,11 +6,13 @@ import { ethers } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
 import { ProfileImage } from "./common";
 import "../../styles/modal.scss";
+import { API_ENDPOINT } from "../../utils/constants";
 import {
   errorNotification,
   getAddressFromENS,
   isValidAddress,
   notifyUser,
+  sendNotification,
 } from "../../utils/utils";
 
 type props = {
@@ -72,7 +74,7 @@ const KeeperForm = ({
       setDiscord(keeperInfo.discord);
       setExpertise(keeperInfo.expertise);
       setWhy(keeperInfo.why);
-      setImageUrl(`http://${window.location.hostname}/${keeperInfo.image}`);
+      setImageUrl(`${API_ENDPOINT}/${keeperInfo.image}`);
     } else {
       setDelegatee("");
       setAddress("");
@@ -286,7 +288,7 @@ const KeeperForm = ({
     formData.append("twitter", twitter);
     // @ts-ignore
     formData.append("file", image);
-    await fetch(`http://${window.location.hostname}/cryptkeeper/create`, {
+    await fetch(`${API_ENDPOINT}/cryptkeeper/create`, {
       method: "POST",
       body: formData,
     })
@@ -341,7 +343,7 @@ const KeeperForm = ({
       // @ts-ignore
       formData.append("file", image);
 
-      await fetch(`http://${window.location.hostname}/cryptkeeper/update`, {
+      await fetch(`${API_ENDPOINT}/cryptkeeper/update`, {
         method: "POST",
         body: formData,
       })
@@ -349,7 +351,14 @@ const KeeperForm = ({
         .then((responseJson) => {
           if (responseJson.status === "success") {
             refresh();
-            onHide();
+            sendNotification(
+              "Crypt. Keepers",
+              "Crypt Keeper updated",
+              3000,
+              onHide(),
+              1000,
+              "success"
+            );
           } else {
             console.log(responseJson.errors);
           }
