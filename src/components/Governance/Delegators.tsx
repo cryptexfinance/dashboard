@@ -179,7 +179,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
                 openDelegate={openDelegate}
                 openWithdraw={openWithdraw}
                 addWithdrawTime={addWithdrawTime}
-                isSigner={delegator.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
+                isSigner={delegator.delegatee.toLowerCase() === currentSignerAddress.toLowerCase()}
               />
             );
           }
