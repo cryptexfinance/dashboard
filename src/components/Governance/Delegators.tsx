@@ -1,13 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
-// import { Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import Row from "react-bootstrap/esm/Row";
 import { useQuery, gql } from "@apollo/client";
 import ProfileCard from "./ProfileCard";
-import NewDelegator from "./NewDelegator";
+import KeeperForm from "./KeeperForm";
 import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
-import { delegatorsInfo } from "./data";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
 
@@ -25,7 +24,9 @@ type delegatorType = {
 
 const Delegators = ({ currentSignerAddress }: props) => {
   const [delegators, setDelegators] = useState<any[]>([]);
-  const [showCreate, setShowCreate] = useState(false);
+  const [keepersInfo, setKeepersInfo] = useState<any[]>([]);
+  const [keeperIndex, setKeeperIndex] = useState(-1);
+  const [showKeeperForm, setShowKeeperForm] = useState(false);
   const [showDelegate, setShowDelegate] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [currentDelegatorAddress, setCurrentDelegatorAddress] = useState("");
@@ -57,7 +58,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
   });
 
   useEffect(() => {
-    const loadDelegators = async () => {
+    const loadKeepers = async () => {
       if (governance.delegatorFactoryRead) {
         if (data) {
           const currentDelegators: any[] = [];
@@ -68,7 +69,22 @@ const Delegators = ({ currentSignerAddress }: props) => {
         }
       }
     };
-    loadDelegators();
+    const loadKeepersFromDB = async () => {
+      await fetch(`http://${window.location.hostname}/cryptkeeper/all`, {
+        method: "GET",
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          setKeepersInfo(responseJson);
+        })
+        .catch((error) => {
+          console.error("Error getting all");
+          console.error(error);
+          setKeepersInfo([]);
+        });
+    };
+    loadKeepers();
+    loadKeepersFromDB();
     // eslint-disable-next-line
   }, [updateData, data, currentSignerAddress]);
 
@@ -93,15 +109,19 @@ const Delegators = ({ currentSignerAddress }: props) => {
     setShowWithdraw(true);
   };
 
-  /* const getDelegatorInfo = (address: string): infoType | null => {
-    const index = delegatorsInfo.findIndex(
-      (item) => item.address.toLowerCase() === address.toLowerCase()
-    );
-    if (index !== -1) {
-      return delegatorsInfo[index];
-    }
-    return null;
-  }; */
+  const showCreateKeeper = () => {
+    setKeeperIndex(-1);
+    setShowKeeperForm(true);
+  };
+
+  const showUpdateKeeper = (index: number) => {
+    setKeeperIndex(index);
+    setShowKeeperForm(true);
+  };
+
+  const hideKeeperForm = () => {
+    setShowKeeperForm(false);
+  };
 
   const getDelegatorData = (address: string): delegatorType | null => {
     const index = delegators.findIndex(
@@ -131,13 +151,11 @@ const Delegators = ({ currentSignerAddress }: props) => {
     <div className={signer.signer ? "delegation" : "delegation off"}>
       {signer.signer && (
         <>
-          {/* 
           <div className="create">
-            <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => setShowCreate(true)}>
-              Create Delegator
+            <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => showCreateKeeper()}>
+              New Crypt Keeper
             </Button>
           </div>
-          */}
           <Row className="staker-wrapper">
             <StakerStats
               refresh={refresh}
@@ -149,33 +167,33 @@ const Delegators = ({ currentSignerAddress }: props) => {
         </>
       )}
       <div className="grid profiles">
-        {delegatorsInfo.map((dInfo) => {
-          const delegator = getDelegatorData(dInfo.address);
+        {keepersInfo.map((kInfo, index) => {
+          const delegator = getDelegatorData(kInfo.address);
           if (delegator) {
             return (
               <ProfileCard
                 key={delegator.id}
                 delegator={delegator}
-                info={dInfo}
+                info={kInfo}
+                showUpdateKeeper={() => showUpdateKeeper(index)}
                 openDelegate={openDelegate}
                 openWithdraw={openWithdraw}
                 addWithdrawTime={addWithdrawTime}
-                action={
-                  delegator.delegatee.toLowerCase() === currentSignerAddress.toLowerCase()
-                    ? "edit"
-                    : "delegate"
-                }
+                isSigner={delegator.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
               />
             );
           }
           return <></>;
         })}
       </div>
-      <NewDelegator
-        show={showCreate}
+      <KeeperForm
+        isNew={keeperIndex === -1}
+        show={showKeeperForm}
         currentAddress={currentSignerAddress}
         delegatorFactory={governance.delegatorFactory}
-        onHide={() => setShowCreate(false)}
+        keepers={delegators}
+        keeperInfo={keeperIndex !== -1 ? keepersInfo[keeperIndex] : null}
+        onHide={() => hideKeeperForm()}
         refresh={() => refresh()}
       />
       <Delegate

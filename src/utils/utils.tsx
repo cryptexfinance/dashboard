@@ -1,5 +1,6 @@
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 import React from "react";
+import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
 
@@ -15,6 +16,15 @@ export const getENS = async (address: string) => {
   const ens = await provider.lookupAddress(address);
   if (ens) {
     return ens;
+  }
+  return null;
+};
+
+export const getAddressFromENS = async (ens: string) => {
+  const provider = ethers.getDefaultProvider();
+  const address = await provider.resolveName(ens);
+  if (address) {
+    return address;
   }
   return null;
 };
@@ -216,3 +226,13 @@ export const getPriceInUSDFromPair = (
   const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
   return ethPrice / amt;
 };
+
+export function toFragment(abi: JsonFragment[]): Fragment[] {
+  const abiFragment = abi.map((item: JsonFragment) => utils.Fragment.from(item));
+
+  if (abiFragment.length > 0 && abiFragment[abiFragment.length - 1] == null) {
+    abiFragment.pop();
+  }
+
+  return abiFragment;
+}

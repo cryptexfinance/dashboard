@@ -177,7 +177,8 @@ input[type="number"] {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="file"] {
   border-radius: 1px;
   background: no-repeat;
   border-color: $dark;
@@ -209,8 +210,27 @@ input[type="number"].neon-hightlight:focus {
   background: no-repeat;
 }
 
+textarea.neon-green:focus {
+  border-color: $green !important;
+  box-shadow: -1px 0px 15px -6px $green;
+  background: no-repeat;
+  color: $white;
+}
+
 .card {
   background-color: $darker;
+}
+.custom-file {
+  label {
+    background: no-repeat;
+    border-radius: 1px;  
+    border-color: $dark;
+    color: $white; 
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: inherit;
+    letter-spacing: 0.3rem;
+  }
 }
 //Same width as sidebar
 .wrapper {
@@ -243,6 +263,12 @@ html,
   width: 300px;
   text-align: left;
   padding: 0.8rem;
+}
+
+form {
+  .field-error {
+    color: $orange;
+  }
 }
 
 #WEB3_CONNECT_MODAL_ID {

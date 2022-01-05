@@ -10,7 +10,7 @@ import NumberFormat from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
-import { makeShortAddress, getENS } from "../utils/utils";
+import { makeShortAddress } from "../utils/utils";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 
 // TODO: On change account reload page
@@ -58,12 +58,13 @@ const Header = () => {
         setAddress(currentAddress);
         const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
-        const ens = await getENS(currentAddress);
+        /* const ens = await getENS(currentAddress);
         if (ens) {
           setAddressField(ens);
         } else {
           setAddressField(makeShortAddress(currentAddress));
-        }
+        } */
+        setAddressField(makeShortAddress(currentAddress));
       }
     };
 

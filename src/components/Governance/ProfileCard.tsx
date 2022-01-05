@@ -3,6 +3,7 @@ import { Button, Card, Badge } from "react-bootstrap";
 import Col from "react-bootstrap/esm/Col";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { FaPen } from "react-icons/fa";
 import { ethers } from "ethers";
 import { useMediaQuery } from "@react-hook/media-query";
 import "../../styles/delegators.scss";
@@ -27,19 +28,21 @@ type props = {
     totalHoldersRepresented: Number;
   };
   info: infoType;
+  showUpdateKeeper: () => void;
   openDelegate: (currentDelegator: string) => void;
   openWithdraw: (currentDelegator: string, ownerStake: string, withdrawTime: number) => void;
   addWithdrawTime: (waitingTime: number) => void;
-  action: string;
+  isSigner: boolean;
 };
 
 const ProfileCard = ({
   delegator,
   info,
+  showUpdateKeeper,
   openDelegate,
   openWithdraw,
   addWithdrawTime,
-  action,
+  isSigner,
 }: props) => {
   const [shortAddress, setShortAddress] = useState("");
   const [actionText, setActionText] = useState("");
@@ -81,15 +84,11 @@ const ProfileCard = ({
         }
       }
       //  Set actions
-      if (action === "delegate") {
-        setActionText("Stake & Delegate");
-      } else {
-        setActionText("Stake & Delegate");
-      }
+      setActionText("Stake & Delegate");
     }
 
     await getProvider();
-  }, [signer, action, delegator, governance, mediaQuery, addWithdrawTime]);
+  }, [signer, delegator, governance, mediaQuery, addWithdrawTime]);
 
   const onRemoveClick = async () => {
     if (tokenOwnerStake) {
@@ -156,152 +155,165 @@ const ProfileCard = ({
   };
 
   return (
-    <Card>
-      <div className="diamond" />
-      <Card.Body>
-        <ProfileImage address={delegator.delegatee} image={info?.image} />
-        <Col md={12} lg={12} className="content">
-          <Card.Title className="pb-2">
-            <div className="title-names">
-              <h5 className="mt-2">{info && info.name}</h5>
-              <a
-                href={`${etherscanUrl()}/address/${delegator.delegatee}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {ethNameFormat()}
-              </a>
-            </div>
-          </Card.Title>
-          <div className="badges-container">
-            <div className="badges-container2">
-              {shortAddress && (
-                <>
-                  {tokenOwnerStake && (
-                    <Badge variant="highlight">
-                      <CtxIcon className="tcap-neon" />
-                      <span className="staked-label">
-                        {round2(parseFloat(tokenOwnerStake.stake))} Staked
-                      </span>
-                    </Badge>
+    <>
+      <Card>
+        <div className="diamond" />
+        <Card.Body>
+          <ProfileImage
+            address={delegator.delegatee}
+            image={`${window.location.hostname}/${info?.image}`}
+            size={25}
+          />
+          <Col md={12} lg={12} className="content">
+            <Card.Title className="pb-2">
+              <div className="title-names">
+                <div className="title-row">
+                  <h5 className="mt-2">{info && info.name}</h5>
+                  {isSigner && (
+                    <Button type="button" variant="outline-light" onClick={showUpdateKeeper}>
+                      <FaPen />
+                    </Button>
                   )}
-                  <VoteBadge
-                    address={delegator.id}
-                    amount={Math.round(parseFloat(delegator.delegatedVotes)).toString()}
-                    label="Votes"
-                  />
-                  <VoteBadge
-                    address={delegator.id}
-                    amount={delegator.totalHoldersRepresented.toString()}
-                    label="Represented"
-                  />
-                  <Badge variant="highlight">
-                    <img src={tallyImg} className="tally" alt="tally logo" />
-                    <a
-                      href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      History
-                    </a>
-                  </Badge>
-                  <Badge variant="highlight">
-                    <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
-                    <a
-                      href={`${etherscanUrl()}/address/${delegator.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Contract
-                    </a>
-                  </Badge>
-                </>
-              )}
-              <div className="accounts">
-                {info.discord && (
-                  <OverlayTrigger
-                    key="bottom"
-                    placement="bottom"
-                    overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
-                  >
-                    <Badge pill variant="highlight">
-                      <img src={discordImg} className="discord" alt="discord logo" />
-                      <a href="/" onClick={copyDiscordToClipboard} className="address">
-                        {info.discord}
+                </div>
+                <a
+                  href={`${etherscanUrl()}/address/${delegator.delegatee}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {ethNameFormat()}
+                </a>
+              </div>
+            </Card.Title>
+            <div className="badges-container">
+              <div className="badges-container2">
+                {shortAddress && (
+                  <>
+                    {tokenOwnerStake && (
+                      <Badge variant="highlight">
+                        <CtxIcon className="tcap-neon" />
+                        <span className="staked-label">
+                          {round2(parseFloat(tokenOwnerStake.stake))} Staked
+                        </span>
+                      </Badge>
+                    )}
+                    <VoteBadge
+                      address={delegator.id}
+                      amount={Math.round(parseFloat(delegator.delegatedVotes)).toString()}
+                      label="Votes"
+                    />
+                    <VoteBadge
+                      address={delegator.id}
+                      amount={delegator.totalHoldersRepresented.toString()}
+                      label="Represented"
+                    />
+                    <Badge variant="highlight">
+                      <img src={tallyImg} className="tally" alt="tally logo" />
+                      <a
+                        href={`https://www.withtally.com/voter/${delegator.delegatee}/governance/cryptex`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        History
                       </a>
                     </Badge>
-                  </OverlayTrigger>
+                    <Badge variant="highlight">
+                      <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
+                      <a
+                        href={`${etherscanUrl()}/address/${delegator.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Contract
+                      </a>
+                    </Badge>
+                  </>
                 )}
-                {info.twitter && (
-                  <Badge pill variant="highlight">
-                    <img src={twitterImg} className="twitter" alt="twitter logo" />
-                    <a
-                      href={`https://twitter.com/${info.twitter}`}
-                      target="_blank"
-                      rel="noreferrer"
+                <div className="accounts">
+                  {info.discord && (
+                    <OverlayTrigger
+                      key="bottom"
+                      placement="bottom"
+                      overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
                     >
-                      {info.twitter}
-                    </a>
-                  </Badge>
-                )}
+                      <Badge pill variant="highlight">
+                        <img src={discordImg} className="discord" alt="discord logo" />
+                        <a href="/" onClick={copyDiscordToClipboard} className="address">
+                          {info.discord}
+                        </a>
+                      </Badge>
+                    </OverlayTrigger>
+                  )}
+                  {info.twitter && (
+                    <Badge pill variant="highlight">
+                      <img src={twitterImg} className="twitter" alt="twitter logo" />
+                      <a
+                        href={`https://twitter.com/${info.twitter}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {info.twitter}
+                      </a>
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="why">
-            <div className="why-title">
-              <h5 className="mt-2">Why me?</h5>
-            </div>
-            <OverlayTrigger
-              key="auto"
-              placement="auto"
-              trigger={["hover", "click"]}
-              overlay={
-                <Tooltip id="tooltip-right" className="farm-tooltip">
-                  {whyHtml(info.why)}
-                </Tooltip>
-              }
-            >
-              <p>
-                {whyBrief()}
-                {info.why.length > briefLength && <span className="continue">...</span>}
-              </p>
-            </OverlayTrigger>
-          </div>
-          <div className="columns">
-            <Col md={12} lg={12} className="content-col1">
-              <div>
-                <h5 className="mt-2">Expertise</h5>
-                <p>{info?.expertise.join(", ")}</p>
+            <div className="why">
+              <div className="why-title">
+                <h5 className="mt-2">Why me?</h5>
               </div>
-            </Col>
-          </div>
-        </Col>
-      </Card.Body>
-      <Card.Footer>
-        {signer.signer && (
-          <div className="buttons-container">
-            {isTokenOwner() && (
-              <Col md={6} lg={6}>
-                <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
-                  Withdraw
+              <OverlayTrigger
+                key="auto"
+                placement="auto"
+                trigger={["hover", "click"]}
+                overlay={
+                  <Tooltip id="tooltip-right" className="farm-tooltip">
+                    {whyHtml(info.why)}
+                  </Tooltip>
+                }
+              >
+                <p>
+                  {whyBrief()}
+                  {info.why.length > briefLength && <span className="continue">...</span>}
+                </p>
+              </OverlayTrigger>
+            </div>
+            <div className="columns">
+              <Col md={12} lg={12} className="content-col1">
+                <div>
+                  <h5 className="mt-2">Expertise</h5>
+                  <p>{info?.expertise}</p>
+                </div>
+              </Col>
+            </div>
+          </Col>
+        </Card.Body>
+        <Card.Footer>
+          {signer.signer && (
+            <div className="buttons-container">
+              {isTokenOwner() && (
+                <Col md={6} lg={6}>
+                  <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
+                    Withdraw
+                  </Button>
+                </Col>
+              )}
+              <Col md={isTokenOwner() ? 6 : 12} lg={isTokenOwner() ? 6 : 12}>
+                <Button
+                  variant="pink"
+                  className="mt-3 mb-4 w-100"
+                  onClick={async () => {
+                    openDelegate(delegator.id);
+                  }}
+                >
+                  {actionText}
                 </Button>
               </Col>
-            )}
-            <Col md={isTokenOwner() ? 6 : 12} lg={isTokenOwner() ? 6 : 12}>
-              <Button
-                variant="pink"
-                className="mt-3 mb-4 w-100"
-                onClick={async () => {
-                  openDelegate(delegator.id);
-                }}
-              >
-                {actionText}
-              </Button>
-            </Col>
-          </div>
-        )}
-      </Card.Footer>
-    </Card>
+            </div>
+          )}
+        </Card.Footer>
+      </Card>
+    </>
   );
 };
 

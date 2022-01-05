@@ -37,6 +37,7 @@ import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
+import { toFragment } from "./utils/utils";
 
 const clientOracle = new ApolloClient({
   uri: process.env.REACT_APP_GRAPH_URL,
@@ -94,7 +95,7 @@ const App = () => {
 
     const currentWETHVaultRead = new Contract(
       contracts.WETHVaultHandler.address,
-      contracts.WETHVaultHandler.abi
+      toFragment(contracts.WETHVaultHandler.abi)
     );
     vaults.setCurrentWETHVaultRead(currentWETHVaultRead);
     const currentDAIVaultRead = new Contract(
@@ -300,7 +301,10 @@ const App = () => {
       contracts.GovernorAlpha.abi
     );
     governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
-    const currentTimelockRead = new Contract(contracts.Timelock.address, contracts.Timelock.abi);
+    const currentTimelockRead = new Contract(
+      contracts.Timelock.address,
+      toFragment(contracts.Timelock.abi)
+    );
     governance.setCurrentTimelockRead(currentTimelockRead);
   };
 
