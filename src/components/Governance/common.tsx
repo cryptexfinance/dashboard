@@ -40,7 +40,7 @@ export const ProfileImage = ({ address, image, size }: imageProps) => (
           e.preventDefault();
         }}
       >
-        <Image src={`http://${image}`} roundedCircle className="avatar" />
+        <Image src={image} roundedCircle className="avatar" />
       </a>
     ) : (
       <a

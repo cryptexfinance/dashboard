@@ -40,7 +40,7 @@ export const NETWORKS = {
   },
 };
 
-export const API_ENDPOINT = "http://localhost";
+export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",

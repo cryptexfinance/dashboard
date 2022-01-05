@@ -365,6 +365,7 @@ const KeeperForm = ({
         })
         .catch((error) => {
           errorNotification("Unexpected error saving to DB");
+          console.error("Unexpected error");
           console.error(error);
         });
     }

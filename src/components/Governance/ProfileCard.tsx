@@ -17,6 +17,7 @@ import GovernanceContext from "../../state/GovernanceContext";
 import { VoteBadge, ProfileImage } from "./common";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { infoType } from "./data";
+import { API_ENDPOINT } from "../../utils/constants";
 
 type props = {
   delegator: {
@@ -161,7 +162,7 @@ const ProfileCard = ({
         <Card.Body>
           <ProfileImage
             address={delegator.delegatee}
-            image={`${window.location.hostname}/${info?.image}`}
+            image={`${API_ENDPOINT}/${info?.image}`}
             size={25}
           />
           <Col md={12} lg={12} className="content">
