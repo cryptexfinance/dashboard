@@ -13,7 +13,7 @@ import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
 import { makeShortAddress, getENS } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { FEATURES, NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
@@ -119,31 +119,34 @@ const Header = ({ signerAddress }: props) => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          {!window.location.pathname.includes("/governance") && (
-            <div className="network-container">
-              <Button
-                className="btn"
-                onClick={
-                  currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
-                }
-              >
-                {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
-                  <div className="title">
-                    <OPTIMISMIcon className="optimism" /> <h6>Kovan</h6>
-                  </div>
-                ) : (
-                  <div className="title">
-                    <ETHIcon className="eth" />
-                    {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
-                      <h6>Ethereum</h6>
-                    ) : (
-                      <h6>Rinkeby</h6>
-                    )}
-                  </div>
-                )}
-              </Button>
-            </div>
-          )}
+          {(FEATURES.OPTIMISM || FEATURES.POLYGON) &&
+            !window.location.pathname.includes("/governance") && (
+              <div className="network-container">
+                <Button
+                  className="btn"
+                  onClick={
+                    currentNetwork.wallet === "metamask"
+                      ? () => setShowChangeNetwork(true)
+                      : () => {}
+                  }
+                >
+                  {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
+                    <div className="title">
+                      <OPTIMISMIcon className="optimism" /> <h6>Kovan</h6>
+                    </div>
+                  ) : (
+                    <div className="title">
+                      <ETHIcon className="eth" />
+                      {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
+                        <h6>Ethereum</h6>
+                      ) : (
+                        <h6>Rinkeby</h6>
+                      )}
+                    </div>
+                  )}
+                </Button>
+              </div>
+            )}
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>

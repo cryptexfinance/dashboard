@@ -48,3 +48,10 @@ export const GRAPHQL_ENDPOINT = {
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };
+
+export const FEATURES = {
+  KEEPERS_API: true,
+  NEW_VAULTS: true,
+  OPTIMISM: true,
+  POLYGON: false,
+};

@@ -461,18 +461,6 @@ const App = () => {
         if (!isLoading) {
           await web3Modal.connect();
         }
-        /* const currentProvider = new ethers.providers.Web3Provider(networkProvider);
-        const network = await currentProvider.getNetwork();
-        if (!isValidNetwork(network.chainId)) {
-          setInvalidNetwork(true);
-        }
-
-        const currentSigner = currentProvider.getSigner();
-        signer.setCurrentSigner(currentSigner);
-        const ethcallProvider = new Provider(currentProvider);
-        await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
-        const cAddress = await currentSigner.getAddress();
-        setCurrentSignerAddress(cAddress); */
       } else {
         setLoading(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";

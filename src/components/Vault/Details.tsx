@@ -38,7 +38,7 @@ import {
   isUndefined,
 } from "../../utils/utils";
 import Loading from "../Loading";
-import { NETWORKS } from "../../utils/constants";
+import { FEATURES, NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -859,7 +859,7 @@ const Details = ({ address }: props) => {
             <option value="ETH">ETH</option>
             <option>WETH</option>
             <option>DAI</option>
-            {currentNetwork.chainId !== NETWORKS.okovan.chainId && (
+            {FEATURES.NEW_VAULTS && currentNetwork.chainId !== NETWORKS.okovan.chainId && (
               <>
                 <option>AAVE</option>
                 <option>LINK</option>

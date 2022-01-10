@@ -9,7 +9,8 @@ import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
-import { API_ENDPOINT } from "../../utils/constants";
+import { API_ENDPOINT, FEATURES } from "../../utils/constants";
+import { delegatorsInfo } from "./data";
 
 type props = {
   currentSignerAddress: string;
@@ -85,7 +86,11 @@ const Delegators = ({ currentSignerAddress }: props) => {
         });
     };
     loadKeepers();
-    loadKeepersFromDB();
+    if (FEATURES.KEEPERS_API) {
+      loadKeepersFromDB();
+    } else {
+      setKeepersInfo(delegatorsInfo);
+    }
     // eslint-disable-next-line
   }, [updateData, data, currentSignerAddress]);
 
@@ -152,11 +157,13 @@ const Delegators = ({ currentSignerAddress }: props) => {
     <div className={signer.signer ? "delegation" : "delegation off"}>
       {signer.signer && (
         <>
-          <div className="create">
-            <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => showCreateKeeper()}>
-              New Crypt Keeper
-            </Button>
-          </div>
+          {FEATURES.KEEPERS_API && (
+            <div className="create">
+              <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => showCreateKeeper()}>
+                New Crypt Keeper
+              </Button>
+            </div>
+          )}
           <Row className="staker-wrapper">
             <StakerStats
               refresh={refresh}
