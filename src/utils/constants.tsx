@@ -43,7 +43,7 @@ export const NETWORKS = {
 export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
-  mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
+  mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo-2",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
