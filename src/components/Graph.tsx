@@ -14,23 +14,26 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon3.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
+import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
+import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { getPriceInUSDFromPair, toUSD } from "../utils/utils";
+import { getPriceInUSDFromPair, isUndefined, toUSD } from "../utils/utils";
 import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
-  const network = useContext(NetworkContext);
+  const currentNetwork = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
   const oracles = useContext(OraclesContext);
-
   const [tcapPrice, setTcapPrice] = useState("0.0");
   const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
   const [MATICStake, setMATICStake] = useState("0");
+  const [aaveStake, setAaveStake] = useState("0");
+  const [linkStake, setLinkStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -50,19 +53,27 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
-  const loadEthereum = async (currentPriceETH: string) => {
-    if (signer) {
-      const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-      // @ts-ignore
-      const [reservesCtxPool] = await signer.ethcallProvider?.all([reservesCtxPoolCall]);
-      const currentPriceCTX = getPriceInUSDFromPair(
-        // @ts-ignore
-        reservesCtxPool[0], // @ts-ignore
-        reservesCtxPool[1],
-        parseFloat(currentPriceETH)
-      );
-      setCtxPrice(currentPriceCTX.toString());
+  const validOracles = (): boolean => {
+    let valid =
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.daiOracleRead) &&
+      !isUndefined(oracles.tcapOracleRead) &&
+      !isUndefined(tokens.tcapTokenRead);
+
+    if (
+      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+      currentNetwork.chainId === NETWORKS.rinkeby.chainId
+    ) {
+      valid =
+        valid &&
+        !isUndefined(oracles.aaveOracle) &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(tokens.ctxPoolTokenRead);
     }
+    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
+    }
+    return valid;
   };
 
   const getMaticUSD = async () => {
@@ -75,40 +86,80 @@ const Graph = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data && signer && oracles.tcapOracleRead) {
+      if (oracles && tokens && data && signer && validOracles()) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
+        const ethcalls = [
+          currentTotalPriceCall,
+          wethOraclePriceCall,
+          daiOraclePriceCall,
+          currentTotalSupplyCall,
+        ];
 
-        // @ts-ignore
-        const [currentTotalPrice, wethOraclePrice, daiOraclePrice, currentTotalSupply] =
-          await signer.ethcallProvider?.all([
-            currentTotalPriceCall,
-            wethOraclePriceCall,
-            daiOraclePriceCall,
-            currentTotalSupplyCall,
-          ]);
+        if (
+          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+          currentNetwork.chainId === NETWORKS.rinkeby.chainId
+        ) {
+          const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
+          const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          ethcalls.push(aaveOraclePriceCall);
+          ethcalls.push(linkOraclePriceCall);
+          ethcalls.push(reservesCtxPoolCall);
+        }
+        let currentTotalPrice;
+        let wethOraclePrice;
+        let daiOraclePrice;
+        let currentTotalSupply;
+        let aaveOraclePrice;
+        let linkOraclePrice;
+        let reservesCtxPool;
+
+        if (
+          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+          currentNetwork.chainId === NETWORKS.rinkeby.chainId
+        ) {
+          // @ts-ignore
+          [
+            currentTotalPrice,
+            wethOraclePrice,
+            daiOraclePrice,
+            currentTotalSupply,
+            aaveOraclePrice,
+            linkOraclePrice,
+            reservesCtxPool,
+          ] = await signer.ethcallProvider?.all(ethcalls);
+        } else {
+          // @ts-ignore
+          [currentTotalPrice, wethOraclePrice, daiOraclePrice, currentTotalSupply] =
+            await signer.ethcallProvider?.all(ethcalls);
+        }
 
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
+        let currentAAVEStake = BigNumber.from(0);
+        let currentLINKStake = BigNumber.from(0);
         let currentMATICStake = BigNumber.from(0);
-        let maticVaultAddress = "";
-        await data.states.forEach((s: any) => {
-          let contracts;
 
-          switch (network.chainId) {
-            case 1:
+        await data.states.forEach((s: any) => {
+          const networkId = currentNetwork.chainId;
+          let contracts;
+          switch (networkId) {
+            case NETWORKS.mainnet.chainId:
               contracts = cryptexJson[1].mainnet.contracts;
               break;
-            case 4:
+            case NETWORKS.rinkeby.chainId:
               contracts = cryptexJson[4].rinkeby.contracts;
               break;
-            case 137:
+            case NETWORKS.okovan.chainId:
+              contracts = cryptexJson[69].okovan.contracts;
+              break;
+            case NETWORKS.polygon.chainId:
               contracts = cryptexJson[137].polygon.contracts;
-              maticVaultAddress = contracts.MATICVaultHandler.address;
               break;
             default:
               contracts = cryptexJson[4].rinkeby.contracts;
@@ -121,7 +172,16 @@ const Graph = () => {
             case contracts.WETHVaultHandler.address.toLowerCase():
               currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
-            case maticVaultAddress.toLowerCase():
+            // @ts-ignore
+            case contracts.AaveVaultHandler.address.toLowerCase():
+              currentAAVEStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
+            // @ts-ignore
+            case contracts.LinkVaultHandler.address.toLowerCase():
+              currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+              break;
+            // @ts-ignore
+            case contracts.MATICVaultHandler.address.toLowerCase():
               currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             default:
@@ -133,21 +193,50 @@ const Graph = () => {
         setDAIStake(formatDAI);
         const formatETH = ethers.utils.formatEther(currentWETHStake);
         setETHStake(formatETH);
+        const formatAAVE = ethers.utils.formatEther(currentAAVEStake);
+        setAaveStake(formatAAVE);
+        const formatLINK = ethers.utils.formatEther(currentLINKStake);
+        setLinkStake(formatLINK);
         const formatMATIC = ethers.utils.formatEther(currentMATICStake);
         setMATICStake(formatMATIC);
+
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
-        let totalMaticUSD = 0;
-        if (network.chainId === NETWORKS.polygon.chainId) {
-          totalMaticUSD = toUSD(await getMaticUSD(), formatMATIC);
+        let aaveUSD = "0";
+        let linkUSD = "0";
+        let maticUSD = "0";
+        if (
+          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+          currentNetwork.chainId === NETWORKS.rinkeby.chainId
+        ) {
+          aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
+          linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
         }
-        const totalUSD = toUSD(ethUSD, formatETH) + toUSD(daiUSD, formatDAI) + totalMaticUSD;
+        if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+          maticUSD = await getMaticUSD();
+        }
+
+        const totalUSD =
+          toUSD(ethUSD, formatETH) +
+          toUSD(daiUSD, formatDAI) +
+          toUSD(aaveUSD, formatAAVE) +
+          toUSD(linkUSD, formatLINK) +
+          toUSD(maticUSD, formatMATIC);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
-
-        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        if (network.chainId !== NETWORKS.polygon.chainId) {
-          loadEthereum(currentPriceETH);
+        if (signer) {
+          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+          if (
+            currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+            currentNetwork.chainId === NETWORKS.rinkeby.chainId
+          ) {
+            const currentPriceCTX = getPriceInUSDFromPair(
+              reservesCtxPool[0],
+              reservesCtxPool[1],
+              parseFloat(currentPriceETH)
+            );
+            setCtxPrice(currentPriceCTX.toString());
+          }
         }
       }
       setLoading(false);
@@ -218,29 +307,65 @@ const Graph = () => {
             DAI
           </h5>
         </Card>
-        <Card>
-          {network.chainId !== NETWORKS.polygon.chainId ? (
-            <>
+        {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+          currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
+          <>
+            <Card>
               <CtxIcon className="ctx" />
               <h4>CTX Price</h4>
-            </>
-          ) : (
-            <>
-              <POLYGONIcon className="eth" />
-              <h4>Total Staked in MATIC</h4>
-            </>
-          )}
-          <h5 className="number neon-blue">
-            <NumberFormat
-              value={network.chainId !== NETWORKS.polygon.chainId ? ctxPrice : MATICStake}
-              displayType="text"
-              thousandSeparator
-              decimalScale={2}
-              prefix={network.chainId !== NETWORKS.polygon.chainId ? "$" : ""}
-            />
-            {network.chainId === NETWORKS.polygon.chainId ? " MATIC" : ""}
-          </h5>
-        </Card>
+              <h5 className="number neon-blue">
+                <NumberFormat
+                  value={ctxPrice}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                  prefix="$"
+                />{" "}
+              </h5>
+            </Card>
+            <Card>
+              <AAVEIcon className="ctx" />
+              <h4>Total Staked in AAVE</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={aaveStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                AAVE
+              </h5>
+            </Card>
+            <Card>
+              <LINKIcon className="ctx" />
+              <h4>Total Staked in LINK</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={linkStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                LINK
+              </h5>
+            </Card>
+          </>
+        )}
+        {currentNetwork.chainId === NETWORKS.polygon.chainId && (
+          <Card>
+            <POLYGONIcon className="eth" />
+            <h4>Total Staked in MATIC</h4>
+            <h5 className="number neon-blue">
+              <NumberFormat
+                value={MATICStake}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              MATIC
+            </h5>
+          </Card>
+        )}
       </div>
     </div>
   );

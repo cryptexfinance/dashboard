@@ -9,6 +9,7 @@
   top: 0px;
   flex-direction: column;
   flex-wrap: nowrap;
+  z-index: 1;
 
   .cls-logo-1 {
     fill: $darker;
@@ -33,7 +34,8 @@
     }
 
     a svg.governance {
-      width: 1.7rem;
+      width: 2.1rem;
+      filter: #A9A7BE;
     }
 
     a.active svg {

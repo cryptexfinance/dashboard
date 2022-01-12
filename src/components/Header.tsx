@@ -5,27 +5,32 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import "../styles/header.scss";
 import { ethers } from "ethers";
+import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
 import { ChangeNetwork } from "./modals/ChangeNetwork";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
-import { makeShortAddress } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { makeShortAddress, getENS } from "../utils/utils";
+import { FEATURES, NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
+import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
-// TODO: On change account reload page
+type props = {
+  signerAddress: string;
+};
 
-const Header = () => {
+const Header = ({ signerAddress }: props) => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
   const [showChangeNetwork, setShowChangeNetwork] = useState(false);
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
+  const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
@@ -54,21 +59,33 @@ const Header = () => {
         });
       } catch (error) {
         // This error code indicates that the chain has not been added to MetaMask.
-        if (error.code === 4902 && newChainId === NETWORKS.polygon.hexChainId) {
+        if (
+          error.code === 4902 &&
+          (newChainId === NETWORKS.okovan.hexChainId || newChainId === NETWORKS.polygon.hexChainId)
+        ) {
           try {
             await window.ethereum.request({
               method: "wallet_addEthereumChain",
               params: [
                 {
                   chainId: newChainId,
-                  chainName: "Polygon Mainnet",
+                  chainName:
+                    newChainId === NETWORKS.okovan.hexChainId
+                      ? "Optimistic Ethereum (Kovan)"
+                      : "Polygon Mainnet",
                   nativeCurrency: {
-                    name: "Matic Token",
-                    symbol: "MATIC",
+                    name: newChainId === NETWORKS.okovan.hexChainId ? "Ether (ETH)" : "Matic Token",
+                    symbol: newChainId === NETWORKS.okovan.hexChainId ? "ETH" : "MATIC",
                     decimals: 18,
                   },
-                  rpcUrls: ["https://rpc-mainnet.maticvigil.com/"],
-                  blockExplorerUrls: ["https://polygonscan.com/"],
+                  rpcUrls:
+                    newChainId === NETWORKS.okovan.hexChainId
+                      ? ["https://kovan.optimism.io"]
+                      : ["https://rpc-mainnet.maticvigil.com/"],
+                  blockExplorerUrls:
+                    newChainId === NETWORKS.okovan.hexChainId
+                      ? ["https://kovan-optimistic.etherscan.io"]
+                      : ["https://polygonscan.com/"],
                 },
               ],
             });
@@ -82,56 +99,76 @@ const Header = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (signer.signer && tokens.tcapToken) {
-        const currentAddress = await signer.signer?.getAddress();
-        const filterMint = tokens.tcapToken.filters.Transfer(null, currentAddress);
-        const filterBurn = tokens.tcapToken.filters.Transfer(currentAddress, null);
+      if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
+        const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
+        const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
         tokens.tcapToken.on(filterMint, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
           setTokenBalance(ethers.utils.formatEther(currentBalance));
         });
 
         tokens.tcapToken.on(filterBurn, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(currentAddress);
+          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
           setTokenBalance(ethers.utils.formatEther(currentBalance));
         });
-        setAddress(currentAddress);
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(currentAddress);
+        const ens = await getENS(signerAddress);
+        if (ens) {
+          setAddressField(ens);
+        } else {
+          setAddressField(makeShortAddress(signerAddress));
+        }
+
+        setAddress(signerAddress);
+        const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
       }
     };
 
     loadAddress();
     // eslint-disable-next-line
-  }, [signer]);
+  }, [signerAddress, currentNetwork.chainId]);
 
   return (
     <Nav className="header">
       {signer.signer ? (
         <>
-          <div className="network-container">
-            <Button
-              className="btn"
-              onClick={
-                currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
-              }
-            >
-              {currentNetwork.chainId === NETWORKS.polygon.chainId ? (
-                <div className="title">
-                  <POLYGONIcon className="eth" /> <h6>Polygon</h6>
-                </div>
-              ) : (
-                <div className="title">
-                  <ETHIcon className="eth" />
-                  {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
-                    <h6>Ethereum</h6>
+          {(FEATURES.OPTIMISM || FEATURES.POLYGON) &&
+            !window.location.pathname.includes("/governance") && (
+              <div className="network-container">
+                <Button
+                  className="btn"
+                  onClick={
+                    currentNetwork.wallet === "metamask"
+                      ? () => setShowChangeNetwork(true)
+                      : () => {}
+                  }
+                >
+                  {currentNetwork.chainId === NETWORKS.okovan.chainId ||
+                  currentNetwork.chainId === NETWORKS.polygon.chainId ? (
+                    <div className="title">
+                      {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
+                        <>
+                          <OPTIMISMIcon className="optimism" /> <h6>Kovan</h6>
+                        </>
+                      ) : (
+                        <>
+                          <POLYGONIcon className="eth" /> <h6>Polygon</h6>
+                        </>
+                      )}
+                    </div>
                   ) : (
-                    <h6>Rinkeby</h6>
+                    <div className="title">
+                      <ETHIcon className="eth" />
+                      {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
+                        <h6>Ethereum</h6>
+                      ) : (
+                        <h6>Rinkeby</h6>
+                      )}
+                    </div>
                   )}
-                </div>
-              )}
-            </Button>
-          </div>
+                </Button>
+              </div>
+            )}
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>
@@ -144,14 +181,15 @@ const Header = () => {
                 decimalScale={2}
               />
             </h5>
-            <h5>
+            <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
+            <h5 className="ml-2">
               <OverlayTrigger
                 key="bottom"
                 placement="bottom"
                 overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
               >
                 <a href="/" onClick={copyCodeToClipboard} className="address">
-                  {makeShortAddress(address)}
+                  {addressField}
                 </a>
               </OverlayTrigger>
             </h5>

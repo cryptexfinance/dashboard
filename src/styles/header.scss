@@ -16,8 +16,6 @@
       height: 3.2rem;
       width: 10.5rem;
       border-radius: 0.3rem;
-      //border-width: 0px;
-      //background-color: transparent;
 
       svg {
         height: 2rem;
@@ -32,6 +30,12 @@
 
       h6 {
         margin-bottom: 0rem;
+      }
+      svg {
+        height: 2rem;
+      }
+      .optimism {
+        width: 2rem;
       }
     }
     @media (max-width: 600px) {
@@ -71,6 +75,7 @@
 
   .address {
     color: white;
+    margin-top:-5px;
   }
 
   @media (max-width: 600px) {

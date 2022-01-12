@@ -9,17 +9,17 @@ import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import NetworkContext from "../state/NetworkContext";
-import SignerContext from "../state/SignerContext";
-import TokensContext from "../state/TokensContext";
-import OraclesContext from "../state/OraclesContext";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress, getPriceInUSDFromPair } from "../utils/utils";
-import "../styles/welcome.scss";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
-import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
-
-import Loading from "./Loading";
+import NetworkContext from "../../state/NetworkContext";
+import SignerContext from "../../state/SignerContext";
+import TokensContext from "../../state/TokensContext";
+import OraclesContext from "../../state/OraclesContext";
+import { Web3ModalContext } from "../../state/Web3ModalContext";
+import { makeShortAddress, getPriceInUSDFromPair, getENS } from "../../utils/utils";
+import "../../styles/welcome.scss";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
+import { NETWORKS } from "../../utils/constants";
+import Loading from "../Loading";
 
 const Welcome = () => {
   const [address, setAddress] = useState("");
@@ -52,9 +52,16 @@ const Welcome = () => {
     const loadAddress = async () => {
       if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.tcapTokenRead) {
         const currentAddress = await signer.signer.getAddress();
-        setAddress(makeShortAddress(currentAddress));
+        if (currentAddress !== address) {
+          const ens = await getENS(currentAddress);
+          if (ens) {
+            setAddress(ens);
+          } else {
+            setAddress(makeShortAddress(currentAddress));
+          }
+        }
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
-        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         // @ts-ignore
         const [currentTcapBalance, wethOraclePrice] = await signer.ethcallProvider?.all([
           currentTcapBalanceCall,
@@ -64,7 +71,7 @@ const Welcome = () => {
         setTcapBalance(tcapString);
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
-        if (currentNetwork.chainId === 1) {
+        if (currentNetwork.chainId === NETWORKS.mainnet.chainId) {
           const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
           // @ts-ignore
@@ -84,7 +91,11 @@ const Welcome = () => {
         }
       }
       if (data) {
-        const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
+        let currentTotalPrice = BigNumber.from(0);
+        const prices = await data?.oracles;
+        if (prices.length > 0) {
+          currentTotalPrice = BigNumber.from(prices[0].answer);
+        }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
@@ -186,7 +197,8 @@ const Welcome = () => {
                     </div>
                     <p className="title tcap">TCAP Balance</p>
                   </Col>
-                  {currentNetwork.chainId !== 137 && (
+                  {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+                    currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
                     <Col>
                       <div className="tcap-balance">
                         <CtxIcon className="tcap-neon" />

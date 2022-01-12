@@ -11,6 +11,10 @@ export interface OraclesContext {
   setCurrentWBTCOracle: (currentOracle: ethers.Contract) => void;
   tcapOracle?: ethers.Contract;
   setCurrentTCAPOracle: (currentOracle: ethers.Contract) => void;
+  aaveOracle?: ethers.Contract;
+  setCurrentAAVEOracle: (currentOracle: ethers.Contract) => void;
+  linkOracle?: ethers.Contract;
+  setCurrentLINKOracle: (currentOracle: ethers.Contract) => void;
   maticOracle?: ethers.Contract;
   setCurrentMATICOracle: (currentOracle: ethers.Contract) => void;
   wethOracleRead?: Contract;
@@ -21,6 +25,10 @@ export interface OraclesContext {
   setCurrentWBTCOracleRead: (currentOracle: Contract) => void;
   tcapOracleRead?: Contract;
   setCurrentTCAPOracleRead: (currentOracle: Contract) => void;
+  aaveOracleRead?: Contract;
+  setCurrentAAVEOracleRead: (currentOracle: Contract) => void;
+  linkOracleRead?: Contract;
+  setCurrentLINKOracleRead: (currentOracle: Contract) => void;
   maticOracleRead?: Contract;
   setCurrentMATICOracleRead: (currentOracle: Contract) => void;
 }
@@ -30,11 +38,15 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentDAIOracle: () => {},
   setCurrentWBTCOracle: () => {},
   setCurrentTCAPOracle: () => {},
+  setCurrentAAVEOracle: () => {},
+  setCurrentLINKOracle: () => {},
   setCurrentMATICOracle: () => {},
   setCurrentWETHOracleRead: () => {},
   setCurrentDAIOracleRead: () => {},
   setCurrentWBTCOracleRead: () => {},
   setCurrentTCAPOracleRead: () => {},
+  setCurrentAAVEOracleRead: () => {},
+  setCurrentLINKOracleRead: () => {},
   setCurrentMATICOracleRead: () => {},
 };
 

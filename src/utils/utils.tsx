@@ -3,12 +3,41 @@ import { ethers, utils } from "ethers";
 import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
+import { FEATURES, NETWORKS } from "./constants";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
     .substr(address.length - 4, address.length)
     .toString()}`;
   return shortAddress;
+};
+
+export const isUndefined = (value: any): boolean => typeof value === "undefined";
+
+export const getENS = async (address: string) => {
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
+  const ens = await provider.lookupAddress(address);
+  if (ens) {
+    return ens;
+  }
+  return null;
+};
+
+export const getAddressFromENS = async (ens: string) => {
+  const provider = ethers.getDefaultProvider();
+  const address = await provider.resolveName(ens);
+  if (address) {
+    return address;
+  }
+  return null;
+};
+
+export const getENSAvatar = async (resolver: ethers.providers.Resolver) => {
+  const avatar = await resolver.getText("avatar");
+  return avatar;
 };
 
 export const isValidAddress = async (address: string) => {
@@ -76,6 +105,8 @@ export const errorNotification = async (body: string) => {
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
 
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
     let notificationTitle = "⏰ Transaction Sent!";
@@ -83,11 +114,12 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     sendNotification(notificationTitle, notificationBody, false);
     await tx.wait(1);
     toast.dismiss();
+
     notificationTitle = "✔️ Transaction Confirmed!";
     notificationBody = "All set, please wait for another confirmation";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
-    await tx.wait(3);
+    await tx.wait(2);
     fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
@@ -203,10 +235,8 @@ export const getPriceInUSDFromPair = (
   return ethPrice / amt;
 };
 
-export function toFragment(abi: JsonFragment[] | string[] | Fragment[]): Fragment[] {
-  const abiFragment = abi.map((item: JsonFragment | string | Fragment) =>
-    utils.Fragment.from(item)
-  );
+export function toFragment(abi: JsonFragment[]): Fragment[] {
+  const abiFragment = abi.map((item: JsonFragment) => utils.Fragment.from(item));
 
   if (abiFragment.length > 0 && abiFragment[abiFragment.length - 1] == null) {
     abiFragment.pop();
@@ -218,21 +248,35 @@ export function toFragment(abi: JsonFragment[] | string[] | Fragment[]): Fragmen
 export const isValidNetwork = (chainId: number) => {
   const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
   if (name === "mainnet") {
-    return chainId === 1 || chainId === 137;
+    return (
+      chainId === NETWORKS.mainnet.chainId ||
+      (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+      (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+    );
   }
-  return chainId === 4 || chainId === 137;
+  return (
+    chainId === NETWORKS.rinkeby.chainId ||
+    (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+    (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+  );
 };
 
-export const getDefaultProvider = (chainId: number, name: string) => {
+export const isInLayer1 = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+  }
+  return false;
+};
+
+export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
   let provider;
-  if (chainId === 137) {
-    provider = new ethers.providers.AlchemyProvider(
-      name,
-      process.env.REACT_APP_ALCHEMY_KEY_POLYGON
-    );
+  if (chainId === NETWORKS.okovan.chainId) {
+    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
   } else {
     const alchemyKey =
-      chainId === 1 ? process.env.REACT_APP_ALCHEMY_KEY : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+      chainId === NETWORKS.mainnet.chainId
+        ? process.env.REACT_APP_ALCHEMY_KEY
+        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
     provider = ethers.getDefaultProvider(name, {
       infura: process.env.REACT_APP_INFURA_ID,
       alchemy: alchemyKey,

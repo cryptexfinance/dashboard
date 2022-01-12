@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
-
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
@@ -30,6 +29,8 @@ import {
 } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
+const ctxClaimVestShowDate = new Date(1634511235 * 1000);
+
 const Farm = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -45,10 +46,12 @@ const Farm = () => {
   const [ctxPoolStake, setCtxPoolStake] = useState("0.0");
   const [ethPoolBalance, setEthPoolBalance] = useState("0.0");
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
+  const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
+  const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [vestingEndTime, setVestingEndTime] = useState(0);
   const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
+  const [updateData, setUpdateData] = useState(false);
   const signer = useContext(SignerContext);
-
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
   const oracles = useContext(OraclesContext);
@@ -144,6 +147,7 @@ const Farm = () => {
 
   const refresh = async () => {
     try {
+      setUpdateData(!updateData);
       await refetch();
     } catch (error) {
       // catch error in case the vault screen is changed
@@ -336,6 +340,8 @@ const Farm = () => {
           setEthRewards(ethers.utils.formatEther(currentEthReward));
           setDaiRewards(ethers.utils.formatEther(currentDaiReward));
 
+          setEthVestAmount(currentVEthPoolReward);
+          setCtxVestAmount(currentVCtxPoolReward);
           if (phase > 1) {
             setEthPoolRewards(
               ethers.utils.formatEther(
@@ -367,11 +373,16 @@ const Farm = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [data]);
+  }, [data, updateData]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }
+
+  const showCtxClaimVest = (): boolean => {
+    const today = new Date();
+    return today > ctxClaimVestShowDate;
+  };
 
   const claimRewards = async (vaultType: string) => {
     try {
@@ -412,6 +423,45 @@ const Farm = () => {
     }
   };
 
+  const claimVest = async (vaultType: string) => {
+    try {
+      let tx: ethers.ContractTransaction;
+      switch (vaultType) {
+        case "ETH":
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+        case "WBTC":
+          tx = await rewards?.wbtcReward?.claimVest();
+          break;
+        case "DAI":
+          tx = await rewards?.daiReward?.claimVest();
+          break;
+        case "ETHPOOL":
+          tx = await rewards?.wethPoolReward?.claimVest();
+          break;
+        case "WBTCPOOL":
+          tx = await rewards?.wbtcPoolReward?.claimVest();
+          break;
+        case "DAIPOOL":
+          tx = await rewards?.daiPoolReward?.claimVest();
+          break;
+        case "CTXPOOL":
+          tx = await rewards?.ctxPoolReward?.claimVest();
+          break;
+        default:
+          tx = await rewards?.wethReward?.claimVest();
+          break;
+      }
+      notifyUser(tx, refresh);
+    } catch (error) {
+      if (error.code === 4001) {
+        errorNotification("Transaction rejected");
+      } else {
+        errorNotification("Error claiming vest");
+      }
+    }
+  };
+
   const exitRewards = async (vaultType: string) => {
     try {
       let tx: ethers.ContractTransaction;
@@ -445,7 +495,7 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>Farming </h3>{" "}
+        <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
             <Card className="diamond mb-2">
@@ -747,11 +797,9 @@ const Farm = () => {
                             <Button variant="dark" className="" disabled>
                               Mint
                             </Button>
-
                             <Button variant="dark" className="ml-4" disabled>
                               Claim
                             </Button>
-
                             <Button variant="dark" className="ml-4" disabled>
                               Exit
                             </Button>
@@ -773,17 +821,27 @@ const Farm = () => {
                             >
                               Stake
                             </Button>
-
-                            <Button
-                              variant="success"
-                              className=" ml-4"
-                              onClick={() => {
-                                claimRewards("ETHPOOL");
-                              }}
-                            >
-                              Claim
-                            </Button>
-
+                            {ethVestAmount.eq(0) ? (
+                              <Button
+                                variant="success"
+                                className="ml-4"
+                                onClick={() => {
+                                  claimRewards("ETHPOOL");
+                                }}
+                              >
+                                Claim
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="success"
+                                className="claim-vest ml-4"
+                                onClick={() => {
+                                  claimVest("ETHPOOL");
+                                }}
+                              >
+                                Claim Vest
+                              </Button>
+                            )}
                             <Button
                               variant="warning"
                               className=" ml-4"
@@ -879,11 +937,9 @@ const Farm = () => {
                             <Button variant="dark" className="" disabled>
                               Mint
                             </Button>
-
                             <Button variant="dark" className="ml-4" disabled>
                               Claim
                             </Button>
-
                             <Button variant="dark" className="ml-4" disabled>
                               Exit
                             </Button>
@@ -905,17 +961,27 @@ const Farm = () => {
                             >
                               Stake
                             </Button>
-
-                            <Button
-                              variant="success"
-                              className=" ml-4"
-                              onClick={() => {
-                                claimRewards("CTXPOOL");
-                              }}
-                            >
-                              Claim
-                            </Button>
-
+                            {ctxVestAmount.gt(0) && showCtxClaimVest() ? (
+                              <Button
+                                variant="success"
+                                className="claim-vest ml-4"
+                                onClick={() => {
+                                  claimVest("CTXPOOL");
+                                }}
+                              >
+                                Claim Vest
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="success"
+                                className=" ml-4"
+                                onClick={() => {
+                                  claimRewards("CTXPOOL");
+                                }}
+                              >
+                                Claim
+                              </Button>
+                            )}
                             <Button
                               variant="warning"
                               className=" ml-4"

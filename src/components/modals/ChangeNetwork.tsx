@@ -1,10 +1,11 @@
 import React from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
-import { NETWORKS } from "../../utils/constants";
+import { FEATURES, NETWORKS } from "../../utils/constants";
 import { useNetworks } from "../../hooks/useNetworks";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
+import { ReactComponent as OPTIMISMIconSmall } from "../../assets/images/graph/optimism.svg";
 
 type props = {
   show: boolean;
@@ -45,13 +46,24 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
               <ETHIconSmall className="eth" /> Rinkeby
             </Button>
           )}
-          <Button
-            className="btn-polygon"
-            onClick={() => changeNetwork(NETWORKS.polygon.hexChainId)}
-            disabled={networks.chainId === NETWORKS.polygon.chainId}
-          >
-            <POLYGONIconSmall className="polygon" /> Polygon
-          </Button>
+          {FEATURES.OPTIMISM && (
+            <Button
+              className="btn-polygon"
+              onClick={() => changeNetwork(NETWORKS.okovan.hexChainId)}
+              disabled={networks.chainId === NETWORKS.okovan.chainId}
+            >
+              <OPTIMISMIconSmall className="polygon" /> Kovan
+            </Button>
+          )}
+          {FEATURES.POLYGON && (
+            <Button
+              className="btn-polygon"
+              onClick={() => changeNetwork(NETWORKS.polygon.hexChainId)}
+              disabled={networks.chainId === NETWORKS.polygon.chainId}
+            >
+              <POLYGONIconSmall className="polygon" /> Polygon
+            </Button>
+          )}
         </div>
       </Modal.Body>
     </Modal>

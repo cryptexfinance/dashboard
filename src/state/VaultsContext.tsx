@@ -9,6 +9,10 @@ export interface VaultsContext {
   setCurrentDAIVault: (currentVault: ethers.Contract) => void;
   wbtcVault?: ethers.Contract;
   setCurrentWBTCVault: (currentVault: ethers.Contract) => void;
+  aaveVault?: ethers.Contract;
+  setCurrentAAVEVault: (currentVault: ethers.Contract) => void;
+  linkVault?: ethers.Contract;
+  setCurrentLINKVault: (currentVault: ethers.Contract) => void;
   maticVault?: ethers.Contract;
   setCurrentMaticVault: (currentVault: ethers.Contract) => void;
   wethVaultRead?: Contract;
@@ -17,6 +21,10 @@ export interface VaultsContext {
   setCurrentDAIVaultRead: (currentVaultRead: Contract) => void;
   wbtcVaultRead?: Contract;
   setCurrentWBTCVaultRead: (currentVaultRead: Contract) => void;
+  aaveVaultRead?: Contract;
+  setCurrentAAVEVaultRead: (currentVaultRead: Contract) => void;
+  linkVaultRead?: Contract;
+  setCurrentLINKVaultRead: (currentVaultRead: Contract) => void;
   maticVaultRead?: Contract;
   setCurrentMaticVaultRead: (currentVaultRead: Contract) => void;
 }
@@ -25,10 +33,14 @@ export const VAULTS_DEFAULT_VALUE = {
   setCurrentWETHVault: () => {},
   setCurrentDAIVault: () => {},
   setCurrentWBTCVault: () => {},
+  setCurrentAAVEVault: () => {},
+  setCurrentLINKVault: () => {},
   setCurrentMaticVault: () => {},
   setCurrentWETHVaultRead: () => {},
   setCurrentDAIVaultRead: () => {},
   setCurrentWBTCVaultRead: () => {},
+  setCurrentAAVEVaultRead: () => {},
+  setCurrentLINKVaultRead: () => {},
   setCurrentMaticVaultRead: () => {},
 };
 

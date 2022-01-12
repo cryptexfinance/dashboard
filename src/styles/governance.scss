@@ -243,6 +243,10 @@
     }
   }
 
+  .cryptkeeper-form {
+    display: flex;
+  }
+
   @media (max-height: 820px) and (min-width: 992px) {
     .card-wrapper {
       margin-top: 1rem;
