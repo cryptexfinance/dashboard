@@ -40,7 +40,7 @@ import {
   isUndefined,
 } from "../../utils/utils";
 import Loading from "../Loading";
-import { FEATURES, NETWORKS } from "../../utils/constants";
+import { NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -912,7 +912,7 @@ const Details = ({ address }: props) => {
             <option value="ETH">ETH</option>
             <option>WETH</option>
             <option>DAI</option>
-            {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
+            {isInLayer1(currentNetwork.chainId) && (
               <>
                 <option>AAVE</option>
                 <option>LINK</option>
