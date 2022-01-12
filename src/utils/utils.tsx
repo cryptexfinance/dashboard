@@ -247,7 +247,7 @@ export function toFragment(abi: JsonFragment[]): Fragment[] {
 
 export const isValidNetwork = (chainId: number) => {
   const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
-  if (name === "mainnet") {
+  if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
       (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
