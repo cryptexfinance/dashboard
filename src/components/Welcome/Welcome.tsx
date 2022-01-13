@@ -36,7 +36,6 @@ const Welcome = () => {
   const history = useHistory();
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
-  const lpURL = process.env.REACT_APP_LP_URL;
 
   const TCAP_PRICE = gql`
     query {
@@ -263,7 +262,7 @@ const Welcome = () => {
                     className="neon-pink"
                     onClick={() => {
                       window.open(
-                        `${lpURL}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
+                        `${NETWORKS.mainnet.lpUrl}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
                         "_blank"
                       );
                     }}

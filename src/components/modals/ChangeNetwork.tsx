@@ -31,7 +31,7 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
       </Modal.Header>
       <Modal.Body>
         <div className="change-network">
-          {process.env.REACT_APP_NETWORK_NAME === "mainnet" ? (
+          {process.env.REACT_APP_NETWORK_ID === "1" ? (
             <Button
               onClick={() => changeNetwork(NETWORKS.mainnet.hexChainId)}
               disabled={networks.chainId === NETWORKS.mainnet.chainId}

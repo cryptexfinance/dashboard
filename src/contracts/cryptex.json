@@ -5,7 +5,7 @@
       "chainId": "1",
       "contracts": {
         "AAVE": {
-          "address": "0x8B4A041A619aC26B33e5BAEe9585e569387ec837",
+          "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
           "abi": [
             {
               "inputs": [],
@@ -321,7 +321,7 @@
           ]
         },
         "AaveOracle": {
-          "address": "0x73Ebb8b08f056F451c2aA53dCAd7A35ce6aD52D0",
+          "address": "0x6443854207cC897aC826C8f843D834f0EE94C732",
           "abi": [
             {
               "inputs": [
@@ -562,7 +562,7 @@
           ]
         },
         "AaveVaultHandler": {
-          "address": "0x119D37aFc784C81626b08813D83598b8673EEE66",
+          "address": "0xada39d170551daf42822E1D3dA64efEBbD14d1D3",
           "abi": [
             {
               "inputs": [
@@ -6510,6 +6510,7 @@
               "anonymous": false,
               "inputs": [
                 {
+                  "indexed": true,
                   "internalType": "address",
                   "name": "previousOwner",
                   "type": "address"
@@ -6573,40 +6574,10 @@
               "anonymous": false,
               "inputs": [
                 {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "indexed": false,
+                  "indexed": true,
                   "internalType": "address",
                   "name": "user",
                   "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "address[]",
-                  "name": "targets",
-                  "type": "address[]"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256[]",
-                  "name": "values",
-                  "type": "uint256[]"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "string[]",
-                  "name": "signatures",
-                  "type": "string[]"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "bytes[]",
-                  "name": "calldatas",
-                  "type": "bytes[]"
                 },
                 {
                   "indexed": false,
@@ -6771,13 +6742,6 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "acceptTimelockAdmin",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
               "inputs": [
                 {
                   "internalType": "address",
@@ -6804,9 +6768,7 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "ctx",
-              "outputs": [
+              "inputs": [
                 {
                   "internalType": "address",
                   "name": "_account",
@@ -6852,9 +6814,7 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "guardian",
-              "outputs": [
+              "inputs": [
                 {
                   "internalType": "bytes32",
                   "name": "role",
@@ -6916,9 +6876,7 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "proposalMaxOperations",
-              "outputs": [
+              "inputs": [
                 {
                   "internalType": "bytes32",
                   "name": "role",
@@ -7058,7 +7016,7 @@
                   "type": "uint256"
                 }
               ],
-              "stateMutability": "pure",
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -7072,11 +7030,6 @@
                   "internalType": "uint256",
                   "name": "_tokenAmount",
                   "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
                 }
               ],
               "name": "recoverERC20",
@@ -7110,9 +7063,7 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "timelock",
-              "outputs": [
+              "inputs": [
                 {
                   "internalType": "bytes32",
                   "name": "role",
@@ -7139,7 +7090,7 @@
                   "type": "uint256"
                 }
               ],
-              "stateMutability": "pure",
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -7152,7 +7103,207 @@
                   "type": "uint256"
                 }
               ],
-              "stateMutability": "pure",
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardRate",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "rewards",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardsDuration",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardsToken",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_rewardsDuration",
+                  "type": "uint256"
+                }
+              ],
+              "name": "setRewardsDuration",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "stake",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "stakingToken",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "totalSupply",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "newOwner",
+                  "type": "address"
+                }
+              ],
+              "name": "transferOwnership",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "userRewardPerTokenPaid",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "vestingAmounts",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "vestingEnd",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "vestingRatio",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "withdraw",
+              "outputs": [],
+              "stateMutability": "nonpayable",
               "type": "function"
             }
           ]
@@ -8049,7 +8200,7 @@
           ]
         },
         "LINK": {
-          "address": "0x5717DC7Cc0489dCc00316bcDB7e752aec664673e",
+          "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
           "abi": [
             {
               "inputs": [],
@@ -8365,7 +8516,7 @@
           ]
         },
         "LinkOracle": {
-          "address": "0xEecF07643384C689C7AB804887ef2187cE75D5Ec",
+          "address": "0x92c4bcdb5c13d9c67f84ba2aaa0879b0ece6d128",
           "abi": [
             {
               "inputs": [
@@ -8606,7 +8757,7 @@
           ]
         },
         "LinkVaultHandler": {
-          "address": "0xBd4a21cC2D12157765a8861A83FC4cfd216630b1",
+          "address": "0xbEB44Febc550f69Ff17f8Aa8eeC070B95eF369ba",
           "abi": [
             {
               "inputs": [

@@ -9,7 +9,9 @@ import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
+import NetworkContext from "../state/NetworkContext";
 import { toUSD } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -22,16 +24,16 @@ const Farm = () => {
   const [ethLiquidity, setEthLiquidity] = useState("0");
   const [ethLiquidityUNI, setEthLiquidityUNI] = useState("0");
   const [ctxLiquidity, setCtxLiquidity] = useState("0");
-
+  const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
 
-  const lpURL = process.env.REACT_APP_LP_URL;
-  const lpUniURL = process.env.REACT_APP_LP_URL_UNI;
-  const visionURL = process.env.REACT_APP_LP_VISION;
-  const uniVisionURL = process.env.REACT_APP_LP_UNI_VISION;
+  const lpURL = NETWORKS.mainnet.lpUrl;
+  const lpUniURL = "https://app.uniswap.org";
+  const visionURL = "https://analytics.sushi.com/pairs";
+  const uniVisionURL = "https://info.uniswap.org/pair";
 
   const one = ethers.utils.parseEther("1");
 
@@ -63,27 +65,24 @@ const Farm = () => {
         governance.timelock &&
         tokens.ctxTokenRead
       ) {
+        let ethPoolAddress = NETWORKS.mainnet.ethPool;
+        let ethUniPoolAddress = NETWORKS.mainnet.ethUniPool;
+        let ethCtxAddress = NETWORKS.mainnet.ctxPool;
+        if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
+          ethPoolAddress = NETWORKS.rinkeby.ethPool;
+          ethUniPoolAddress = NETWORKS.rinkeby.ethUniPool;
+          ethCtxAddress = NETWORKS.rinkeby.ctxPool;
+        }
+
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const tcapOraclePriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        const currentPoolWethCall = await tokens.wethTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH
-        );
-        const currentWethTCAPCall = await tokens.tcapTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH
-        );
-        const currentPoolWethCtxCall = await tokens.wethTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_CTX
-        );
-        const currentPoolCtxCall = await tokens.ctxTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_CTX
-        );
-        const currentPoolWethUNICall = await tokens.wethTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH_UNI
-        );
-        const currentWethTCAPUNICall = await tokens.tcapTokenRead?.balanceOf(
-          process?.env?.REACT_APP_POOL_ETH_UNI
-        );
+        const currentPoolWethCall = await tokens.wethTokenRead?.balanceOf(ethPoolAddress);
+        const currentWethTCAPCall = await tokens.tcapTokenRead?.balanceOf(ethPoolAddress);
+        const currentPoolWethCtxCall = await tokens.wethTokenRead?.balanceOf(ethCtxAddress);
+        const currentPoolCtxCall = await tokens.ctxTokenRead?.balanceOf(ethCtxAddress);
+        const currentPoolWethUNICall = await tokens.wethTokenRead?.balanceOf(ethUniPoolAddress);
+        const currentWethTCAPUNICall = await tokens.tcapTokenRead?.balanceOf(ethUniPoolAddress);
 
         // @ts-ignore
         const [

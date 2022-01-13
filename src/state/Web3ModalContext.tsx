@@ -4,6 +4,7 @@ import Web3Modal from "web3modal";
 import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Authereum from "authereum";
+import WalletLink from "walletlink";
 
 let network = "mainnet";
 
@@ -46,7 +47,13 @@ const providerOptions = {
   authereum: {
     package: Authereum, // required
   },
-  /* See Provider Options Section */
+  walletlink: {
+    package: WalletLink, // Required
+    options: {
+      appName: "Cryptex Finance", // Required
+      infuraId: process.env.REACT_APP_INFURA_ID,
+    },
+  },
 };
 
 const web3Modal = new Web3Modal({
