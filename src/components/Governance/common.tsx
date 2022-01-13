@@ -16,7 +16,7 @@ type imageProps = {
 };
 
 const etherscanUrl = () => {
-  if (process.env.REACT_APP_NETWORK_NAME === "mainnet") {
+  if (process.env.REACT_APP_NETWORK_ID === "1") {
     return "https://etherscan.io";
   }
   return "https://rinkeby.etherscan.io";

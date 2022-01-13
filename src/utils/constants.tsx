@@ -10,6 +10,7 @@ export const NETWORKS = {
     ethUniPool: "0x3436d87664964df8a1825f826f127dec13117b0b",
     daiPool: "",
     ctxPool: "0x2a93167ed63a31f35ca4788e2eb9fbd9fa6089d0",
+    lpUrl: "https://app.sushi.com",
   },
   rinkeby: {
     chainId: 4,

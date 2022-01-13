@@ -30,7 +30,7 @@ const Farm = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
 
-  const lpURL = "https://app.sushi.com";
+  const lpURL = NETWORKS.mainnet.lpUrl;
   const lpUniURL = "https://app.uniswap.org";
   const visionURL = "https://analytics.sushi.com/pairs";
   const uniVisionURL = "https://info.uniswap.org/pair";

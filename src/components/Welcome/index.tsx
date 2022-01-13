@@ -14,9 +14,7 @@ const Wrapper = () => {
   const currentNetwork = useContext(NetworkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_NAME === "mainnet"
-        ? GRAPHQL_ENDPOINT.mainnet
-        : GRAPHQL_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
     )
   );
 
