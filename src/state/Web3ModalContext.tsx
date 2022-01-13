@@ -5,6 +5,7 @@ import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Authereum from "authereum";
 import WalletLink from "walletlink";
+import Fortmatic from "fortmatic";
 
 let network = "mainnet";
 
@@ -38,21 +39,34 @@ const providerOptions = {
       infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
-  portis: {
-    package: Portis, // required
-    options: {
-      id: process.env.REACT_APP_PORTIS_ID, // required
-    },
-  },
-  authereum: {
-    package: Authereum, // required
-  },
   walletlink: {
     package: WalletLink, // Required
     options: {
       appName: "Cryptex Finance", // Required
       infuraId: process.env.REACT_APP_INFURA_ID,
     },
+  },
+  fortmatic: {
+    package: Fortmatic,
+    options: {
+      key: process.env.REACT_APP_FORTMATIC_KEY,
+      network: {
+        chainId: process.env.REACT_APP_NETWORK_ID,
+        rpcUrl:
+          process.env.REACT_APP_NETWORK_ID === "1"
+            ? "https://main-light.eth.linkpool.io/"
+            : "https://rinkeby-light.eth.linkpool.io/",
+      }, // if we don't pass it, it will default to localhost:8454
+    },
+  },
+  portis: {
+    package: Portis, // required
+    options: {
+      id: process.env.REACT_APP_PORTIS_ID,
+    },
+  },
+  authereum: {
+    package: Authereum, // required
   },
 };
 
