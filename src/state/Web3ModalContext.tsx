@@ -6,6 +6,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import Authereum from "authereum";
 import WalletLink from "walletlink";
 import Fortmatic from "fortmatic";
+import { NETWORKS } from "../utils/constants";
 
 let network = "mainnet";
 
@@ -54,8 +55,8 @@ const providerOptions = {
         chainId: process.env.REACT_APP_NETWORK_ID,
         rpcUrl:
           process.env.REACT_APP_NETWORK_ID === "1"
-            ? "https://main-light.eth.linkpool.io/"
-            : "https://rinkeby-light.eth.linkpool.io/",
+            ? NETWORKS.mainnet.infuraRpcUrl
+            : NETWORKS.rinkeby.infuraRpcUrl,
       }, // if we don't pass it, it will default to localhost:8454
     },
   },
