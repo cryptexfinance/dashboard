@@ -11,7 +11,7 @@ export const NETWORKS = {
     daiPool: "",
     ctxPool: "0x2a93167ed63a31f35ca4788e2eb9fbd9fa6089d0",
     lpUrl: "https://app.sushi.com",
-    infuraRpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+    infuraRpcUrl: "https://mainnet.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
   },
   rinkeby: {
     chainId: 4,
@@ -24,7 +24,7 @@ export const NETWORKS = {
     ethUniPool: "0x3436d87664964df8a1825f826f127dec13117b0b",
     daiPool: "0xb9625c0ec3dd89b00d20d1e3ea03d5b4072f03b4",
     ctxPool: "0x9c4438470b1593cf4efe0f85108e7416c3b582f8",
-    infuraRpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+    infuraRpcUrl: "https://rinkeby.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
   },
   okovan: {
     chainId: 69,
