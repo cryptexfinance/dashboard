@@ -526,10 +526,11 @@ const App = () => {
       } else {
         setLoading(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        const provider = getDefaultProvider(parseInt(chainId), NETWORKS.rinkeby.name);
+        const provider = getDefaultProvider(parseInt(chainId), NETWORKS.mainnet.name);
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        setCurrentNetwork(parseInt(chainId), "");
         setLoading(false);
       }
     }

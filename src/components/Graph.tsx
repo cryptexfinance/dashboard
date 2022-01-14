@@ -12,7 +12,7 @@ import { ReactComponent as StakeIcon } from "../assets/images/graph/stake.svg";
 import { ReactComponent as H24Icon } from "../assets/images/graph/24h.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon3.svg";
+// import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon3.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
@@ -31,7 +31,7 @@ const Graph = () => {
   const [ctxPrice, setCtxPrice] = useState("0.0");
   const [ETHStake, setETHStake] = useState("0");
   const [DAIStake, setDAIStake] = useState("0");
-  const [MATICStake, setMATICStake] = useState("0");
+  // const [MATICStake, setMATICStake] = useState("0");
   const [aaveStake, setAaveStake] = useState("0");
   const [linkStake, setLinkStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
@@ -76,13 +76,13 @@ const Graph = () => {
     return valid;
   };
 
-  const getMaticUSD = async () => {
+  /* const getMaticUSD = async () => {
     const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
     // @ts-ignore
     const [maticOraclePrice] = await signer.ethcallProvider?.all([maticOraclePriceCall]);
     const maticUSD = ethers.utils.formatEther(maticOraclePrice.mul(10000000000));
     return maticUSD;
-  };
+  }; */
 
   useEffect(() => {
     const load = async () => {
@@ -143,7 +143,7 @@ const Graph = () => {
         let currentWETHStake = BigNumber.from(0);
         let currentAAVEStake = BigNumber.from(0);
         let currentLINKStake = BigNumber.from(0);
-        let currentMATICStake = BigNumber.from(0);
+        // const currentMATICStake = BigNumber.from(0);
 
         await data.states.forEach((s: any) => {
           const networkId = currentNetwork.chainId;
@@ -181,9 +181,9 @@ const Graph = () => {
               currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
               break;
             // @ts-ignore
-            case contracts.MATICVaultHandler.address.toLowerCase():
+            /* case contracts.MATICVaultHandler.address.toLowerCase():
               currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
+              break; */
             default:
               break;
           }
@@ -197,14 +197,14 @@ const Graph = () => {
         setAaveStake(formatAAVE);
         const formatLINK = ethers.utils.formatEther(currentLINKStake);
         setLinkStake(formatLINK);
-        const formatMATIC = ethers.utils.formatEther(currentMATICStake);
-        setMATICStake(formatMATIC);
+        /* const formatMATIC = ethers.utils.formatEther(currentMATICStake);
+        setMATICStake(formatMATIC); */
 
         const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
         let aaveUSD = "0";
         let linkUSD = "0";
-        let maticUSD = "0";
+        // let maticUSD = "0";
         if (
           currentNetwork.chainId === NETWORKS.mainnet.chainId ||
           currentNetwork.chainId === NETWORKS.rinkeby.chainId
@@ -212,16 +212,16 @@ const Graph = () => {
           aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
         }
-        if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+        /* if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
           maticUSD = await getMaticUSD();
-        }
+        } */
 
         const totalUSD =
           toUSD(ethUSD, formatETH) +
           toUSD(daiUSD, formatDAI) +
           toUSD(aaveUSD, formatAAVE) +
-          toUSD(linkUSD, formatLINK) +
-          toUSD(maticUSD, formatMATIC);
+          toUSD(linkUSD, formatLINK);
+        //  toUSD(maticUSD, formatMATIC);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
@@ -354,7 +354,7 @@ const Graph = () => {
             )}
           </>
         )}
-        {currentNetwork.chainId === NETWORKS.polygon.chainId && (
+        {/* {currentNetwork.chainId === NETWORKS.polygon.chainId && (
           <Card>
             <POLYGONIcon className="eth" />
             <h4>Total Staked in MATIC</h4>
@@ -368,7 +368,7 @@ const Graph = () => {
               MATIC
             </h5>
           </Card>
-        )}
+        )} */}
       </div>
     </div>
   );
