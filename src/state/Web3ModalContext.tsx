@@ -34,17 +34,17 @@ switch (process.env.REACT_APP_NETWORK_ID) {
 }
 
 const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      infuraId: process.env.REACT_APP_INFURA_ID, // required
-    },
-  },
   walletlink: {
     package: WalletLink, // Required
     options: {
       appName: "Cryptex Finance", // Required
       infuraId: process.env.REACT_APP_INFURA_ID,
+    },
+  },
+  walletconnect: {
+    package: WalletConnectProvider, // required
+    options: {
+      infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
   fortmatic: {

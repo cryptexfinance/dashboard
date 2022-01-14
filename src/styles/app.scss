@@ -293,6 +293,12 @@ form {
   .web3modal-provider-description {
     font-family: "Space Mono";
   }
+  @media (max-width: 770px) { 
+    
+    .web3modal-provider-wrapper:last-child {
+      grid-row: 3;
+    }
+  }
 }
 
 @media (max-width: 600px) {
