@@ -5,8 +5,6 @@ import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Authereum from "authereum";
 import WalletLink from "walletlink";
-import Fortmatic from "fortmatic";
-import { NETWORKS } from "../utils/constants";
 
 let network = "mainnet";
 
@@ -47,7 +45,7 @@ const providerOptions = {
       infuraId: process.env.REACT_APP_INFURA_ID,
     },
   },
-  fortmatic: {
+  /* fortmatic: {
     package: Fortmatic,
     options: {
       key: process.env.REACT_APP_FORTMATIC_KEY,
@@ -59,7 +57,7 @@ const providerOptions = {
             : NETWORKS.rinkeby.infuraRpcUrl,
       }, // if we don't pass it, it will default to localhost:8454
     },
-  },
+  }, */
   portis: {
     package: Portis, // required
     options: {
