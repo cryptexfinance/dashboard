@@ -40,7 +40,7 @@ import {
   isUndefined,
 } from "../../utils/utils";
 import Loading from "../Loading";
-import { NETWORKS } from "../../utils/constants";
+import { FEATURES, NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -65,7 +65,7 @@ const Details = ({ address }: props) => {
       break;
     case "weth":
       currency = "WETH";
-      if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      if (FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId) {
         history?.push(`/vault/MATIC`);
         currency = "MATIC";
       }
@@ -74,7 +74,7 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
         currency = "AAVE";
       } else {
         currency = "ETH";
@@ -82,7 +82,7 @@ const Details = ({ address }: props) => {
       }
       break;
     case "link":
-      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
         currency = "LINK";
       } else {
         currency = "ETH";
@@ -91,7 +91,7 @@ const Details = ({ address }: props) => {
       break;
     case "matic":
       currency = "MATIC";
-      if (currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+      if (!FEATURES.POLYGON && currentNetwork.chainId !== NETWORKS.polygon.chainId) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
@@ -101,7 +101,8 @@ const Details = ({ address }: props) => {
       history?.push(`/vault/WETH`);
       break;
     default:
-      currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
+      currency =
+        FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH";
       break;
   }
 
@@ -451,7 +452,6 @@ const Details = ({ address }: props) => {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     onError: () => {
-      console.log("Error ----- ");
       console.log(error);
     },
     onCompleted: () => {
@@ -871,7 +871,6 @@ const Details = ({ address }: props) => {
     async function load() {
       // TODO : if stuck at pending do something
       if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
-        // await loadVault(selectedVault);
         setIsLoading(false);
       }
     }
@@ -912,7 +911,7 @@ const Details = ({ address }: props) => {
             <option value="ETH">ETH</option>
             <option>WETH</option>
             <option>DAI</option>
-            {isInLayer1(currentNetwork.chainId) && (
+            {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
               <>
                 <option>AAVE</option>
                 <option>LINK</option>

@@ -506,11 +506,11 @@ const App = () => {
     setCurrentSignerAddress(cAddress);
     setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
-    networkProvider.on("chainChanged", (chainId: number) => {
+    /* networkProvider.on("chainChanged", (chainId: number) => {
       // web3Modal.clearCachedProvider();
       setCurrentNetwork(chainId, "");
       window.location.reload();
-    });
+    }); */
     setLoading(false);
   });
 

@@ -18,8 +18,8 @@ import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { getPriceInUSDFromPair, isUndefined, toUSD } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { getPriceInUSDFromPair, isInLayer1, isUndefined, toUSD } from "../utils/utils";
+import { FEATURES, NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
@@ -307,8 +307,7 @@ const Graph = () => {
             DAI
           </h5>
         </Card>
-        {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-          currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
+        {isInLayer1(currentNetwork.chainId) && (
           <>
             <Card>
               <CtxIcon className="ctx" />
@@ -323,32 +322,36 @@ const Graph = () => {
                 />{" "}
               </h5>
             </Card>
-            <Card>
-              <AAVEIcon className="ctx" />
-              <h4>Total Staked in AAVE</h4>
-              <h5 className="number neon-highlight">
-                <NumberFormat
-                  value={aaveStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />{" "}
-                AAVE
-              </h5>
-            </Card>
-            <Card>
-              <LINKIcon className="ctx" />
-              <h4>Total Staked in LINK</h4>
-              <h5 className="number neon-highlight">
-                <NumberFormat
-                  value={linkStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />{" "}
-                LINK
-              </h5>
-            </Card>
+            {FEATURES.NEW_VAULTS && (
+              <>
+                <Card>
+                  <AAVEIcon className="ctx" />
+                  <h4>Total Staked in AAVE</h4>
+                  <h5 className="number neon-highlight">
+                    <NumberFormat
+                      value={aaveStake}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                    />{" "}
+                    AAVE
+                  </h5>
+                </Card>
+                <Card>
+                  <LINKIcon className="ctx" />
+                  <h4>Total Staked in LINK</h4>
+                  <h5 className="number neon-highlight">
+                    <NumberFormat
+                      value={linkStake}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                    />{" "}
+                    LINK
+                  </h5>
+                </Card>
+              </>
+            )}
           </>
         )}
         {currentNetwork.chainId === NETWORKS.polygon.chainId && (
