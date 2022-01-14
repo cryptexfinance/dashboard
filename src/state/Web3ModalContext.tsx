@@ -55,8 +55,8 @@ const providerOptions = {
         chainId: process.env.REACT_APP_NETWORK_ID,
         rpcUrl:
           process.env.REACT_APP_NETWORK_ID === "1"
-            ? NETWORKS.mainnet.infuraRpcUrl
-            : NETWORKS.rinkeby.infuraRpcUrl,
+            ? NETWORKS.mainnet.infuraFortmaticRpcUrl
+            : NETWORKS.rinkeby.infuraFortmaticRpcUrl,
       }, // if we don't pass it, it will default to localhost:8454
     },
   },
