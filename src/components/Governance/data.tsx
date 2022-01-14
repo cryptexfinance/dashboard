@@ -16,8 +16,7 @@ export const delegatorsInfo = [
     eth_name: "brajon.eth",
     image: "brajon.png",
     expertise: ["Development"],
-    why:
-      "I’ve been a Cryptex supporter since Nov 2020 and see the vision Joe and the team are trying to accomplish. My goal is to help this project reach its potential of creating institutional grade investment products that allow anyone to get exposure to currently nontradeable markets.",
+    why: "I’ve been a Cryptex supporter since Nov 2020 and see the vision Joe and the team are trying to accomplish. My goal is to help this project reach its potential of creating institutional grade investment products that allow anyone to get exposure to currently nontradeable markets.",
     discord: "brajon#4226",
     twitter: "yadfarms",
   },
@@ -59,8 +58,7 @@ export const delegatorsInfo = [
     eth_name: "0xD27e8256196d6f794c4329644C225b7b81a260f7",
     image: "Huntsman.jpg",
     expertise: ["Economics/Retail Investing"],
-    why:
-      "Huntsman is a relative newcomer to cryptocurrency investing, and while he only discovered Cryptex when it was listed on Gemini, his Cryptex journey has seen him allocate over 10% of his investment portfolio into collateralizing vaults, minting TCAP, and providing liquidity on Sushiswap. He is very excited about the potential of this DAO and its community, as well as its flagship TCAP. He is humbly asking for your delegation for those who want to place their stake with a retail everyman who can't wait for the Moon but wants to invest decades into this project to see it to its maximum potential.",
+    why: "Huntsman is a relative newcomer to cryptocurrency investing, and while he only discovered Cryptex when it was listed on Gemini, his Cryptex journey has seen him allocate over 10% of his investment portfolio into collateralizing vaults, minting TCAP, and providing liquidity on Sushiswap. He is very excited about the potential of this DAO and its community, as well as its flagship TCAP. He is humbly asking for your delegation for those who want to place their stake with a retail everyman who can't wait for the Moon but wants to invest decades into this project to see it to its maximum potential.",
     discord: "Huntsman202#2502",
     twitter: "OGDavidGNowak",
   },
@@ -70,8 +68,7 @@ export const delegatorsInfo = [
     eth_name: "indigo.eth",
     image: "indigo.png",
     expertise: ["Development", "Operations"],
-    why:
-      "I'm a security expert who specializes in smart contract and operational security auditing.\n\nI will vote for incentivized liquidity and staking, expansion to new projects/networks, and supporting operations that will drive adoption of TCAP.",
+    why: "I'm a security expert who specializes in smart contract and operational security auditing.\n\nI will vote for incentivized liquidity and staking, expansion to new projects/networks, and supporting operations that will drive adoption of TCAP.",
     discord: " Indigo#3132",
     twitter: "",
   },
@@ -91,8 +88,7 @@ export const delegatorsInfo = [
     eth_name: "0x767D222a509D107522e50161CA17FfCF0e5AA3dE",
     image: "leo.png",
     expertise: ["Operations"],
-    why:
-      "I am a long-term crypto investor and builder. I am a big supporter of the cryptex project from the very beginning. I have promoted the project to a large Chinese crypto community with a few thousand people. I have initiated the debank.com integration and get it supported recently.\n\nI would like to represent the Chinese crypto investors in the project and continue supporting and promoting the cryptex project.",
+    why: "I am a long-term crypto investor and builder. I am a big supporter of the cryptex project from the very beginning. I have promoted the project to a large Chinese crypto community with a few thousand people. I have initiated the debank.com integration and get it supported recently.\n\nI would like to represent the Chinese crypto investors in the project and continue supporting and promoting the cryptex project.",
     discord: "",
     twitter: "leo_hao",
   },
@@ -102,8 +98,7 @@ export const delegatorsInfo = [
     eth_name: "0x4CbAeDF625d236EC66e2dc47e7E139b1e79677Da",
     image: "mediumarchibald.png",
     expertise: ["Investigative journalist", "Freelance political/legal researcher"],
-    why:
-      "My profession is trust- and referral-based. I either present verifiable information, or I don’t get future clients.",
+    why: "My profession is trust- and referral-based. I either present verifiable information, or I don’t get future clients.",
     discord: "MediumArchibald#4336",
     twitter: "",
   },
@@ -113,8 +108,7 @@ export const delegatorsInfo = [
     eth_name: "0xC3c5ac9C328323e53DbdF064D94779436B91C49A",
     image: "brightside.png",
     expertise: ["Operations"],
-    why:
-      "Passionate about project, mission and vision. Multi-disciplinary background leading my own project and developments including a separate ERC-20 token.",
+    why: "Passionate about project, mission and vision. Multi-disciplinary background leading my own project and developments including a separate ERC-20 token.",
     discord: "mrbrightside#1833",
     twitter: "",
   },

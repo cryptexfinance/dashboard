@@ -177,7 +177,8 @@ input[type="number"] {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="file"] {
   border-radius: 1px;
   background: no-repeat;
   border-color: $dark;
@@ -200,7 +201,6 @@ input[type="number"].neon-orange:focus {
   color: $white;
   background: no-repeat;
 }
-
 input[type="text"].neon-hightlight:focus,
 input[type="number"].neon-hightlight:focus {
   border-color: $highlight !important;
@@ -209,8 +209,27 @@ input[type="number"].neon-hightlight:focus {
   background: no-repeat;
 }
 
+textarea.neon-green:focus {
+  border-color: $green !important;
+  box-shadow: -1px 0px 15px -6px $green;
+  background: no-repeat;
+  color: $white;
+}
+
 .card {
   background-color: $darker;
+}
+.custom-file {
+  label {
+    background: no-repeat;
+    border-radius: 1px;  
+    border-color: $dark;
+    color: $white; 
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: inherit;
+    letter-spacing: 0.3rem;
+  }
 }
 //Same width as sidebar
 .wrapper {
@@ -245,6 +264,12 @@ html,
   padding: 0.8rem;
 }
 
+form {
+  .field-error {
+    color: $orange;
+  }
+}
+
 #WEB3_CONNECT_MODAL_ID {
   .web3modal-provider-container {
     transition: background-color 0s ease-in-out 0s;
@@ -259,7 +284,7 @@ html,
 
   .web3modal-modal-card {
     border-radius: 4px;
-    box-shadow: 0px 0px 4px #f124ff, 0px 0px 34px rgba(241, 36, 255, 0.24);
+    box-shadow: 0px 0px 4px #f124ff, 0px 0px 34px rgba(241, 36, 255, 0.24);    
   }
   .web3modal-provider-name {
     font-family: "Nineteen Ninety Seven";
@@ -278,3 +303,4 @@ html,
     margin-top: 4rem;
   }
 }
+

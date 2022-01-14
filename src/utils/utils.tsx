@@ -1,7 +1,9 @@
-import { ethers } from "ethers";
 import React from "react";
+import { ethers, utils } from "ethers";
+import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
+import { FEATURES, NETWORKS } from "./constants";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -10,11 +12,25 @@ export const makeShortAddress = (address: string) => {
   return shortAddress;
 };
 
+export const isUndefined = (value: any): boolean => typeof value === "undefined";
+
 export const getENS = async (address: string) => {
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const ens = await provider.lookupAddress(address);
   if (ens) {
     return ens;
+  }
+  return null;
+};
+
+export const getAddressFromENS = async (ens: string) => {
+  const provider = ethers.getDefaultProvider();
+  const address = await provider.resolveName(ens);
+  if (address) {
+    return address;
   }
   return null;
 };
@@ -88,6 +104,8 @@ export const errorNotification = async (body: string) => {
   const title = "❌ Whoopsie!";
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
+
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
@@ -215,4 +233,54 @@ export const getPriceInUSDFromPair = (
   // amount of token0 required to by 1 WETH
   const amt = parseFloat(ethers.utils.formatEther(one.mul(reserves0).div(reservesWETH)));
   return ethPrice / amt;
+};
+
+export function toFragment(abi: JsonFragment[]): Fragment[] {
+  const abiFragment = abi.map((item: JsonFragment) => utils.Fragment.from(item));
+
+  if (abiFragment.length > 0 && abiFragment[abiFragment.length - 1] == null) {
+    abiFragment.pop();
+  }
+
+  return abiFragment;
+}
+
+export const isValidNetwork = (chainId: number) => {
+  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  if (name.toLowerCase() === "mainnet") {
+    return (
+      chainId === NETWORKS.mainnet.chainId ||
+      (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+      (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+    );
+  }
+  return (
+    chainId === NETWORKS.rinkeby.chainId ||
+    (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+    (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+  );
+};
+
+export const isInLayer1 = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+  }
+  return false;
+};
+
+export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+  let provider;
+  if (chainId === NETWORKS.okovan.chainId) {
+    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
+  } else {
+    const alchemyKey =
+      chainId === NETWORKS.mainnet.chainId
+        ? process.env.REACT_APP_ALCHEMY_KEY
+        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+    provider = ethers.getDefaultProvider(name, {
+      infura: process.env.REACT_APP_INFURA_ID,
+      alchemy: alchemyKey,
+    });
+  }
+  return provider;
 };

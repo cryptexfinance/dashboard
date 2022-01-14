@@ -39,17 +39,13 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
         );
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
         // @ts-ignore
-        const [
-          totalSupply,
-          currentStake,
-          currentReward,
-          currentWaitTime,
-        ] = await signer.ethcallProvider?.all([
-          totalSupplyCall,
-          currentStakeCall,
-          currentRewardCall,
-          currentWaitTimeCall,
-        ]);
+        const [totalSupply, currentStake, currentReward, currentWaitTime] =
+          await signer.ethcallProvider?.all([
+            totalSupplyCall,
+            currentStakeCall,
+            currentRewardCall,
+            currentWaitTimeCall,
+          ]);
         setTotalStaked(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));

@@ -12,10 +12,11 @@ type badgeProps = {
 type imageProps = {
   address: string;
   image: string;
+  size: number;
 };
 
 const etherscanUrl = () => {
-  if (process.env.REACT_APP_NETWORK_NAME === "mainnet") {
+  if (process.env.REACT_APP_NETWORK_ID === "1") {
     return "https://etherscan.io";
   }
   return "https://rinkeby.etherscan.io";
@@ -30,7 +31,7 @@ export const VoteBadge = ({ address, amount, label }: badgeProps) => (
   </Badge>
 );
 
-export const ProfileImage = ({ address, image }: imageProps) => (
+export const ProfileImage = ({ address, image, size }: imageProps) => (
   <>
     {image ? (
       <a
@@ -39,7 +40,7 @@ export const ProfileImage = ({ address, image }: imageProps) => (
           e.preventDefault();
         }}
       >
-        <Image src={"images/".concat(image)} roundedCircle className="avatar" />
+        <Image src={image} roundedCircle className="avatar" />
       </a>
     ) : (
       <a
@@ -48,7 +49,7 @@ export const ProfileImage = ({ address, image }: imageProps) => (
           e.preventDefault();
         }}
       >
-        <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
+        <Davatar size={size} address={address} generatedAvatarType="jazzicon" />
       </a>
     )}
   </>

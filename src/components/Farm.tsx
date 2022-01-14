@@ -70,7 +70,7 @@ const Farm = () => {
 
   const oneYear = 60 * 60 * 24 * 365;
 
-  const lpURL = process.env.REACT_APP_LP_URL;
+  const lpURL = "https://app.sushi.com";
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
   const USER_VAULTS = gql`
