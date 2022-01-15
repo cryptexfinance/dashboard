@@ -4,7 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
-import ethers from "ethers";
+import { ethers } from "ethers";
 import governanceContext from "../../state/GovernanceContext";
 import "../../styles/modal.scss";
 import { errorNotification, notifyUser } from "../../utils/utils";

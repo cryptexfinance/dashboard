@@ -6,32 +6,41 @@ import InputGroup from "react-bootstrap/esm/InputGroup";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { Contract } from "ethers-multicall";
-import ethers, { BigNumber } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
+import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
 import VaultsContext from "../../state/VaultsContext";
 import SignerContext from "../../state/SignerContext";
 import "../../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
-import { ReactComponent as BTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
+import { ReactComponent as AAVEIconSmall } from "../../assets/images/vault/aave.svg";
+import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
+import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
-import { ReactComponent as WBTCIcon } from "../../assets/images/graph/WBTC.svg";
+import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
+import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
+import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon3.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import {
   notifyUser,
   toUSD,
   errorNotification,
+  getDefaultProvider,
+  isInLayer1,
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
+  isUndefined,
 } from "../../utils/utils";
 import Loading from "../Loading";
+import { FEATURES, NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
@@ -40,12 +49,13 @@ type props = {
 // TODO: Vault doesn't show if approve is 0 even if there is data in the vault
 
 const Details = ({ address }: props) => {
+  const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
 
-  let currency = "ETH";
+  let currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
   // @ts-ignore
@@ -55,16 +65,44 @@ const Details = ({ address }: props) => {
       break;
     case "weth":
       currency = "WETH";
+      if (FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId) {
+        history?.push(`/vault/MATIC`);
+        currency = "MATIC";
+      }
       break;
     case "dai":
       currency = "DAI";
+      break;
+    case "aave":
+      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+        currency = "AAVE";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
+      break;
+    case "link":
+      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+        currency = "LINK";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
+      break;
+    case "matic":
+      currency = "MATIC";
+      if (!FEATURES.POLYGON && currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+        history?.push(`/vault/ETH`);
+        currency = "ETH";
+      }
       break;
     case "wbtc":
       currency = "WETH";
       history?.push(`/vault/WETH`);
       break;
     default:
-      currency = "ETH";
+      currency =
+        FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH";
       break;
   }
 
@@ -149,33 +187,65 @@ const Details = ({ address }: props) => {
     return currentCollateralPrice;
   };
 
-  async function loadVault(vaultType: string, vaultData: any) {
+  const validVaults = (): boolean => {
+    let valid =
+      !isUndefined(oracles.wethOracle) &&
+      !isUndefined(oracles.daiOracle) &&
+      !isUndefined(oracles.tcapOracle) &&
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.daiOracleRead) &&
+      !isUndefined(vaults.wethVault) &&
+      !isUndefined(vaults.daiVault) &&
+      !isUndefined(tokens.wethTokenRead) &&
+      !isUndefined(tokens.daiTokenRead);
+
     if (
-      signer.signer &&
-      oracles.wethOracle &&
-      oracles.daiOracle &&
-      oracles.wethOracleRead &&
-      oracles.daiOracleRead &&
-      oracles.tcapOracle &&
-      vaults.wethVault &&
-      vaults.daiVault &&
-      tokens.wethToken &&
-      tokens.daiToken &&
-      tokens.wethTokenRead &&
-      tokens.daiTokenRead &&
-      vaultData
+      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+      currentNetwork.chainId === NETWORKS.rinkeby.chainId
     ) {
+      valid =
+        valid &&
+        !isUndefined(oracles.aaveOracle) &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(oracles.aaveOracleRead) &&
+        !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(vaults.aaveVault) &&
+        !isUndefined(vaults.linkVault) &&
+        !isUndefined(tokens.aaveToken) &&
+        !isUndefined(tokens.linkToken) &&
+        !isUndefined(tokens.aaveTokenRead) &&
+        !isUndefined(tokens.linkTokenRead);
+    }
+    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      valid =
+        valid &&
+        !isUndefined(oracles.maticOracle) &&
+        !isUndefined(oracles.maticOracleRead) &&
+        !isUndefined(vaults.maticVault) &&
+        !isUndefined(vaults.maticVaultRead) &&
+        !isUndefined(tokens.maticToken) &&
+        !isUndefined(tokens.maticTokenRead);
+    }
+
+    return valid;
+  };
+
+  const isGasAsset = () =>
+    (currentNetwork.chainId !== NETWORKS.polygon.chainId && selectedVault === "ETH") ||
+    (currentNetwork.chainId === NETWORKS.polygon.chainId && selectedVault === "MATIC");
+
+  async function loadVault(vaultType: string, vaultData: any) {
+    if (signer.signer && validVaults() && vaultData) {
       let currentVault: any;
       let currentVaultRead: any;
       let currentToken;
       let currentOracleRead;
       let currentTokenRead;
       let balance;
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
+      const provider = getDefaultProvider(
+        currentNetwork.chainId || NETWORKS.rinkeby.chainId,
+        NETWORKS.rinkeby.name
+      );
       switch (vaultType) {
         case "ETH": {
           currentVault = vaults.wethVault;
@@ -200,6 +270,28 @@ const Details = ({ address }: props) => {
           currentOracleRead = oracles.daiOracleRead;
           currentTokenRead = tokens.daiTokenRead;
           break;
+        case "AAVE":
+          currentVault = vaults.aaveVault;
+          currentVaultRead = vaults.aaveVaultRead;
+          currentToken = tokens.aaveToken;
+          currentOracleRead = oracles.aaveOracleRead;
+          currentTokenRead = tokens.aaveTokenRead;
+          break;
+        case "LINK":
+          currentVault = vaults.linkVault;
+          currentVaultRead = vaults.linkVaultRead;
+          currentToken = tokens.linkToken;
+          currentOracleRead = oracles.linkOracleRead;
+          currentTokenRead = tokens.linkTokenRead;
+          break;
+        case "MATIC":
+          currentVault = vaults.maticVault;
+          currentVaultRead = vaults.maticVaultRead;
+          currentToken = tokens.maticToken;
+          currentOracleRead = oracles.maticOracleRead;
+          currentTokenRead = tokens.maticTokenRead;
+          balance = await provider.getBalance(address);
+          break;
         default:
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
@@ -220,6 +312,8 @@ const Details = ({ address }: props) => {
       let currentBlock = await provider.getBlockNumber();
       currentBlock -= 10;
       if (
+        (currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+          currentNetwork.chainId === NETWORKS.rinkeby.chainId) &&
         vaultData.vaults.length > 0 &&
         !vaultData._meta.hasIndexingErrors &&
         graphBlock >= currentBlock
@@ -242,6 +336,7 @@ const Details = ({ address }: props) => {
       }
 
       if (vaultType !== "ETH") {
+        // @ts-ignore
         balance = await currentToken.balanceOf(address);
       }
 
@@ -250,10 +345,15 @@ const Details = ({ address }: props) => {
 
       if (currentVaultData) {
         const { vaultId, collateral, debt } = currentVaultData;
+        // @ts-ignore
         const allowanceCall = await currentTokenRead.allowance(address, currentVault.address);
         const currentRatioCall = await currentVaultRead.getVaultRatio(vaultId);
+
+        // @ts-ignore
         const currentTCAPPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
         const currentMinRatioCall = await currentVaultRead.ratio();
 
@@ -277,6 +377,7 @@ const Details = ({ address }: props) => {
         decimals = decimalsVal;
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
         setSelectedVaultId(vaultId);
+
         if (!allowance.isZero() || vaultType === "ETH") {
           setMinRatio(currentMinRatio.toString());
           setIsApproved(true);
@@ -311,15 +412,15 @@ const Details = ({ address }: props) => {
           setIsApproved(false);
         }
       } else {
+        // @ts-ignore
         const decimalsCall = await currentTokenRead.decimals();
+        // @ts-ignore
         const currentPriceCall = await currentOracleRead.getLatestAnswer();
-
         // @ts-ignore
         const [decimalsVal, currentPriceVal] = await signer.ethcallProvider?.all([
           decimalsCall,
           currentPriceCall,
         ]);
-
         decimals = decimalsVal;
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
 
@@ -333,9 +434,10 @@ const Details = ({ address }: props) => {
 
       setSelectedVaultDecimals(decimals);
       const currentBalance = ethers.utils.formatUnits(balance, decimals);
-
       if (parseFloat(currentBalance) < 0.09) {
         setTokenBalanceDecimals(4);
+      } else {
+        setTokenBalanceDecimals(2);
       }
       setTokenBalance(currentBalance);
 
@@ -344,11 +446,14 @@ const Details = ({ address }: props) => {
     }
   }
 
-  const { data, refetch, networkStatus } = useQuery(USER_VAULT, {
+  const { data, error, refetch, networkStatus } = useQuery(USER_VAULT, {
     variables: { owner: address },
     pollInterval: 200000,
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
+    onError: () => {
+      console.log(error);
+    },
     onCompleted: () => {
       loadVault(selectedVault, data);
     },
@@ -356,8 +461,13 @@ const Details = ({ address }: props) => {
 
   const refresh = async () => {
     try {
-      await refetch();
+      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+        await refetch();
+      } else {
+        loadVault(selectedVault, data);
+      }
     } catch (error) {
+      console.log(error);
       // catch error in case the vault screen is changed
     }
   };
@@ -506,10 +616,17 @@ const Details = ({ address }: props) => {
 
       // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
-        if (selectedVault === "ETH") {
-          const tx = await selectedVaultContract?.addCollateralETH({
-            value: amount,
-          });
+        if (isGasAsset()) {
+          let tx;
+          if (selectedVault === "ETH") {
+            tx = await selectedVaultContract?.addCollateralETH({
+              value: amount,
+            });
+          } else {
+            tx = await selectedVaultContract?.addCollateralMATIC({
+              value: amount,
+            });
+          }
           notifyUser(tx, refresh);
         } else {
           const tx = await selectedVaultContract?.addCollateral(amount);
@@ -534,15 +651,11 @@ const Details = ({ address }: props) => {
     e.preventDefault();
     let balance = "0";
     if (selectedVault === "ETH") {
-      const network = process.env.REACT_APP_NETWORK_NAME;
-      const provider = ethers.getDefaultProvider(network, {
-        infura: process.env.REACT_APP_INFURA_ID,
-        alchemy: process.env.REACT_APP_ALCHEMY_KEY,
-      });
-
+      const provider = getDefaultProvider(currentNetwork.chainId, currentNetwork.name);
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
       const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
+      console.log(value);
       balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
@@ -563,8 +676,13 @@ const Details = ({ address }: props) => {
       const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
 
       try {
-        if (selectedVault === "ETH") {
-          const tx = await selectedVaultContract?.removeCollateralETH(amount);
+        if (isGasAsset()) {
+          let tx;
+          if (selectedVault === "ETH") {
+            tx = await selectedVaultContract?.removeCollateralETH(amount);
+          } else {
+            tx = await selectedVaultContract?.removeCollateralMATIC(amount);
+          }
           notifyUser(tx, refresh);
         } else {
           const tx = await selectedVaultContract?.removeCollateral(amount);
@@ -730,6 +848,9 @@ const Details = ({ address }: props) => {
   };
 
   const onChangeVault = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsApproved(false);
+    setTokenBalance("0");
+    setTokenBalanceUSD("0");
     setSelectedVault(event.target.value);
     // Clean form
     setAddCollateralTxt("");
@@ -750,7 +871,6 @@ const Details = ({ address }: props) => {
     async function load() {
       // TODO : if stuck at pending do something
       if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
-        // await loadVault(selectedVault);
         setIsLoading(false);
       }
     }
@@ -774,8 +894,12 @@ const Details = ({ address }: props) => {
           switch (selectedVault) {
             case "DAI":
               return <DAIIconSmall className="dai" />;
-            case "WBTC":
-              return <BTCIconSmall className="btc" />;
+            case "AAVE":
+              return <AAVEIconSmall className="btc" />;
+            case "LINK":
+              return <LINKIconSmall className="link" />;
+            case "MATIC":
+              return <POLYGONIconSmall className="dai" />;
             default:
               return <ETHIconSmall className="weth" />;
           }
@@ -783,10 +907,16 @@ const Details = ({ address }: props) => {
 
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
+            {currentNetwork.chainId === NETWORKS.polygon.chainId && <option>MATIC</option>}
             <option value="ETH">ETH</option>
             <option>WETH</option>
-            {/* <option>WBTC</option> */}
             <option>DAI</option>
+            {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
+              <>
+                <option>AAVE</option>
+                <option>LINK</option>
+              </>
+            )}
           </Form.Control>
           <p className="number">
             <NumberFormat
@@ -817,8 +947,12 @@ const Details = ({ address }: props) => {
                   switch (selectedVault) {
                     case "DAI":
                       return <DAIIcon className="eth" />;
-                    case "WBTC":
-                      return <WBTCIcon className="eth" />;
+                    case "AAVE":
+                      return <AAVEIcon className="eth" />;
+                    case "LINK":
+                      return <LINKIcon className="eth" />;
+                    case "MATIC":
+                      return <POLYGONIcon className="eth" />;
                     default:
                       return <ETHIcon className="eth" />;
                   }
@@ -831,8 +965,12 @@ const Details = ({ address }: props) => {
                         switch (selectedVault) {
                           case "DAI":
                             return <DAIIconSmall className="dai small" />;
-                          case "WBTC":
-                            return <BTCIconSmall className="btc small" />;
+                          case "AAVE":
+                            return <AAVEIconSmall className="aave small" />;
+                          case "LINK":
+                            return <LINKIconSmall className="link small" />;
+                          case "MATIC":
+                            return <POLYGONIconSmall className="btc small" />;
                           default:
                             return <ETHIconSmall className="small" />;
                         }
@@ -903,8 +1041,12 @@ const Details = ({ address }: props) => {
                         switch (selectedVault) {
                           case "DAI":
                             return <DAIIconSmall className="dai" />;
-                          case "WBTC":
-                            return <BTCIconSmall className="btc" />;
+                          case "AAVE":
+                            return <AAVEIconSmall className="aave" />;
+                          case "LINK":
+                            return <LINKIconSmall className="link" />;
+                          case "MATIC":
+                            return <POLYGONIconSmall className="polygon" />;
                           default:
                             return <ETHIconSmall className="weth" />;
                         }
@@ -1101,7 +1243,7 @@ const Details = ({ address }: props) => {
                         thousandSeparator
                         decimalScale={4}
                       />{" "}
-                      ETH
+                      {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
                     </Form.Text>
                   </Form.Group>
                 </Form>

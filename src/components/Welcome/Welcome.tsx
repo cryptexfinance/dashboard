@@ -5,20 +5,21 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import ethers, { BigNumber } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import SignerContext from "../state/SignerContext";
-import TokensContext from "../state/TokensContext";
-import OraclesContext from "../state/OraclesContext";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import { makeShortAddress, getPriceInUSDFromPair } from "../utils/utils";
-import "../styles/welcome.scss";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
-import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
-
-import Loading from "./Loading";
+import NetworkContext from "../../state/NetworkContext";
+import SignerContext from "../../state/SignerContext";
+import TokensContext from "../../state/TokensContext";
+import OraclesContext from "../../state/OraclesContext";
+import { Web3ModalContext } from "../../state/Web3ModalContext";
+import { makeShortAddress, getPriceInUSDFromPair, getENS } from "../../utils/utils";
+import "../../styles/welcome.scss";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
+import { NETWORKS } from "../../utils/constants";
+import Loading from "../Loading";
 
 const Welcome = () => {
   const [address, setAddress] = useState("");
@@ -29,12 +30,12 @@ const Welcome = () => {
   const [ctxUSDBalance, setCtxUSDBalance] = useState("0.0");
   const [ctxBalance, setCtxBalance] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
+  const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const web3Modal = useContext(Web3ModalContext);
   const history = useHistory();
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
-  const lpURL = process.env.REACT_APP_LP_URL;
 
   const TCAP_PRICE = gql`
     query {
@@ -48,49 +49,52 @@ const Welcome = () => {
 
   useEffect(() => {
     const loadAddress = async () => {
-      if (
-        signer.signer &&
-        tokens.tcapToken &&
-        tokens.ctxToken &&
-        oracles.tcapOracle &&
-        tokens.tcapTokenRead
-      ) {
+      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.tcapTokenRead) {
         const currentAddress = await signer.signer.getAddress();
-        setAddress(makeShortAddress(currentAddress));
+        if (currentAddress !== address) {
+          const ens = await getENS(currentAddress);
+          if (ens) {
+            setAddress(ens);
+          } else {
+            setAddress(makeShortAddress(currentAddress));
+          }
+        }
         const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
-        const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
-        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
-        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         // @ts-ignore
-        const [
-          currentTcapBalance,
-          currentCtxBalance,
-          wethOraclePrice,
-          reservesCtxPool,
-        ] = await signer.ethcallProvider?.all([
+        const [currentTcapBalance, wethOraclePrice] = await signer.ethcallProvider?.all([
           currentTcapBalanceCall,
-          currentCtxBalanceCall,
           wethOraclePriceCall,
-          reservesCtxPoolCall,
         ]);
-
         const tcapString = ethers.utils.formatEther(currentTcapBalance);
         setTcapBalance(tcapString);
-        const ctxString = ethers.utils.formatEther(currentCtxBalance);
-        setCtxBalance(ctxString);
-
         const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        const currentPriceCTX = await getPriceInUSDFromPair(
-          reservesCtxPool[0],
-          reservesCtxPool[1],
-          parseFloat(currentPriceETH)
-        );
-        const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
-        setCtxUSDBalance(ctxUSD.toString());
+
+        if (currentNetwork.chainId === NETWORKS.mainnet.chainId) {
+          const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
+          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          // @ts-ignore
+          const [currentCtxBalance, reservesCtxPool] = await signer.ethcallProvider?.all([
+            currentCtxBalanceCall,
+            reservesCtxPoolCall,
+          ]);
+          const ctxString = ethers.utils.formatEther(currentCtxBalance);
+          setCtxBalance(ctxString);
+          const currentPriceCTX = await getPriceInUSDFromPair(
+            reservesCtxPool[0],
+            reservesCtxPool[1],
+            parseFloat(currentPriceETH)
+          );
+          const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
+          setCtxUSDBalance(ctxUSD.toString());
+        }
       }
       if (data) {
-        const currentTotalPrice = BigNumber.from(await data?.oracles[0].answer);
+        let currentTotalPrice = BigNumber.from(0);
+        const prices = await data?.oracles;
+        if (prices.length > 0) {
+          currentTotalPrice = BigNumber.from(prices[0].answer);
+        }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
@@ -192,33 +196,36 @@ const Welcome = () => {
                     </div>
                     <p className="title tcap">TCAP Balance</p>
                   </Col>
-                  <Col>
-                    <div className="tcap-balance">
-                      <CtxIcon className="tcap-neon" />
-                      <div>
-                        <h3 className="number neon-dark-blue">
-                          <NumberFormat
-                            className="number"
-                            value={ctxBalance}
-                            displayType="text"
-                            thousandSeparator
-                            decimalScale={2}
-                          />
-                        </h3>
-                        <p className="number usd-balance">
-                          <NumberFormat
-                            className="number"
-                            value={ctxUSDBalance}
-                            displayType="text"
-                            thousandSeparator
-                            prefix="$"
-                            decimalScale={parseFloat(ctxUSDBalance) > 1000 ? 0 : 2}
-                          />
-                        </p>
+                  {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
+                    currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
+                    <Col>
+                      <div className="tcap-balance">
+                        <CtxIcon className="tcap-neon" />
+                        <div>
+                          <h3 className="number neon-dark-blue">
+                            <NumberFormat
+                              className="number"
+                              value={ctxBalance}
+                              displayType="text"
+                              thousandSeparator
+                              decimalScale={2}
+                            />
+                          </h3>
+                          <p className="number usd-balance">
+                            <NumberFormat
+                              className="number"
+                              value={ctxUSDBalance}
+                              displayType="text"
+                              thousandSeparator
+                              prefix="$"
+                              decimalScale={parseFloat(ctxUSDBalance) > 1000 ? 0 : 2}
+                            />
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <p className="title tcap">CTX Balance</p>
-                  </Col>
+                      <p className="title tcap">CTX Balance</p>
+                    </Col>
+                  )}
                 </Row>
               </Card>
             ) : (
@@ -255,7 +262,7 @@ const Welcome = () => {
                     className="neon-pink"
                     onClick={() => {
                       window.open(
-                        `${lpURL}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
+                        `${NETWORKS.mainnet.lpUrl}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
                         "_blank"
                       );
                     }}

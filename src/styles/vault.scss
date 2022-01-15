@@ -40,6 +40,14 @@
         margin-top: 12px;
         width: 1.3rem;
       }
+      &.aave {
+        margin-top: 10px;
+        width: 1.5rem;
+      }
+      &.link {
+        margin-top: 3px;
+        width: 1.5rem;
+      }
     }
 
     .select-container {
@@ -60,7 +68,7 @@
     color: $white;
     -webkit-appearance: none;
     appearance: none;
-    width: 7rem;
+    width: 7.8rem;
     background: url("../assets/images/select-arrow.svg") 96% / 15% no-repeat;
     outline: none;
 
@@ -174,18 +182,29 @@
             filter: none;
             width: 2rem;
           }
-
           &.btc {
             margin-top: 0px;
             width: 1.8rem;
           }
-
           &.dai {
             margin-top: 0px;
             width: 1.5rem;
             filter: none;
             margin-right: 2px;
             filter: drop-shadow(0px 0px 5px $dark-blue);
+          }
+
+          &.polygon {
+            margin-top: 0px;
+            width: 1.5rem;
+          }  
+          &.aave {
+            width: 1.5rem;
+            margin-top: 2px;
+          }
+          &.link {
+            width: 1.6rem;
+            margin-top: -3px;
           }
         }
       }
@@ -310,6 +329,16 @@
         &.dai.small {
           margin-top: -5px;
           width: 1.5rem;
+          filter: drop-shadow(0px 0px 5px $highlight);
+        }
+        &.aave.small {
+          margin-top: 2px;
+          width: 1.7rem;
+          filter: drop-shadow(0px 0px 5px $highlight);
+        }
+        &.link.small {
+          margin-top: -3px;
+          width: 1.7rem;
           filter: drop-shadow(0px 0px 5px $highlight);
         }
       }
