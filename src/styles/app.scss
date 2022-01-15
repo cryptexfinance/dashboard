@@ -297,6 +297,9 @@ form {
     .web3modal-provider-wrapper:last-child {
       grid-row: 2;
     }
+    .web3modal-provider-description {
+      display: none;
+    }
   }
 }
 
