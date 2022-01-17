@@ -34,17 +34,17 @@ switch (process.env.REACT_APP_NETWORK_ID) {
 }
 
 const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      infuraId: process.env.REACT_APP_INFURA_ID, // required
-    },
-  },
   walletlink: {
     package: WalletLink, // Required
     options: {
       appName: "Cryptex Finance", // Required
       infuraId: process.env.REACT_APP_INFURA_ID,
+    },
+  },
+  walletconnect: {
+    package: WalletConnectProvider, // required
+    options: {
+      infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
   fortmatic: {
@@ -55,8 +55,8 @@ const providerOptions = {
         chainId: process.env.REACT_APP_NETWORK_ID,
         rpcUrl:
           process.env.REACT_APP_NETWORK_ID === "1"
-            ? NETWORKS.mainnet.infuraRpcUrl
-            : NETWORKS.rinkeby.infuraRpcUrl,
+            ? NETWORKS.mainnet.infuraFortmaticRpcUrl
+            : NETWORKS.rinkeby.infuraFortmaticRpcUrl,
       }, // if we don't pass it, it will default to localhost:8454
     },
   },
