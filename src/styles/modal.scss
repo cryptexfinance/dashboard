@@ -75,9 +75,11 @@
     }
 
     .avatar {
-      height: 92%;
-      width: 80%;
       position: absolute;
+      height: 92%;
+      width: 65%;
+      margin-left: 20px;
+      cursor: pointer;
     }
 
     .image-group {
@@ -91,7 +93,7 @@
       }
       a {
         position: absolute;
-        margin-left: 20px;
+        margin-left: 35px;
       }
     }
 
@@ -120,8 +122,10 @@
     }
     input[type="file"] {
       background-color: $dark;
-      height: 90%;
+      height: 100%;
       width: 90%;
+      margin-left: 20px;
+      cursor: pointer;
     }
     .custom-file-label {
       border-color: $green;

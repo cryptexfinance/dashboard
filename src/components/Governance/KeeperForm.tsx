@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Image } from "react-bootstrap";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import { ethers } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
+import Compressor from "compressorjs";
+import { ReactComponent as PlusIcon } from "../../assets/images/plus.svg";
 import { ProfileImage } from "./common";
 import "../../styles/modal.scss";
 import { API_ENDPOINT } from "../../utils/constants";
@@ -25,6 +29,8 @@ type props = {
   onHide: () => void;
   refresh: () => void;
 };
+
+const MAX_IMAGE_SIZE = 100000;
 
 const KeeperForm = ({
   isNew,
@@ -54,6 +60,7 @@ const KeeperForm = ({
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState("");
+  const [searchIconClass, setSearchIconClass] = useState("add-file-icon");
 
   const cleanErrors = () => {
     setNameError("");
@@ -63,6 +70,7 @@ const KeeperForm = ({
     setTwitterError("");
     setDiscordError("");
     setImageError("");
+    setSearchIconClass("add-file-icon");
   };
 
   useEffect(() => {
@@ -205,25 +213,47 @@ const KeeperForm = ({
     return true;
   };
 
-  const isImageValid = (value: File | null): boolean => {
+  const isImageFile = (value: File | null): boolean => {
     if (value === null) {
       if (isNew) {
-        setImageError("Image cannot be empty");
+        setImageError("Image field cannot be empty.");
+        setSearchIconClass("add-file-icon error");
+        if (image !== null) {
+          setImageUrl("");
+        }
       }
       return !isNew;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
-      setImageError("Invalid file type");
+      setImageError("Invalid file type, valid types are: png, jpg and jpeg.");
+      setSearchIconClass("add-file-icon error");
+      setImageUrl("");
       return false;
     }
-    if (value.size > 100000) {
-      setImageError("Image max size is 100 KB");
+    return true;
+  };
+
+  const isImageSizeValid = (value: File): boolean => {
+    if (value.size > MAX_IMAGE_SIZE) {
+      const sizeKB = Math.round(value.size / 100);
+      setImageError(
+        `Image size should be less than 100 KB. Compressed image size is ${sizeKB} KB.`
+      );
+      setSearchIconClass("add-file-icon error");
       setImageUrl("");
       return false;
     }
     setImageError("");
     return true;
   };
+
+  /* const isImageValid = (): boolean => {
+    if (isImageFile(image)) {
+      // @ts-ignore
+      return isImageSizeValid(image);
+    }
+    return false;
+  }; */
 
   const onChangeDelegatee = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDelegatee(event.target.value);
@@ -255,16 +285,45 @@ const KeeperForm = ({
     isWhyValid(event.target.value);
   };
 
+  const handleImageCompress = (img: File, q: number): void => {
+    /* eslint-disable no-new */
+    new Compressor(img, {
+      quality: q,
+      maxWidth: 512,
+      maxHeight: 512,
+      minWidth: 180,
+      minHeight: 180,
+      width: 200,
+      // @ts-ignore
+      success: (result) => {
+        // Compressed image
+        const compressedImg = new File([result], img.name);
+        if (isImageSizeValid(compressedImg)) {
+          setImage(compressedImg);
+          setImageUrl(URL.createObjectURL(compressedImg));
+          setSearchIconClass("add-file-icon");
+        }
+      },
+    });
+  };
+
   const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       if (typeof event.target.files[0] !== "undefined") {
-        setImage(event.target.files[0]);
-        if (isImageValid(event.target.files[0])) {
-          setImageUrl(URL.createObjectURL(event.target.files[0]));
+        if (isImageFile(event.target.files[0])) {
+          const img = event.target.files[0];
+          if (img.size > MAX_IMAGE_SIZE) {
+            setSearchIconClass("add-file-icon loading");
+            handleImageCompress(img, 0.7);
+          } else {
+            setImageError("");
+            setImage(img);
+            setImageUrl(URL.createObjectURL(img));
+          }
         }
       }
     } else {
-      isImageValid(null);
+      isImageFile(null);
     }
   };
 
@@ -275,7 +334,7 @@ const KeeperForm = ({
     isWhyValid(why) &&
     isTwitterValid(twitter) &&
     isDiscordValid(discord) &&
-    isImageValid(image);
+    imageUrl !== "";
 
   const saveKeeper = async () => {
     const formData = new FormData();
@@ -394,11 +453,33 @@ const KeeperForm = ({
               {imageUrl !== "" ? (
                 <Image src={imageUrl} roundedCircle className="avatar" />
               ) : (
-                <ProfileImage
-                  address={address === "" ? currentAddress : address}
-                  image=""
-                  size={120}
-                />
+                <OverlayTrigger
+                  key="top"
+                  placement="bottom"
+                  show={imageError !== ""}
+                  overlay={
+                    <Tooltip id="ttip-current-reward" className="farm-tooltip error">
+                      {imageError}
+                    </Tooltip>
+                  }
+                >
+                  <>
+                    <ProfileImage
+                      address={address === "" ? currentAddress : address}
+                      image=""
+                      size={120}
+                    />
+                    <a
+                      href="/"
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                      }}
+                      className={searchIconClass}
+                    >
+                      <PlusIcon />
+                    </a>
+                  </>
+                </OverlayTrigger>
               )}
               <Form.File
                 type="file"
@@ -408,7 +489,6 @@ const KeeperForm = ({
                 label="Select your image"
                 custom
               />
-              <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>
             <Col sm={12} md={8} lg={8}>
               <Col sm={12} md={12} lg={12}>
