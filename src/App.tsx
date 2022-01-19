@@ -519,14 +519,16 @@ const App = () => {
     if (savedAlert) setShow(false);
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
-        // const networkProvider =
         if (!isLoading) {
           await web3Modal.connect();
         }
       } else {
         setLoading(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        const provider = getDefaultProvider(parseInt(chainId), NETWORKS.mainnet.name);
+        const provider = getDefaultProvider(
+          parseInt(chainId),
+          chainId === "1" ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
+        );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         setContracts(randomSigner, ethcallProvider, parseInt(chainId));
@@ -623,7 +625,7 @@ const App = () => {
                     <ToastContainer />
                     <Switch>
                       <Route path={`${match.url}/`}>
-                        <Wrapper />
+                        <Wrapper signerAddress={currentSignerAddress} />
                       </Route>
                       <ApolloProvider client={apolloClient}>
                         <Route path={`${match.url}graph`}>
