@@ -244,7 +244,7 @@ const Details = ({ address }: props) => {
       let balance;
       const provider = getDefaultProvider(
         currentNetwork.chainId || NETWORKS.rinkeby.chainId,
-        NETWORKS.rinkeby.name
+        currentNetwork.chainId === 1 ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
       );
       switch (vaultType) {
         case "ETH": {
