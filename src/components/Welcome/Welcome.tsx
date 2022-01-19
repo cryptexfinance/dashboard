@@ -14,15 +14,20 @@ import SignerContext from "../../state/SignerContext";
 import TokensContext from "../../state/TokensContext";
 import OraclesContext from "../../state/OraclesContext";
 import { Web3ModalContext } from "../../state/Web3ModalContext";
-import { makeShortAddress, getPriceInUSDFromPair, getENS } from "../../utils/utils";
+import { makeShortAddress, getPriceInUSDFromPair, getENS, isInLayer1 } from "../../utils/utils";
 import "../../styles/welcome.scss";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { NETWORKS } from "../../utils/constants";
 import Loading from "../Loading";
 
-const Welcome = () => {
+type props = {
+  signerAddress: string;
+};
+
+const Welcome = ({ signerAddress }: props) => {
   const [address, setAddress] = useState("");
+  const [currentAddress, setCurrentAddress] = useState("");
   const [tcapBalance, setTcapBalance] = useState("0.0");
   const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
   const [totalPrice, setTotalPrice] = useState("0.0");
@@ -50,43 +55,44 @@ const Welcome = () => {
   useEffect(() => {
     const loadAddress = async () => {
       if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.tcapTokenRead) {
-        const currentAddress = await signer.signer.getAddress();
-        if (currentAddress !== address) {
-          const ens = await getENS(currentAddress);
+        if (signerAddress !== "" && signerAddress !== currentAddress) {
+          const ens = await getENS(signerAddress);
           if (ens) {
             setAddress(ens);
           } else {
-            setAddress(makeShortAddress(currentAddress));
+            setAddress(makeShortAddress(signerAddress));
           }
-        }
-        const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        // @ts-ignore
-        const [currentTcapBalance, wethOraclePrice] = await signer.ethcallProvider?.all([
-          currentTcapBalanceCall,
-          wethOraclePriceCall,
-        ]);
-        const tcapString = ethers.utils.formatEther(currentTcapBalance);
-        setTcapBalance(tcapString);
-        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
-        if (currentNetwork.chainId === NETWORKS.mainnet.chainId) {
-          const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
-          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(signerAddress);
+          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           // @ts-ignore
-          const [currentCtxBalance, reservesCtxPool] = await signer.ethcallProvider?.all([
-            currentCtxBalanceCall,
-            reservesCtxPoolCall,
+          const [currentTcapBalance, wethOraclePrice] = await signer.ethcallProvider?.all([
+            currentTcapBalanceCall,
+            wethOraclePriceCall,
           ]);
-          const ctxString = ethers.utils.formatEther(currentCtxBalance);
-          setCtxBalance(ctxString);
-          const currentPriceCTX = await getPriceInUSDFromPair(
-            reservesCtxPool[0],
-            reservesCtxPool[1],
-            parseFloat(currentPriceETH)
-          );
-          const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
-          setCtxUSDBalance(ctxUSD.toString());
+          const tcapString = ethers.utils.formatEther(currentTcapBalance);
+          setTcapBalance(tcapString);
+          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+
+          if (isInLayer1(currentNetwork.chainId)) {
+            const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
+            const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+            // @ts-ignore
+            const [currentCtxBalance, reservesCtxPool] = await signer.ethcallProvider?.all([
+              currentCtxBalanceCall,
+              reservesCtxPoolCall,
+            ]);
+            const ctxString = ethers.utils.formatEther(currentCtxBalance);
+            setCtxBalance(ctxString);
+            const currentPriceCTX = await getPriceInUSDFromPair(
+              reservesCtxPool[0],
+              reservesCtxPool[1],
+              parseFloat(currentPriceETH)
+            );
+            const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
+            setCtxUSDBalance(ctxUSD.toString());
+          }
+          setCurrentAddress(signerAddress);
         }
       }
       if (data) {
@@ -106,7 +112,7 @@ const Welcome = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [tcapUSDBalance, data, isLoading, address]);
+  }, [signerAddress, tcapUSDBalance, data]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
