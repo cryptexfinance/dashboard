@@ -1,0 +1,63 @@
+{
+  "connect": "Conectar Billetera",
+  "trade":  "Cambiar",
+  "Mint":  "Mint",
+  "Pool":  "Pool",
+  "Farm":  "Farm",
+  "vault-warning": "⚠️ Make sure to always have a ratio above the minimum ratio to avoid getting liquidated.",
+  "wait": "Please wait...",
+  "welcome": {
+    "tcap": "Capitalización total del mercado de criptomonedas",
+    "tcap-token": "Token de capitalización total del mercado de criptomonedas",
+    "tcap-info": "Total Crypto Market Capitalization is updated on-chain on every 1% movement",
+    "title1": "Mi Balance Total",
+    "subtitle1": "Cuenta conectada",
+    "title2": "Usar TCAP",
+    "subtitle2": "Trade TCAP using SushiSwap or create new supply using a vault",
+    "title3": "Conecta tu cuenta",
+    "subtitle3": "Mint TCAP, or check your balance connecting your account",
+    "tcap-balance": "Balance de TCAP",
+    "ctx-balance": "Balance de CTX"
+  },
+  "vault": {
+    "warning": "",
+    "loading": "Cargando Baúl",
+    "title1": "El Baúl",
+    "subtitle1": "Seleccione su colateral",
+    "no-connected": "No wallet connected. Please Connect your wallet to Create a Vault and approve your collateral to start minting TCAP tokens.",
+    "approve": "Aprobar Baúl",
+    "approve-text": "Vault not approved. Please approve your collateral to start minting TCAP tokens.",
+    "create": "Crear Baúl",
+    "create-text": "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens.",
+    "balance-title": "{{vault}} Balance",
+    "ratio-title": "Vault Ratio",
+    "ratio-warning": "Ratio must be > {{minRatio}}% or you will be liquidated.",
+    "collateral": {
+      "title": "Staked Collateral",
+      "add": "Add Collateral",
+      "remove": "Remove Collateral"
+    },
+    "debt": {
+      "title": "Vault Debt",
+      "mint": "Mint TCAP",
+      "burn": "Burn TCAP",
+      "fee": "Burn Fee"
+    },
+    "status": {
+      "na": "N/A",  
+      "safe": "safe",
+      "warning": "warning",
+      "danger": "danger",
+      "error": "error" 
+    },
+    "errors": {
+      "no-funds": "Insufficient funds to stake",
+      "no-collateral": "Not enough collateral on vault",
+      "burn-too-high": "Burn value too high"
+    }
+  },
+  "errors": {
+    "tran-rejected": "Transaction rejected",
+    "empty": "Campo no puede estar vacío"
+  }
+}
