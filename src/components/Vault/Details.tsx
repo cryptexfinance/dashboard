@@ -44,11 +44,12 @@ import { FEATURES, NETWORKS } from "../../utils/constants";
 
 type props = {
   address: string;
+  t: any;
 };
 
 // TODO: Vault doesn't show if approve is 0 even if there is data in the vault
 
-const Details = ({ address }: props) => {
+const Details = ({ address, t }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
@@ -107,10 +108,8 @@ const Details = ({ address }: props) => {
   }
 
   // Actions
-  const [title, setTitle] = useState("Create Vault");
-  const [text, setText] = useState(
-    "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
-  );
+  const [title, setTitle] = useState(t("vault.create"));
+  const [text, setText] = useState(t("vault.create-text"));
   const [isApproved, setIsApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -405,10 +404,8 @@ const Details = ({ address }: props) => {
           const usdTCAP = toUSD(currentTCAPPriceFormat, parsedDebt);
           setVaultDebtUSD(usdTCAP.toString());
         } else {
-          setText(
-            "Vault not approved. Please approve your collateral to start minting TCAP tokens."
-          );
-          setTitle("Approve Vault");
+          setText(t("vault.approve-text"));
+          setTitle(t("vault.approve"));
           setIsApproved(false);
         }
       } else {
@@ -425,10 +422,8 @@ const Details = ({ address }: props) => {
         currentPrice = ethers.utils.formatEther(currentPriceVal.mul(10000000000));
 
         setSelectedVaultId("0");
-        setText(
-          "No vault Created. Please Create a Vault and approve your collateral to start minting TCAP tokens."
-        );
-        setTitle("Create Vault");
+        setText(t("vault.create-text"));
+        setTitle(t("vault.create"));
         setIsApproved(false);
       }
 
@@ -500,16 +495,16 @@ const Details = ({ address }: props) => {
     }
 
     if (r === 0) {
-      setVaultStatus("N/A");
+      setVaultStatus(t("vault.status.na"));
     } else if (r >= parseFloat(minRatio) + 50) {
-      setVaultStatus("safe");
+      setVaultStatus(t("vault.status.safe"));
     } else if (r >= parseFloat(minRatio) + 30) {
-      setVaultStatus("warning");
+      setVaultStatus(t("vault.status.warning"));
     } else if (r >= parseFloat(minRatio)) {
-      setVaultStatus("danger");
+      setVaultStatus(t("vault.status.danger"));
     } else {
       setVaultRatio("0");
-      setVaultStatus("error");
+      setVaultStatus(t("vault.status.error"));
     }
   };
 
@@ -635,15 +630,15 @@ const Details = ({ address }: props) => {
       } catch (error) {
         console.error(error);
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Insufficient funds to stake");
+          errorNotification(t("vault.errors.no-funds"));
         }
       }
       setAddCollateralTxt("");
       setAddCollateralUSD("0");
     } else {
-      errorNotification("Field can't be empty");
+      errorNotification(t("errors.empty"));
     }
   };
 
@@ -691,15 +686,15 @@ const Details = ({ address }: props) => {
       } catch (error) {
         console.error(error);
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Not enough collateral on vault");
+          errorNotification(t("vault.errors.tran-rejected"));
         }
       }
       setRemoveCollateralTxt("");
       setRemoveCollateralUSD("0");
     } else {
-      errorNotification("Field can't be empty");
+      errorNotification(t("errors.empty"));
     }
   };
 
@@ -734,15 +729,15 @@ const Details = ({ address }: props) => {
       } catch (error) {
         console.error(error);
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Not enough collateral on vault");
+          errorNotification(t("vault.errors.no-collateral"));
         }
       }
       setMintTxt("");
       setMintUSD("0");
     } else {
-      errorNotification("Field can't be empty");
+      errorNotification(t("errors.empty"));
     }
   };
 
@@ -781,16 +776,16 @@ const Details = ({ address }: props) => {
       } catch (error) {
         console.error(error);
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Burn value too high");
+          errorNotification(t("vault.errors.burn-too-high"));
         }
       }
       setBurnTxt("");
       setBurnUSD("0");
       setBurnFee("0");
     } else {
-      errorNotification("Field can't be empty");
+      errorNotification(t("errors.empty"));
     }
   };
 
@@ -881,14 +876,14 @@ const Details = ({ address }: props) => {
   if (isLoading) {
     return (
       <div className="loading-container">
-        <Loading title="Loading Vault" message="Please wait..." />
+        <Loading title={t("loading")} message={t("wait")} />
       </div>
     );
   }
 
   return (
     <>
-      <p>Select your Collateral</p>
+      <p>{t("vault.subtitle1")}</p>
       <div className="icon-container">
         {(() => {
           switch (selectedVault) {
@@ -958,7 +953,7 @@ const Details = ({ address }: props) => {
                   }
                 })()}
                 <div className="info">
-                  <h4>{selectedVault} Balance</h4>
+                  <h4>{t("vault.balance-title", { vault: selectedVault })}</h4>
                   <div>
                     <div className="amount">
                       {(() => {
@@ -1001,14 +996,12 @@ const Details = ({ address }: props) => {
               <Card>
                 <RatioIcon className="ratio" />
                 <div className="info">
-                  <h4>Vault Ratio</h4>{" "}
+                  <h4>{t("vault.ratio-title")}</h4>{" "}
                   <OverlayTrigger
                     key="top"
                     placement="top"
                     overlay={
-                      <Tooltip id="tooltip-top">
-                        Ratio must be {`>`} {minRatio}% or you will be liquidated
-                      </Tooltip>
+                      <Tooltip id="tooltip-top">{t("vault.ratio-warning", { minRatio })}</Tooltip>
                     }
                   >
                     <Button variant="dark">?</Button>
@@ -1034,7 +1027,7 @@ const Details = ({ address }: props) => {
             <div className="form-card">
               <Card>
                 <div className="info">
-                  <h4>Staked Collateral</h4>
+                  <h4>{t("vault.collateral.title")}</h4>
                   <div>
                     <div className="amount">
                       {(() => {
@@ -1075,7 +1068,7 @@ const Details = ({ address }: props) => {
                 </div>
                 <Form>
                   <Form.Group>
-                    <Form.Label>Add Collateral</Form.Label>
+                    <Form.Label>{t("vault.collateral.add")}</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={maxAddCollateral}>
                         MAX
@@ -1107,7 +1100,7 @@ const Details = ({ address }: props) => {
                     </Form.Text>
                   </Form.Group>
                   <Form.Group className="remove">
-                    <Form.Label>Remove Collateral</Form.Label>
+                    <Form.Label>{t("vault.collateral.remove")}</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number orange" onClick={safeRemoveCollateral}>
                         MAX SAFE
@@ -1144,7 +1137,7 @@ const Details = ({ address }: props) => {
             <div className="form-card">
               <Card>
                 <div className="info">
-                  <h4>Vault Debt</h4>
+                  <h4>{t("vault.debt.title")}</h4>
                   <div>
                     <div className="amount">
                       <TcapIcon className="tcap-neon" />
@@ -1172,7 +1165,7 @@ const Details = ({ address }: props) => {
                 </div>
                 <Form>
                   <Form.Group>
-                    <Form.Label>Mint TCAP</Form.Label>
+                    <Form.Label>{t("vault.debt.mint")}</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number" onClick={safeMintTCAP}>
                         MAX SAFE
@@ -1204,7 +1197,7 @@ const Details = ({ address }: props) => {
                     </Form.Text>
                   </Form.Group>
                   <Form.Group className="remove">
-                    <Form.Label>Burn TCAP</Form.Label>
+                    <Form.Label>{t("vault.debt.burn")}</Form.Label>
                     <Form.Label className="max">
                       <a href="/" className="number orange" onClick={maxBurnTCAP}>
                         MAX
@@ -1235,7 +1228,7 @@ const Details = ({ address }: props) => {
                       />
                     </Form.Text>
                     <Form.Text className="text-muted burn-fee">
-                      Burn Fee:{" "}
+                      {t("vault.debt.fee")}:{" "}
                       <NumberFormat
                         className="number neon-pink"
                         value={burnFee}

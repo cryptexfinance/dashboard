@@ -1,10 +1,11 @@
 /* eslint-disable prefer-destructuring */
-import React, { useState, useContext, useEffect } from "react";
+import React, { Suspense, useState, useContext, useEffect } from "react";
 import { Switch, Route, useRouteMatch, useLocation } from "react-router-dom";
 import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import "./i18n";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import { useSwipeable } from "react-swipeable";
@@ -594,58 +595,62 @@ const App = () => {
                     setShowSidebar={setShowSidebar}
                     isMobile={isMobile}
                   />
-                  <Container fluid className="wrapper" {...handlers}>
-                    {show && (
-                      <Alert
-                        onClose={() => {
-                          setShow(false);
-                          localStorage.setItem("alert", "false");
-                        }}
-                        dismissible
-                      >
-                        <b>💀 This project is in beta. Use at your own risk.</b>
-                      </Alert>
-                    )}
-                    {vaultWarning && location.pathname === "/vault" && (
-                      <Alert
-                        onClose={() => {
-                          setVaultWarning(false);
-                          localStorage.setItem("alert", "false");
-                        }}
-                        dismissible
-                      >
-                        <b>
-                          ⚠️ Make sure to always have a ratio above the minimum ratio to avoid
-                          getting liquidated.
-                        </b>
-                      </Alert>
-                    )}
+                  <Suspense
+                    fallback={<Loading title="Loading" message="Please wait" position="total" />}
+                  >
+                    <Container fluid className="wrapper" {...handlers}>
+                      {show && (
+                        <Alert
+                          onClose={() => {
+                            setShow(false);
+                            localStorage.setItem("alert", "false");
+                          }}
+                          dismissible
+                        >
+                          <b>💀 This project is in beta. Use at your own risk.</b>
+                        </Alert>
+                      )}
+                      {vaultWarning && location.pathname === "/vault" && (
+                        <Alert
+                          onClose={() => {
+                            setVaultWarning(false);
+                            localStorage.setItem("alert", "false");
+                          }}
+                          dismissible
+                        >
+                          <b>
+                            ⚠️ Make sure to always have a ratio above the minimum ratio to avoid
+                            getting liquidated.
+                          </b>
+                        </Alert>
+                      )}
 
-                    <Header signerAddress={currentSignerAddress} />
-                    <ToastContainer />
-                    <Switch>
-                      <Route path={`${match.url}/`}>
-                        <Wrapper signerAddress={currentSignerAddress} />
-                      </Route>
-                      <ApolloProvider client={apolloClient}>
-                        <Route path={`${match.url}graph`}>
-                          <Graph />
+                      <Header signerAddress={currentSignerAddress} />
+                      <ToastContainer />
+                      <Switch>
+                        <Route path={`${match.url}/`}>
+                          <Wrapper signerAddress={currentSignerAddress} />
                         </Route>
-                        <Route path={`${match.url}vault`}>
-                          <Vault />
-                        </Route>
-                        <Route path={`${match.url}farm`}>
-                          <Farm />
-                        </Route>
-                        <Route path={`${match.url}governance`}>
-                          <Delegators currentSignerAddress={currentSignerAddress} />
-                        </Route>
-                        <Route path={`${match.url}pools`}>
-                          <Pool />
-                        </Route>
-                      </ApolloProvider>
-                    </Switch>
-                  </Container>
+                        <ApolloProvider client={apolloClient}>
+                          <Route path={`${match.url}graph`}>
+                            <Graph />
+                          </Route>
+                          <Route path={`${match.url}vault`}>
+                            <Vault />
+                          </Route>
+                          <Route path={`${match.url}farm`}>
+                            <Farm />
+                          </Route>
+                          <Route path={`${match.url}governance`}>
+                            <Delegators currentSignerAddress={currentSignerAddress} />
+                          </Route>
+                          <Route path={`${match.url}pools`}>
+                            <Pool />
+                          </Route>
+                        </ApolloProvider>
+                      </Switch>
+                    </Container>
+                  </Suspense>
                 </rewardsContext.Provider>
               </governanceContext.Provider>
             </vaultsContext.Provider>
