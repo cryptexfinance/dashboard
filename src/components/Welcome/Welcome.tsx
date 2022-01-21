@@ -54,6 +54,7 @@ const Welcome = ({ signerAddress }: props) => {
 
   useEffect(() => {
     const loadAddress = async () => {
+      let tcapString = "0";
       if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.tcapTokenRead) {
         if (signerAddress !== "" && signerAddress !== currentAddress) {
           const ens = await getENS(signerAddress);
@@ -70,7 +71,7 @@ const Welcome = ({ signerAddress }: props) => {
             currentTcapBalanceCall,
             wethOraclePriceCall,
           ]);
-          const tcapString = ethers.utils.formatEther(currentTcapBalance);
+          tcapString = ethers.utils.formatEther(currentTcapBalance);
           setTcapBalance(tcapString);
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
@@ -95,6 +96,14 @@ const Welcome = ({ signerAddress }: props) => {
           setCurrentAddress(signerAddress);
         }
       }
+    };
+    loadAddress();
+
+    // eslint-disable-next-line
+  }, [signerAddress]);
+
+  useEffect(() => {
+    const loadData = async () => {
       if (data) {
         let currentTotalPrice = BigNumber.from(0);
         const prices = await data?.oracles;
@@ -102,17 +111,16 @@ const Welcome = ({ signerAddress }: props) => {
           currentTotalPrice = BigNumber.from(prices[0].answer);
         }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
+        const cTcapPrice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
-        const tcapUSD = parseFloat(tcapBalance) * parseFloat(tcapPrice);
+        setTcapPrice(cTcapPrice);
+        const tcapUSD = parseFloat(tcapBalance) * parseFloat(cTcapPrice);
         setTcapUSDBalance(tcapUSD.toString());
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
-
-    loadAddress();
-    // eslint-disable-next-line
-  }, [signerAddress, tcapUSDBalance, data]);
+    loadData();
+  }, [data, tcapBalance]);
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
