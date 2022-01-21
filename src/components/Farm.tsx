@@ -8,13 +8,13 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
+import { useTranslation } from "react-i18next";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
 import VaultsContext from "../state/VaultsContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
 import RewardsContext from "../state/RewardsContext";
-
 import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -32,6 +32,7 @@ import { Stake } from "./modals/Stake";
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
 const Farm = () => {
+  const { t } = useTranslation();
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [ethRewards, setEthRewards] = useState("0");
@@ -376,7 +377,7 @@ const Farm = () => {
   }, [data, updateData]);
 
   if (isLoading) {
-    return <Loading title="Loading" message="Please wait" />;
+    return <Loading title={t("loading")} message={t("wait")} />;
   }
 
   const showCtxClaimVest = (): boolean => {
@@ -416,9 +417,9 @@ const Farm = () => {
       notifyUser(tx, refresh);
     } catch (error) {
       if (error.code === 4001) {
-        errorNotification("Transaction rejected");
+        errorNotification(t("errors.tran-rejected"));
       } else {
-        errorNotification("Insufficient funds to stake");
+        errorNotification(t("errors.no-funds"));
       }
     }
   };
@@ -495,20 +496,20 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>Farming</h3>{" "}
+        <h3>{t("farming.farming")}</h3>{" "}
         <Row className="card-wrapper">
           <Row>
             <Card className="diamond mb-2">
-              <h2>Minting Rewards </h2>
+              <h2>{t("farming.minting")}</h2>
               <Table hover className="mt-2">
                 <thead>
                   <tr>
                     <th />
-                    <th>Description</th>
-                    <th>Current Mint</th>
+                    <th>{t("description")}</th>
+                    <th>{t("farming.current-mint")}</th>
                     <th>
                       <div className="rewards">
-                        <div className="title-current">Current Reward</div>
+                        <div className="title-current">{t("farming.current-reward")}</div>
                         <div className="button-current">
                           <OverlayTrigger
                             key="top"
@@ -516,11 +517,7 @@ const Farm = () => {
                             trigger={["hover", "click"]}
                             overlay={
                               <Tooltip id="ttip-current-reward" className="farm-tooltip">
-                                Early adopters rewards are issued over 14 days for a total of
-                                500,000 CTX. Assuming approximately 6500 Ethereum blocks per day
-                                over 14 days (91,000 Ethereum blocks), the per block reward would be
-                                5.4945 CTX split across the debtors at that point in time. 100% of
-                                the reward is immediately available.
+                                {t("farming.current-info")}
                               </Tooltip>
                             }
                           >
@@ -564,23 +561,23 @@ const Farm = () => {
                       CTX
                     </td>
                     <td>
-                      <b className="fire">Inactive</b>
+                      <b className="fire">{t("inactive")}</b>
                     </td>
                     <td align="right">
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="" disabled>
-                            Mint
+                            {t("mint")}
                           </Button>
 
                           <Button variant="dark" className="ml-4" disabled>
-                            Claim
+                            {t("claim")}
                           </Button>
                         </>
                       ) : (
                         <>
                           <Button variant="primary" className="" href="vault/ETH">
-                            Mint
+                            {t("mint")}
                           </Button>
 
                           <Button
@@ -590,7 +587,7 @@ const Farm = () => {
                               claimRewards("ETH");
                             }}
                           >
-                            Claim
+                            {t("claim")}
                           </Button>
                         </>
                       )}
@@ -626,23 +623,23 @@ const Farm = () => {
                       CTX
                     </td>
                     <td>
-                      <b className="fire">Inactive</b>
+                      <b className="fire">{t("inactive")}</b>
                     </td>
                     <td align="right">
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="" disabled>
-                            Mint
+                            {t("mint")}
                           </Button>
 
                           <Button variant="dark" className="ml-4" disabled>
-                            Claim
+                            {t("claim")}
                           </Button>
                         </>
                       ) : (
                         <>
                           <Button variant="primary" className="" href="vault/DAI">
-                            Mint
+                            {t("mint")}
                           </Button>
 
                           <Button
@@ -652,7 +649,7 @@ const Farm = () => {
                               claimRewards("DAI");
                             }}
                           >
-                            Claim
+                            {t("claim")}
                           </Button>
                         </>
                       )}
@@ -664,17 +661,17 @@ const Farm = () => {
 
             {phase > 1 && (
               <Card className="diamond mt-4">
-                <h2>Liquidity Rewards </h2>
+                <h2>{t("farming.liquidity")}</h2>
                 <Table hover className="mt-2">
                   <thead>
                     <tr>
                       <th />
-                      <th>Description</th>
-                      <th>Balance</th>
-                      <th>Stake</th>
+                      <th>{t("description")}</th>
+                      <th>{t("balance")}</th>
+                      <th>{t("stake")}</th>
                       <th>
                         <div className="rewards">
-                          <div className="title">Unlocked Reward</div>
+                          <div className="title">{t("farming.unlocked")}</div>
                           <div className="button">
                             <OverlayTrigger
                               key="top"
@@ -682,7 +679,7 @@ const Farm = () => {
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                  Available to claim immediately.
+                                  {t("farming.unlocked-info")}
                                 </Tooltip>
                               }
                             >
@@ -693,7 +690,7 @@ const Farm = () => {
                       </th>
                       <th>
                         <div className="rewards">
-                          <div className="title">Locked Reward</div>
+                          <div className="title">{t("farming.locked")}</div>
                           <div className="button">
                             <OverlayTrigger
                               key="top"
@@ -701,7 +698,7 @@ const Farm = () => {
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="tooltip-top" className="farm-tooltip">
-                                  Rewards are unlocked 6 months after the start of the pool.
+                                  {t("farming.locked-info")}
                                 </Tooltip>
                               }
                             >

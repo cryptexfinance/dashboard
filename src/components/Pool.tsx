@@ -4,6 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import Row from "react-bootstrap/esm/Row";
 import Table from "react-bootstrap/esm/Table";
 import { ethers } from "ethers";
+import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import TokensContext from "../state/TokensContext";
@@ -20,6 +21,7 @@ import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 import Loading from "./Loading";
 
 const Farm = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [ethLiquidity, setEthLiquidity] = useState("0");
   const [ethLiquidityUNI, setEthLiquidityUNI] = useState("0");
@@ -140,23 +142,23 @@ const Farm = () => {
   }, [tokens]);
 
   if (isLoading) {
-    return <Loading title="Loading" message="Please wait" />;
+    return <Loading title={t("loading")} message={t("wait")} />;
   }
 
   return (
     <div className="farm">
       <div>
-        <h3>Pools </h3>{" "}
+        <h3>{t("pools.pools")} </h3>{" "}
         <Row className="card-wrapper">
           <>
             <Card className="diamond pool mt-4">
-              <h2>Enabled Pools </h2>
+              <h2>{t("pools.enabled")}</h2>
               <Table hover className="mt-2">
                 <thead>
                   <tr>
                     <th />
-                    <th>Available Pools</th>
-                    <th>Liquidity</th>
+                    <th>{t("pools.available")}</th>
+                    <th>{t("pools.liquidity")}</th>
                     <th />
                   </tr>
                 </thead>
@@ -197,7 +199,7 @@ const Farm = () => {
                         target="_blank"
                         href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                       >
-                        Pool
+                        {t("pool")}
                       </Button>
                     </td>
                   </tr>
@@ -237,7 +239,7 @@ const Farm = () => {
                         target="_blank"
                         href={`${lpURL}/#/add/ETH/${tokens.ctxToken?.address}`}
                       >
-                        Pool
+                        {t("pool")}
                       </Button>
                     </td>
                   </tr>
@@ -275,7 +277,7 @@ const Farm = () => {
                         target="_blank"
                         href={`${lpUniURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                       >
-                        Pool
+                        {t("pool")}
                       </Button>
                     </td>
                   </tr>

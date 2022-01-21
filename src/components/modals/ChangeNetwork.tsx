@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
+import { useTranslation } from "react-i18next";
 import { FEATURES, NETWORKS } from "../../utils/constants";
 import { useNetworks } from "../../hooks/useNetworks";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
@@ -14,6 +15,7 @@ type props = {
 };
 
 export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
+  const { t } = useTranslation();
   const networks = useNetworks();
 
   return (
@@ -27,7 +29,7 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Choose Network</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{t("choose-network")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="change-network">

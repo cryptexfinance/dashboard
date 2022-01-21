@@ -632,7 +632,7 @@ const Details = ({ address, t }: props) => {
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification(t("vault.errors.no-funds"));
+          errorNotification(t("errors.no-funds"));
         }
       }
       setAddCollateralTxt("");
