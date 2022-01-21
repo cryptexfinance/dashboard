@@ -655,7 +655,6 @@ const Details = ({ address }: props) => {
       balance = ethers.utils.formatEther(await provider.getBalance(address));
     } else if (selectedCollateralContract) {
       const value = BigNumber.from(await selectedCollateralContract.balanceOf(address));
-      console.log(value);
       balance = ethers.utils.formatUnits(value, selectedVaultDecimals);
     }
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));

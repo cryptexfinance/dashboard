@@ -89,7 +89,8 @@ const ProfileCard = ({
     }
 
     await getProvider();
-  }, [signer, delegator, governance, mediaQuery, addWithdrawTime]);
+    // eslint-disable-next-line
+  }, [signer, delegator, governance, mediaQuery]);
 
   const onRemoveClick = async () => {
     if (tokenOwnerStake) {
