@@ -837,12 +837,27 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
-      const tx = await selectedVaultContract?.createVault();
-      notifyUser(tx, refresh);
+      try {
+        const tx = await selectedVaultContract?.createVault();
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
     } else {
-      const amount = approveValue;
-      const tx = await selectedCollateralContract?.approve(selectedVaultContract?.address, amount);
-      notifyUser(tx, refresh);
+      try {
+        const amount = approveValue;
+        const tx = await selectedCollateralContract?.approve(
+          selectedVaultContract?.address,
+          amount
+        );
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001) {
+          errorNotification("Transaction rejected");
+        }
+      }
     }
   };
 

@@ -95,7 +95,7 @@ const App = () => {
         break;
       default:
         cNetwork = NETWORKS.rinkeby;
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
     networks.setCurrentChainId(networkId);
@@ -508,6 +508,7 @@ const App = () => {
     // @ts-ignore
     /* networkProvider.on("chainChanged", (chainId: number) => {
       // web3Modal.clearCachedProvider();
+      console.log("---- chainId -------");
       setCurrentNetwork(chainId, "");
       window.location.reload();
     }); */
@@ -539,7 +540,7 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal]);
+  }, [web3Modal, web3Modal.cachedProvider]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setShowSidebar(true),

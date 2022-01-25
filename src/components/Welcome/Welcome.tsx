@@ -96,13 +96,26 @@ const Welcome = ({ signerAddress }: props) => {
           setCurrentAddress(signerAddress);
         }
       }
+      if (data) {
+        let currentTotalPrice = BigNumber.from(0);
+        const prices = await data?.oracles;
+        if (prices.length > 0) {
+          currentTotalPrice = BigNumber.from(prices[0].answer);
+        }
+        const TotalTcapPrice = currentTotalPrice.mul(10000000000);
+        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
+        setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
+        const tcapUSD = parseFloat(tcapString) * parseFloat(tcapPrice);
+        setTcapUSDBalance(tcapUSD.toString());
+        setIsLoading(false);
+      }
     };
     loadAddress();
 
     // eslint-disable-next-line
-  }, [signerAddress]);
+  }, [signerAddress, data]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     const loadData = async () => {
       if (data) {
         let currentTotalPrice = BigNumber.from(0);
@@ -120,7 +133,7 @@ const Welcome = ({ signerAddress }: props) => {
       setIsLoading(false);
     };
     loadData();
-  }, [data, tcapBalance]);
+  }, [data, tcapBalance]); */
 
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
