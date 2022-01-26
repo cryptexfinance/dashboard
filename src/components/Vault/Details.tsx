@@ -634,7 +634,7 @@ const Details = ({ address }: props) => {
         }
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Insufficient funds to stake");
@@ -732,7 +732,7 @@ const Details = ({ address }: props) => {
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Not enough collateral on vault");
@@ -779,7 +779,7 @@ const Details = ({ address }: props) => {
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Burn value too high");
@@ -841,7 +841,7 @@ const Details = ({ address }: props) => {
         const tx = await selectedVaultContract?.createVault();
         notifyUser(tx, refresh);
       } catch (error) {
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         }
       }
@@ -854,7 +854,7 @@ const Details = ({ address }: props) => {
         );
         notifyUser(tx, refresh);
       } catch (error) {
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         }
       }

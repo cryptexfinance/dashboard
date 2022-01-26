@@ -415,7 +415,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Insufficient funds to stake");
@@ -454,7 +454,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Error claiming vest");
@@ -484,7 +484,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Insufficient funds to exit");

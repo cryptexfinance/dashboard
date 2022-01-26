@@ -507,11 +507,20 @@ const App = () => {
     setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
     /* networkProvider.on("chainChanged", (chainId: number) => {
-      // web3Modal.clearCachedProvider();
-      console.log("---- chainId -------");
       setCurrentNetwork(chainId, "");
       window.location.reload();
     }); */
+
+    if (!networkProvider.isFortmatic) {
+      // @ts-ignore
+      networkProvider.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          web3Modal.clearCachedProvider();
+        }
+        window.location.reload();
+      });
+    }
+
     setLoading(false);
   });
 
@@ -540,7 +549,7 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal, web3Modal.cachedProvider]);
+  }, [web3Modal]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setShowSidebar(true),

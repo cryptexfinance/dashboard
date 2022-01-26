@@ -265,7 +265,7 @@ export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
     return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
   }
-  return false;
+  return true;
 };
 
 export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {

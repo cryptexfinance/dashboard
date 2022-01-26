@@ -33,7 +33,7 @@ export const Delegate = ({ show, onHide, refresh }: props) => {
           setAddressText("");
           onHide();
         } catch (error) {
-          if (error.code === 4001) {
+          if (error.code === 4001 || error.code === -32603) {
             errorNotification("Transaction rejected");
           } else {
             errorNotification("Invalid address");
