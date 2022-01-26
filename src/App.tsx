@@ -94,7 +94,7 @@ const App = () => {
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
         break;
       default:
-        cNetwork = NETWORKS.rinkeby;
+        cNetwork = NETWORKS.mainnet;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
