@@ -37,7 +37,7 @@ const Wrapper = ({ signerAddress }: props) => {
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
         break;
       default:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
   }, [currentNetwork.chainId]);

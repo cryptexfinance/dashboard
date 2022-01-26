@@ -94,8 +94,8 @@ const App = () => {
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
         break;
       default:
-        cNetwork = NETWORKS.rinkeby;
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        cNetwork = NETWORKS.mainnet;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
     networks.setCurrentChainId(networkId);
@@ -507,10 +507,20 @@ const App = () => {
     setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
     /* networkProvider.on("chainChanged", (chainId: number) => {
-      // web3Modal.clearCachedProvider();
       setCurrentNetwork(chainId, "");
       window.location.reload();
     }); */
+
+    if (!networkProvider.isFortmatic) {
+      // @ts-ignore
+      networkProvider.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          web3Modal.clearCachedProvider();
+        }
+        window.location.reload();
+      });
+    }
+
     setLoading(false);
   });
 

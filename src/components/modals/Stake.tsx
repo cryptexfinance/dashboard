@@ -56,7 +56,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           setStakeText("");
           onHide();
         } catch (error) {
-          if (error.code === 4001) {
+          if (error.code === 4001 || error.code === -32603) {
             errorNotification("Transaction rejected");
           } else {
             errorNotification("Token not Approved");
@@ -77,7 +77,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         setStakeText("");
         setIsApproved(true);
       } catch (error) {
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           console.log(error);

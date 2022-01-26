@@ -634,7 +634,7 @@ const Details = ({ address }: props) => {
         }
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Insufficient funds to stake");
@@ -732,7 +732,7 @@ const Details = ({ address }: props) => {
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Not enough collateral on vault");
@@ -779,7 +779,7 @@ const Details = ({ address }: props) => {
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           errorNotification("Burn value too high");
@@ -837,12 +837,27 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
-      const tx = await selectedVaultContract?.createVault();
-      notifyUser(tx, refresh);
+      try {
+        const tx = await selectedVaultContract?.createVault();
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001 || error.code === -32603) {
+          errorNotification("Transaction rejected");
+        }
+      }
     } else {
-      const amount = approveValue;
-      const tx = await selectedCollateralContract?.approve(selectedVaultContract?.address, amount);
-      notifyUser(tx, refresh);
+      try {
+        const amount = approveValue;
+        const tx = await selectedCollateralContract?.approve(
+          selectedVaultContract?.address,
+          amount
+        );
+        notifyUser(tx, refresh);
+      } catch (error) {
+        if (error.code === 4001 || error.code === -32603) {
+          errorNotification("Transaction rejected");
+        }
+      }
     }
   };
 
