@@ -278,7 +278,6 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
         ? process.env.REACT_APP_ALCHEMY_KEY
         : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
     provider = ethers.getDefaultProvider(name, {
-      infura: process.env.REACT_APP_INFURA_ID,
       alchemy: alchemyKey,
     });
   }

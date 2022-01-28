@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
@@ -22,8 +24,12 @@ import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 type props = {
   signerAddress: string;
 };
+type propsDD = {
+  className: string;
+};
 
 const Header = ({ signerAddress }: props) => {
+  const { t, i18n } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -32,6 +38,7 @@ const Header = ({ signerAddress }: props) => {
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  const [language, setLanguage] = useState("EN");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -122,11 +129,40 @@ const Header = ({ signerAddress }: props) => {
         const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
       }
+      const lng = localStorage.getItem("language");
+      if (lng) {
+        i18n.changeLanguage(lng);
+        setLanguage(lng.toUpperCase());
+      }
     };
 
     loadAddress();
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLanguage(lng.toUpperCase());
+    localStorage.setItem("language", lng);
+  };
+
+  const handleOnSelect = (eventKey: any, event: Object) => {
+    console.log(event);
+    changeLanguage(eventKey);
+  };
+
+  const LangDropDown = ({ className }: propsDD) => (
+    <Dropdown onSelect={handleOnSelect} className={className}>
+      <Dropdown.Toggle variant="success" id="dropdown-basic">
+        {language}
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.Item eventKey="en">English</Dropdown.Item>
+        <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
 
   return (
     <Nav className="header">
@@ -193,6 +229,7 @@ const Header = ({ signerAddress }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
+            <LangDropDown className="btn-language small" />
           </div>
           <ChangeNetwork
             show={showChangeNetwork}
@@ -201,15 +238,18 @@ const Header = ({ signerAddress }: props) => {
           />
         </>
       ) : (
-        <Button
-          variant="pink"
-          className="neon-pink"
-          onClick={() => {
-            web3Modal.toggleModal();
-          }}
-        >
-          Connect Wallet
-        </Button>
+        <>
+          <Button
+            variant="pink"
+            className="neon-pink"
+            onClick={() => {
+              web3Modal.toggleModal();
+            }}
+          >
+            {t("connect")}
+          </Button>
+          <LangDropDown className="btn-language" />
+        </>
       )}
     </Nav>
   );

@@ -5,6 +5,7 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
@@ -26,6 +27,7 @@ type props = {
 };
 
 const Welcome = ({ signerAddress }: props) => {
+  const { t } = useTranslation();
   const [address, setAddress] = useState("");
   const [currentAddress, setCurrentAddress] = useState("");
   const [tcapBalance, setTcapBalance] = useState("0.0");
@@ -136,7 +138,7 @@ const Welcome = ({ signerAddress }: props) => {
   }, [data, tcapBalance]); */
 
   if (isLoading) {
-    return <Loading title="Loading" message="Please wait" />;
+    return <Loading title={t("loading")} message={t("wait")} />;
   }
 
   return (
@@ -155,15 +157,11 @@ const Welcome = ({ signerAddress }: props) => {
               />
             </h2>
             <p>
-              Total Cryptocurrency Market Capitalization
+              {t("welcome.tcap")}
               <OverlayTrigger
                 key="bottom"
                 placement="bottom"
-                overlay={
-                  <Tooltip id="tooltip-bottom">
-                    Total Crypto Market Capitalization is updated on-chain on every 1% movement
-                  </Tooltip>
-                }
+                overlay={<Tooltip id="tooltip-bottom">{t("welcome.tcap-info")}</Tooltip>}
               >
                 <Button variant="dark" className="question">
                   ?
@@ -182,7 +180,7 @@ const Welcome = ({ signerAddress }: props) => {
                 decimalScale={2}
               />
             </h2>
-            <p>Total Cryptocurrency Market Capitalization Token</p>
+            <p>{t("welcome.tcap-token")}</p>
           </Col>
         </Row>
         <Row className="card-wrapper">
@@ -190,9 +188,9 @@ const Welcome = ({ signerAddress }: props) => {
             {address !== "" ? (
               <Card className="balance">
                 <div className="">
-                  <h2>My Total Balance</h2>
+                  <h2>{t("welcome.title1")}</h2>
                   <p>
-                    Connected Account <b className="">{address}</b>
+                    {t("welcome.subtitle1")} <b className="">{address}</b>
                   </p>
                 </div>
                 <Row className="">
@@ -221,7 +219,7 @@ const Welcome = ({ signerAddress }: props) => {
                         </p>
                       </div>
                     </div>
-                    <p className="title tcap">TCAP Balance</p>
+                    <p className="title tcap">{t("welcome.tcap-balance")}</p>
                   </Col>
                   {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
                     currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
@@ -250,7 +248,7 @@ const Welcome = ({ signerAddress }: props) => {
                           </p>
                         </div>
                       </div>
-                      <p className="title tcap">CTX Balance</p>
+                      <p className="title tcap">{t("welcome.ctx-balance")}</p>
                     </Col>
                   )}
                 </Row>
@@ -258,8 +256,8 @@ const Welcome = ({ signerAddress }: props) => {
             ) : (
               <Card className="balance">
                 <div className="">
-                  <h2>Connect Your Account</h2>
-                  <p>Mint TCAP,or check your balance connecting your account</p>
+                  <h2>{t("welcome.title3")}</h2>
+                  <p>{t("welcome.subtitle3")}</p>
                 </div>
                 <Row className="">
                   <Col>
@@ -271,7 +269,7 @@ const Welcome = ({ signerAddress }: props) => {
                         web3Modal.toggleModal();
                       }}
                     >
-                      Connect Wallet
+                      {t("connect")}
                     </Button>
                   </Col>
                 </Row>
@@ -280,8 +278,8 @@ const Welcome = ({ signerAddress }: props) => {
           </Col>
           <Col xs={12} sm={12} md={6} lg={6} className="use-tcap">
             <Card className="diamond">
-              <h2>Use TCAP</h2>
-              <p>Trade TCAP using SushiSwap or create new supply using a vault</p>
+              <h2>{t("welcome.title2")}</h2>
+              <p>{t("welcome.subtitle2")}</p>
               <Row className="">
                 <Col>
                   <Button
@@ -294,7 +292,7 @@ const Welcome = ({ signerAddress }: props) => {
                       );
                     }}
                   >
-                    Trade
+                    {t("trade")}
                   </Button>
                   {address !== "" ? (
                     <Button
@@ -304,11 +302,11 @@ const Welcome = ({ signerAddress }: props) => {
                         history.push("/vault");
                       }}
                     >
-                      Mint
+                      {t("mint")}
                     </Button>
                   ) : (
                     <Button variant="dark" className="" disabled>
-                      Mint
+                      {t("mint")}
                     </Button>
                   )}
                 </Col>
@@ -323,11 +321,11 @@ const Welcome = ({ signerAddress }: props) => {
                         history.push("/pools");
                       }}
                     >
-                      Pool
+                      {t("pool")}
                     </Button>
                   ) : (
                     <Button variant="dark" className="" disabled>
-                      Pool
+                      {t("pool")}
                     </Button>
                   )}
                   {address !== "" ? (
@@ -338,11 +336,11 @@ const Welcome = ({ signerAddress }: props) => {
                         history.push("/farm");
                       }}
                     >
-                      Farm
+                      {t("farm")}
                     </Button>
                   ) : (
                     <Button variant="dark" className="" disabled>
-                      Farm
+                      {t("farm")}
                     </Button>
                   )}
                 </Col>

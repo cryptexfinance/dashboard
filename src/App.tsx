@@ -1,16 +1,16 @@
 /* eslint-disable prefer-destructuring */
-import React, { useState, useContext, useEffect } from "react";
-import { Switch, Route, useRouteMatch, useLocation } from "react-router-dom";
+import React, { Suspense, useState, useContext, useEffect } from "react";
+import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import "./i18n";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import { useSwipeable } from "react-swipeable";
 import { useMediaQuery } from "@react-hook/media-query";
 import Container from "react-bootstrap/esm/Container";
-import Alert from "react-bootstrap/esm/Alert";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
@@ -21,6 +21,7 @@ import Pool from "./components/Pool";
 import Delegators from "./components/Governance/Delegators";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
+import Warnings from "./components/Warnings";
 import { useSigner } from "./hooks/useSigner";
 import { useNetworks } from "./hooks/useNetworks";
 import { useVaults } from "./hooks/useVaults";
@@ -54,8 +55,6 @@ const App = () => {
   const web3Modal = useContext(Web3ModalContext);
   const [isLoading, setLoading] = useState(false);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
-  const [show, setShow] = useState(true);
-  const [vaultWarning, setVaultWarning] = useState(true);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
   const [showSidebar, setShowSidebar] = useState(true);
   const [apolloClient, setApolloClient] = useState(
@@ -71,7 +70,6 @@ const App = () => {
   const governance = useGovernance();
   const rewards = useRewards();
   const match = useRouteMatch();
-  const location = useLocation();
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
 
   const setCurrentNetwork = (networkId: number, walletName: string) => {
@@ -525,8 +523,6 @@ const App = () => {
   });
 
   useEffect(() => {
-    const savedAlert = localStorage.getItem("alert");
-    if (savedAlert) setShow(false);
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
         if (!isLoading) {
@@ -604,58 +600,35 @@ const App = () => {
                     setShowSidebar={setShowSidebar}
                     isMobile={isMobile}
                   />
-                  <Container fluid className="wrapper" {...handlers}>
-                    {show && (
-                      <Alert
-                        onClose={() => {
-                          setShow(false);
-                          localStorage.setItem("alert", "false");
-                        }}
-                        dismissible
-                      >
-                        <b>💀 This project is in beta. Use at your own risk.</b>
-                      </Alert>
-                    )}
-                    {vaultWarning && location.pathname === "/vault" && (
-                      <Alert
-                        onClose={() => {
-                          setVaultWarning(false);
-                          localStorage.setItem("alert", "false");
-                        }}
-                        dismissible
-                      >
-                        <b>
-                          ⚠️ Make sure to always have a ratio above the minimum ratio to avoid
-                          getting liquidated.
-                        </b>
-                      </Alert>
-                    )}
-
-                    <Header signerAddress={currentSignerAddress} />
-                    <ToastContainer />
-                    <Switch>
-                      <Route path={`${match.url}/`}>
-                        <Wrapper signerAddress={currentSignerAddress} />
-                      </Route>
-                      <ApolloProvider client={apolloClient}>
-                        <Route path={`${match.url}graph`}>
-                          <Graph />
+                  <Suspense fallback={<Loading position="total" />}>
+                    <Container fluid className="wrapper" {...handlers}>
+                      <Warnings />
+                      <Header signerAddress={currentSignerAddress} />
+                      <ToastContainer />
+                      <Switch>
+                        <Route path={`${match.url}/`}>
+                          <Wrapper signerAddress={currentSignerAddress} />
                         </Route>
-                        <Route path={`${match.url}vault`}>
-                          <Vault />
-                        </Route>
-                        <Route path={`${match.url}farm`}>
-                          <Farm />
-                        </Route>
-                        <Route path={`${match.url}governance`}>
-                          <Delegators currentSignerAddress={currentSignerAddress} />
-                        </Route>
-                        <Route path={`${match.url}pools`}>
-                          <Pool />
-                        </Route>
-                      </ApolloProvider>
-                    </Switch>
-                  </Container>
+                        <ApolloProvider client={apolloClient}>
+                          <Route path={`${match.url}graph`}>
+                            <Graph />
+                          </Route>
+                          <Route path={`${match.url}vault`}>
+                            <Vault />
+                          </Route>
+                          <Route path={`${match.url}farm`}>
+                            <Farm />
+                          </Route>
+                          <Route path={`${match.url}governance`}>
+                            <Delegators currentSignerAddress={currentSignerAddress} />
+                          </Route>
+                          <Route path={`${match.url}pools`}>
+                            <Pool />
+                          </Route>
+                        </ApolloProvider>
+                      </Switch>
+                    </Container>
+                  </Suspense>
                 </rewardsContext.Provider>
               </governanceContext.Provider>
             </vaultsContext.Provider>

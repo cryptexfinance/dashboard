@@ -13,6 +13,7 @@ type props = {
   currentWithdrawTime: number;
   onHide: () => void;
   refresh: () => void;
+  t: any;
 };
 
 const Withdraw = ({
@@ -23,6 +24,7 @@ const Withdraw = ({
   currentWithdrawTime,
   onHide,
   refresh,
+  t,
 }: props) => {
   const [withdrawText, setWithdrawText] = useState("");
   const [canWithdraw, setCanWithdraw] = useState(true);
@@ -51,13 +53,13 @@ const Withdraw = ({
             setWithdrawText("");
             onHide();
           } catch (error) {
-            errorNotification("Need to wait the minimum staking period");
+            errorNotification(t("governance.errors.need-to-wait"));
           }
         } else {
-          errorNotification("Invalid amount to withdraw");
+          errorNotification(t("governance.errors.invalid-amount"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("empty"));
       }
       setCanWithdraw(true);
     }
@@ -80,20 +82,17 @@ const Withdraw = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Withdraw</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{t("governance.withdraw")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            <p>
-              Remove delegated votes from this Crypt Keeper. CTX must be staked and delegated for a
-              minimum of 7 days before you are eligible to withdraw.
-            </p>
-            <Form.Label>Amount to remove</Form.Label>
+            <p>{t("governance.withdraw-info")}</p>
+            <Form.Label>{t("governance.amount-remove")}</Form.Label>
             <Form.Label className="max">
               <a href="/" className="number orange" onClick={maxWithdraw}>
-                MAX
+                {t("max")}
               </a>
             </Form.Label>
             <Form.Control
@@ -104,7 +103,9 @@ const Withdraw = ({
               onChange={onChangeWithdraw}
             />
             {currentWithdrawTime !== 0 && (
-              <span className="warning-span">* Eligible to withdraw on {withdrawDate()}</span>
+              <span className="warning-span">
+                {t("governance.withdraw-info2", { date: withdrawDate() })}
+              </span>
             )}
           </Form.Group>
         </Form>
@@ -116,7 +117,7 @@ const Withdraw = ({
           onClick={withdraw}
           disabled={!canWithdraw}
         >
-          {canWithdraw ? "Withdraw" : "Withdrawing"}
+          {canWithdraw ? t("governance.withdraw") : t("governance.withdrawing")}
         </Button>
       </Modal.Footer>
     </Modal>

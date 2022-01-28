@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Image } from "react-bootstrap";
-import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
-import Tooltip from "react-bootstrap/esm/Tooltip";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import { ethers } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
-import Compressor from "compressorjs";
-import { ReactComponent as PlusIcon } from "../../assets/images/plus.svg";
 import { ProfileImage } from "./common";
 import "../../styles/modal.scss";
 import { API_ENDPOINT } from "../../utils/constants";
@@ -28,9 +24,8 @@ type props = {
   keeperInfo: any | null;
   onHide: () => void;
   refresh: () => void;
+  t: any;
 };
-
-const MAX_IMAGE_SIZE = 100000;
 
 const KeeperForm = ({
   isNew,
@@ -41,6 +36,7 @@ const KeeperForm = ({
   keeperInfo,
   onHide,
   refresh,
+  t,
 }: props) => {
   const [saving, setSaving] = useState(false);
   const [delegatee, setDelegatee] = useState("");
@@ -60,7 +56,6 @@ const KeeperForm = ({
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState("");
-  const [searchIconClass, setSearchIconClass] = useState("add-file-icon");
 
   const cleanErrors = () => {
     setNameError("");
@@ -70,7 +65,6 @@ const KeeperForm = ({
     setTwitterError("");
     setDiscordError("");
     setImageError("");
-    setSearchIconClass("add-file-icon");
   };
 
   useEffect(() => {
@@ -118,11 +112,11 @@ const KeeperForm = ({
       if (re2.test(value.trim())) {
         add = await getAddressFromENS(value);
         if (add === null) {
-          setDelegateeError("Please enter a valid ENS name");
+          setDelegateeError(t("errors.invalid-ens"));
           return false;
         }
         if (keeperExists(add)) {
-          setDelegateeError("Crypt keeper already exists for this address.");
+          setDelegateeError(t("governance.errors.exists"));
           return false;
         }
 
@@ -134,11 +128,11 @@ const KeeperForm = ({
 
       add = await isValidAddress(value.trim());
       if (add === null) {
-        setDelegateeError("Please enter a valid address");
+        setDelegateeError(t("errors.invalid-address"));
         return false;
       }
       if (keeperExists(add)) {
-        setDelegateeError("Crypt keeper already exists for this address.");
+        setDelegateeError(t("governance.errors.exists"));
         return false;
       }
       setIsEthName(false);
@@ -146,17 +140,17 @@ const KeeperForm = ({
       setDelegateeError("");
       return true;
     }
-    setDelegateeError("Please enter a valid eth name or address");
+    setDelegateeError(t("governance.errors.invalid-ens-address"));
     return false;
   };
 
   const isNameValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setNameError("Name cannot be empty");
+      setNameError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 25) {
-      setNameError("Name is too long (25 characters max)");
+      setNameError(t("governance.errors.too-long", { max: "25" }));
       return false;
     }
     setNameError("");
@@ -167,7 +161,7 @@ const KeeperForm = ({
     const re = /^[a-zA-Z0-9_]{1,15}$/;
     if (value.trim().length > 0) {
       if (!re.test(value.trim())) {
-        setTwitterError("It is not a valid twitter username)");
+        setTwitterError(t("governance.errors.invalid-twitter"));
         return false;
       }
     }
@@ -179,7 +173,7 @@ const KeeperForm = ({
     const re = /^.{3,32}#[0-9]{4}$/;
     if (value.trim().length > 0) {
       if (!re.test(value.trim())) {
-        setDiscordError("It is not a valid twitter username)");
+        setDiscordError(t("governance.errors.invalid-discord"));
         return false;
       }
     }
@@ -189,11 +183,11 @@ const KeeperForm = ({
 
   const isExpertiseValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setExpertiseError("Expertise cannot be empty");
+      setExpertiseError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 120) {
-      setExpertiseError("Expertise is too loong (120 characters  max)");
+      setExpertiseError(t("governance.errors.too-long", { max: "25" }));
       return false;
     }
     setExpertiseError("");
@@ -202,58 +196,36 @@ const KeeperForm = ({
 
   const isWhyValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setWhyError("Why field cannot be empty");
+      setWhyError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 2500) {
-      setWhyError("Why field is too loong (2500 characters  max)");
+      setWhyError(t("governance.errors.too-long", { max: "2500" }));
       return false;
     }
     setWhyError("");
     return true;
   };
 
-  const isImageFile = (value: File | null): boolean => {
+  const isImageValid = (value: File | null): boolean => {
     if (value === null) {
       if (isNew) {
-        setImageError("Image field cannot be empty.");
-        setSearchIconClass("add-file-icon error");
-        if (image !== null) {
-          setImageUrl("");
-        }
+        setImageError(t("errors.empty"));
       }
       return !isNew;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
-      setImageError("Invalid file type, valid types are: png, jpg and jpeg.");
-      setSearchIconClass("add-file-icon error");
-      setImageUrl("");
+      setImageError(t("errors.invalid-file-type"));
       return false;
     }
-    return true;
-  };
-
-  const isImageSizeValid = (value: File): boolean => {
-    if (value.size > MAX_IMAGE_SIZE) {
-      const sizeKB = Math.round(value.size / 100);
-      setImageError(
-        `Image size should be less than 100 KB. Compressed image size is ${sizeKB} KB.`
-      );
-      setSearchIconClass("add-file-icon error");
+    if (value.size > 100000) {
+      setImageError(t("errors.invalid-image-size", { size: Math.round(value.size / 1000) }));
       setImageUrl("");
       return false;
     }
     setImageError("");
     return true;
   };
-
-  /* const isImageValid = (): boolean => {
-    if (isImageFile(image)) {
-      // @ts-ignore
-      return isImageSizeValid(image);
-    }
-    return false;
-  }; */
 
   const onChangeDelegatee = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDelegatee(event.target.value);
@@ -285,45 +257,16 @@ const KeeperForm = ({
     isWhyValid(event.target.value);
   };
 
-  const handleImageCompress = (img: File, q: number): void => {
-    /* eslint-disable no-new */
-    new Compressor(img, {
-      quality: q,
-      maxWidth: 512,
-      maxHeight: 512,
-      minWidth: 180,
-      minHeight: 180,
-      width: 200,
-      // @ts-ignore
-      success: (result) => {
-        // Compressed image
-        const compressedImg = new File([result], img.name);
-        if (isImageSizeValid(compressedImg)) {
-          setImage(compressedImg);
-          setImageUrl(URL.createObjectURL(compressedImg));
-          setSearchIconClass("add-file-icon");
-        }
-      },
-    });
-  };
-
   const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       if (typeof event.target.files[0] !== "undefined") {
-        if (isImageFile(event.target.files[0])) {
-          const img = event.target.files[0];
-          if (img.size > MAX_IMAGE_SIZE) {
-            setSearchIconClass("add-file-icon loading");
-            handleImageCompress(img, 0.7);
-          } else {
-            setImageError("");
-            setImage(img);
-            setImageUrl(URL.createObjectURL(img));
-          }
+        setImage(event.target.files[0]);
+        if (isImageValid(event.target.files[0])) {
+          setImageUrl(URL.createObjectURL(event.target.files[0]));
         }
       }
     } else {
-      isImageFile(null);
+      isImageValid(null);
     }
   };
 
@@ -334,7 +277,7 @@ const KeeperForm = ({
     isWhyValid(why) &&
     isTwitterValid(twitter) &&
     isDiscordValid(discord) &&
-    imageUrl !== "";
+    isImageValid(image);
 
   const saveKeeper = async () => {
     const formData = new FormData();
@@ -358,8 +301,7 @@ const KeeperForm = ({
         }
       })
       .catch((error) => {
-        console.error("Error creating");
-        errorNotification("Error creating keeper.");
+        errorNotification(t("governance.errors.creating-keeper"));
         console.error(error);
       });
   };
@@ -367,9 +309,6 @@ const KeeperForm = ({
   const createKeeper = async (event: React.MouseEvent) => {
     event.preventDefault();
     setSaving(true);
-    /* if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      saveKeeper();
-    } */
     if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
       if (delegatee) {
         try {
@@ -380,10 +319,10 @@ const KeeperForm = ({
           refresh();
           onHide();
         } catch (error) {
-          errorNotification("Delegator for the address already exists.");
+          errorNotification(t("governance.errors.empty"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
     }
     setSaving(false);
@@ -411,8 +350,8 @@ const KeeperForm = ({
           if (responseJson.status === "success") {
             refresh();
             sendNotification(
-              "Crypt. Keepers",
-              "Crypt Keeper updated",
+              t("governance.success.title"),
+              t("governance.success.message"),
               3000,
               onHide(),
               1000,
@@ -423,8 +362,7 @@ const KeeperForm = ({
           }
         })
         .catch((error) => {
-          errorNotification("Unexpected error saving to DB");
-          console.error("Unexpected error");
+          errorNotification(t("errors.unexpected"));
           console.error(error);
         });
     }
@@ -443,7 +381,7 @@ const KeeperForm = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Create Crypt Keeper</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{t("governance.form.create")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
@@ -453,33 +391,11 @@ const KeeperForm = ({
               {imageUrl !== "" ? (
                 <Image src={imageUrl} roundedCircle className="avatar" />
               ) : (
-                <OverlayTrigger
-                  key="top"
-                  placement="bottom"
-                  show={imageError !== ""}
-                  overlay={
-                    <Tooltip id="ttip-current-reward" className="farm-tooltip error">
-                      {imageError}
-                    </Tooltip>
-                  }
-                >
-                  <>
-                    <ProfileImage
-                      address={address === "" ? currentAddress : address}
-                      image=""
-                      size={120}
-                    />
-                    <a
-                      href="/"
-                      onClick={(e: React.MouseEvent) => {
-                        e.preventDefault();
-                      }}
-                      className={searchIconClass}
-                    >
-                      <PlusIcon />
-                    </a>
-                  </>
-                </OverlayTrigger>
+                <ProfileImage
+                  address={address === "" ? currentAddress : address}
+                  image=""
+                  size={120}
+                />
               )}
               <Form.File
                 type="file"
@@ -489,6 +405,7 @@ const KeeperForm = ({
                 label="Select your image"
                 custom
               />
+              <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>
             <Col sm={12} md={8} lg={8}>
               <Col sm={12} md={12} lg={12}>
@@ -497,7 +414,7 @@ const KeeperForm = ({
                     type="text"
                     required
                     className={delegateeError === "" ? "neon-green" : "neon-orange"}
-                    placeholder="Delegatee eth name or address"
+                    placeholder={t("governance.form.keeper")}
                     value={delegatee}
                     onChange={onChangeDelegatee}
                     disabled={!isNew}
@@ -517,7 +434,7 @@ const KeeperForm = ({
                     type="text"
                     required
                     className={nameError === "" ? "neon-green" : "neon-orange"}
-                    placeholder="Name"
+                    placeholder={t("governance.form.name")}
                     value={name}
                     onChange={onChangeName}
                   />
@@ -533,7 +450,7 @@ const KeeperForm = ({
                   type="text"
                   required
                   className={expertiseError === "" ? "neon-green" : "neon-orange"}
-                  placeholder="Expertise"
+                  placeholder={t("governance.expertise")}
                   value={expertise}
                   onChange={onChangeExpertise}
                 />
@@ -549,7 +466,7 @@ const KeeperForm = ({
                   as="textarea"
                   rows={7}
                   className={whyError === "" ? "neon-green" : "neon-orange"}
-                  placeholder="Why?"
+                  placeholder={t("governance.form.why")}
                   value={why}
                   onChange={onChangeWhy}
                 />

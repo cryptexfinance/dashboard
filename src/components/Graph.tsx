@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "../styles/graph.scss";
 import Card from "react-bootstrap/esm/Card";
 import { BigNumber, ethers } from "ethers";
+import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import NetworkContext from "../state/NetworkContext";
@@ -23,6 +24,7 @@ import { FEATURES, NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
+  const { t } = useTranslation();
   const currentNetwork = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
@@ -254,7 +256,7 @@ const Graph = () => {
       <div className="grid">
         <Card>
           <StakeIcon className="stake" />
-          <h4>Total Staked in USD</h4>
+          <h4>{t("graph.staked-usd")}</h4>
           <h5 className="number neon-green">
             <NumberFormat
               value={TotalStake}
@@ -267,7 +269,7 @@ const Graph = () => {
         </Card>
         <Card>
           <H24Icon className="h24" />
-          <h4>Total Supply</h4>
+          <h4>{t("graph.total-supply")}</h4>
           <h5 className="number neon-blue">
             <NumberFormat
               value={totalSupply}
@@ -280,7 +282,7 @@ const Graph = () => {
         </Card>
         <Card>
           <TcapIcon className="tcap" />
-          <h4>TCAP Price</h4>
+          <h4>{t("graph.tcap-price")}</h4>
           <h5 className="number neon-highlight">
             <NumberFormat
               value={tcapPrice}
@@ -293,7 +295,7 @@ const Graph = () => {
         </Card>
         <Card>
           <WETHIcon className="weth" />
-          <h4>Total Staked in ETH</h4>
+          <h4>{t("graph.staked-eth")}</h4>
           <h5 className="number neon-highlight">
             <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             ETH
@@ -301,7 +303,7 @@ const Graph = () => {
         </Card>
         <Card>
           <DAIIcon className="dai" />
-          <h4>Total Staked in DAI</h4>
+          <h4>{t("graph.staked-dai")}</h4>
           <h5 className="number neon-orange">
             <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
@@ -311,7 +313,7 @@ const Graph = () => {
           <>
             <Card>
               <CtxIcon className="ctx" />
-              <h4>CTX Price</h4>
+              <h4>{t("graph.ctx-price")}</h4>
               <h5 className="number neon-blue">
                 <NumberFormat
                   value={ctxPrice}
@@ -326,7 +328,7 @@ const Graph = () => {
               <>
                 <Card>
                   <AAVEIcon className="ctx" />
-                  <h4>Total Staked in AAVE</h4>
+                  <h4>{t("graph.staked-aave")}</h4>
                   <h5 className="number neon-highlight">
                     <NumberFormat
                       value={aaveStake}
@@ -339,7 +341,7 @@ const Graph = () => {
                 </Card>
                 <Card>
                   <LINKIcon className="ctx" />
-                  <h4>Total Staked in LINK</h4>
+                  <h4>{t("graph.staked-link")}</h4>
                   <h5 className="number neon-highlight">
                     <NumberFormat
                       value={linkStake}
@@ -357,7 +359,7 @@ const Graph = () => {
         {/* {currentNetwork.chainId === NETWORKS.polygon.chainId && (
           <Card>
             <POLYGONIcon className="eth" />
-            <h4>Total Staked in MATIC</h4>
+            <h4>{t("graph.staked-matic")}</h4>
             <h5 className="number neon-blue">
               <NumberFormat
                 value={MATICStake}
