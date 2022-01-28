@@ -10,7 +10,11 @@ const clientOracle = (graphqlEndpoint: string) =>
     cache: new InMemoryCache(),
   });
 
-const Wrapper = () => {
+type props = {
+  signerAddress: string;
+};
+
+const Wrapper = ({ signerAddress }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
@@ -33,14 +37,14 @@ const Wrapper = () => {
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
         break;
       default:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
   }, [currentNetwork.chainId]);
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Welcome />
+      <Welcome signerAddress={signerAddress} />
     </ApolloProvider>
   );
 };

@@ -94,8 +94,8 @@ const App = () => {
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
         break;
       default:
-        cNetwork = NETWORKS.rinkeby;
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        cNetwork = NETWORKS.mainnet;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
     }
     networks.setCurrentChainId(networkId);
@@ -507,10 +507,20 @@ const App = () => {
     setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
     /* networkProvider.on("chainChanged", (chainId: number) => {
-      // web3Modal.clearCachedProvider();
       setCurrentNetwork(chainId, "");
       window.location.reload();
     }); */
+
+    if (!networkProvider.isFortmatic) {
+      // @ts-ignore
+      networkProvider.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          web3Modal.clearCachedProvider();
+        }
+        window.location.reload();
+      });
+    }
+
     setLoading(false);
   });
 
@@ -519,14 +529,16 @@ const App = () => {
     if (savedAlert) setShow(false);
     async function loadProvider() {
       if (web3Modal.cachedProvider && !signer.signer) {
-        // const networkProvider =
         if (!isLoading) {
           await web3Modal.connect();
         }
       } else {
         setLoading(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        const provider = getDefaultProvider(parseInt(chainId), NETWORKS.mainnet.name);
+        const provider = getDefaultProvider(
+          parseInt(chainId),
+          chainId === "1" ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
+        );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         setContracts(randomSigner, ethcallProvider, parseInt(chainId));
@@ -623,7 +635,7 @@ const App = () => {
                     <ToastContainer />
                     <Switch>
                       <Route path={`${match.url}/`}>
-                        <Wrapper />
+                        <Wrapper signerAddress={currentSignerAddress} />
                       </Route>
                       <ApolloProvider client={apolloClient}>
                         <Route path={`${match.url}graph`}>
