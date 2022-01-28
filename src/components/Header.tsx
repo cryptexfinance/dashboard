@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
@@ -24,6 +26,7 @@ type props = {
 };
 
 const Header = ({ signerAddress }: props) => {
+  const { i18n } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -32,6 +35,7 @@ const Header = ({ signerAddress }: props) => {
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  const [language, setLanguage] = useState("EN");
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -128,6 +132,17 @@ const Header = ({ signerAddress }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLanguage(lng);
+  };
+
+  const handleOnSelect = (eventKey: any, event: Object) => {
+    console.log(eventKey);
+    console.log(event);
+    changeLanguage(eventKey);
+  };
+
   return (
     <Nav className="header">
       {signer.signer ? (
@@ -193,6 +208,16 @@ const Header = ({ signerAddress }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
+            <Dropdown onSelect={handleOnSelect}>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                {language}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="en">English</Dropdown.Item>
+                <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
           <ChangeNetwork
             show={showChangeNetwork}
