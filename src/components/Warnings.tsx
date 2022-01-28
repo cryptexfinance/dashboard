@@ -16,17 +16,6 @@ const Warnings = () => {
 
   return (
     <>
-      {vaultWarning && location.pathname === "/vault" && (
-        <Alert
-          onClose={() => {
-            setVaultWarning(false);
-            localStorage.setItem("alert", "false");
-          }}
-          dismissible
-        >
-          <b>{t("vault-warning")}</b>
-        </Alert>
-      )}
       {showBeta && (
         <Alert
           onClose={() => {
@@ -36,6 +25,17 @@ const Warnings = () => {
           dismissible
         >
           <b>💀 {t("warning")}</b>
+        </Alert>
+      )}        
+      {vaultWarning && location.pathname === "/vault" && (
+        <Alert
+          onClose={() => {
+            setVaultWarning(false);
+            localStorage.setItem("alert", "false");
+          }}
+          dismissible
+        >
+          <b>{t("vault-warning")}</b>
         </Alert>
       )}
     </>
