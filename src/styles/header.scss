@@ -73,6 +73,32 @@
     padding-left: 1rem;
   }
 
+  .btn-language {
+    margin-left: 15px;
+    button {
+      border-radius: 5px;
+      border-color: $green;
+      background-color: $darker !important;
+      width: auto;
+      height: 2.5rem;
+    }
+    .dropdown-toggle {
+      background-color: $darker;
+      border-color: $highlight;
+    }
+    .dropdown-menu {
+      background-color: $darker;
+      border-color: $highlight;
+    }
+    .dropdown-item {
+      color: $white;
+    }
+    .dropdown-item:hover {
+      color: $off-white;
+      background-color: rgba(205, 149, 214, 0.4);
+    }
+  }
+
   .address {
     color: white;
     margin-top:-5px;

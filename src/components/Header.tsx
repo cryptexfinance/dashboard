@@ -126,6 +126,11 @@ const Header = ({ signerAddress }: props) => {
         const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
       }
+      const lng = localStorage.getItem("language");
+      if (lng) {
+        i18n.changeLanguage(lng);
+        setLanguage(lng.toUpperCase());
+      }
     };
 
     loadAddress();
@@ -134,11 +139,11 @@ const Header = ({ signerAddress }: props) => {
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
-    setLanguage(lng);
+    setLanguage(lng.toUpperCase());
+    localStorage.setItem("language", lng);
   };
 
   const handleOnSelect = (eventKey: any, event: Object) => {
-    console.log(eventKey);
     console.log(event);
     changeLanguage(eventKey);
   };
@@ -208,7 +213,7 @@ const Header = ({ signerAddress }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
-            <Dropdown onSelect={handleOnSelect}>
+            <Dropdown onSelect={handleOnSelect} className="btn-language">
               <Dropdown.Toggle variant="success" id="dropdown-basic">
                 {language}
               </Dropdown.Toggle>
