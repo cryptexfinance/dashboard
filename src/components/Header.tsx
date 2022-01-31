@@ -131,7 +131,6 @@ const Header = ({ signerAddress }: props) => {
       }
       const lng = localStorage.getItem("language");
       if (lng) {
-        i18n.changeLanguage(lng);
         setLanguage(lng.toUpperCase());
       }
     };

@@ -26,7 +26,7 @@ const Warnings = () => {
         >
           <b>💀 {t("warning")}</b>
         </Alert>
-      )}        
+      )}
       {vaultWarning && location.pathname === "/vault" && (
         <Alert
           onClose={() => {

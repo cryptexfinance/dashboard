@@ -31,10 +31,10 @@
   "wait": "Please wait",
   "warning": "This project is in beta. Use at your own risk.",
   "welcome": {
-    "tcap": "Total Cryptocurrency Market Capitalization",
+    "tcap": "Capitalización total del mercado de criptomonedas",
     "tcap-token": "Total Cryptocurrency Market Capitalization Token",
-    "tcap-info": "Total Crypto Market Capitalization is updated on-chain on every 1% movement",
-    "title1": "My Total Balance",
+    "tcap-info": "Token de capitalización de mercado de criptomonedas total",
+    "title1": "Mi balance total",
     "subtitle1": "Connected Account",
     "title2": "Use TCAP",
     "subtitle2": "Trade TCAP using SushiSwap or create new supply using a vault",
