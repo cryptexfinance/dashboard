@@ -14,7 +14,7 @@ import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
-import { makeShortAddress, getENS } from "../utils/utils";
+import { makeShortAddress, getENS, isPolygon } from "../utils/utils";
 import { FEATURES, NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
@@ -57,6 +57,50 @@ const Header = ({ signerAddress }: props) => {
     document.body.removeChild(el);
   };
 
+  async function addNetwork(newChainId: string) {
+    let chainName = "Polygon Mainnet";
+    let currency = "Matic Token";
+    let symbol = "MATIC";
+    let rpcUrl = "https://rpc-mainnet.maticvigil.com/";
+    let blockUrl = "https://polygonscan.com/";
+
+    if (newChainId === NETWORKS.mumbai.hexChainId) {
+      chainName = "Mumbai";
+      currency = "Matic Token";
+      symbol = "MATIC";
+      rpcUrl = "https://rpc-mumbai.maticvigil.com/";
+      blockUrl = "https://mumbai.polygonscan.com/";
+    }
+    if (newChainId === NETWORKS.okovan.hexChainId) {
+      chainName = "Optimistic Ethereum (Kovan)";
+      currency = "Ether (ETH)";
+      symbol = "ETH";
+      rpcUrl = "https://kovan.optimism.io";
+      blockUrl = "https://kovan-optimistic.etherscan.io";
+    }
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: newChainId,
+            chainName,
+            nativeCurrency: {
+              name: currency,
+              symbol,
+              decimals: 18,
+            },
+            rpcUrls: [rpcUrl],
+            blockExplorerUrls: [blockUrl],
+          },
+        ],
+      });
+    } catch (addError) {
+      // handle "add" error
+    }
+  }
+
   async function changeNetwork(newChainId: string) {
     if (currentNetwork.wallet === "metamask") {
       try {
@@ -68,37 +112,9 @@ const Header = ({ signerAddress }: props) => {
         // This error code indicates that the chain has not been added to MetaMask.
         if (
           error.code === 4902 &&
-          (newChainId === NETWORKS.okovan.hexChainId || newChainId === NETWORKS.polygon.hexChainId)
+          (newChainId !== NETWORKS.mainnet.hexChainId || newChainId !== NETWORKS.rinkeby.hexChainId)
         ) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  chainId: newChainId,
-                  chainName:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? "Optimistic Ethereum (Kovan)"
-                      : "Polygon Mainnet",
-                  nativeCurrency: {
-                    name: newChainId === NETWORKS.okovan.hexChainId ? "Ether (ETH)" : "Matic Token",
-                    symbol: newChainId === NETWORKS.okovan.hexChainId ? "ETH" : "MATIC",
-                    decimals: 18,
-                  },
-                  rpcUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan.optimism.io"]
-                      : ["https://rpc-mainnet.maticvigil.com/"],
-                  blockExplorerUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan-optimistic.etherscan.io"]
-                      : ["https://polygonscan.com/"],
-                },
-              ],
-            });
-          } catch (addError) {
-            // handle "add" error
-          }
+          addNetwork(newChainId);
         }
       }
     }
@@ -129,8 +145,9 @@ const Header = ({ signerAddress }: props) => {
         const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
       }
-      const lng = localStorage.getItem("language");
+      let lng = localStorage.getItem("language");
       if (lng) {
+        if (lng === "en-US") lng = "en";
         setLanguage(lng.toUpperCase());
       }
     };
@@ -179,7 +196,7 @@ const Header = ({ signerAddress }: props) => {
                   }
                 >
                   {currentNetwork.chainId === NETWORKS.okovan.chainId ||
-                  currentNetwork.chainId === NETWORKS.polygon.chainId ? (
+                  isPolygon(currentNetwork.chainId) ? (
                     <div className="title">
                       {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
                         <>
@@ -187,7 +204,12 @@ const Header = ({ signerAddress }: props) => {
                         </>
                       ) : (
                         <>
-                          <POLYGONIcon className="eth" /> <h6>Polygon</h6>
+                          <POLYGONIcon className="eth" />
+                          {currentNetwork.chainId === NETWORKS.polygon.chainId ? (
+                            <h6>Polygon</h6>
+                          ) : (
+                            <h6>Mumbai</h6>
+                          )}
                         </>
                       )}
                     </div>

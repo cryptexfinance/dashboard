@@ -18,6 +18,27 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
   const { t } = useTranslation();
   const networks = useNetworks();
 
+  const PolygonNetworks = () => {
+    let { hexChainId, chainId } = NETWORKS.polygon;
+    let name = "Polygon";
+
+    if (process.env.REACT_APP_NETWORK_ID !== "1") {
+      hexChainId = NETWORKS.mumbai.hexChainId;
+      chainId = NETWORKS.mumbai.chainId;
+      name = "Mumbai";
+    }
+
+    return (
+      <Button
+        className="btn-polygon"
+        onClick={() => changeNetwork(hexChainId)}
+        disabled={networks.chainId === chainId}
+      >
+        <POLYGONIconSmall className="polygon" /> {name}
+      </Button>
+    );
+  };
+
   return (
     <Modal
       show={show}
@@ -57,15 +78,7 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
               <OPTIMISMIconSmall className="polygon" /> Kovan
             </Button>
           )}
-          {FEATURES.POLYGON && (
-            <Button
-              className="btn-polygon"
-              onClick={() => changeNetwork(NETWORKS.polygon.hexChainId)}
-              disabled={networks.chainId === NETWORKS.polygon.chainId}
-            >
-              <POLYGONIconSmall className="polygon" /> Polygon
-            </Button>
-          )}
+          {FEATURES.POLYGON && <PolygonNetworks />}
         </div>
       </Modal.Body>
     </Modal>

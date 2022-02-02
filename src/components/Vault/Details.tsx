@@ -34,6 +34,7 @@ import {
   errorNotification,
   getDefaultProvider,
   isInLayer1,
+  isPolygon,
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
@@ -56,17 +57,21 @@ const Details = ({ address, t }: props) => {
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
 
-  let currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
+  let currency = !isPolygon(currentNetwork.chainId) ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
   // @ts-ignore
   switch (match?.params?.currency?.toLowerCase()) {
     case "eth":
       currency = "ETH";
+      if (FEATURES.POLYGON && isPolygon(currentNetwork.chainId)) {
+        history?.push(`/vault/MATIC`);
+        currency = "MATIC";
+      }
       break;
     case "weth":
       currency = "WETH";
-      if (FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      if (FEATURES.POLYGON && isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/MATIC`);
         currency = "MATIC";
       }
@@ -92,7 +97,7 @@ const Details = ({ address, t }: props) => {
       break;
     case "matic":
       currency = "MATIC";
-      if (!FEATURES.POLYGON && currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+      if (!FEATURES.POLYGON && !isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
@@ -102,8 +107,7 @@ const Details = ({ address, t }: props) => {
       history?.push(`/vault/WETH`);
       break;
     default:
-      currency =
-        FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH";
+      currency = FEATURES.POLYGON && isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH";
       break;
   }
 
@@ -188,34 +192,31 @@ const Details = ({ address, t }: props) => {
 
   const validVaults = (): boolean => {
     let valid =
-      !isUndefined(oracles.wethOracle) &&
       !isUndefined(oracles.daiOracle) &&
       !isUndefined(oracles.tcapOracle) &&
-      !isUndefined(oracles.wethOracleRead) &&
       !isUndefined(oracles.daiOracleRead) &&
-      !isUndefined(vaults.wethVault) &&
       !isUndefined(vaults.daiVault) &&
-      !isUndefined(tokens.wethTokenRead) &&
       !isUndefined(tokens.daiTokenRead);
 
-    if (
-      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-      currentNetwork.chainId === NETWORKS.rinkeby.chainId
-    ) {
+    if (isInLayer1(currentNetwork.chainId)) {
       valid =
         valid &&
+        !isUndefined(oracles.wethOracle) &&
         !isUndefined(oracles.aaveOracle) &&
         !isUndefined(oracles.linkOracle) &&
+        !isUndefined(oracles.wethOracleRead) &&
         !isUndefined(oracles.aaveOracleRead) &&
         !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(vaults.wethVault) &&
         !isUndefined(vaults.aaveVault) &&
         !isUndefined(vaults.linkVault) &&
         !isUndefined(tokens.aaveToken) &&
         !isUndefined(tokens.linkToken) &&
+        !isUndefined(tokens.wethTokenRead) &&
         !isUndefined(tokens.aaveTokenRead) &&
         !isUndefined(tokens.linkTokenRead);
     }
-    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+    if (isPolygon(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.maticOracle) &&
@@ -230,8 +231,8 @@ const Details = ({ address, t }: props) => {
   };
 
   const isGasAsset = () =>
-    (currentNetwork.chainId !== NETWORKS.polygon.chainId && selectedVault === "ETH") ||
-    (currentNetwork.chainId === NETWORKS.polygon.chainId && selectedVault === "MATIC");
+    (!isPolygon(currentNetwork.chainId) && selectedVault === "ETH") ||
+    (isPolygon(currentNetwork.chainId) && selectedVault === "MATIC");
 
   async function loadVault(vaultType: string, vaultData: any) {
     if (signer.signer && validVaults() && vaultData) {
@@ -242,11 +243,11 @@ const Details = ({ address, t }: props) => {
       let currentTokenRead;
       let balance;
       const provider = getDefaultProvider(
-        currentNetwork.chainId || NETWORKS.rinkeby.chainId,
+        currentNetwork.chainId || NETWORKS.mainnet.chainId,
         currentNetwork.chainId === 1 ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
       );
       switch (vaultType) {
-        case "ETH": {
+        case "ETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
@@ -254,7 +255,6 @@ const Details = ({ address, t }: props) => {
           currentTokenRead = tokens.wethTokenRead;
           balance = await provider.getBalance(address);
           break;
-        }
         case "WETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
@@ -289,7 +289,7 @@ const Details = ({ address, t }: props) => {
           currentToken = tokens.maticToken;
           currentOracleRead = oracles.maticOracleRead;
           currentTokenRead = tokens.maticTokenRead;
-          balance = await provider.getBalance(address);
+          // balance = await provider.getBalance(address);
           break;
         default:
           currentVault = vaults.wethVault;
@@ -339,7 +339,7 @@ const Details = ({ address, t }: props) => {
         balance = await currentToken.balanceOf(address);
       }
 
-      let decimals;
+      let decimals = 18;
       let currentPrice;
 
       if (currentVaultData) {
@@ -450,7 +450,12 @@ const Details = ({ address, t }: props) => {
       console.log(error);
     },
     onCompleted: () => {
-      loadVault(selectedVault, data);
+      let vaultType = selectedVault;
+      if (isPolygon(currentNetwork.chainId) && vaultType === "ETH") {
+        vaultType = "MATIC";
+        setSelectedVault("MATIC");
+      }
+      loadVault(vaultType, data);
     },
   });
 
@@ -916,9 +921,9 @@ const Details = ({ address, t }: props) => {
 
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
-            {currentNetwork.chainId === NETWORKS.polygon.chainId && <option>MATIC</option>}
-            <option value="ETH">ETH</option>
-            <option>WETH</option>
+            {isPolygon(currentNetwork.chainId) && <option>MATIC</option>}
+            {!isPolygon(currentNetwork.chainId) && <option value="ETH">ETH</option>}
+            {!isPolygon(currentNetwork.chainId) && <option>WETH</option>}
             <option>DAI</option>
             {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
               <>

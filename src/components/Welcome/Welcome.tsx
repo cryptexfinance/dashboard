@@ -67,24 +67,23 @@ const Welcome = ({ signerAddress }: props) => {
           }
 
           const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(signerAddress);
-          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           // @ts-ignore
-          const [currentTcapBalance, wethOraclePrice] = await signer.ethcallProvider?.all([
-            currentTcapBalanceCall,
-            wethOraclePriceCall,
-          ]);
+          const [currentTcapBalance] = await signer.ethcallProvider?.all([currentTcapBalanceCall]);
           tcapString = ethers.utils.formatEther(currentTcapBalance);
           setTcapBalance(tcapString);
-          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
 
           if (isInLayer1(currentNetwork.chainId)) {
+            const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
             const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
             const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
             // @ts-ignore
-            const [currentCtxBalance, reservesCtxPool] = await signer.ethcallProvider?.all([
-              currentCtxBalanceCall,
-              reservesCtxPoolCall,
-            ]);
+            const [wethOraclePrice, currentCtxBalance, reservesCtxPool] =
+              await signer.ethcallProvider?.all([
+                wethOraclePriceCall,
+                currentCtxBalanceCall,
+                reservesCtxPoolCall,
+              ]);
+            const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
             const ctxString = ethers.utils.formatEther(currentCtxBalance);
             setCtxBalance(ctxString);
             const currentPriceCTX = await getPriceInUSDFromPair(
@@ -116,26 +115,6 @@ const Welcome = ({ signerAddress }: props) => {
 
     // eslint-disable-next-line
   }, [signerAddress, data]);
-
-  /*  useEffect(() => {
-    const loadData = async () => {
-      if (data) {
-        let currentTotalPrice = BigNumber.from(0);
-        const prices = await data?.oracles;
-        if (prices.length > 0) {
-          currentTotalPrice = BigNumber.from(prices[0].answer);
-        }
-        const TotalTcapPrice = currentTotalPrice.mul(10000000000);
-        const cTcapPrice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
-        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(cTcapPrice);
-        const tcapUSD = parseFloat(tcapBalance) * parseFloat(cTcapPrice);
-        setTcapUSDBalance(tcapUSD.toString());
-      }
-      setIsLoading(false);
-    };
-    loadData();
-  }, [data, tcapBalance]); */
 
   if (isLoading) {
     return <Loading title={t("loading")} message={t("wait")} />;

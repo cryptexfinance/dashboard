@@ -41,7 +41,7 @@ import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
-import { isValidNetwork, getDefaultProvider, toFragment } from "./utils/utils";
+import { isValidNetwork, isPolygon, getDefaultProvider, toFragment } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
 const clientOracle = (graphqlEndpoint: string) =>
@@ -75,21 +75,25 @@ const App = () => {
   const setCurrentNetwork = (networkId: number, walletName: string) => {
     let cNetwork;
     switch (networkId) {
-      case 1:
+      case NETWORKS.mainnet.chainId:
         cNetwork = NETWORKS.mainnet;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
-      case 4:
+      case NETWORKS.rinkeby.chainId:
         cNetwork = NETWORKS.rinkeby;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
         break;
-      case 69:
+      case NETWORKS.okovan.chainId:
         cNetwork = NETWORKS.okovan;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
         break;
-      case 137:
+      case NETWORKS.polygon.chainId:
         cNetwork = NETWORKS.polygon;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
+        break;
+      case NETWORKS.mumbai.chainId:
+        cNetwork = NETWORKS.mumbai;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mumbai));
         break;
       default:
         cNetwork = NETWORKS.mainnet;
@@ -98,8 +102,11 @@ const App = () => {
     }
     networks.setCurrentChainId(networkId);
     networks.setCurrentName(cNetwork.name);
-    networks.setCurrentWETHAddress(cNetwork.weth);
     networks.setCurrentDAIAddress(cNetwork.dai);
+    if (networkId !== NETWORKS.polygon.chainId && networkId !== NETWORKS.mumbai.chainId) {
+      // @ts-ignore
+      networks.setCurrentWETHAddress(cNetwork.weth);
+    }
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
@@ -256,10 +263,33 @@ const App = () => {
     }
   };
 
-  const setPolygonContracts = async (currentSigner: ethers.Signer) => {
-    const contracts = cryptexJson[137].polygon.contracts;
+  const setPolygonContracts = async (
+    currentSigner: ethers.Signer,
+    ethcallProvider: Provider,
+    chainId: number
+  ) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
+    let contracts;
+    let daiAddress;
+    let maticAddress;
+    if (chainId === NETWORKS.polygon.chainId) {
+      contracts = cryptexJson[137].polygon.contracts;
+      daiAddress = NETWORKS.polygon.dai;
+      maticAddress = NETWORKS.polygon.matic;
+    } else {
+      contracts = cryptexJson[80001].mumbai.contracts;
+      daiAddress = NETWORKS.mumbai.dai;
+      maticAddress = NETWORKS.mumbai.matic;
+    }
 
     // Set Vaults
+    const currentDAIVault = new ethers.Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentDAIVault(currentDAIVault);
     const currentMaticVault = new ethers.Contract(
       contracts.MATICVaultHandler.address,
       contracts.MATICVaultHandler.abi,
@@ -267,6 +297,11 @@ const App = () => {
     );
     vaults.setCurrentMaticVault(currentMaticVault);
 
+    const currentDAIVaultRead = new Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi
+    );
+    vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
     const currentMATICVaultRead = new Contract(
       contracts.MATICVaultHandler.address,
       toFragment(contracts.MATICVaultHandler.abi)
@@ -274,22 +309,55 @@ const App = () => {
     vaults.setCurrentMaticVaultRead(currentMATICVaultRead);
 
     // Set Tokens
-    const currentMATICToken = new ethers.Contract(NETWORKS.polygon.matic, ERC20.abi, currentSigner);
+    const currentDAIToken = new ethers.Contract(daiAddress, WETH.abi, currentSigner);
+    tokens.setCurrentDAIToken(currentDAIToken);
+    const currentMATICToken = new ethers.Contract(maticAddress, ERC20.abi, currentSigner);
     tokens.setCurrentMATICToken(currentMATICToken);
-    const currentMATICTokenRead = new Contract(NETWORKS.polygon.matic, ERC20.abi);
+    const currentTCAPToken = new ethers.Contract(
+      contracts.TCAP.address,
+      contracts.TCAP.abi,
+      currentSigner
+    );
+    tokens.setCurrentTCAPToken(currentTCAPToken);
+    const currentDAITokenRead = new Contract(daiAddress, WETH.abi);
+    tokens.setCurrentDAITokenRead(currentDAITokenRead);
+    const currentMATICTokenRead = new Contract(maticAddress, ERC20.abi);
     tokens.setCurrentMATICTokenRead(currentMATICTokenRead);
+    const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
+    tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
+
     // Set Oracles
+    const currentDAIOracle = new ethers.Contract(
+      contracts.DAIOracle.address,
+      contracts.DAIOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentDAIOracle(currentDAIOracle);
+    const currentTCAPOracle = new ethers.Contract(
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentTCAPOracle(currentTCAPOracle);
     const currentMATICOracle = new ethers.Contract(
-      contracts.MATICOracle.address,
-      contracts.MATICOracle.abi,
+      contracts.WMATICOracle.address,
+      contracts.WMATICOracle.abi,
       currentSigner
     );
     oracles.setCurrentMATICOracle(currentMATICOracle);
+    const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
+    oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
+    const currentTCAPOracleRead = new Contract(
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi
+    );
+    oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
     const currentMATICOracleRead = new Contract(
-      contracts.MATICOracle.address,
-      contracts.MATICOracle.abi
+      contracts.WMATICOracle.address,
+      contracts.WMATICOracle.abi
     );
     oracles.setCurrentMATICOracleRead(currentMATICOracleRead);
+    setLoading(false);
   };
 
   const setContracts = async (
@@ -303,25 +371,20 @@ const App = () => {
     let wethAddress;
     let daiAddress;
     switch (chainId) {
-      case 1:
+      case NETWORKS.mainnet.chainId:
         contracts = cryptexJson[1].mainnet.contracts;
         wethAddress = NETWORKS.mainnet.weth;
         daiAddress = NETWORKS.mainnet.dai;
         break;
-      case 4:
+      case NETWORKS.rinkeby.chainId:
         contracts = cryptexJson[4].rinkeby.contracts;
         wethAddress = NETWORKS.rinkeby.weth;
         daiAddress = NETWORKS.rinkeby.dai;
         break;
-      case 69:
+      case NETWORKS.okovan.chainId:
         contracts = cryptexJson[69].okovan.contracts;
         wethAddress = NETWORKS.okovan.weth;
         daiAddress = NETWORKS.okovan.dai;
-        break;
-      case 137:
-        contracts = cryptexJson[137].polygon.contracts;
-        wethAddress = NETWORKS.polygon.weth;
-        daiAddress = NETWORKS.polygon.dai;
         break;
       default:
         contracts = cryptexJson[4].rinkeby.contracts;
@@ -483,9 +546,6 @@ const App = () => {
     if (chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId) {
       setEthereumContracts(chainId, currentSigner);
     }
-    if (chainId === NETWORKS.polygon.chainId) {
-      setPolygonContracts(currentSigner);
-    }
   };
 
   web3Modal.on("connect", async (networkProvider) => {
@@ -499,15 +559,21 @@ const App = () => {
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
-    await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+
+    if (isPolygon(network.chainId)) {
+      await setPolygonContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    } else {
+      await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    }
+
     const cAddress = await currentSigner.getAddress();
     setCurrentSignerAddress(cAddress);
     setCurrentNetwork(network.chainId, walletName);
     // @ts-ignore
-    /* networkProvider.on("chainChanged", (chainId: number) => {
+    networkProvider.on("chainChanged", (chainId: number) => {
       setCurrentNetwork(chainId, "");
       window.location.reload();
-    }); */
+    });
 
     if (!networkProvider.isFortmatic) {
       // @ts-ignore
@@ -537,7 +603,11 @@ const App = () => {
         );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
-        setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        if (isPolygon(parseInt(chainId))) {
+          setPolygonContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        } else {
+          setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        }
         setCurrentNetwork(parseInt(chainId), "");
         setLoading(false);
       }

@@ -44,10 +44,15 @@ export const NETWORKS = {
     chainId: 137,
     hexChainId: "0x89",
     name: "matic",
-    eth: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
-    weth: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
     dai: "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
     matic: "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+  },
+  mumbai: {
+    chainId: 80001,
+    hexChainId: "0x13881",
+    name: "matic",
+    dai: "0xB06498E2a35d5F09AB53643F2b479a9bf909E796",
+    matic: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
   },
 };
 
@@ -58,11 +63,12 @@ export const GRAPHQL_ENDPOINT = {
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
+  mumbai: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };
 
 export const FEATURES = {
   KEEPERS_API: false,
   NEW_VAULTS: true,
   OPTIMISM: false,
-  POLYGON: false,
+  POLYGON: true,
 };

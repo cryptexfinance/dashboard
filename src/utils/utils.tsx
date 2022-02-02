@@ -257,7 +257,7 @@ export const isValidNetwork = (chainId: number) => {
   return (
     chainId === NETWORKS.rinkeby.chainId ||
     (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
-    (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+    (FEATURES.POLYGON && chainId === NETWORKS.mumbai.chainId)
   );
 };
 
@@ -268,16 +268,38 @@ export const isInLayer1 = (chainId: number | undefined) => {
   return false;
 };
 
+export const isPolygon = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.polygon.chainId || chainId === NETWORKS.mumbai.chainId;
+  }
+  return false;
+};
+
 export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
   let provider;
   if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
   } else {
-    const alchemyKey =
-      chainId === NETWORKS.mainnet.chainId
-        ? process.env.REACT_APP_ALCHEMY_KEY
-        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+    let alchemyKey;
+    switch (chainId) {
+      case NETWORKS.mainnet.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
+        break;
+      case NETWORKS.rinkeby.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+        break;
+      case NETWORKS.polygon.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_POLYGON;
+        break;
+      case NETWORKS.mumbai.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_MUMBAI;
+        break;
+      default:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
+        break;
+    }
     provider = ethers.getDefaultProvider(name, {
+      infura: process.env.REACT_APP_INFURA_ID,
       alchemy: alchemyKey,
     });
   }
