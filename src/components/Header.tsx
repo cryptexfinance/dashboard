@@ -12,8 +12,8 @@ import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
-import { makeShortAddress, getENS } from "../utils/utils";
-import { FEATURES, NETWORKS } from "../utils/constants";
+import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
@@ -50,6 +50,48 @@ const Header = ({ signerAddress }: props) => {
     document.body.removeChild(el);
   };
 
+  async function addNetwork(newChainId: string) {
+    let chainName = "Optimism";
+    let currency = "Ether (ETH)";
+    let symbol = "OETH";
+    let rpcUrl = "https://mainnet.optimism.io/";
+    let blockExplorerUrl = "https://optimistic.etherscan.io";
+
+    if (newChainId === NETWORKS.okovan.hexChainId) {
+      chainName = "Optimistic Ethereum (Kovan)";
+      rpcUrl = "https://kovan.optimism.io";
+      blockExplorerUrl = "https://kovan-optimistic.etherscan.io";
+    }
+    if (newChainId === NETWORKS.polygon.hexChainId) {
+      chainName = "Polygon Mainnet";
+      currency = "Matic Token";
+      symbol = "MATIC";
+      rpcUrl = "https://rpc-mainnet.maticvigil.com/";
+      blockExplorerUrl = "https://polygonscan.com/";
+    }
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: newChainId,
+            chainName,
+            nativeCurrency: {
+              name: currency,
+              symbol,
+              decimals: 18,
+            },
+            rpcUrls: [rpcUrl],
+            blockExplorerUrls: [blockExplorerUrl],
+          },
+        ],
+      });
+    } catch (addError) {
+      // handle "add" error
+    }
+  }
+
   async function changeNetwork(newChainId: string) {
     if (currentNetwork.wallet === "metamask") {
       try {
@@ -61,37 +103,11 @@ const Header = ({ signerAddress }: props) => {
         // This error code indicates that the chain has not been added to MetaMask.
         if (
           error.code === 4902 &&
-          (newChainId === NETWORKS.okovan.hexChainId || newChainId === NETWORKS.polygon.hexChainId)
+          (newChainId === NETWORKS.optimism.hexChainId ||
+            newChainId === NETWORKS.okovan.hexChainId ||
+            newChainId === NETWORKS.polygon.hexChainId)
         ) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  chainId: newChainId,
-                  chainName:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? "Optimistic Ethereum (Kovan)"
-                      : "Polygon Mainnet",
-                  nativeCurrency: {
-                    name: newChainId === NETWORKS.okovan.hexChainId ? "Ether (ETH)" : "Matic Token",
-                    symbol: newChainId === NETWORKS.okovan.hexChainId ? "ETH" : "MATIC",
-                    decimals: 18,
-                  },
-                  rpcUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan.optimism.io"]
-                      : ["https://rpc-mainnet.maticvigil.com/"],
-                  blockExplorerUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan-optimistic.etherscan.io"]
-                      : ["https://polygonscan.com/"],
-                },
-              ],
-            });
-          } catch (addError) {
-            // handle "add" error
-          }
+          addNetwork(newChainId);
         }
       }
     }
@@ -128,47 +144,47 @@ const Header = ({ signerAddress }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
+  const EthereumBtn = () => (
+    <>
+      <ETHIcon className="eth" />
+      <h6>{currentNetwork.chainId === NETWORKS.mainnet.chainId ? "Ethereum" : "Rinkeby"}</h6>
+    </>
+  );
+
+  const OptimismBtn = () => (
+    <>
+      <OPTIMISMIcon className="optimism" />
+      <h6>{currentNetwork.chainId === NETWORKS.optimism.chainId ? "Optimism" : "Kovan"}</h6>
+    </>
+  );
+
+  const PolygonBtn = () => (
+    <>
+      <POLYGONIcon className="eth" />
+      <h6>{currentNetwork.chainId === NETWORKS.polygon.chainId ? "Polygon" : "Mumbai"}</h6>
+    </>
+  );
+
   return (
     <Nav className="header">
       {signer.signer ? (
         <>
-          {(FEATURES.OPTIMISM || FEATURES.POLYGON) &&
-            !window.location.pathname.includes("/governance") && (
-              <div className="network-container">
-                <Button
-                  className="btn"
-                  onClick={
-                    currentNetwork.wallet === "metamask"
-                      ? () => setShowChangeNetwork(true)
-                      : () => {}
-                  }
-                >
-                  {currentNetwork.chainId === NETWORKS.okovan.chainId ||
-                  currentNetwork.chainId === NETWORKS.polygon.chainId ? (
-                    <div className="title">
-                      {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
-                        <>
-                          <OPTIMISMIcon className="optimism" /> <h6>Kovan</h6>
-                        </>
-                      ) : (
-                        <>
-                          <POLYGONIcon className="eth" /> <h6>Polygon</h6>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="title">
-                      <ETHIcon className="eth" />
-                      {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
-                        <h6>Ethereum</h6>
-                      ) : (
-                        <h6>Rinkeby</h6>
-                      )}
-                    </div>
-                  )}
-                </Button>
-              </div>
-            )}
+          {!window.location.pathname.includes("/governance") && (
+            <div className="network-container">
+              <Button
+                className="btn"
+                onClick={
+                  currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
+                }
+              >
+                <div className="title">
+                  {isInLayer1(currentNetwork.chainId) && EthereumBtn()}
+                  {isOptimism(currentNetwork.chainId) && OptimismBtn()}
+                  {isPolygon(currentNetwork.chainId) && PolygonBtn()}
+                </div>
+              </Button>
+            </div>
+          )}
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>

@@ -32,6 +32,14 @@ export const NETWORKS = {
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
     ),
   },
+  optimism: {
+    chainId: 10,
+    hexChainId: "0xA",
+    name: "optimism",
+    eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
+    weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
+    dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+  },
   okovan: {
     chainId: 69,
     hexChainId: "0x45",
@@ -63,6 +71,6 @@ export const GRAPHQL_ENDPOINT = {
 export const FEATURES = {
   KEEPERS_API: false,
   NEW_VAULTS: true,
-  OPTIMISM: false,
+  OPTIMISM: true,
   POLYGON: false,
 };

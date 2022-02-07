@@ -20,11 +20,15 @@ import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.sv
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
 import { ReactComponent as AAVEIconSmall } from "../../assets/images/vault/aave.svg";
 import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
+import { ReactComponent as UNIIconSmall } from "../../assets/images/vault/uni.svg";
+import { ReactComponent as SNXIconSmall } from "../../assets/images/vault/snx2.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
+import { ReactComponent as SNXIcon } from "../../assets/images/graph/snx.svg";
+import { ReactComponent as UNIIcon } from "../../assets/images/graph/uni.svg";
 import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon3.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
@@ -34,6 +38,8 @@ import {
   errorNotification,
   getDefaultProvider,
   isInLayer1,
+  isPolygon,
+  isOptimism,
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
@@ -55,7 +61,7 @@ const Details = ({ address }: props) => {
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
 
-  let currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
+  let currency = !isPolygon(currentNetwork.chainId) ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
   // @ts-ignore
@@ -65,7 +71,7 @@ const Details = ({ address }: props) => {
       break;
     case "weth":
       currency = "WETH";
-      if (FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      if (FEATURES.POLYGON && isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/MATIC`);
         currency = "MATIC";
       }
@@ -74,7 +80,7 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+      if (isInLayer1(currentNetwork.chainId)) {
         currency = "AAVE";
       } else {
         currency = "ETH";
@@ -82,7 +88,7 @@ const Details = ({ address }: props) => {
       }
       break;
     case "link":
-      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+      if (!isPolygon(currentNetwork.chainId)) {
         currency = "LINK";
       } else {
         currency = "ETH";
@@ -91,18 +97,13 @@ const Details = ({ address }: props) => {
       break;
     case "matic":
       currency = "MATIC";
-      if (!FEATURES.POLYGON && currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+      if (!FEATURES.POLYGON && !isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
       break;
-    case "wbtc":
-      currency = "WETH";
-      history?.push(`/vault/WETH`);
-      break;
     default:
-      currency =
-        FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH";
+      currency = FEATURES.POLYGON && isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH";
       break;
   }
 
@@ -115,6 +116,7 @@ const Details = ({ address }: props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Vault Data
+  const [vaultOptions, setVaultOptions] = useState<Array<string>>([]);
   const [selectedVaultId, setSelectedVaultId] = useState("0");
   const [vaultDebt, setVaultDebt] = useState("0");
   const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
@@ -199,10 +201,7 @@ const Details = ({ address }: props) => {
       !isUndefined(tokens.wethTokenRead) &&
       !isUndefined(tokens.daiTokenRead);
 
-    if (
-      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-      currentNetwork.chainId === NETWORKS.rinkeby.chainId
-    ) {
+    if (isInLayer1(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.aaveOracle) &&
@@ -216,7 +215,7 @@ const Details = ({ address }: props) => {
         !isUndefined(tokens.aaveTokenRead) &&
         !isUndefined(tokens.linkTokenRead);
     }
-    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+    if (isPolygon(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.maticOracle) &&
@@ -243,11 +242,11 @@ const Details = ({ address }: props) => {
       let currentTokenRead;
       let balance;
       const provider = getDefaultProvider(
-        currentNetwork.chainId || NETWORKS.rinkeby.chainId,
+        currentNetwork.chainId || NETWORKS.mainnet.chainId,
         currentNetwork.chainId === 1 ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
       );
       switch (vaultType) {
-        case "ETH": {
+        case "ETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
@@ -255,7 +254,6 @@ const Details = ({ address }: props) => {
           currentTokenRead = tokens.wethTokenRead;
           balance = await provider.getBalance(address);
           break;
-        }
         case "WETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
@@ -883,6 +881,14 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
+      let vOptions = ["MATIC", "DAI"];
+      if (isInLayer1(currentNetwork.chainId)) {
+        vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
+      }
+      if (isOptimism(currentNetwork.chainId)) {
+        vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
+      }
+      setVaultOptions(vOptions);
       // TODO : if stuck at pending do something
       if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
         setIsLoading(false);
@@ -912,6 +918,10 @@ const Details = ({ address }: props) => {
               return <AAVEIconSmall className="btc" />;
             case "LINK":
               return <LINKIconSmall className="link" />;
+            case "UNI":
+              return <UNIIconSmall className="link" />;
+            case "SNX":
+              return <SNXIconSmall className="link" />;
             case "MATIC":
               return <POLYGONIconSmall className="dai" />;
             default:
@@ -921,16 +931,9 @@ const Details = ({ address }: props) => {
 
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
-            {currentNetwork.chainId === NETWORKS.polygon.chainId && <option>MATIC</option>}
-            <option value="ETH">ETH</option>
-            <option>WETH</option>
-            <option>DAI</option>
-            {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
-              <>
-                <option>AAVE</option>
-                <option>LINK</option>
-              </>
-            )}
+            {vaultOptions.map((val) => (
+              <option key={val}>{val}</option>
+            ))}
           </Form.Control>
           <p className="number">
             <NumberFormat
@@ -965,6 +968,10 @@ const Details = ({ address }: props) => {
                       return <AAVEIcon className="eth" />;
                     case "LINK":
                       return <LINKIcon className="eth" />;
+                    case "SNX":
+                      return <SNXIcon className="eth" />;
+                    case "UNI":
+                      return <UNIIcon className="eth" />;
                     case "MATIC":
                       return <POLYGONIcon className="eth" />;
                     default:
@@ -983,6 +990,10 @@ const Details = ({ address }: props) => {
                             return <AAVEIconSmall className="aave small" />;
                           case "LINK":
                             return <LINKIconSmall className="link small" />;
+                          case "SNX":
+                            return <SNXIconSmall className="dai small" />;
+                          case "UNI":
+                            return <UNIIconSmall className="dai small" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="btc small" />;
                           default:
@@ -1059,6 +1070,10 @@ const Details = ({ address }: props) => {
                             return <AAVEIconSmall className="aave" />;
                           case "LINK":
                             return <LINKIconSmall className="link" />;
+                          case "SNX":
+                            return <SNXIconSmall className="dai" />;
+                          case "UNI":
+                            return <UNIIconSmall className="dai" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="polygon" />;
                           default:

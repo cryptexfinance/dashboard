@@ -250,7 +250,7 @@ export const isValidNetwork = (chainId: number) => {
   if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
-      (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+      (FEATURES.OPTIMISM && chainId === NETWORKS.optimism.chainId) ||
       (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
     );
   }
@@ -264,6 +264,20 @@ export const isValidNetwork = (chainId: number) => {
 export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
     return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+  }
+  return false;
+};
+
+export const isOptimism = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.optimism.chainId || chainId === NETWORKS.okovan.chainId;
+  }
+  return false;
+};
+
+export const isPolygon = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.polygon.chainId;
   }
   return false;
 };

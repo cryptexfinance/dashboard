@@ -32,28 +32,37 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
       <Modal.Body>
         <div className="change-network">
           {process.env.REACT_APP_NETWORK_ID === "1" ? (
-            <Button
-              onClick={() => changeNetwork(NETWORKS.mainnet.hexChainId)}
-              disabled={networks.chainId === NETWORKS.mainnet.chainId}
-            >
-              <ETHIconSmall className="eth" /> Ethereum
-            </Button>
+            <>
+              <Button
+                onClick={() => changeNetwork(NETWORKS.mainnet.hexChainId)}
+                disabled={networks.chainId === NETWORKS.mainnet.chainId}
+              >
+                <ETHIconSmall className="eth" /> Ethereum
+              </Button>
+              <Button
+                className="btn-polygon"
+                onClick={() => changeNetwork(NETWORKS.optimism.hexChainId)}
+                disabled={networks.chainId === NETWORKS.optimism.chainId}
+              >
+                <OPTIMISMIconSmall className="polygon" /> Optimism
+              </Button>
+            </>
           ) : (
-            <Button
-              onClick={() => changeNetwork(NETWORKS.rinkeby.hexChainId)}
-              disabled={networks.chainId === NETWORKS.rinkeby.chainId}
-            >
-              <ETHIconSmall className="eth" /> Rinkeby
-            </Button>
-          )}
-          {FEATURES.OPTIMISM && (
-            <Button
-              className="btn-polygon"
-              onClick={() => changeNetwork(NETWORKS.okovan.hexChainId)}
-              disabled={networks.chainId === NETWORKS.okovan.chainId}
-            >
-              <OPTIMISMIconSmall className="polygon" /> Kovan
-            </Button>
+            <>
+              <Button
+                onClick={() => changeNetwork(NETWORKS.rinkeby.hexChainId)}
+                disabled={networks.chainId === NETWORKS.rinkeby.chainId}
+              >
+                <ETHIconSmall className="eth" /> Rinkeby
+              </Button>
+              <Button
+                className="btn-polygon"
+                onClick={() => changeNetwork(NETWORKS.okovan.hexChainId)}
+                disabled={networks.chainId === NETWORKS.okovan.chainId}
+              >
+                <OPTIMISMIconSmall className="polygon" /> Kovan
+              </Button>
+            </>
           )}
           {FEATURES.POLYGON && (
             <Button

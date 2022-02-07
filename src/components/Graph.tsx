@@ -16,10 +16,19 @@ import { ReactComponent as POLYGONIcon } from "../assets/images/graph/polygon3.s
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
+import { ReactComponent as UNIIcon } from "../assets/images/graph/uni.svg";
+import { ReactComponent as SNXIcon } from "../assets/images/graph/snx.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
-import { getPriceInUSDFromPair, isInLayer1, isUndefined, toUSD } from "../utils/utils";
-import { FEATURES, NETWORKS } from "../utils/constants";
+import {
+  getPriceInUSDFromPair,
+  isInLayer1,
+  isOptimism,
+  isPolygon,
+  isUndefined,
+  toUSD,
+} from "../utils/utils";
+import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
@@ -322,36 +331,66 @@ const Graph = () => {
                 />{" "}
               </h5>
             </Card>
-            {FEATURES.NEW_VAULTS && (
-              <>
-                <Card>
-                  <AAVEIcon className="ctx" />
-                  <h4>Total Staked in AAVE</h4>
-                  <h5 className="number neon-highlight">
-                    <NumberFormat
-                      value={aaveStake}
-                      displayType="text"
-                      thousandSeparator
-                      decimalScale={2}
-                    />{" "}
-                    AAVE
-                  </h5>
-                </Card>
-                <Card>
-                  <LINKIcon className="ctx" />
-                  <h4>Total Staked in LINK</h4>
-                  <h5 className="number neon-highlight">
-                    <NumberFormat
-                      value={linkStake}
-                      displayType="text"
-                      thousandSeparator
-                      decimalScale={2}
-                    />{" "}
-                    LINK
-                  </h5>
-                </Card>
-              </>
-            )}
+            <Card>
+              <AAVEIcon className="ctx" />
+              <h4>Total Staked in AAVE</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={aaveStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                AAVE
+              </h5>
+            </Card>
+          </>
+        )}
+        {!isPolygon(currentNetwork.chainId) && (
+          <>
+            <Card>
+              <LINKIcon className="ctx" />
+              <h4>Total Staked in LINK</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={linkStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                LINK
+              </h5>
+            </Card>
+          </>
+        )}
+        {isOptimism(currentNetwork.chainId) && (
+          <>
+            <Card>
+              <UNIIcon className="ctx" />
+              <h4>Total Staked in UNI</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={linkStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                UNI
+              </h5>
+            </Card>
+            <Card>
+              <SNXIcon className="ctx" />
+              <h4>Total Staked in SNX</h4>
+              <h5 className="number neon-highlight">
+                <NumberFormat
+                  value={linkStake}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />{" "}
+                SNX
+              </h5>
+            </Card>
           </>
         )}
         {currentNetwork.chainId === NETWORKS.polygon.chainId && (
