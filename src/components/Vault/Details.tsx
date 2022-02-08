@@ -919,7 +919,7 @@ const Details = ({ address }: props) => {
             case "LINK":
               return <LINKIconSmall className="link" />;
             case "UNI":
-              return <UNIIconSmall className="link" />;
+              return <UNIIconSmall className="uni" />;
             case "SNX":
               return <SNXIconSmall className="link" />;
             case "MATIC":
@@ -968,10 +968,10 @@ const Details = ({ address }: props) => {
                       return <AAVEIcon className="eth" />;
                     case "LINK":
                       return <LINKIcon className="eth" />;
-                    case "SNX":
-                      return <SNXIcon className="eth" />;
                     case "UNI":
                       return <UNIIcon className="eth" />;
+                    case "SNX":
+                      return <SNXIcon className="eth" />;
                     case "MATIC":
                       return <POLYGONIcon className="eth" />;
                     default:
@@ -990,10 +990,10 @@ const Details = ({ address }: props) => {
                             return <AAVEIconSmall className="aave small" />;
                           case "LINK":
                             return <LINKIconSmall className="link small" />;
-                          case "SNX":
-                            return <SNXIconSmall className="dai small" />;
                           case "UNI":
-                            return <UNIIconSmall className="dai small" />;
+                            return <UNIIconSmall className="uni small" />;
+                          case "SNX":
+                            return <SNXIconSmall className="snx small" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="btc small" />;
                           default:
@@ -1071,9 +1071,9 @@ const Details = ({ address }: props) => {
                           case "LINK":
                             return <LINKIconSmall className="link" />;
                           case "SNX":
-                            return <SNXIconSmall className="dai" />;
+                            return <SNXIconSmall className="snx" />;
                           case "UNI":
-                            return <UNIIconSmall className="dai" />;
+                            return <UNIIconSmall className="uni" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="polygon" />;
                           default:

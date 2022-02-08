@@ -48,6 +48,10 @@
         margin-top: 3px;
         width: 1.5rem;
       }
+      &.uni {
+        margin-top: 3px;
+        width: 1.7rem;
+      }
     }
 
     .select-container {
@@ -206,6 +210,14 @@
             width: 1.6rem;
             margin-top: -3px;
           }
+          &.uni {
+            width: 1.6rem;
+            margin-top: -4px;
+          }
+          &.snx {
+            width: 1.5rem;
+            margin-top: -3px;
+          }
         }
       }
 
@@ -339,6 +351,16 @@
         &.link.small {
           margin-top: -3px;
           width: 1.7rem;
+          filter: drop-shadow(0px 0px 5px $highlight);
+        }
+        &.uni.small {
+          margin-top: -5px;
+          width: 1.7rem;
+          filter: drop-shadow(0px 0px 5px $highlight);
+        }
+        &.snx.small {
+          margin-top: -3px;
+          width: 1.5rem;
           filter: drop-shadow(0px 0px 5px $highlight);
         }
       }
