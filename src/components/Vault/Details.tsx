@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import i18next from "i18next";
 import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
 import Form from "react-bootstrap/esm/Form";
@@ -967,7 +968,9 @@ const Details = ({ address, t }: props) => {
                   }
                 })()}
                 <div className="info">
-                  <h4>{t("vault.balance-title", { vault: selectedVault })}</h4>
+                  <h4 className={i18next.language}>
+                    {t("vault.balance-title", { vault: selectedVault })}
+                  </h4>
                   <div>
                     <div className="amount">
                       {(() => {
@@ -1010,17 +1013,19 @@ const Details = ({ address, t }: props) => {
               <Card>
                 <RatioIcon className="ratio" />
                 <div className="info">
-                  <h4>{t("vault.ratio-title")}</h4>{" "}
-                  <OverlayTrigger
-                    key="top"
-                    placement="top"
-                    overlay={
-                      <Tooltip id="tooltip-top">{t("vault.ratio-warning", { minRatio })}</Tooltip>
-                    }
-                  >
-                    <Button variant="dark">?</Button>
-                  </OverlayTrigger>
-                  <div>
+                  <div className="ratio-title">
+                    <h4 className={i18next.language}>{t("vault.ratio-title")}</h4>{" "}
+                    <OverlayTrigger
+                      key="top"
+                      placement="top"
+                      overlay={
+                        <Tooltip id="tooltip-top">{t("vault.ratio-warning", { minRatio })}</Tooltip>
+                      }
+                    >
+                      <Button variant="dark">?</Button>
+                    </OverlayTrigger>
+                  </div>
+                  <div className="ratio-amount">
                     <div className="amount">
                       <h4 className=" ml-2 number neon-blue">
                         <NumberFormat
@@ -1041,7 +1046,7 @@ const Details = ({ address, t }: props) => {
             <div className="form-card">
               <Card>
                 <div className="info">
-                  <h4>{t("vault.collateral.title")}</h4>
+                  <h4 className={i18next.language}>{t("vault.collateral.title")}</h4>
                   <div>
                     <div className="amount">
                       {(() => {
@@ -1114,12 +1119,16 @@ const Details = ({ address, t }: props) => {
                     </Form.Text>
                   </Form.Group>
                   <Form.Group className="remove">
-                    <Form.Label>{t("vault.collateral.remove")}</Form.Label>
-                    <Form.Label className="max">
-                      <a href="/" className="number orange" onClick={safeRemoveCollateral}>
-                        {t("max-safe")}
-                      </a>
-                    </Form.Label>
+                    <div className="titles">
+                      <Form.Label className="collateral-remove">
+                        {t("vault.collateral.remove")}
+                      </Form.Label>
+                      <Form.Label className="max">
+                        <a href="/" className="number orange" onClick={safeRemoveCollateral}>
+                          {t("max-safe")}
+                        </a>
+                      </Form.Label>
+                    </div>
                     <InputGroup>
                       <Form.Control
                         type="number"
@@ -1151,7 +1160,7 @@ const Details = ({ address, t }: props) => {
             <div className="form-card">
               <Card>
                 <div className="info">
-                  <h4>{t("vault.debt.title")}</h4>
+                  <h4 className={i18next.language}>{t("vault.debt.title")}</h4>
                   <div>
                     <div className="amount">
                       <TcapIcon className="tcap-neon" />

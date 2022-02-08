@@ -134,6 +134,7 @@
 
       div {
         width: 100%;
+        flex: 1;
       }
 
       p {
@@ -144,6 +145,11 @@
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
+      }
+
+      h4.fr {
+        flex: 2;
+        font-size: 1.2rem;
       }
     }
 
@@ -266,6 +272,23 @@
         .remove {
           margin-top: 3.5rem;
         }
+
+        .titles {
+          display: flex;
+          .collateral-remove {
+            flex:  2;
+          }
+          .max {
+            display: flex;
+            flex: 1;
+            align-items: flex-end;
+            justify-content: flex-end;
+            
+            a {
+              text-align: right;
+            }
+          }
+        }
       }
     }
 
@@ -295,6 +318,15 @@
       .info {
         margin-top: 1rem;
 
+        .ratio-title {
+          display: flex;
+          flex: 1;
+          align-items: center;
+        }
+        .ratio-amount {
+          flex: 1
+        }
+
         .btn {
           margin-top: 0.7rem;
           height: 40px;
@@ -304,6 +336,9 @@
         h4 {
           padding-bottom: 0;
           margin-bottom: 0;
+        }
+        h4.fr {
+          font-size: 1.1rem;
         }
         .amount h4 {
           margin-bottom: 0.5rem;
@@ -343,7 +378,6 @@
         }
       }
     }
-
     .tcap {
       .card {
         min-height: 26rem;
@@ -482,6 +516,21 @@
     .pre-actions {
       p {
         width: 20rem;
+      }
+    }
+
+    .actions-container {
+      .form-card { 
+        form {
+          .titles {
+            .collateral-remove {
+              flex:  1;
+            }
+            .max {
+              flex:  1;  
+            }
+          }
+        }
       }
     }
 

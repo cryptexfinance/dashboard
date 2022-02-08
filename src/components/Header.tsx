@@ -158,6 +158,7 @@ const Header = ({ signerAddress }: props) => {
 
       <Dropdown.Menu>
         <Dropdown.Item eventKey="en">English</Dropdown.Item>
+        <Dropdown.Item eventKey="fr">French</Dropdown.Item>
         <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
