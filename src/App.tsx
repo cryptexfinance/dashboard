@@ -585,13 +585,15 @@ const App = () => {
     const cAddress = await currentSigner.getAddress();
     setCurrentSignerAddress(cAddress);
     setCurrentNetwork(network.chainId, walletName);
+
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
-      setCurrentNetwork(chainId, "");
-      window.location.reload();
+      if (chainId !== network.chainId) {
+        setCurrentNetwork(chainId, "");
+        window.location.reload();
+      }
     });
-
-    if (!networkProvider.isFortmatic) {
+    if (networkProvider.isFortmatic) {
       // @ts-ignore
       networkProvider.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length === 0) {
