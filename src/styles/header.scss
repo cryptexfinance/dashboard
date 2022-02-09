@@ -82,5 +82,20 @@
     padding-right: 0rem;
     justify-content: center;
     margin-top: 70px;
+
+    .network-container {
+      .btn {
+        width: 85%;
+        .title {
+          justify-content: center;
+        }
+        h6 {
+          margin-left: 2rem;
+        }
+      }
+    }
+    .info {
+      justify-content: center;
+    }
   }
 }
