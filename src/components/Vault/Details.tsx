@@ -874,6 +874,7 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
+      setBtnDisabled(true);
       try {
         const tx = await selectedVaultContract?.createVault();
         notifyUser(tx, refresh);
@@ -882,7 +883,9 @@ const Details = ({ address }: props) => {
           errorNotification("Transaction rejected");
         }
       }
+      setBtnDisabled(false);
     } else {
+      setBtnDisabled(true);
       try {
         const amount = approveValue;
         const tx = await selectedCollateralContract?.approve(
@@ -895,6 +898,7 @@ const Details = ({ address }: props) => {
           errorNotification("Transaction rejected");
         }
       }
+      setBtnDisabled(false);
     }
   };
 
@@ -1331,7 +1335,7 @@ const Details = ({ address }: props) => {
         <div className="pre-actions">
           <h5 className="action-title">{title}</h5>
           <p>{text}</p>
-          <Button variant="pink neon-pink" onClick={action}>
+          <Button variant="pink neon-pink" onClick={action} disabled={btnDisabled}>
             {title}
           </Button>
         </div>

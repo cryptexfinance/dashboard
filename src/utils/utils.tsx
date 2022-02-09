@@ -287,7 +287,8 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
   if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
   } else if (chainId === NETWORKS.optimism.chainId) {
-    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OPTIMISM);
+    // provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OPTIMISM);
+    provider = ethers.getDefaultProvider(NETWORKS.optimism.infuraRpcUrl);
   } else {
     const alchemyKey =
       chainId === NETWORKS.mainnet.chainId

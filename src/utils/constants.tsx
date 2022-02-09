@@ -42,6 +42,9 @@ export const NETWORKS = {
     link: "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6",
     snx: "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
     uni: "0x6fd9d7ad17242c41f7131d257212c54a0e816691",
+    infuraRpcUrl: "https://optimism-mainnet.infura.io/v3/".concat(
+      process.env.REACT_APP_INFURA_ID || ""
+    ),
   },
   okovan: {
     chainId: 69,
@@ -50,6 +53,9 @@ export const NETWORKS = {
     eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
     weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
     dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    infuraRpcUrl: "https://optimism-kovan.infura.io/v3/".concat(
+      process.env.REACT_APP_INFURA_ID || ""
+    ),
   },
   polygon: {
     chainId: 137,

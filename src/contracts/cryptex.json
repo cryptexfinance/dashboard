@@ -32417,7 +32417,7 @@
           ]
         },
         "DAIVaultHandler": {
-          "address": "0x1A14F9367Db41400BE5d38a0bC48d4Cc2e4B7157",
+          "address": "0x2C890633Db29f21fccbA57c68DcCEF09AB0D4763",
           "abi": [
             {
               "inputs": [
@@ -32878,19 +32878,6 @@
             },
             {
               "inputs": [],
-              "name": "MAX_DECIMAL_PLACES",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "MAX_FEE",
               "outputs": [
                 {
@@ -32988,19 +32975,6 @@
                   "internalType": "contract IERC20",
                   "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "collateralDecimalsAdjustmentFactor",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -34149,7 +34123,7 @@
           ]
         },
         "LinkVaultHandler": {
-          "address": "0x717170B66654292dFBd89c39F5aE6753D2aC1381",
+          "address": "0x61925C38e28F60e688f7d05E65f63792166a5aFE",
           "abi": [
             {
               "inputs": [
@@ -34610,19 +34584,6 @@
             },
             {
               "inputs": [],
-              "name": "MAX_DECIMAL_PLACES",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "MAX_FEE",
               "outputs": [
                 {
@@ -34720,19 +34681,6 @@
                   "internalType": "contract IERC20",
                   "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "collateralDecimalsAdjustmentFactor",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -36204,7 +36152,7 @@
           ]
         },
         "SNXVaultHandler": {
-          "address": "0x443366a7a5821619D8d57405511E4fadD9964771",
+          "address": "0xc8BB1cd417D20116387a5e0603e195cA4f3Cf59A",
           "abi": [
             {
               "inputs": [
@@ -36665,19 +36613,6 @@
             },
             {
               "inputs": [],
-              "name": "MAX_DECIMAL_PLACES",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "MAX_FEE",
               "outputs": [
                 {
@@ -36775,19 +36710,6 @@
                   "internalType": "contract IERC20",
                   "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "collateralDecimalsAdjustmentFactor",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -38517,7 +38439,7 @@
           ]
         },
         "UNIVaultHandler": {
-          "address": "0x5B577578565c2404BB84E734F583CF8523236eF1",
+          "address": "0x66ae98E432329E42B7988CFDCB6f524b1999CB4a",
           "abi": [
             {
               "inputs": [
@@ -38978,19 +38900,6 @@
             },
             {
               "inputs": [],
-              "name": "MAX_DECIMAL_PLACES",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "MAX_FEE",
               "outputs": [
                 {
@@ -39088,19 +38997,6 @@
                   "internalType": "contract IERC20",
                   "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "collateralDecimalsAdjustmentFactor",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -39767,7 +39663,7 @@
           ]
         },
         "WETHVaultHandler": {
-          "address": "0x56549e2fE1D9f0a9556f92494d04F263A5011a00",
+          "address": "0xE0c99C503c4AE5eC50aC63C59C7eF4725C355fdD",
           "abi": [
             {
               "inputs": [
@@ -40228,19 +40124,6 @@
             },
             {
               "inputs": [],
-              "name": "MAX_DECIMAL_PLACES",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "MAX_FEE",
               "outputs": [
                 {
@@ -40345,19 +40228,6 @@
                   "internalType": "contract IERC20",
                   "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "collateralDecimalsAdjustmentFactor",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
