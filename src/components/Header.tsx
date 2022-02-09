@@ -53,7 +53,7 @@ const Header = ({ signerAddress }: props) => {
   async function addNetwork(newChainId: string) {
     let chainName = "Optimism";
     let currency = "Ether (ETH)";
-    let symbol = "OETH";
+    let symbol = "ETH";
     let rpcUrl = "https://mainnet.optimism.io/";
     let blockExplorerUrl = "https://optimistic.etherscan.io";
 

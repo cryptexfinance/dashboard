@@ -115,26 +115,6 @@ const Welcome = ({ signerAddress }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, data]);
 
-  /*  useEffect(() => {
-    const loadData = async () => {
-      if (data) {
-        let currentTotalPrice = BigNumber.from(0);
-        const prices = await data?.oracles;
-        if (prices.length > 0) {
-          currentTotalPrice = BigNumber.from(prices[0].answer);
-        }
-        const TotalTcapPrice = currentTotalPrice.mul(10000000000);
-        const cTcapPrice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
-        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(cTcapPrice);
-        const tcapUSD = parseFloat(tcapBalance) * parseFloat(cTcapPrice);
-        setTcapUSDBalance(tcapUSD.toString());
-      }
-      setIsLoading(false);
-    };
-    loadData();
-  }, [data, tcapBalance]); */
-
   if (isLoading) {
     return <Loading title="Loading" message="Please wait" />;
   }

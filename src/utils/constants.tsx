@@ -36,9 +36,12 @@ export const NETWORKS = {
     chainId: 10,
     hexChainId: "0xA",
     name: "optimism",
-    eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
-    weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
+    eth: "0x4200000000000000000000000000000000000006",
+    weth: "0x4200000000000000000000000000000000000006",
     dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    link: "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6",
+    snx: "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
+    uni: "0x6fd9d7ad17242c41f7131d257212c54a0e816691",
   },
   okovan: {
     chainId: 69,
@@ -64,6 +67,7 @@ export const API_ENDPOINT = "https://api.cryptex.finance";
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo-2",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };

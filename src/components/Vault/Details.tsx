@@ -114,6 +114,7 @@ const Details = ({ address }: props) => {
   );
   const [isApproved, setIsApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [btnDisabled, setBtnDisabled] = useState(false);
 
   // Vault Data
   const [vaultOptions, setVaultOptions] = useState<Array<string>>([]);
@@ -215,6 +216,25 @@ const Details = ({ address }: props) => {
         !isUndefined(tokens.aaveTokenRead) &&
         !isUndefined(tokens.linkTokenRead);
     }
+    if (isOptimism(currentNetwork.chainId)) {
+      valid =
+        valid &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(oracles.snxOracle) &&
+        !isUndefined(oracles.uniOracle) &&
+        !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(oracles.snxOracleRead) &&
+        !isUndefined(oracles.uniOracleRead) &&
+        !isUndefined(vaults.linkVault) &&
+        !isUndefined(vaults.snxVault) &&
+        !isUndefined(vaults.uniVault) &&
+        !isUndefined(tokens.linkToken) &&
+        !isUndefined(tokens.snxToken) &&
+        !isUndefined(tokens.uniToken) &&
+        !isUndefined(tokens.linkTokenRead) &&
+        !isUndefined(tokens.snxTokenRead) &&
+        !isUndefined(tokens.uniTokenRead);
+    }
     if (isPolygon(currentNetwork.chainId)) {
       valid =
         valid &&
@@ -281,6 +301,20 @@ const Details = ({ address }: props) => {
           currentToken = tokens.linkToken;
           currentOracleRead = oracles.linkOracleRead;
           currentTokenRead = tokens.linkTokenRead;
+          break;
+        case "SNX":
+          currentVault = vaults.snxVault;
+          currentVaultRead = vaults.snxVaultRead;
+          currentToken = tokens.snxToken;
+          currentOracleRead = oracles.snxOracleRead;
+          currentTokenRead = tokens.snxTokenRead;
+          break;
+        case "UNI":
+          currentVault = vaults.uniVault;
+          currentVaultRead = vaults.uniVaultRead;
+          currentToken = tokens.uniToken;
+          currentOracleRead = oracles.uniOracleRead;
+          currentTokenRead = tokens.uniTokenRead;
           break;
         case "MATIC":
           currentVault = vaults.maticVault;
@@ -459,7 +493,7 @@ const Details = ({ address }: props) => {
 
   const refresh = async () => {
     try {
-      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      if (!isOptimism(currentNetwork.chainId)) {
         await refetch();
       } else {
         loadVault(selectedVault, data);
@@ -609,10 +643,9 @@ const Details = ({ address }: props) => {
 
   const addCollateral = async () => {
     if (addCollateralTxt) {
+      setBtnDisabled(true);
       // fix decimals
       const amount = ethers.utils.parseUnits(addCollateralTxt, selectedVaultDecimals);
-
-      // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
         if (isGasAsset()) {
           let tx;
@@ -638,6 +671,7 @@ const Details = ({ address }: props) => {
           errorNotification("Insufficient funds to stake");
         }
       }
+      setBtnDisabled(false);
       setAddCollateralTxt("");
       setAddCollateralUSD("0");
     } else {
@@ -671,7 +705,7 @@ const Details = ({ address }: props) => {
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
       const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
-
+      setBtnDisabled(true);
       try {
         if (isGasAsset()) {
           let tx;
@@ -693,6 +727,7 @@ const Details = ({ address }: props) => {
           errorNotification("Not enough collateral on vault");
         }
       }
+      setBtnDisabled(false);
       setRemoveCollateralTxt("");
       setRemoveCollateralUSD("0");
     } else {
@@ -724,6 +759,7 @@ const Details = ({ address }: props) => {
 
   const mintTCAP = async () => {
     if (mintTxt) {
+      setBtnDisabled(true);
       try {
         const amount = ethers.utils.parseEther(mintTxt);
         const tx = await selectedVaultContract?.mint(amount);
@@ -736,6 +772,7 @@ const Details = ({ address }: props) => {
           errorNotification("Not enough collateral on vault");
         }
       }
+      setBtnDisabled(false);
       setMintTxt("");
       setMintUSD("0");
     } else {
@@ -767,6 +804,7 @@ const Details = ({ address }: props) => {
 
   const burnTCAP = async () => {
     if (burnTxt) {
+      setBtnDisabled(true);
       try {
         const amount = ethers.utils.parseEther(burnTxt);
         const currentBurnFee = await selectedVaultContract?.getFee(amount);
@@ -783,6 +821,7 @@ const Details = ({ address }: props) => {
           errorNotification("Burn value too high");
         }
       }
+      setBtnDisabled(false);
       setBurnTxt("");
       setBurnUSD("0");
       setBurnFee("0");
@@ -1119,7 +1158,11 @@ const Details = ({ address }: props) => {
                         onChange={onChangeAddCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-green" onClick={addCollateral}>
+                        <Button
+                          className="neon-green"
+                          onClick={addCollateral}
+                          disabled={btnDisabled}
+                        >
                           +
                         </Button>
                       </InputGroup.Append>
@@ -1151,7 +1194,11 @@ const Details = ({ address }: props) => {
                         onChange={onChangeRemoveCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-orange" onClick={removeCollateral}>
+                        <Button
+                          className="neon-orange"
+                          onClick={removeCollateral}
+                          disabled={btnDisabled}
+                        >
                           -
                         </Button>
                       </InputGroup.Append>
@@ -1216,7 +1263,7 @@ const Details = ({ address }: props) => {
                         onChange={onChangeMint}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-green" onClick={mintTCAP}>
+                        <Button className="neon-green" onClick={mintTCAP} disabled={btnDisabled}>
                           +
                         </Button>
                       </InputGroup.Append>
@@ -1248,7 +1295,7 @@ const Details = ({ address }: props) => {
                         onChange={onChangeBurn}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-orange" onClick={burnTCAP}>
+                        <Button className="neon-orange" onClick={burnTCAP} disabled={btnDisabled}>
                           -
                         </Button>
                       </InputGroup.Append>

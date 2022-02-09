@@ -46,6 +46,7 @@ import {
   isValidNetwork,
   getDefaultProvider,
   toFragment,
+  isOptimism,
 } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
@@ -78,6 +79,7 @@ const App = () => {
   const rewards = useRewards();
   const match = useRouteMatch();
   const location = useLocation();
+  setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
 
   const setCurrentNetwork = (networkId: number, walletName: string) => {
@@ -90,6 +92,10 @@ const App = () => {
       case 4:
         cNetwork = NETWORKS.rinkeby;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        break;
+      case 10:
+        cNetwork = NETWORKS.optimism;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
         break;
       case 69:
         cNetwork = NETWORKS.okovan;
@@ -266,6 +272,104 @@ const App = () => {
       const currentDAIPoolToken = new ethers.Contract(daiPoolAddress, UniV2Pair.abi, currentSigner);
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
     }
+
+    // Set Governance
+    // @ts-ignore
+    const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
+    tokens.setCurrentCtxToken(currentCtx);
+    const currentGovernorAlpha = new ethers.Contract(
+      // @ts-ignore
+      contracts.GovernorAlpha.address,
+      // @ts-ignore
+      contracts.GovernorAlpha.abi,
+      currentSigner
+    );
+    governance.setCurrentGovernorAlpha(currentGovernorAlpha);
+    const currentTimelock = new ethers.Contract(
+      // @ts-ignore
+      contracts.Timelock.address,
+      // @ts-ignore
+      contracts.Timelock.abi,
+      currentSigner
+    );
+    governance.setCurrentTimelock(currentTimelock);
+    // @ts-ignore
+    const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
+    tokens.setCurrentCtxTokenRead(currentCtxRead);
+
+    const currentGovernorAlphaRead = new Contract(
+      // @ts-ignore
+      contracts.GovernorAlpha.address,
+      // @ts-ignore
+      contracts.GovernorAlpha.abi
+    );
+    governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
+    const currentTimelockRead = new Contract(
+      // @ts-ignore
+      contracts.Timelock.address,
+      // @ts-ignore
+      toFragment(contracts.Timelock.abi)
+    );
+    governance.setCurrentTimelockRead(currentTimelockRead);
+  };
+
+  const setOptimismContracts = async (currentSigner: ethers.Signer) => {
+    const contracts = cryptexJson[10].optimism.contracts;
+
+    // Set Vaults
+    const currentSNXVault = new ethers.Contract(
+      contracts.SNXVaultHandler.address,
+      contracts.SNXVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentSNXVault(currentSNXVault);
+    const currentUNIVault = new ethers.Contract(
+      contracts.UNIVaultHandler.address,
+      contracts.UNIVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentUNIVault(currentUNIVault);
+
+    const currentSNXVaultRead = new Contract(
+      contracts.SNXVaultHandler.address,
+      contracts.SNXVaultHandler.abi
+    );
+    vaults.setCurrentSNXVaultRead(currentSNXVaultRead);
+    const currentUNIVaultRead = new Contract(
+      contracts.UNIVaultHandler.address,
+      contracts.UNIVaultHandler.abi
+    );
+    vaults.setCurrentUNIVaultRead(currentUNIVaultRead);
+
+    // Set Tokens
+    const currentSNXToken = new ethers.Contract(NETWORKS.optimism.snx, ERC20.abi, currentSigner);
+    tokens.setCurrentSNXToken(currentSNXToken);
+    const currentUNIToken = new ethers.Contract(NETWORKS.optimism.uni, ERC20.abi, currentSigner);
+    tokens.setCurrentUNIToken(currentUNIToken);
+
+    const currentSNXTokenRead = new Contract(NETWORKS.optimism.snx, ERC20.abi);
+    tokens.setCurrentSNXTokenRead(currentSNXTokenRead);
+    const currentUNITokenRead = new Contract(NETWORKS.optimism.uni, ERC20.abi);
+    tokens.setCurrentUNITokenRead(currentUNITokenRead);
+
+    // Set Oracles
+    const currentSNXOracle = new ethers.Contract(
+      contracts.SNXOracle.address,
+      contracts.SNXOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentSNXOracle(currentSNXOracle);
+    const currentUNIOracle = new ethers.Contract(
+      contracts.UNIOracle.address,
+      contracts.UNIOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentUNIOracle(currentUNIOracle);
+
+    const currentSNXOracleRead = new Contract(contracts.SNXOracle.address, contracts.SNXOracle.abi);
+    oracles.setCurrentSNXOracleRead(currentSNXOracleRead);
+    const currentUNIOracleRead = new Contract(contracts.UNIOracle.address, contracts.UNIOracle.abi);
+    oracles.setCurrentUNIOracleRead(currentUNIOracleRead);
   };
 
   const setPolygonContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
@@ -316,31 +420,37 @@ const App = () => {
     let contracts;
     let wethAddress;
     let daiAddress;
+    let linkAddress;
     switch (chainId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
         wethAddress = NETWORKS.mainnet.weth;
         daiAddress = NETWORKS.mainnet.dai;
+        linkAddress = contracts.LINK.address;
         break;
       case 4:
         contracts = cryptexJson[4].rinkeby.contracts;
         wethAddress = NETWORKS.rinkeby.weth;
         daiAddress = NETWORKS.rinkeby.dai;
+        linkAddress = contracts.LINK.address;
         break;
       case 10:
-        contracts = cryptexJson[69].okovan.contracts;
-        wethAddress = NETWORKS.okovan.weth;
-        daiAddress = NETWORKS.okovan.dai;
+        contracts = cryptexJson[10].optimism.contracts;
+        wethAddress = NETWORKS.optimism.weth;
+        daiAddress = NETWORKS.optimism.dai;
+        linkAddress = NETWORKS.optimism.link;
         break;
       case 69:
         contracts = cryptexJson[69].okovan.contracts;
         wethAddress = NETWORKS.okovan.weth;
         daiAddress = NETWORKS.okovan.dai;
+        linkAddress = "";
         break;
       default:
         contracts = cryptexJson[4].rinkeby.contracts;
         wethAddress = NETWORKS.rinkeby.weth;
         daiAddress = NETWORKS.rinkeby.dai;
+        linkAddress = contracts.LINK.address;
         break;
     }
 
@@ -391,11 +501,7 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentTCAPToken(currentTCAPToken);
-    const currentLINKToken = new ethers.Contract(
-      contracts.LINK.address,
-      contracts.LINK.abi,
-      currentSigner
-    );
+    const currentLINKToken = new ethers.Contract(linkAddress, ERC20.abi, currentSigner);
     tokens.setCurrentLINKToken(currentLINKToken);
 
     const currentWETHTokenRead = new Contract(wethAddress, ERC20.abi);
@@ -404,7 +510,7 @@ const App = () => {
     tokens.setCurrentDAITokenRead(currentDAITokenRead);
     const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
     tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
-    const currentLINKTokenRead = new Contract(contracts.LINK.address, contracts.LINK.abi);
+    const currentLINKTokenRead = new Contract(linkAddress, ERC20.abi);
     tokens.setCurrentLINKTokenRead(currentLINKTokenRead);
 
     // Set Oracles
@@ -451,47 +557,11 @@ const App = () => {
     );
     oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
 
-    // Set Governance
-    // @ts-ignore
-    const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
-    tokens.setCurrentCtxToken(currentCtx);
-    const currentGovernorAlpha = new ethers.Contract(
-      // @ts-ignore
-      contracts.GovernorAlpha.address,
-      // @ts-ignore
-      contracts.GovernorAlpha.abi,
-      currentSigner
-    );
-    governance.setCurrentGovernorAlpha(currentGovernorAlpha);
-    const currentTimelock = new ethers.Contract(
-      // @ts-ignore
-      contracts.Timelock.address,
-      // @ts-ignore
-      contracts.Timelock.abi,
-      currentSigner
-    );
-    governance.setCurrentTimelock(currentTimelock);
-    // @ts-ignore
-    const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
-    tokens.setCurrentCtxTokenRead(currentCtxRead);
-
-    const currentGovernorAlphaRead = new Contract(
-      // @ts-ignore
-      contracts.GovernorAlpha.address,
-      // @ts-ignore
-      contracts.GovernorAlpha.abi
-    );
-    governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
-    const currentTimelockRead = new Contract(
-      // @ts-ignore
-      contracts.Timelock.address,
-      // @ts-ignore
-      toFragment(contracts.Timelock.abi)
-    );
-    governance.setCurrentTimelockRead(currentTimelockRead);
-
     if (isInLayer1(chainId)) {
       setEthereumContracts(chainId, currentSigner);
+    }
+    if (isOptimism(chainId)) {
+      setOptimismContracts(currentSigner);
     }
   };
 

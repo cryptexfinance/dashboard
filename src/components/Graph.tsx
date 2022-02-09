@@ -43,6 +43,8 @@ const Graph = () => {
   const [MATICStake, setMATICStake] = useState("0");
   const [aaveStake, setAaveStake] = useState("0");
   const [linkStake, setLinkStake] = useState("0");
+  const [snxStake, setSNXStake] = useState("0");
+  const [uniStake, setUNIStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -69,16 +71,21 @@ const Graph = () => {
       !isUndefined(oracles.tcapOracleRead) &&
       !isUndefined(tokens.tcapTokenRead);
 
-    if (
-      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-      currentNetwork.chainId === NETWORKS.rinkeby.chainId
-    ) {
+    if (isInLayer1(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.aaveOracle) &&
         !isUndefined(oracles.linkOracle) &&
         !isUndefined(tokens.ctxPoolTokenRead);
     }
+    if (isOptimism(currentNetwork.chainId)) {
+      valid =
+        valid &&
+        !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(oracles.snxOracleRead) &&
+        !isUndefined(oracles.uniOracleRead);
+    }
+
     if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
       valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
     }
@@ -107,10 +114,7 @@ const Graph = () => {
           currentTotalSupplyCall,
         ];
 
-        if (
-          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-          currentNetwork.chainId === NETWORKS.rinkeby.chainId
-        ) {
+        if (isInLayer1(currentNetwork.chainId)) {
           const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
           const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
@@ -118,18 +122,25 @@ const Graph = () => {
           ethcalls.push(linkOraclePriceCall);
           ethcalls.push(reservesCtxPoolCall);
         }
+        if (isOptimism(currentNetwork.chainId)) {
+          const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+          const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
+          const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
+          ethcalls.push(linkOraclePriceCall);
+          ethcalls.push(snxOraclePriceCall);
+          ethcalls.push(uniOraclePriceCall);
+        }
         let currentTotalPrice;
         let wethOraclePrice;
         let daiOraclePrice;
         let currentTotalSupply;
         let aaveOraclePrice;
         let linkOraclePrice;
+        let snxOraclePrice;
+        let uniOraclePrice;
         let reservesCtxPool;
 
-        if (
-          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-          currentNetwork.chainId === NETWORKS.rinkeby.chainId
-        ) {
+        if (isInLayer1(currentNetwork.chainId)) {
           // @ts-ignore
           [
             currentTotalPrice,
@@ -138,6 +149,18 @@ const Graph = () => {
             currentTotalSupply,
             aaveOraclePrice,
             linkOraclePrice,
+            reservesCtxPool,
+          ] = await signer.ethcallProvider?.all(ethcalls);
+        } else if (isOptimism(currentNetwork.chainId)) {
+          // @ts-ignore
+          [
+            currentTotalPrice,
+            wethOraclePrice,
+            daiOraclePrice,
+            currentTotalSupply,
+            linkOraclePrice,
+            snxOraclePrice,
+            uniOraclePrice,
             reservesCtxPool,
           ] = await signer.ethcallProvider?.all(ethcalls);
         } else {
@@ -152,49 +175,70 @@ const Graph = () => {
         let currentWETHStake = BigNumber.from(0);
         let currentAAVEStake = BigNumber.from(0);
         let currentLINKStake = BigNumber.from(0);
+        let currentSNXStake = BigNumber.from(0);
+        let currentUNIStake = BigNumber.from(0);
         let currentMATICStake = BigNumber.from(0);
 
+        const networkId = currentNetwork.chainId;
+        // @ts-ignore
+        let contracts;
+        switch (networkId) {
+          case NETWORKS.mainnet.chainId:
+            contracts = cryptexJson[1].mainnet.contracts;
+            break;
+          case NETWORKS.rinkeby.chainId:
+            contracts = cryptexJson[4].rinkeby.contracts;
+            break;
+          case NETWORKS.optimism.chainId:
+            contracts = cryptexJson[10].optimism.contracts;
+            break;
+          case NETWORKS.okovan.chainId:
+            contracts = cryptexJson[69].okovan.contracts;
+            break;
+          case NETWORKS.polygon.chainId:
+            contracts = cryptexJson[137].polygon.contracts;
+            break;
+          default:
+            contracts = cryptexJson[4].rinkeby.contracts;
+            break;
+        }
         await data.states.forEach((s: any) => {
-          const networkId = currentNetwork.chainId;
-          let contracts;
-          switch (networkId) {
-            case NETWORKS.mainnet.chainId:
-              contracts = cryptexJson[1].mainnet.contracts;
-              break;
-            case NETWORKS.rinkeby.chainId:
-              contracts = cryptexJson[4].rinkeby.contracts;
-              break;
-            case NETWORKS.okovan.chainId:
-              contracts = cryptexJson[69].okovan.contracts;
-              break;
-            case NETWORKS.polygon.chainId:
-              contracts = cryptexJson[137].polygon.contracts;
-              break;
-            default:
-              contracts = cryptexJson[4].rinkeby.contracts;
-              break;
+          const cAddress = s.id.toLowerCase();
+          // @ts-ignore
+          if (cAddress === contracts.DAIVaultHandler.address.toLowerCase()) {
+            currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
           }
-          switch (s.id.toLowerCase()) {
-            case contracts.DAIVaultHandler.address.toLowerCase():
-              currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
-            case contracts.WETHVaultHandler.address.toLowerCase():
-              currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
+          // @ts-ignore
+          if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
+            currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+          }
+
+          if (isPolygon(currentNetwork.chainId)) {
             // @ts-ignore
-            case contracts.AaveVaultHandler.address.toLowerCase():
-              currentAAVEStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
-            // @ts-ignore
-            case contracts.LinkVaultHandler.address.toLowerCase():
-              currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
-            // @ts-ignore
-            case contracts.MATICVaultHandler.address.toLowerCase():
+            if (cAddress === contracts.MATICVaultHandler.address.toLowerCase()) {
               currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-              break;
-            default:
-              break;
+            }
+            // @ts-ignore
+          } else if (cAddress === contracts.LinkVaultHandler.address.toLowerCase()) {
+            currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+          }
+
+          if (
+            isInLayer1(currentNetwork.chainId) &&
+            // @ts-ignore
+            cAddress === contracts.AaveVaultHandler.address.toLowerCase()
+          ) {
+            currentAAVEStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+          }
+          if (isOptimism(currentNetwork.chainId)) {
+            // @ts-ignore
+            if (cAddress === contracts.SNXVaultHandler.address.toLowerCase()) {
+              currentSNXStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            }
+            // @ts-ignore
+            if (cAddress === contracts.UNIVaultHandler.address.toLowerCase()) {
+              currentUNIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            }
           }
         });
 
@@ -206,6 +250,10 @@ const Graph = () => {
         setAaveStake(formatAAVE);
         const formatLINK = ethers.utils.formatEther(currentLINKStake);
         setLinkStake(formatLINK);
+        const formatSNX = ethers.utils.formatEther(currentSNXStake);
+        setSNXStake(formatSNX);
+        const formatUNI = ethers.utils.formatEther(currentUNIStake);
+        setUNIStake(formatUNI);
         const formatMATIC = ethers.utils.formatEther(currentMATICStake);
         setMATICStake(formatMATIC);
 
@@ -213,13 +261,17 @@ const Graph = () => {
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
         let aaveUSD = "0";
         let linkUSD = "0";
+        let snxUSD = "0";
+        let uniUSD = "0";
         let maticUSD = "0";
-        if (
-          currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-          currentNetwork.chainId === NETWORKS.rinkeby.chainId
-        ) {
+        if (isInLayer1(currentNetwork.chainId)) {
           aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+        }
+        if (isOptimism(currentNetwork.chainId)) {
+          linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+          snxUSD = ethers.utils.formatEther(snxOraclePrice.mul(10000000000));
+          uniUSD = ethers.utils.formatEther(uniOraclePrice.mul(10000000000));
         }
         if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
           maticUSD = await getMaticUSD();
@@ -230,15 +282,14 @@ const Graph = () => {
           toUSD(daiUSD, formatDAI) +
           toUSD(aaveUSD, formatAAVE) +
           toUSD(linkUSD, formatLINK) +
+          toUSD(snxUSD, formatSNX) +
+          toUSD(uniUSD, formatUNI) +
           toUSD(maticUSD, formatMATIC);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
         if (signer) {
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          if (
-            currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-            currentNetwork.chainId === NETWORKS.rinkeby.chainId
-          ) {
+          if (isInLayer1(currentNetwork.chainId)) {
             const currentPriceCTX = getPriceInUSDFromPair(
               reservesCtxPool[0],
               reservesCtxPool[1],
@@ -370,7 +421,7 @@ const Graph = () => {
               <h4>Total Staked in UNI</h4>
               <h5 className="number neon-highlight">
                 <NumberFormat
-                  value={linkStake}
+                  value={uniStake}
                   displayType="text"
                   thousandSeparator
                   decimalScale={2}
@@ -383,7 +434,7 @@ const Graph = () => {
               <h4>Total Staked in SNX</h4>
               <h5 className="number neon-highlight">
                 <NumberFormat
-                  value={linkStake}
+                  value={snxStake}
                   displayType="text"
                   thousandSeparator
                   decimalScale={2}
