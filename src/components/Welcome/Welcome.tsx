@@ -203,8 +203,7 @@ const Welcome = ({ signerAddress }: props) => {
                     </div>
                     <p className="title tcap">TCAP Balance</p>
                   </Col>
-                  {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-                    currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
+                  {isInLayer1(currentNetwork.chainId) && (
                     <Col>
                       <div className="tcap-balance">
                         <CtxIcon className="tcap-neon" />
