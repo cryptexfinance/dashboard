@@ -166,29 +166,6 @@ const Header = ({ signerAddress }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
-  /*
-  const EthereumBtn = () => (
-    <>
-      <ETHIcon className="eth" />
-      <h6>{currentNetwork.chainId === NETWORKS.mainnet.chainId ? "Ethereum" : "Rinkeby"}</h6>
-    </>
-  );
-
-  const OptimismBtn = () => (
-    <>
-      <OPTIMISMIcon className="optimism" />
-      <h6>{currentNetwork.chainId === NETWORKS.optimism.chainId ? "Optimism" : "Kovan"}</h6>
-    </>
-  );
-
-  const PolygonBtn = () => (
-    <>
-      <POLYGONIcon className="eth" />
-      <h6>{currentNetwork.chainId === NETWORKS.polygon.chainId ? "Polygon" : "Mumbai"}</h6>
-    </>
-  );
-  */
-
   const EthereumToggle = () => (
     <>
       <ETHIcon className="eth" />
@@ -234,18 +211,6 @@ const Header = ({ signerAddress }: props) => {
         <>
           {!window.location.pathname.includes("/governance") && (
             <div className="network-container">
-              {/* <Button
-                className="btn"
-                onClick={
-                  currentNetwork.isBrowserWallet ? () => setShowChangeNetwork(true) : () => {}
-                }
-              >
-                <div className="title">
-                  {isInLayer1(currentNetwork.chainId) && EthereumBtn()}
-                  {isOptimism(currentNetwork.chainId) && OptimismBtn()}
-                  {isPolygon(currentNetwork.chainId) && PolygonBtn()}
-                </div>
-              </Button> */}
               <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
                 <Dropdown.Toggle
                   variant="secondary"

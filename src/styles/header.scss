@@ -134,13 +134,22 @@
     margin-top: 70px;
 
     .network-container {
-      .btn {
+      .dropdown {
         width: 85%;
-        .title {
-          justify-content: center;
+
+        button{
+          width: 100% !important;
         }
-        h6 {
-          margin-left: 2rem;
+      }
+      .dropdown-menu {
+        width: 100%;
+      }
+      .dropdown-toggle::after {
+        margin-left: 85%;
+      }
+      .network-toggle {
+        svg { 
+          margin-right: 15px;
         }
       }
     }
