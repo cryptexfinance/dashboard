@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import "../styles/header.scss";
@@ -93,7 +94,7 @@ const Header = ({ signerAddress }: props) => {
   }
 
   async function changeNetwork(newChainId: string) {
-    if (currentNetwork.wallet === "metamask") {
+    if (currentNetwork.isBrowserWallet) {
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
@@ -112,6 +113,27 @@ const Header = ({ signerAddress }: props) => {
       }
     }
   }
+
+  const onNetworkChange = async (newChainId: string | null) => {
+    if (currentNetwork.isBrowserWallet) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: newChainId }],
+        });
+      } catch (error) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (
+          error.code === 4902 &&
+          (newChainId === NETWORKS.optimism.hexChainId ||
+            newChainId === NETWORKS.okovan.hexChainId ||
+            newChainId === NETWORKS.polygon.hexChainId)
+        ) {
+          addNetwork(newChainId);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const loadAddress = async () => {
@@ -144,6 +166,7 @@ const Header = ({ signerAddress }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
+  /*
   const EthereumBtn = () => (
     <>
       <ETHIcon className="eth" />
@@ -164,6 +187,46 @@ const Header = ({ signerAddress }: props) => {
       <h6>{currentNetwork.chainId === NETWORKS.polygon.chainId ? "Polygon" : "Mumbai"}</h6>
     </>
   );
+  */
+
+  const EthereumToggle = () => (
+    <>
+      <ETHIcon className="eth" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
+    </>
+  );
+
+  const EthereumOpt = () => (
+    <Dropdown.Item key={NETWORKS.mainnet.chainId} eventKey={NETWORKS.mainnet.hexChainId}>
+      {EthereumToggle()}
+    </Dropdown.Item>
+  );
+
+  const OptimismToggle = () => (
+    <>
+      <OPTIMISMIcon className="optimism" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Optimism" : "Kovan"}</h6>
+    </>
+  );
+
+  const OptimismOpt = () => (
+    <Dropdown.Item key={NETWORKS.optimism.chainId} eventKey={NETWORKS.optimism.hexChainId}>
+      {OptimismToggle()}
+    </Dropdown.Item>
+  );
+
+  const PolygonToggle = () => (
+    <>
+      <POLYGONIcon className="eth" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Polygon" : "Mumbai"}</h6>
+    </>
+  );
+
+  /* const PolygonOpt = () => (
+    <Dropdown.Item key={NETWORKS.polygon.chainId} eventKey={NETWORKS.polygon.hexChainId}>
+      {PolygonToggle()}
+    </Dropdown.Item>
+  ); */
 
   return (
     <Nav className="header">
@@ -171,10 +234,10 @@ const Header = ({ signerAddress }: props) => {
         <>
           {!window.location.pathname.includes("/governance") && (
             <div className="network-container">
-              <Button
+              {/* <Button
                 className="btn"
                 onClick={
-                  currentNetwork.wallet === "metamask" ? () => setShowChangeNetwork(true) : () => {}
+                  currentNetwork.isBrowserWallet ? () => setShowChangeNetwork(true) : () => {}
                 }
               >
                 <div className="title">
@@ -182,7 +245,25 @@ const Header = ({ signerAddress }: props) => {
                   {isOptimism(currentNetwork.chainId) && OptimismBtn()}
                   {isPolygon(currentNetwork.chainId) && PolygonBtn()}
                 </div>
-              </Button>
+              </Button> */}
+              <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
+                <Dropdown.Toggle
+                  variant="secondary"
+                  id="dropdown-flags"
+                  className="text-left"
+                  style={{ width: 200 }}
+                >
+                  <div className="network-toggle">
+                    {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
+                    {isOptimism(currentNetwork.chainId) && OptimismToggle()}
+                    {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                  </div>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {EthereumOpt()}
+                  {OptimismOpt()}
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
           )}
           <div className="info">

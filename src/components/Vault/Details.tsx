@@ -924,12 +924,12 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
-      let vOptions = ["MATIC", "DAI"];
-      if (isInLayer1(currentNetwork.chainId)) {
-        vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
-      }
+      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
       if (isOptimism(currentNetwork.chainId)) {
         vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
+      }
+      if (isPolygon(currentNetwork.chainId)) {
+        vOptions = ["MATIC", "DAI"];
       }
       setVaultOptions(vOptions);
       // TODO : if stuck at pending do something

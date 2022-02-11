@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import { getProviderInfo } from "web3modal";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import { useSwipeable } from "react-swipeable";
@@ -82,7 +83,7 @@ const App = () => {
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
 
-  const setCurrentNetwork = (networkId: number, walletName: string) => {
+  const setCurrentNetwork = (networkId: number, walletName: string, isBrowserWallet: boolean) => {
     let cNetwork;
     switch (networkId) {
       case 1:
@@ -114,6 +115,7 @@ const App = () => {
     networks.setCurrentName(cNetwork.name);
     networks.setCurrentWETHAddress(cNetwork.weth);
     networks.setCurrentDAIAddress(cNetwork.dai);
+    networks.setCurrentIsBrowserWallet(isBrowserWallet);
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
@@ -582,14 +584,17 @@ const App = () => {
     } else {
       await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
     }
+
+    const isBrowserWallet =
+      networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
     const cAddress = await currentSigner.getAddress();
     setCurrentSignerAddress(cAddress);
-    setCurrentNetwork(network.chainId, walletName);
+    setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
 
     // @ts-ignore
     networkProvider.on("chainChanged", (chainId: number) => {
       if (chainId !== network.chainId) {
-        setCurrentNetwork(chainId, "");
+        setCurrentNetwork(chainId, "", isBrowserWallet);
         window.location.reload();
       }
     });
@@ -628,7 +633,7 @@ const App = () => {
         } else {
           setContracts(randomSigner, ethcallProvider, parseInt(chainId));
         }
-        setCurrentNetwork(parseInt(chainId), "");
+        setCurrentNetwork(parseInt(chainId), "", false);
         setLoading(false);
       }
     }
