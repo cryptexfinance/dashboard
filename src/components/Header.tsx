@@ -22,9 +22,10 @@ import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
 type props = {
   signerAddress: string;
+  isMobile: boolean;
 };
 
-const Header = ({ signerAddress }: props) => {
+const Header = ({ signerAddress, isMobile }: props) => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -33,6 +34,7 @@ const Header = ({ signerAddress }: props) => {
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  const [loading, setLoading] = useState(false);
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -137,6 +139,7 @@ const Header = ({ signerAddress }: props) => {
 
   useEffect(() => {
     const loadAddress = async () => {
+      setLoading(true);
       if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
         const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
         const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
@@ -159,6 +162,7 @@ const Header = ({ signerAddress }: props) => {
         setAddress(signerAddress);
         const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
+        setLoading(false);
       }
     };
 
@@ -199,6 +203,7 @@ const Header = ({ signerAddress }: props) => {
     </>
   );
 
+  const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
   /* const PolygonOpt = () => (
     <Dropdown.Item key={NETWORKS.polygon.chainId} eventKey={NETWORKS.polygon.hexChainId}>
       {PolygonToggle()}
@@ -209,7 +214,7 @@ const Header = ({ signerAddress }: props) => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          {!window.location.pathname.includes("/governance") && (
+          {!window.location.pathname.includes("/governance") && showDropdown() && (
             <div className="network-container">
               <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
                 <Dropdown.Toggle

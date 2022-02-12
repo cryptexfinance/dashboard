@@ -722,7 +722,7 @@ const App = () => {
                       </Alert>
                     )}
 
-                    <Header signerAddress={currentSignerAddress} />
+                    <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
                     <ToastContainer />
                     <Switch>
                       <Route path={`${match.url}/`}>
