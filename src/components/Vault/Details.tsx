@@ -20,11 +20,15 @@ import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.sv
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
 import { ReactComponent as AAVEIconSmall } from "../../assets/images/vault/aave.svg";
 import { ReactComponent as LINKIconSmall } from "../../assets/images/vault/chainlink.svg";
+import { ReactComponent as UNIIconSmall } from "../../assets/images/vault/uni.svg";
+import { ReactComponent as SNXIconSmall } from "../../assets/images/vault/snx2.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
+import { ReactComponent as SNXIcon } from "../../assets/images/graph/snx.svg";
+import { ReactComponent as UNIIcon } from "../../assets/images/graph/uni.svg";
 import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon3.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
@@ -34,6 +38,8 @@ import {
   errorNotification,
   getDefaultProvider,
   isInLayer1,
+  isPolygon,
+  isOptimism,
   getRatio,
   getSafeRemoveCollateral,
   getSafeMint,
@@ -55,7 +61,7 @@ const Details = ({ address }: props) => {
   const vaults = useContext(VaultsContext);
   const signer = useContext(SignerContext);
 
-  let currency = currentNetwork.chainId !== NETWORKS.polygon.chainId ? "ETH" : "MATIC";
+  let currency = !isPolygon(currentNetwork.chainId) ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
   // @ts-ignore
@@ -65,7 +71,7 @@ const Details = ({ address }: props) => {
       break;
     case "weth":
       currency = "WETH";
-      if (FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      if (FEATURES.POLYGON && isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/MATIC`);
         currency = "MATIC";
       }
@@ -74,7 +80,7 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+      if (isInLayer1(currentNetwork.chainId)) {
         currency = "AAVE";
       } else {
         currency = "ETH";
@@ -82,7 +88,7 @@ const Details = ({ address }: props) => {
       }
       break;
     case "link":
-      if (FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId)) {
+      if (!isPolygon(currentNetwork.chainId)) {
         currency = "LINK";
       } else {
         currency = "ETH";
@@ -91,18 +97,13 @@ const Details = ({ address }: props) => {
       break;
     case "matic":
       currency = "MATIC";
-      if (!FEATURES.POLYGON && currentNetwork.chainId !== NETWORKS.polygon.chainId) {
+      if (!FEATURES.POLYGON && !isPolygon(currentNetwork.chainId)) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
       break;
-    case "wbtc":
-      currency = "WETH";
-      history?.push(`/vault/WETH`);
-      break;
     default:
-      currency =
-        FEATURES.POLYGON && currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH";
+      currency = FEATURES.POLYGON && isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH";
       break;
   }
 
@@ -113,8 +114,10 @@ const Details = ({ address }: props) => {
   );
   const [isApproved, setIsApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [btnDisabled, setBtnDisabled] = useState(false);
 
   // Vault Data
+  const [vaultOptions, setVaultOptions] = useState<Array<string>>([]);
   const [selectedVaultId, setSelectedVaultId] = useState("0");
   const [vaultDebt, setVaultDebt] = useState("0");
   const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
@@ -199,10 +202,7 @@ const Details = ({ address }: props) => {
       !isUndefined(tokens.wethTokenRead) &&
       !isUndefined(tokens.daiTokenRead);
 
-    if (
-      currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-      currentNetwork.chainId === NETWORKS.rinkeby.chainId
-    ) {
+    if (isInLayer1(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.aaveOracle) &&
@@ -216,7 +216,26 @@ const Details = ({ address }: props) => {
         !isUndefined(tokens.aaveTokenRead) &&
         !isUndefined(tokens.linkTokenRead);
     }
-    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+    if (isOptimism(currentNetwork.chainId)) {
+      valid =
+        valid &&
+        !isUndefined(oracles.linkOracle) &&
+        !isUndefined(oracles.snxOracle) &&
+        !isUndefined(oracles.uniOracle) &&
+        !isUndefined(oracles.linkOracleRead) &&
+        !isUndefined(oracles.snxOracleRead) &&
+        !isUndefined(oracles.uniOracleRead) &&
+        !isUndefined(vaults.linkVault) &&
+        !isUndefined(vaults.snxVault) &&
+        !isUndefined(vaults.uniVault) &&
+        !isUndefined(tokens.linkToken) &&
+        !isUndefined(tokens.snxToken) &&
+        !isUndefined(tokens.uniToken) &&
+        !isUndefined(tokens.linkTokenRead) &&
+        !isUndefined(tokens.snxTokenRead) &&
+        !isUndefined(tokens.uniTokenRead);
+    }
+    if (isPolygon(currentNetwork.chainId)) {
       valid =
         valid &&
         !isUndefined(oracles.maticOracle) &&
@@ -243,11 +262,11 @@ const Details = ({ address }: props) => {
       let currentTokenRead;
       let balance;
       const provider = getDefaultProvider(
-        currentNetwork.chainId || NETWORKS.rinkeby.chainId,
+        currentNetwork.chainId || NETWORKS.mainnet.chainId,
         currentNetwork.chainId === 1 ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
       );
       switch (vaultType) {
-        case "ETH": {
+        case "ETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
           currentToken = tokens.wethToken;
@@ -255,7 +274,6 @@ const Details = ({ address }: props) => {
           currentTokenRead = tokens.wethTokenRead;
           balance = await provider.getBalance(address);
           break;
-        }
         case "WETH":
           currentVault = vaults.wethVault;
           currentVaultRead = vaults.wethVaultRead;
@@ -283,6 +301,20 @@ const Details = ({ address }: props) => {
           currentToken = tokens.linkToken;
           currentOracleRead = oracles.linkOracleRead;
           currentTokenRead = tokens.linkTokenRead;
+          break;
+        case "SNX":
+          currentVault = vaults.snxVault;
+          currentVaultRead = vaults.snxVaultRead;
+          currentToken = tokens.snxToken;
+          currentOracleRead = oracles.snxOracleRead;
+          currentTokenRead = tokens.snxTokenRead;
+          break;
+        case "UNI":
+          currentVault = vaults.uniVault;
+          currentVaultRead = vaults.uniVaultRead;
+          currentToken = tokens.uniToken;
+          currentOracleRead = oracles.uniOracleRead;
+          currentTokenRead = tokens.uniTokenRead;
           break;
         case "MATIC":
           currentVault = vaults.maticVault;
@@ -461,7 +493,7 @@ const Details = ({ address }: props) => {
 
   const refresh = async () => {
     try {
-      if (currentNetwork.chainId !== NETWORKS.okovan.chainId) {
+      if (!isOptimism(currentNetwork.chainId)) {
         await refetch();
       } else {
         loadVault(selectedVault, data);
@@ -611,10 +643,9 @@ const Details = ({ address }: props) => {
 
   const addCollateral = async () => {
     if (addCollateralTxt) {
+      setBtnDisabled(true);
       // fix decimals
       const amount = ethers.utils.parseUnits(addCollateralTxt, selectedVaultDecimals);
-
-      // const amount = ethers.utils.parseEther(addCollateralTxt);
       try {
         if (isGasAsset()) {
           let tx;
@@ -640,6 +671,7 @@ const Details = ({ address }: props) => {
           errorNotification("Insufficient funds to stake");
         }
       }
+      setBtnDisabled(false);
       setAddCollateralTxt("");
       setAddCollateralUSD("0");
     } else {
@@ -673,7 +705,7 @@ const Details = ({ address }: props) => {
   const removeCollateral = async () => {
     if (removeCollateralTxt) {
       const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
-
+      setBtnDisabled(true);
       try {
         if (isGasAsset()) {
           let tx;
@@ -695,6 +727,7 @@ const Details = ({ address }: props) => {
           errorNotification("Not enough collateral on vault");
         }
       }
+      setBtnDisabled(false);
       setRemoveCollateralTxt("");
       setRemoveCollateralUSD("0");
     } else {
@@ -726,6 +759,7 @@ const Details = ({ address }: props) => {
 
   const mintTCAP = async () => {
     if (mintTxt) {
+      setBtnDisabled(true);
       try {
         const amount = ethers.utils.parseEther(mintTxt);
         const tx = await selectedVaultContract?.mint(amount);
@@ -738,6 +772,7 @@ const Details = ({ address }: props) => {
           errorNotification("Not enough collateral on vault");
         }
       }
+      setBtnDisabled(false);
       setMintTxt("");
       setMintUSD("0");
     } else {
@@ -769,6 +804,7 @@ const Details = ({ address }: props) => {
 
   const burnTCAP = async () => {
     if (burnTxt) {
+      setBtnDisabled(true);
       try {
         const amount = ethers.utils.parseEther(burnTxt);
         const currentBurnFee = await selectedVaultContract?.getFee(amount);
@@ -785,6 +821,7 @@ const Details = ({ address }: props) => {
           errorNotification("Burn value too high");
         }
       }
+      setBtnDisabled(false);
       setBurnTxt("");
       setBurnUSD("0");
       setBurnFee("0");
@@ -837,6 +874,7 @@ const Details = ({ address }: props) => {
 
   const action = async () => {
     if (selectedVaultId === "0") {
+      setBtnDisabled(true);
       try {
         const tx = await selectedVaultContract?.createVault();
         notifyUser(tx, refresh);
@@ -845,7 +883,9 @@ const Details = ({ address }: props) => {
           errorNotification("Transaction rejected");
         }
       }
+      setBtnDisabled(false);
     } else {
+      setBtnDisabled(true);
       try {
         const amount = approveValue;
         const tx = await selectedCollateralContract?.approve(
@@ -858,6 +898,7 @@ const Details = ({ address }: props) => {
           errorNotification("Transaction rejected");
         }
       }
+      setBtnDisabled(false);
     }
   };
 
@@ -883,6 +924,14 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
+      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
+      if (isOptimism(currentNetwork.chainId)) {
+        vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
+      }
+      if (isPolygon(currentNetwork.chainId)) {
+        vOptions = ["MATIC", "DAI"];
+      }
+      setVaultOptions(vOptions);
       // TODO : if stuck at pending do something
       if (networkStatus === NetworkStatus.ready || networkStatus === NetworkStatus.error) {
         setIsLoading(false);
@@ -912,6 +961,10 @@ const Details = ({ address }: props) => {
               return <AAVEIconSmall className="btc" />;
             case "LINK":
               return <LINKIconSmall className="link" />;
+            case "UNI":
+              return <UNIIconSmall className="uni" />;
+            case "SNX":
+              return <SNXIconSmall className="link" />;
             case "MATIC":
               return <POLYGONIconSmall className="dai" />;
             default:
@@ -921,16 +974,9 @@ const Details = ({ address }: props) => {
 
         <div className="select-container">
           <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
-            {currentNetwork.chainId === NETWORKS.polygon.chainId && <option>MATIC</option>}
-            <option value="ETH">ETH</option>
-            <option>WETH</option>
-            <option>DAI</option>
-            {FEATURES.NEW_VAULTS && isInLayer1(currentNetwork.chainId) && (
-              <>
-                <option>AAVE</option>
-                <option>LINK</option>
-              </>
-            )}
+            {vaultOptions.map((val) => (
+              <option key={val}>{val}</option>
+            ))}
           </Form.Control>
           <p className="number">
             <NumberFormat
@@ -965,6 +1011,10 @@ const Details = ({ address }: props) => {
                       return <AAVEIcon className="eth" />;
                     case "LINK":
                       return <LINKIcon className="eth" />;
+                    case "UNI":
+                      return <UNIIcon className="eth" />;
+                    case "SNX":
+                      return <SNXIcon className="eth" />;
                     case "MATIC":
                       return <POLYGONIcon className="eth" />;
                     default:
@@ -983,6 +1033,10 @@ const Details = ({ address }: props) => {
                             return <AAVEIconSmall className="aave small" />;
                           case "LINK":
                             return <LINKIconSmall className="link small" />;
+                          case "UNI":
+                            return <UNIIconSmall className="uni small" />;
+                          case "SNX":
+                            return <SNXIconSmall className="snx small" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="btc small" />;
                           default:
@@ -1059,6 +1113,10 @@ const Details = ({ address }: props) => {
                             return <AAVEIconSmall className="aave" />;
                           case "LINK":
                             return <LINKIconSmall className="link" />;
+                          case "SNX":
+                            return <SNXIconSmall className="snx" />;
+                          case "UNI":
+                            return <UNIIconSmall className="uni" />;
                           case "MATIC":
                             return <POLYGONIconSmall className="polygon" />;
                           default:
@@ -1104,7 +1162,11 @@ const Details = ({ address }: props) => {
                         onChange={onChangeAddCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-green" onClick={addCollateral}>
+                        <Button
+                          className="neon-green"
+                          onClick={addCollateral}
+                          disabled={btnDisabled}
+                        >
                           +
                         </Button>
                       </InputGroup.Append>
@@ -1136,7 +1198,11 @@ const Details = ({ address }: props) => {
                         onChange={onChangeRemoveCollateral}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-orange" onClick={removeCollateral}>
+                        <Button
+                          className="neon-orange"
+                          onClick={removeCollateral}
+                          disabled={btnDisabled}
+                        >
                           -
                         </Button>
                       </InputGroup.Append>
@@ -1201,7 +1267,7 @@ const Details = ({ address }: props) => {
                         onChange={onChangeMint}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-green" onClick={mintTCAP}>
+                        <Button className="neon-green" onClick={mintTCAP} disabled={btnDisabled}>
                           +
                         </Button>
                       </InputGroup.Append>
@@ -1233,7 +1299,7 @@ const Details = ({ address }: props) => {
                         onChange={onChangeBurn}
                       />
                       <InputGroup.Append>
-                        <Button className="neon-orange" onClick={burnTCAP}>
+                        <Button className="neon-orange" onClick={burnTCAP} disabled={btnDisabled}>
                           -
                         </Button>
                       </InputGroup.Append>
@@ -1269,7 +1335,7 @@ const Details = ({ address }: props) => {
         <div className="pre-actions">
           <h5 className="action-title">{title}</h5>
           <p>{text}</p>
-          <Button variant="pink neon-pink" onClick={action}>
+          <Button variant="pink neon-pink" onClick={action} disabled={btnDisabled}>
             {title}
           </Button>
         </div>

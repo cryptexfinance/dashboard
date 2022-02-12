@@ -10,6 +10,8 @@ export const useOracles = (): OraclesContext => {
   const [tcapOracle, setTCAPOracle] = useState<ethers.Contract>();
   const [aaveOracle, setAAVEOracle] = useState<ethers.Contract>();
   const [linkOracle, setLINKOracle] = useState<ethers.Contract>();
+  const [snxOracle, setSNXOracle] = useState<ethers.Contract>();
+  const [uniOracle, setUNIOracle] = useState<ethers.Contract>();
   const [maticOracle, setMATICOracle] = useState<ethers.Contract>();
   const [wethOracleRead, setETHOracleRead] = useState<Contract>();
   const [daiOracleRead, setDAIOracleRead] = useState<Contract>();
@@ -17,6 +19,8 @@ export const useOracles = (): OraclesContext => {
   const [tcapOracleRead, setTCAPOracleRead] = useState<Contract>();
   const [aaveOracleRead, setAAVEOracleRead] = useState<Contract>();
   const [linkOracleRead, setLINKOracleRead] = useState<Contract>();
+  const [snxOracleRead, setSNXOracleRead] = useState<Contract>();
+  const [uniOracleRead, setUNIOracleRead] = useState<Contract>();
   const [maticOracleRead, setMATICOracleRead] = useState<Contract>();
 
   const setCurrentWETHOracle = React.useCallback((currentWETHOracle: ethers.Contract): void => {
@@ -36,6 +40,12 @@ export const useOracles = (): OraclesContext => {
   }, []);
   const setCurrentLINKOracle = React.useCallback((currentLINKOracle: ethers.Contract): void => {
     setLINKOracle(currentLINKOracle);
+  }, []);
+  const setCurrentSNXOracle = React.useCallback((currentSNXOracle: ethers.Contract): void => {
+    setSNXOracle(currentSNXOracle);
+  }, []);
+  const setCurrentUNIOracle = React.useCallback((currentUNIOracle: ethers.Contract): void => {
+    setUNIOracle(currentUNIOracle);
   }, []);
   const setCurrentMATICOracle = React.useCallback((currentMATICOracle: ethers.Contract): void => {
     setMATICOracle(currentMATICOracle);
@@ -58,6 +68,12 @@ export const useOracles = (): OraclesContext => {
   const setCurrentLINKOracleRead = React.useCallback((currentLINKOracleRead: Contract): void => {
     setLINKOracleRead(currentLINKOracleRead);
   }, []);
+  const setCurrentSNXOracleRead = React.useCallback((currentSNXOracleRead: Contract): void => {
+    setSNXOracleRead(currentSNXOracleRead);
+  }, []);
+  const setCurrentUNIOracleRead = React.useCallback((currentUNIOracleRead: Contract): void => {
+    setUNIOracleRead(currentUNIOracleRead);
+  }, []);
   const setCurrentMATICOracleRead = React.useCallback((currentMATICOracleRead: Contract): void => {
     setMATICOracleRead(currentMATICOracleRead);
   }, []);
@@ -74,6 +90,10 @@ export const useOracles = (): OraclesContext => {
     setCurrentAAVEOracle,
     linkOracle,
     setCurrentLINKOracle,
+    snxOracle,
+    setCurrentSNXOracle,
+    uniOracle,
+    setCurrentUNIOracle,
     maticOracle,
     setCurrentMATICOracle,
     wethOracleRead,
@@ -88,6 +108,10 @@ export const useOracles = (): OraclesContext => {
     setCurrentAAVEOracleRead,
     linkOracleRead,
     setCurrentLINKOracleRead,
+    snxOracleRead,
+    setCurrentSNXOracleRead,
+    uniOracleRead,
+    setCurrentUNIOracleRead,
     maticOracleRead,
     setCurrentMATICOracleRead,
   };

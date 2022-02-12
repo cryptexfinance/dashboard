@@ -12,6 +12,56 @@
     flex: 1;
     flex-direction: row;
     padding-left: 3rem;
+
+    .dropdown {
+      border-radius: 0.3rem;
+      border: solid 1px $highlight;
+      background-color: $darker;
+    }
+    .network-toggle {
+      display: flex;
+      h6 {
+        line-height: 2rem;
+      }
+      svg { 
+        margin-right: 12px;
+      }
+    }
+    .dropdown-menu {
+      background-color: $darker;
+      margin-top: 1px !important;
+      width: 200px;
+      .dropdown-item {
+        display: flex;
+        padding: 0.5rem 1rem;
+        h6 {
+          line-height: 1.5rem;
+          color: $white;
+        }
+        svg { 
+          margin-right: 20px;
+        }
+      }
+      .dropdown-item.active {
+        background-color: rgba(121, 64, 242, 0.4);
+      }
+      .dropdown-item:hover {
+        background-color: rgba(121, 64, 242, 0.3);
+      }
+    }
+    .dropdown-toggle::after {
+        position: absolute;
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.5em solid;
+        border-right: 0.5em solid transparent;
+        border-bottom: 0;
+        border-left: 0.5em solid transparent;
+        margin-top: -17px;
+        margin-left: 155px;
+    }
+
     .btn {
       height: 3.2rem;
       width: 10.5rem;
@@ -81,6 +131,30 @@
   @media (max-width: 600px) {
     padding-right: 0rem;
     justify-content: center;
-    margin-top: 70px;
+    margin-top: 50px;
+
+    .network-container {
+      .dropdown {
+        width: 85%;
+
+        button{
+          width: 100% !important;
+        }
+      }
+      .dropdown-menu {
+        width: 100%;
+      }
+      .dropdown-toggle::after {
+        margin-left: 85%;
+      }
+      .network-toggle {
+        svg { 
+          margin-right: 15px;
+        }
+      }
+    }
+    .info {
+      justify-content: center;
+    }
   }
 }

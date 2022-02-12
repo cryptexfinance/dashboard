@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import { getProviderInfo } from "web3modal";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import { useSwipeable } from "react-swipeable";
@@ -40,7 +41,14 @@ import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
-import { isValidNetwork, getDefaultProvider, toFragment } from "./utils/utils";
+import {
+  isInLayer1,
+  isPolygon,
+  isValidNetwork,
+  getDefaultProvider,
+  toFragment,
+  isOptimism,
+} from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
 const clientOracle = (graphqlEndpoint: string) =>
@@ -72,9 +80,10 @@ const App = () => {
   const rewards = useRewards();
   const match = useRouteMatch();
   const location = useLocation();
+  setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
 
-  const setCurrentNetwork = (networkId: number, walletName: string) => {
+  const setCurrentNetwork = (networkId: number, walletName: string, isBrowserWallet: boolean) => {
     let cNetwork;
     switch (networkId) {
       case 1:
@@ -84,6 +93,10 @@ const App = () => {
       case 4:
         cNetwork = NETWORKS.rinkeby;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+        break;
+      case 10:
+        cNetwork = NETWORKS.optimism;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
         break;
       case 69:
         cNetwork = NETWORKS.okovan;
@@ -102,6 +115,7 @@ const App = () => {
     networks.setCurrentName(cNetwork.name);
     networks.setCurrentWETHAddress(cNetwork.weth);
     networks.setCurrentDAIAddress(cNetwork.dai);
+    networks.setCurrentIsBrowserWallet(isBrowserWallet);
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
@@ -132,22 +146,11 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentAAVEVault(currentAAVEVault);
-    const currentLINKVault = new ethers.Contract(
-      contracts.LinkVaultHandler.address,
-      contracts.LinkVaultHandler.abi,
-      currentSigner
-    );
-    vaults.setCurrentLINKVault(currentLINKVault);
     const currentAVEEVaultRead = new Contract(
       contracts.AaveVaultHandler.address,
       contracts.AaveVaultHandler.abi
     );
     vaults.setCurrentAAVEVaultRead(currentAVEEVaultRead);
-    const currentLINKVaultRead = new Contract(
-      contracts.LinkVaultHandler.address,
-      contracts.LinkVaultHandler.abi
-    );
-    vaults.setCurrentLINKVaultRead(currentLINKVaultRead);
 
     // Tokens
     const currentAAVEToken = new ethers.Contract(
@@ -156,17 +159,43 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentAAVEToken(currentAAVEToken);
-    const currentLINKToken = new ethers.Contract(
-      contracts.LINK.address,
-      contracts.LINK.abi,
-      currentSigner
-    );
-    tokens.setCurrentLINKToken(currentLINKToken);
 
     const currentAAVETokenRead = new Contract(contracts.AAVE.address, contracts.AAVE.abi);
     tokens.setCurrentAAVETokenRead(currentAAVETokenRead);
-    const currentLINKTokenRead = new Contract(contracts.LINK.address, contracts.LINK.abi);
-    tokens.setCurrentLINKTokenRead(currentLINKTokenRead);
+
+    // Set Rewards
+    const currentWETHReward = new ethers.Contract(
+      // @ts-ignore
+      contracts.WETHRewardHandler.address,
+      // @ts-ignore
+      contracts.WETHRewardHandler.abi,
+      currentSigner
+    );
+    rewards.setCurrentWETHReward(currentWETHReward);
+    const currentDAIReward = new ethers.Contract(
+      // @ts-ignore
+      contracts.DAIRewardHandler.address,
+      // @ts-ignore
+      contracts.DAIRewardHandler.abi,
+      currentSigner
+    );
+    rewards.setCurrentDAIReward(currentDAIReward);
+
+    const currentWETHRewardRead = new Contract(
+      // @ts-ignore
+      contracts.WETHRewardHandler.address,
+      // @ts-ignore
+      contracts.WETHRewardHandler.abi
+    );
+    rewards.setCurrentWETHRewardRead(currentWETHRewardRead);
+
+    const currentDAIRewardRead = new Contract(
+      // @ts-ignore
+      contracts.DAIRewardHandler.address,
+      // @ts-ignore
+      contracts.DAIRewardHandler.abi
+    );
+    rewards.setCurrentDAIRewardRead(currentDAIRewardRead);
 
     // Set Liquidity Rewards
     const currentWETHPoolReward = new ethers.Contract(
@@ -203,22 +232,11 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentAAVEOracle(currentAAVEOracle);
-    const currentLINKOracle = new ethers.Contract(
-      contracts.LinkOracle.address,
-      contracts.LinkOracle.abi,
-      currentSigner
-    );
-    oracles.setCurrentLINKOracle(currentLINKOracle);
     const currentAAVEOracleRead = new Contract(
       contracts.AaveOracle.address,
       contracts.AaveOracle.abi
     );
     oracles.setCurrentAAVEOracleRead(currentAAVEOracleRead);
-    const currentLINKOracleRead = new Contract(
-      contracts.LinkOracle.address,
-      contracts.LinkOracle.abi
-    );
-    oracles.setCurrentLINKOracleRead(currentLINKOracleRead);
 
     // Set Governance
     const currentDelegatorFactory = new ethers.Contract(
@@ -256,9 +274,109 @@ const App = () => {
       const currentDAIPoolToken = new ethers.Contract(daiPoolAddress, UniV2Pair.abi, currentSigner);
       tokens.setCurrentDAIPoolToken(currentDAIPoolToken);
     }
+
+    // Set Governance
+    // @ts-ignore
+    const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
+    tokens.setCurrentCtxToken(currentCtx);
+    const currentGovernorAlpha = new ethers.Contract(
+      // @ts-ignore
+      contracts.GovernorAlpha.address,
+      // @ts-ignore
+      contracts.GovernorAlpha.abi,
+      currentSigner
+    );
+    governance.setCurrentGovernorAlpha(currentGovernorAlpha);
+    const currentTimelock = new ethers.Contract(
+      // @ts-ignore
+      contracts.Timelock.address,
+      // @ts-ignore
+      contracts.Timelock.abi,
+      currentSigner
+    );
+    governance.setCurrentTimelock(currentTimelock);
+    // @ts-ignore
+    const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
+    tokens.setCurrentCtxTokenRead(currentCtxRead);
+
+    const currentGovernorAlphaRead = new Contract(
+      // @ts-ignore
+      contracts.GovernorAlpha.address,
+      // @ts-ignore
+      contracts.GovernorAlpha.abi
+    );
+    governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
+    const currentTimelockRead = new Contract(
+      // @ts-ignore
+      contracts.Timelock.address,
+      // @ts-ignore
+      toFragment(contracts.Timelock.abi)
+    );
+    governance.setCurrentTimelockRead(currentTimelockRead);
   };
 
-  const setPolygonContracts = async (currentSigner: ethers.Signer) => {
+  const setOptimismContracts = async (currentSigner: ethers.Signer) => {
+    const contracts = cryptexJson[10].optimism.contracts;
+
+    // Set Vaults
+    const currentSNXVault = new ethers.Contract(
+      contracts.SNXVaultHandler.address,
+      contracts.SNXVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentSNXVault(currentSNXVault);
+    const currentUNIVault = new ethers.Contract(
+      contracts.UNIVaultHandler.address,
+      contracts.UNIVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentUNIVault(currentUNIVault);
+
+    const currentSNXVaultRead = new Contract(
+      contracts.SNXVaultHandler.address,
+      contracts.SNXVaultHandler.abi
+    );
+    vaults.setCurrentSNXVaultRead(currentSNXVaultRead);
+    const currentUNIVaultRead = new Contract(
+      contracts.UNIVaultHandler.address,
+      contracts.UNIVaultHandler.abi
+    );
+    vaults.setCurrentUNIVaultRead(currentUNIVaultRead);
+
+    // Set Tokens
+    const currentSNXToken = new ethers.Contract(NETWORKS.optimism.snx, ERC20.abi, currentSigner);
+    tokens.setCurrentSNXToken(currentSNXToken);
+    const currentUNIToken = new ethers.Contract(NETWORKS.optimism.uni, ERC20.abi, currentSigner);
+    tokens.setCurrentUNIToken(currentUNIToken);
+
+    const currentSNXTokenRead = new Contract(NETWORKS.optimism.snx, ERC20.abi);
+    tokens.setCurrentSNXTokenRead(currentSNXTokenRead);
+    const currentUNITokenRead = new Contract(NETWORKS.optimism.uni, ERC20.abi);
+    tokens.setCurrentUNITokenRead(currentUNITokenRead);
+
+    // Set Oracles
+    const currentSNXOracle = new ethers.Contract(
+      contracts.SNXOracle.address,
+      contracts.SNXOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentSNXOracle(currentSNXOracle);
+    const currentUNIOracle = new ethers.Contract(
+      contracts.UNIOracle.address,
+      contracts.UNIOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentUNIOracle(currentUNIOracle);
+
+    const currentSNXOracleRead = new Contract(contracts.SNXOracle.address, contracts.SNXOracle.abi);
+    oracles.setCurrentSNXOracleRead(currentSNXOracleRead);
+    const currentUNIOracleRead = new Contract(contracts.UNIOracle.address, contracts.UNIOracle.abi);
+    oracles.setCurrentUNIOracleRead(currentUNIOracleRead);
+  };
+
+  const setPolygonContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
     const contracts = cryptexJson[137].polygon.contracts;
 
     // Set Vaults
@@ -304,31 +422,37 @@ const App = () => {
     let contracts;
     let wethAddress;
     let daiAddress;
+    let linkAddress;
     switch (chainId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
         wethAddress = NETWORKS.mainnet.weth;
         daiAddress = NETWORKS.mainnet.dai;
+        linkAddress = contracts.LINK.address;
         break;
       case 4:
         contracts = cryptexJson[4].rinkeby.contracts;
         wethAddress = NETWORKS.rinkeby.weth;
         daiAddress = NETWORKS.rinkeby.dai;
+        linkAddress = contracts.LINK.address;
+        break;
+      case 10:
+        contracts = cryptexJson[10].optimism.contracts;
+        wethAddress = NETWORKS.optimism.weth;
+        daiAddress = NETWORKS.optimism.dai;
+        linkAddress = NETWORKS.optimism.link;
         break;
       case 69:
         contracts = cryptexJson[69].okovan.contracts;
         wethAddress = NETWORKS.okovan.weth;
         daiAddress = NETWORKS.okovan.dai;
-        break;
-      case 137:
-        contracts = cryptexJson[137].polygon.contracts;
-        wethAddress = NETWORKS.polygon.weth;
-        daiAddress = NETWORKS.polygon.dai;
+        linkAddress = "";
         break;
       default:
         contracts = cryptexJson[4].rinkeby.contracts;
         wethAddress = NETWORKS.rinkeby.weth;
         daiAddress = NETWORKS.rinkeby.dai;
+        linkAddress = contracts.LINK.address;
         break;
     }
 
@@ -345,6 +469,12 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentDAIVault(currentDAIVault);
+    const currentLINKVault = new ethers.Contract(
+      contracts.LinkVaultHandler.address,
+      contracts.LinkVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentLINKVault(currentLINKVault);
 
     const currentWETHVaultRead = new Contract(
       contracts.WETHVaultHandler.address,
@@ -356,6 +486,11 @@ const App = () => {
       contracts.DAIVaultHandler.abi
     );
     vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
+    const currentLINKVaultRead = new Contract(
+      contracts.LinkVaultHandler.address,
+      contracts.LinkVaultHandler.abi
+    );
+    vaults.setCurrentLINKVaultRead(currentLINKVaultRead);
 
     // Set Tokens
     const currentWETHToken = new ethers.Contract(wethAddress, ERC20.abi, currentSigner);
@@ -368,6 +503,8 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentTCAPToken(currentTCAPToken);
+    const currentLINKToken = new ethers.Contract(linkAddress, ERC20.abi, currentSigner);
+    tokens.setCurrentLINKToken(currentLINKToken);
 
     const currentWETHTokenRead = new Contract(wethAddress, ERC20.abi);
     tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
@@ -375,40 +512,8 @@ const App = () => {
     tokens.setCurrentDAITokenRead(currentDAITokenRead);
     const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
     tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
-
-    // Set Rewards
-    const currentWETHReward = new ethers.Contract(
-      // @ts-ignore
-      contracts.WETHRewardHandler.address,
-      // @ts-ignore
-      contracts.WETHRewardHandler.abi,
-      currentSigner
-    );
-    rewards.setCurrentWETHReward(currentWETHReward);
-    const currentDAIReward = new ethers.Contract(
-      // @ts-ignore
-      contracts.DAIRewardHandler.address,
-      // @ts-ignore
-      contracts.DAIRewardHandler.abi,
-      currentSigner
-    );
-    rewards.setCurrentDAIReward(currentDAIReward);
-
-    const currentWETHRewardRead = new Contract(
-      // @ts-ignore
-      contracts.WETHRewardHandler.address,
-      // @ts-ignore
-      contracts.WETHRewardHandler.abi
-    );
-    rewards.setCurrentWETHRewardRead(currentWETHRewardRead);
-
-    const currentDAIRewardRead = new Contract(
-      // @ts-ignore
-      contracts.DAIRewardHandler.address,
-      // @ts-ignore
-      contracts.DAIRewardHandler.abi
-    );
-    rewards.setCurrentDAIRewardRead(currentDAIRewardRead);
+    const currentLINKTokenRead = new Contract(linkAddress, ERC20.abi);
+    tokens.setCurrentLINKTokenRead(currentLINKTokenRead);
 
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
@@ -423,6 +528,12 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentDAIOracle(currentDAIOracle);
+    const currentLINKOracle = new ethers.Contract(
+      contracts.LinkOracle.address,
+      contracts.LinkOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentLINKOracle(currentLINKOracle);
     const currentTCAPOracle = new ethers.Contract(
       contracts.TCAPOracle.address,
       contracts.TCAPOracle.abi,
@@ -437,56 +548,22 @@ const App = () => {
     oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
     const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
     oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
+    const currentLINKOracleRead = new Contract(
+      contracts.LinkOracle.address,
+      contracts.LinkOracle.abi
+    );
+    oracles.setCurrentLINKOracleRead(currentLINKOracleRead);
     const currentTCAPOracleRead = new Contract(
       contracts.TCAPOracle.address,
       contracts.TCAPOracle.abi
     );
     oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
 
-    // Set Governance
-    // @ts-ignore
-    const currentCtx = new ethers.Contract(contracts.Ctx.address, contracts.Ctx.abi, currentSigner);
-    tokens.setCurrentCtxToken(currentCtx);
-    const currentGovernorAlpha = new ethers.Contract(
-      // @ts-ignore
-      contracts.GovernorAlpha.address,
-      // @ts-ignore
-      contracts.GovernorAlpha.abi,
-      currentSigner
-    );
-    governance.setCurrentGovernorAlpha(currentGovernorAlpha);
-    const currentTimelock = new ethers.Contract(
-      // @ts-ignore
-      contracts.Timelock.address,
-      // @ts-ignore
-      contracts.Timelock.abi,
-      currentSigner
-    );
-    governance.setCurrentTimelock(currentTimelock);
-    // @ts-ignore
-    const currentCtxRead = new Contract(contracts.Ctx.address, contracts.Ctx.abi);
-    tokens.setCurrentCtxTokenRead(currentCtxRead);
-
-    const currentGovernorAlphaRead = new Contract(
-      // @ts-ignore
-      contracts.GovernorAlpha.address,
-      // @ts-ignore
-      contracts.GovernorAlpha.abi
-    );
-    governance.setCurrentGovernorAlphaRead(currentGovernorAlphaRead);
-    const currentTimelockRead = new Contract(
-      // @ts-ignore
-      contracts.Timelock.address,
-      // @ts-ignore
-      toFragment(contracts.Timelock.abi)
-    );
-    governance.setCurrentTimelockRead(currentTimelockRead);
-
-    if (chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId) {
+    if (isInLayer1(chainId)) {
       setEthereumContracts(chainId, currentSigner);
     }
-    if (chainId === NETWORKS.polygon.chainId) {
-      setPolygonContracts(currentSigner);
+    if (isOptimism(chainId)) {
+      setOptimismContracts(currentSigner);
     }
   };
 
@@ -501,17 +578,27 @@ const App = () => {
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
-    await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+
+    if (isPolygon(network.chainId)) {
+      await setPolygonContracts(currentSigner, ethcallProvider);
+    } else {
+      await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+    }
+
+    const isBrowserWallet =
+      networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
     const cAddress = await currentSigner.getAddress();
     setCurrentSignerAddress(cAddress);
-    setCurrentNetwork(network.chainId, walletName);
-    // @ts-ignore
-    /* networkProvider.on("chainChanged", (chainId: number) => {
-      setCurrentNetwork(chainId, "");
-      window.location.reload();
-    }); */
+    setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
 
-    if (!networkProvider.isFortmatic) {
+    // @ts-ignore
+    networkProvider.on("chainChanged", (chainId: number) => {
+      if (chainId !== network.chainId) {
+        setCurrentNetwork(chainId, "", isBrowserWallet);
+        window.location.reload();
+      }
+    });
+    if (networkProvider.isFortmatic) {
       // @ts-ignore
       networkProvider.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length === 0) {
@@ -541,8 +628,12 @@ const App = () => {
         );
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
-        setContracts(randomSigner, ethcallProvider, parseInt(chainId));
-        setCurrentNetwork(parseInt(chainId), "");
+        if (isPolygon(parseInt(chainId))) {
+          setPolygonContracts(randomSigner, ethcallProvider);
+        } else {
+          setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+        }
+        setCurrentNetwork(parseInt(chainId), "", false);
         setLoading(false);
       }
     }
@@ -631,7 +722,7 @@ const App = () => {
                       </Alert>
                     )}
 
-                    <Header signerAddress={currentSignerAddress} />
+                    <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
                     <ToastContainer />
                     <Switch>
                       <Route path={`${match.url}/`}>
