@@ -103,9 +103,10 @@ const Welcome = ({ signerAddress }: props) => {
           currentTotalPrice = BigNumber.from(prices[0].answer);
         }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
+        const tprice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
-        const tcapUSD = parseFloat(tcapString) * parseFloat(tcapPrice);
+        setTcapPrice(tprice);
+        const tcapUSD = parseFloat(tcapString) * parseFloat(tprice);
         setTcapUSDBalance(tcapUSD.toString());
         setIsLoading(false);
       }
