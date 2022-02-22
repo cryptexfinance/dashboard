@@ -14,7 +14,6 @@ import VaultsContext from "../state/VaultsContext";
 import OraclesContext from "../state/OraclesContext";
 import GovernanceContext from "../state/GovernanceContext";
 import RewardsContext from "../state/RewardsContext";
-
 import "../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";

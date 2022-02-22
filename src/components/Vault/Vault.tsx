@@ -7,7 +7,7 @@ import "../../styles/vault.scss";
 import Loading from "../Loading";
 import Details from "./Details";
 
-const Vault = () => {
+export const Vault = () => {
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
 
@@ -60,5 +60,3 @@ const Vault = () => {
     </div>
   );
 };
-
-export default Vault;

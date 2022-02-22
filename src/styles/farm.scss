@@ -221,23 +221,13 @@
         }
 
         .table {
-          color: $white;
-          tr:hover {
-            color: $white;
-          }
-
           td {
-            vertical-align: middle;
-
-            a {
-              font-weight: bold;
-              color: $purple;
-            }
-
             a.uniswap {
               color: #ff007a;
             }
-
+             a.btn {
+              padding-top: 0.4rem;
+            }
             .end-date {
               font-size: 0.8rem;
               color: $light;
@@ -245,15 +235,6 @@
             &.vested-reward {
               padding-top: 2.2rem;
             }
-          }
-
-          a.btn {
-            padding-top: 0.4rem;
-            height: 2.5rem;
-            color: white;
-            width: 5rem;
-            margin-left: auto;
-            margin-right: auto;
           }
 
           .btn {
@@ -283,6 +264,11 @@
           }
 
           thead {
+            .rewards {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+            }
             .btn {
               width: 37px;
               min-width: 35px;
@@ -291,11 +277,6 @@
               background-color: $dark;
               margin-top: 5px;
               margin-left: 7px;
-            }
-            .rewards {
-              display: flex;
-              flex-direction: row;
-              align-items: center;
             }
             @media (max-width: 1500px) {
               .title {
