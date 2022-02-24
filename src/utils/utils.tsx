@@ -250,7 +250,7 @@ export const isValidNetwork = (chainId: number) => {
   if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
-      (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+      (FEATURES.OPTIMISM && chainId === NETWORKS.optimism.chainId) ||
       (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
     );
   }
@@ -268,6 +268,13 @@ export const isInLayer1 = (chainId: number | undefined) => {
   return false;
 };
 
+export const isOptimism = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.optimism.chainId || chainId === NETWORKS.okovan.chainId;
+  }
+  return false;
+};
+
 export const isPolygon = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
     return chainId === NETWORKS.polygon.chainId || chainId === NETWORKS.mumbai.chainId;
@@ -279,6 +286,9 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
   let provider;
   if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
+  } else if (chainId === NETWORKS.optimism.chainId) {
+    // provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OPTIMISM);
+    provider = ethers.getDefaultProvider(NETWORKS.optimism.infuraRpcUrl);
   } else {
     let alchemyKey;
     switch (chainId) {

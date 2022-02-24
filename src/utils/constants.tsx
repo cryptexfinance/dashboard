@@ -32,6 +32,20 @@ export const NETWORKS = {
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
     ),
   },
+  optimism: {
+    chainId: 10,
+    hexChainId: "0xA",
+    name: "optimism",
+    eth: "0x4200000000000000000000000000000000000006",
+    weth: "0x4200000000000000000000000000000000000006",
+    dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    link: "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6",
+    snx: "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
+    uni: "0x6fd9d7ad17242c41f7131d257212c54a0e816691",
+    infuraRpcUrl: "https://optimism-mainnet.infura.io/v3/".concat(
+      process.env.REACT_APP_INFURA_ID || ""
+    ),
+  },
   okovan: {
     chainId: 69,
     hexChainId: "0x45",
@@ -39,6 +53,9 @@ export const NETWORKS = {
     eth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
     weth: "0x13fcDc22A2C9E558f21d17B688C38B2B5E2B4eF6",
     dai: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    infuraRpcUrl: "https://optimism-kovan.infura.io/v3/".concat(
+      process.env.REACT_APP_INFURA_ID || ""
+    ),
   },
   polygon: {
     chainId: 137,
@@ -51,7 +68,7 @@ export const NETWORKS = {
     chainId: 80001,
     hexChainId: "0x13881",
     name: "matic",
-    dai: "0xB06498E2a35d5F09AB53643F2b479a9bf909E796",
+    dai: "0xb89c4c3ED0C6CA1C6a522CD2ddE9B197D4142Fe2",
     matic: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
   },
 };
@@ -61,6 +78,7 @@ export const API_ENDPOINT = "https://api.cryptex.finance";
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo-2",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
   mumbai: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
@@ -69,6 +87,6 @@ export const GRAPHQL_ENDPOINT = {
 export const FEATURES = {
   KEEPERS_API: false,
   NEW_VAULTS: true,
-  OPTIMISM: false,
+  OPTIMISM: true,
   POLYGON: true,
 };

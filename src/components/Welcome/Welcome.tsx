@@ -6,10 +6,9 @@ import Row from "react-bootstrap/esm/Row";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useHistory } from "react-router-dom";
-import { useQuery, gql } from "@apollo/client";
 import NetworkContext from "../../state/NetworkContext";
 import SignerContext from "../../state/SignerContext";
 import TokensContext from "../../state/TokensContext";
@@ -24,9 +23,10 @@ import Loading from "../Loading";
 
 type props = {
   signerAddress: string;
+  loadingContracts: boolean;
 };
 
-const Welcome = ({ signerAddress }: props) => {
+const Welcome = ({ signerAddress, loadingContracts }: props) => {
   const { t } = useTranslation();
   const [address, setAddress] = useState("");
   const [currentAddress, setCurrentAddress] = useState("");
@@ -44,6 +44,7 @@ const Welcome = ({ signerAddress }: props) => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
 
+  /*
   const TCAP_PRICE = gql`
     query {
       oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
@@ -53,12 +54,24 @@ const Welcome = ({ signerAddress }: props) => {
   `;
 
   const { data } = useQuery(TCAP_PRICE);
-
+ */
   useEffect(() => {
     const loadAddress = async () => {
-      let tcapString = "0";
-      if (signer.signer && tokens.tcapToken && oracles.tcapOracle && tokens.tcapTokenRead) {
-        if (signerAddress !== "" && signerAddress !== currentAddress) {
+      if (oracles.tcapOracleRead) {
+        const currentTcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+        // @ts-ignore
+        const [currentTcapPrice] = await signer.ethcallProvider?.all([currentTcapPriceCall]);
+        const TotalTcapPrice = currentTcapPrice.mul(10000000000);
+        const tPrice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
+        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
+        setTcapPrice(tPrice);
+
+        if (
+          signer.signer &&
+          tokens.tcapTokenRead &&
+          signerAddress !== "" &&
+          signerAddress !== currentAddress
+        ) {
           const ens = await getENS(signerAddress);
           if (ens) {
             setAddress(ens);
@@ -69,8 +82,10 @@ const Welcome = ({ signerAddress }: props) => {
           const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(signerAddress);
           // @ts-ignore
           const [currentTcapBalance] = await signer.ethcallProvider?.all([currentTcapBalanceCall]);
-          tcapString = ethers.utils.formatEther(currentTcapBalance);
+          const tcapString = ethers.utils.formatEther(currentTcapBalance);
           setTcapBalance(tcapString);
+          const tcapUSD = parseFloat(tcapString) * parseFloat(tPrice);
+          setTcapUSDBalance(tcapUSD.toString());
 
           if (isInLayer1(currentNetwork.chainId)) {
             const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
@@ -96,25 +111,27 @@ const Welcome = ({ signerAddress }: props) => {
           }
           setCurrentAddress(signerAddress);
         }
+        setIsLoading(false);
       }
-      if (data) {
+      /* if (data) {
         let currentTotalPrice = BigNumber.from(0);
         const prices = await data?.oracles;
         if (prices.length > 0) {
           currentTotalPrice = BigNumber.from(prices[0].answer);
         }
         const TotalTcapPrice = currentTotalPrice.mul(10000000000);
+        const tprice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(ethers.utils.formatEther(TotalTcapPrice.div(10000000000)));
-        const tcapUSD = parseFloat(tcapString) * parseFloat(tcapPrice);
+        setTcapPrice(tprice);
+        const tcapUSD = parseFloat(tcapString) * parseFloat(tprice);
         setTcapUSDBalance(tcapUSD.toString());
         setIsLoading(false);
-      }
+      } */
     };
     loadAddress();
 
     // eslint-disable-next-line
-  }, [signerAddress, data]);
+  }, [signerAddress, loadingContracts]);
 
   if (isLoading) {
     return <Loading title={t("loading")} message={t("wait")} />;
@@ -200,8 +217,7 @@ const Welcome = ({ signerAddress }: props) => {
                     </div>
                     <p className="title tcap">{t("welcome.tcap-balance")}</p>
                   </Col>
-                  {(currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-                    currentNetwork.chainId === NETWORKS.rinkeby.chainId) && (
+                  {isInLayer1(currentNetwork.chainId) && (
                     <Col>
                       <div className="tcap-balance">
                         <CtxIcon className="tcap-neon" />

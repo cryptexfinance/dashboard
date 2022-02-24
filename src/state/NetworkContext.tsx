@@ -14,6 +14,8 @@ export interface NetworkContext {
   setCurrentMATICAddress: (address: string) => void;
   wallet?: string;
   setCurrentWallet: (walletName: string) => void;
+  isBrowserWallet?: boolean;
+  setCurrentIsBrowserWallet: (isBrowserW: boolean) => void;
 }
 
 const NETWORK_DEFAULT_VALUE = {
@@ -29,6 +31,8 @@ const NETWORK_DEFAULT_VALUE = {
   setCurrentMATICAddress: () => {},
   wallet: "",
   setCurrentWallet: () => {},
+  isBrowserWallet: false,
+  setCurrentIsBrowserWallet: () => {},
 };
 
 const networkContext = React.createContext<NetworkContext>(NETWORK_DEFAULT_VALUE);

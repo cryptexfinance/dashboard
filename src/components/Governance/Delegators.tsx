@@ -11,23 +11,23 @@ import StakerStats from "./StakerStats";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
 import { API_ENDPOINT, FEATURES } from "../../utils/constants";
-import { delegatorsInfo } from "./data";
+import { delegatorsInfo, infoType } from "./data";
 
 type props = {
   currentSignerAddress: string;
 };
-type delegatorType = {
+/* type delegatorType = {
   id: string;
   delegatee: string;
   delegatedVotes: string;
   delegatedVotesRaw: string;
   tokenOwners: { stake: string; stakeRaw: string }[];
   totalHoldersRepresented: Number;
-};
+}; */
 
 const Delegators = ({ currentSignerAddress }: props) => {
   const { t } = useTranslation();
-  const [delegators, setDelegators] = useState<any[]>([]);
+  const [keepers, setKeepers] = useState<any[]>([]);
   const [keepersInfo, setKeepersInfo] = useState<any[]>([]);
   const [keeperIndex, setKeeperIndex] = useState(-1);
   const [showKeeperForm, setShowKeeperForm] = useState(false);
@@ -69,7 +69,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           await data.delegators.forEach((d: any) => {
             currentDelegators.push(d);
           });
-          setDelegators(currentDelegators);
+          setKeepers(currentDelegators);
         }
       }
     };
@@ -131,12 +131,22 @@ const Delegators = ({ currentSignerAddress }: props) => {
     setShowKeeperForm(false);
   };
 
-  const getDelegatorData = (address: string): delegatorType | null => {
-    const index = delegators.findIndex(
+  /* const getDelegatorData = (address: string): delegatorType | null => {
+    const index = keepers.findIndex(
       (item) => item.delegatee.toLowerCase() === address.toLowerCase()
     );
     if (index !== -1) {
-      return delegators[index];
+      return keepers[index];
+    }
+    return null;
+  }; */
+
+  const getKeepersData = (address: string): infoType | null => {
+    const index = keepersInfo.findIndex(
+      (item) => item.address.toLowerCase() === address.toLowerCase()
+    );
+    if (index !== -1) {
+      return keepersInfo[index];
     }
     return null;
   };
@@ -178,19 +188,19 @@ const Delegators = ({ currentSignerAddress }: props) => {
         </>
       )}
       <div className="grid profiles">
-        {keepersInfo.map((kInfo, index) => {
-          const delegator = getDelegatorData(kInfo.address);
-          if (delegator) {
+        {keepers.map((keeper, index) => {
+          const keeperInfo = getKeepersData(keeper.delegatee);
+          if (keeperInfo) {
             return (
               <ProfileCard
-                key={delegator.id}
-                delegator={delegator}
-                info={kInfo}
+                key={keeper.id}
+                delegator={keeper}
+                info={keeperInfo}
                 showUpdateKeeper={() => showUpdateKeeper(index)}
                 openDelegate={openDelegate}
                 openWithdraw={openWithdraw}
                 addWithdrawTime={addWithdrawTime}
-                isSigner={delegator.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
+                isSigner={keeper.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
                 t={t}
               />
             );
@@ -203,7 +213,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         show={showKeeperForm}
         currentAddress={currentSignerAddress}
         delegatorFactory={governance.delegatorFactory}
-        keepers={delegators}
+        keepers={keepers}
         keeperInfo={keeperIndex !== -1 ? keepersInfo[keeperIndex] : null}
         onHide={() => hideKeeperForm()}
         refresh={() => refresh()}
