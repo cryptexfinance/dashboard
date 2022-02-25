@@ -759,13 +759,16 @@ const Details = ({ address, t }: props) => {
     e.preventDefault();
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
     const currentTcapPrice = ethers.utils.formatEther(await tcapPrice());
-    const collateralToRemove = await getSafeRemoveCollateral(
+    let collateralToRemove = await getSafeRemoveCollateral(
       minRatio,
       vaultCollateral,
       currentPrice,
       currentTcapPrice,
       vaultDebt
     );
+    if (selectedVaultDecimals === 8) {
+      collateralToRemove = parseFloat(collateralToRemove.toFixed(8)) - 0.00000001;
+    }
     setRemoveCollateralTxt(collateralToRemove.toString());
     let usd = toUSD(currentPrice, collateralToRemove.toString());
     if (!usd) {
