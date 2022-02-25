@@ -81,7 +81,8 @@
     },
     "errors": {
       "no-collateral": "Not enough collateral on vault",
-      "burn-too-high": "Burn value too high"
+      "burn-too-high": "Burn value too high",
+      "burn-balance-low": "Burn value is greater than your balance."
     }
   },
   "pools": {

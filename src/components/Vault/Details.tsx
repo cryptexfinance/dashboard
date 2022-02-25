@@ -767,7 +767,6 @@ const Details = ({ address, t }: props) => {
       vaultDebt
     );
     if (selectedVaultDecimals === 8) {
-      console.log(collateralToRemove);
       collateralToRemove = parseFloat(collateralToRemove.toFixed(8)) - 0.00000001;
       collateralToRemove = parseFloat(collateralToRemove.toFixed(8));
     }
@@ -829,9 +828,13 @@ const Details = ({ address, t }: props) => {
 
   const burnTCAP = async () => {
     if (burnTxt) {
+      const amount = ethers.utils.parseEther(burnTxt);
+      // const currentBalanceCall = await tokens.tcapTokenRead?.balanceOf(address);
+      // @ts-ignore
+      // const [currentBalance] = await signer.ethcallProvider?.all([currentBalanceCall]);
+      // if (amount.lt(currentBalance)) {
       setBtnDisabled(true);
       try {
-        const amount = ethers.utils.parseEther(burnTxt);
         const currentBurnFee = await selectedVaultContract?.getFee(amount);
         const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
         const ethFee = ethers.utils.formatEther(increasedFee);
@@ -850,6 +853,9 @@ const Details = ({ address, t }: props) => {
       setBurnTxt("");
       setBurnUSD("0");
       setBurnFee("0");
+      /* } else {
+        errorNotification(t("vault.errors.burn-balance-low"));
+      } */
     } else {
       errorNotification(t("errors.empty"));
     }

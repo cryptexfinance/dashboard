@@ -81,7 +81,8 @@
     },
     "errors": {
       "no-collateral": "保险库没有足够的抵押品",
-      "burn-too-high": "销毁值太高"
+      "burn-too-high": "销毁值太高",
+      "burn-balance-low": "Burn value is greater than your balance."
     }
   },
   "pools": {
