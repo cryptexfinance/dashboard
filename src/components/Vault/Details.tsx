@@ -767,7 +767,9 @@ const Details = ({ address, t }: props) => {
       vaultDebt
     );
     if (selectedVaultDecimals === 8) {
+      console.log(collateralToRemove);
       collateralToRemove = parseFloat(collateralToRemove.toFixed(8)) - 0.00000001;
+      collateralToRemove = parseFloat(collateralToRemove.toFixed(8));
     }
     setRemoveCollateralTxt(collateralToRemove.toString());
     let usd = toUSD(currentPrice, collateralToRemove.toString());
