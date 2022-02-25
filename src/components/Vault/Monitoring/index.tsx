@@ -1,43 +1,120 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ButtonGroup from "react-bootstrap/esm/ButtonGroup";
 import Card from "react-bootstrap/esm/Card";
 import Col from "react-bootstrap/Col";
 import Dropdown from "react-bootstrap/Dropdown";
 import Pagination from "react-bootstrap/Pagination";
-import Table from "react-bootstrap/Table";
 import ToggleButton from "react-bootstrap/esm/ToggleButton";
-import "../../styles/vault-monitoring.scss";
-import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
-import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
-import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
-import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
-import { vaults } from "./data";
-
-type iconProps = {
-  name: string;
-};
+import "../../../styles/vault-monitoring.scss";
+import { useQuery, gql, NetworkStatus } from "@apollo/client";
+import NetworkContext from "../../../state/NetworkContext";
+import OraclesContext from "../../../state/OraclesContext";
+import SignerContext from "../../../state/SignerContext";
+import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
+import { ReactComponent as DAIIcon } from "../../../assets/images/graph/DAI.svg";
+import { Vaults } from "./vaults";
+import { vaultsType } from "../data";
+import { isInLayer1, isOptimism, isPolygon, validOracles } from "../../../utils/utils";
 
 export const Monitoring = () => {
+  const currentNetwork = useContext(NetworkContext);
+  const oracles = useContext(OraclesContext);
+  const signer = useContext(SignerContext);
+  const [vaults, setVaults] = useState<Array<vaultsType>>([]);
   const [radioValue, setRadioValue] = useState("1");
   const radios = [
     { name: "All Vaults", value: "1" },
     { name: "My Vaults", value: "2" },
   ];
+  const vaultsQuery = gql`
+    query allVaults {
+      vaults(first: 100) {
+        id
+        vaultId
+        owner
+        collateral
+        debt
+        currentRatio
+        tokenSymbol
+      }
+    }
+  `;
 
-  const CollateralIcon = ({ name }: iconProps) => {
-    console.log("AA");
-    switch (name) {
-      case "eth":
-        return <WETHIcon className="eth" />;
-      case "dai":
-        return <DAIIcon className="dai" />;
-      case "aave":
-        return <AAVEIcon className="aave" />;
-      default:
-        return <LINKIcon className="link" />;
+  const loadPrices = async () => {
+    if (signer && oracles && validOracles(currentNetwork.chainId || 1, oracles)) {
+      const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+      const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
+
+      const ethcalls = [tcapPriceCall, daiOraclePriceCall];
+      if (isInLayer1(currentNetwork.chainId)) {
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
+        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+        ethcalls.push(wethOraclePriceCall);
+        ethcalls.push(aaveOraclePriceCall);
+        ethcalls.push(linkOraclePriceCall);
+      }
+      if (isOptimism(currentNetwork.chainId)) {
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+        const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
+        const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
+        ethcalls.push(wethOraclePriceCall);
+        ethcalls.push(linkOraclePriceCall);
+        ethcalls.push(snxOraclePriceCall);
+        ethcalls.push(uniOraclePriceCall);
+      }
+      let tcapOraclePrice;
+      let daiOraclePrice;
+      let wethOraclePrice;
+      let aaveOraclePrice;
+      let linkOraclePrice;
+      let snxOraclePrice;
+      let uniOraclePrice;
+
+      if (isInLayer1(currentNetwork.chainId)) {
+        // @ts-ignore
+        [
+          tcapOraclePrice,
+          daiOraclePrice,
+          wethOraclePrice,
+          aaveOraclePrice,
+          linkOraclePrice,
+        ] = await signer.ethcallProvider?.all(ethcalls);
+      } else if (isOptimism(currentNetwork.chainId)) {
+        // @ts-ignore
+        [
+          tcapOraclePrice,
+          daiOraclePrice,
+          wethOraclePrice,
+          linkOraclePrice,
+          snxOraclePrice,
+          uniOraclePrice,
+        ] = await signer.ethcallProvider?.all(ethcalls);
+      }
     }
   };
+
+  useEffect(() => {
+    loadPrices();
+  }, []);
+
+  /* const loadVaults = (vaultsData: any) => {
+    vautltsData.map((v, index) => {
+
+    });
+  } */
+
+  const { data, error, refetch, networkStatus } = useQuery(vaultsQuery, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    onError: () => {
+      console.log(error);
+    },
+    onCompleted: () => {
+      // loadVaults(data);
+    },
+  });
 
   const VaultPagination = () => {
     console.log("AA");
@@ -61,8 +138,6 @@ export const Monitoring = () => {
       </Pagination>
     );
   };
-
-  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
     <div className="vault-monitoring">
@@ -149,65 +224,7 @@ export const Monitoring = () => {
               </ButtonGroup>
             </div>
           </Col>
-          <Table hover className="mt-2 vaults">
-            <thead>
-              <tr>
-                <th className="status">Status</th>
-                <th className="collateral">Collateral</th>
-                <th className="collateral-usd">Collateral (USD)</th>
-                <th>
-                  <div className="debt">
-                    <TcapIcon className="tcap" /> <span>Debt</span>
-                  </div>
-                </th>
-                <th className="debt-usd">Debt (USD)</th>
-                <th className="ratio">Ratio</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vaults.map((v, index) => {
-                console.log("enter");
-                return (
-                  <tr key={index}>
-                    <td>
-                      <div className="status">
-                        <span className={v.status}>{capitalize(v.status)}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="collateral">
-                        <span className="number">{v.collateral_value}</span>
-                        <CollateralIcon name={v.collateral} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="collateral-usd">
-                        <span className="number">${v.collateral_usd}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="debt">
-                        <span className="number">{v.debt}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="debt">
-                        <span className="number">${v.debt_usd}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="ratio">
-                        <span className={v.status}>
-                          {v.ratio}
-                          {v.ratio === "N/A" ? "" : "%"}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
+          <Vaults vaults={vaults} />
           <Col md={12} className="pag-container">
             <VaultPagination />
           </Col>

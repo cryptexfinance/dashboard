@@ -4,6 +4,7 @@ import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
 import { FEATURES, NETWORKS } from "./constants";
+import { OraclesContext } from "../state/OraclesContext";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -300,4 +301,27 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
     });
   }
   return provider;
+};
+
+export const validOracles = (chainId: number, oracles: OraclesContext): boolean => {
+  let valid =
+    !isUndefined(oracles.wethOracleRead) &&
+    !isUndefined(oracles.daiOracleRead) &&
+    !isUndefined(oracles.tcapOracleRead);
+
+  if (isInLayer1(chainId)) {
+    valid = valid && !isUndefined(oracles.aaveOracle) && !isUndefined(oracles.linkOracle);
+  }
+  if (isOptimism(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(oracles.linkOracleRead) &&
+      !isUndefined(oracles.snxOracleRead) &&
+      !isUndefined(oracles.uniOracleRead);
+  }
+
+  if (chainId === NETWORKS.polygon.chainId) {
+    valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
+  }
+  return valid;
 };
