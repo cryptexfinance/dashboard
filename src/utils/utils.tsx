@@ -142,6 +142,21 @@ export const getRatio = async (
   return ratio;
 };
 
+export const getRatio2 = (
+  collateral: string,
+  collateralPrice: string,
+  debt: string,
+  tcapPrice: string
+) => {
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const d = parseFloat(debt);
+  const tp = parseFloat(tcapPrice);
+  if (d === 0 || tp === 0) return 0;
+  const ratio = (c * cp * 100) / (d * tp);
+  return ratio;
+};
+
 export const getSafeMint = async (
   ratio: string,
   collateral: string,

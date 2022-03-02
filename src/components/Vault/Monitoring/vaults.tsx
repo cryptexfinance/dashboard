@@ -1,36 +1,14 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
-import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
-import { ReactComponent as DAIIcon } from "../../../assets/images/graph/DAI.svg";
-import { ReactComponent as AAVEIcon } from "../../../assets/images/graph/aave.svg";
-import { ReactComponent as LINKIcon } from "../../../assets/images/graph/chainlink.svg";
-import { vaultsType } from "../data";
+import { capitalize, CollateralIcon, VaultsType } from "./types";
 
 type dataType = {
-  vaults: Array<vaultsType>;
-};
-type iconProps = {
-  name: string;
+  vaults: Array<VaultsType>;
 };
 
 export const Vaults = ({ vaults }: dataType) => {
-  const CollateralIcon = ({ name }: iconProps) => {
-    console.log("AA");
-    switch (name) {
-      case "eth":
-        return <WETHIcon className="eth" />;
-      case "dai":
-        return <DAIIcon className="dai" />;
-      case "aave":
-        return <AAVEIcon className="aave" />;
-      default:
-        return <LINKIcon className="link" />;
-    }
-  };
-
-  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
+  console.log("a");
   return (
     <Table hover className="mt-2 vaults">
       <thead>
@@ -59,13 +37,13 @@ export const Vaults = ({ vaults }: dataType) => {
               </td>
               <td>
                 <div className="collateral">
-                  <span className="number">{v.collateral_value}</span>
-                  <CollateralIcon name={v.collateral} />
+                  <span className="number">{v.collateralValue}</span>
+                  <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
                 </div>
               </td>
               <td>
                 <div className="collateral-usd">
-                  <span className="number">${v.collateral_usd}</span>
+                  <span className="number">${v.collateralUsd}</span>
                 </div>
               </td>
               <td>
@@ -75,14 +53,14 @@ export const Vaults = ({ vaults }: dataType) => {
               </td>
               <td>
                 <div className="debt">
-                  <span className="number">${v.debt_usd}</span>
+                  <span className="number">${v.debtUsd}</span>
                 </div>
               </td>
               <td>
                 <div className="ratio">
                   <span className={v.status}>
                     {v.ratio}
-                    {v.ratio === "N/A" ? "" : "%"}
+                    {v.ratio === 0 ? "" : "%"}
                   </span>
                 </div>
               </td>
