@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
 import { FEATURES, NETWORKS } from "./constants";
 import { OraclesContext } from "../state/OraclesContext";
+import { VaultsContext } from "../state/VaultsContext";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -325,7 +326,7 @@ export const validOracles = (chainId: number, oracles: OraclesContext): boolean 
     !isUndefined(oracles.tcapOracleRead);
 
   if (isInLayer1(chainId)) {
-    valid = valid && !isUndefined(oracles.aaveOracle) && !isUndefined(oracles.linkOracle);
+    valid = valid && !isUndefined(oracles.aaveOracleRead) && !isUndefined(oracles.linkOracleRead);
   }
   if (isOptimism(chainId)) {
     valid =
@@ -337,6 +338,26 @@ export const validOracles = (chainId: number, oracles: OraclesContext): boolean 
 
   if (chainId === NETWORKS.polygon.chainId) {
     valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
+  }
+  return valid;
+};
+
+export const validVaults = (chainId: number, vaults: VaultsContext): boolean => {
+  let valid = !isUndefined(vaults.wethVaultRead) && !isUndefined(vaults.daiVaultRead);
+
+  if (isInLayer1(chainId)) {
+    valid = valid && !isUndefined(vaults.aaveVaultRead) && !isUndefined(vaults.linkVaultRead);
+  }
+  if (isOptimism(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(vaults.linkVaultRead) &&
+      !isUndefined(vaults.snxVaultRead) &&
+      !isUndefined(vaults.uniVaultRead);
+  }
+
+  if (chainId === NETWORKS.polygon.chainId) {
+    valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
   }
   return valid;
 };

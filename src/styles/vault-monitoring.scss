@@ -133,6 +133,9 @@
         div {
           display: flex;    
         }
+        tr.hide {
+          display: none;
+        }
         td {
           border-top: 0.5px solid #a440f2;
         }

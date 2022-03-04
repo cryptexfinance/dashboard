@@ -1,14 +1,18 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
-import { capitalize, CollateralIcon, VaultsType } from "./types";
+import { PaginationType, VaultsType } from "./types";
+import { capitalize, CollateralIcon, numberFormatStr } from "./common";
 
 type dataType = {
   vaults: Array<VaultsType>;
+  pagination: PaginationType;
 };
 
-export const Vaults = ({ vaults }: dataType) => {
-  console.log("a");
+export const Vaults = ({ vaults, pagination }: dataType) => {
+  console.log("vaults ---");
   return (
     <Table hover className="mt-2 vaults">
       <thead>
@@ -27,9 +31,9 @@ export const Vaults = ({ vaults }: dataType) => {
       </thead>
       <tbody>
         {vaults.map((v, index) => {
-          console.log("enter");
+          const itemPage = Math.ceil((index + 1) / pagination.itemsPerPage);
           return (
-            <tr key={index}>
+            <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
               <td>
                 <div className="status">
                   <span className={v.status}>{capitalize(v.status)}</span>
@@ -37,29 +41,42 @@ export const Vaults = ({ vaults }: dataType) => {
               </td>
               <td>
                 <div className="collateral">
-                  <span className="number">{v.collateralValue}</span>
-                  <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
+                  <OverlayTrigger
+                    key="top"
+                    placement="right"
+                    trigger={["hover", "click"]}
+                    overlay={
+                      <Tooltip id="ttip-current-reward" className="farm-tooltip">
+                        {v.collateralValue}
+                      </Tooltip>
+                    }
+                  >
+                    <>
+                      <span className="number">{numberFormatStr(v.collateralValue, 4)}</span>
+                      <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
+                    </>
+                  </OverlayTrigger>
                 </div>
               </td>
               <td>
                 <div className="collateral-usd">
-                  <span className="number">${v.collateralUsd}</span>
+                  <span className="number">${numberFormatStr(v.collateralUsd, 2)}</span>
                 </div>
               </td>
               <td>
                 <div className="debt">
-                  <span className="number">{v.debt}</span>
+                  <span className="number">{numberFormatStr(v.debt, 4)}</span>
                 </div>
               </td>
               <td>
                 <div className="debt">
-                  <span className="number">${v.debtUsd}</span>
+                  <span className="number">${numberFormatStr(v.debtUsd, 2)}</span>
                 </div>
               </td>
               <td>
                 <div className="ratio">
                   <span className={v.status}>
-                    {v.ratio}
+                    {v.ratio.toFixed(0)}
                     {v.ratio === 0 ? "" : "%"}
                   </span>
                 </div>

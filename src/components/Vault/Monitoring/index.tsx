@@ -4,43 +4,66 @@ import ButtonGroup from "react-bootstrap/esm/ButtonGroup";
 import Card from "react-bootstrap/esm/Card";
 import Col from "react-bootstrap/Col";
 import Dropdown from "react-bootstrap/Dropdown";
-import Pagination from "react-bootstrap/Pagination";
 import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import "../../../styles/vault-monitoring.scss";
 import { useQuery, gql } from "@apollo/client";
 import NetworkContext from "../../../state/NetworkContext";
 import OraclesContext from "../../../state/OraclesContext";
 import SignerContext from "../../../state/SignerContext";
+import vaultsContext from "../../../state/VaultsContext";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
-import { getRatio2, isInLayer1, isOptimism, toUSD, validOracles } from "../../../utils/utils";
-import { Vaults } from "./vaults";
 import {
-  capitalize,
-  CollateralIcon,
+  getRatio2,
+  isInLayer1,
+  isOptimism,
+  toUSD,
+  validOracles,
+  validVaults,
+} from "../../../utils/utils";
+import { Vaults } from "./Vaults";
+import { VaultPagination } from "./Pagination";
+import Loading from "../../Loading";
+import {
   DropdownItemType,
   OraclePricesType,
   PaginationType,
+  VaultsRatioType,
   VaultsType,
+  VaultsTotalsType,
 } from "./types";
+import { capitalize, CollateralIcon, numberFormatStr } from "./common";
 
 const pagDefault = {
   previous: 0,
   current: 0,
   next: 0,
   pages: 0,
-  itemsPerPage: 20,
+  itemsPerPage: 10,
   itemsCount: 0,
-  lastId: "",
+  lastId: "0",
+};
+
+const totalsDefault = {
+  vaults: 0,
+  collateral: "0",
+  collateralUSD: "0",
+  debt: "0",
+  debtUSD: "0",
 };
 
 export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
+  const vaults = useContext(vaultsContext);
   const signer = useContext(SignerContext);
+  const [skipQuery, setSkipQuery] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
   const [oraclePrices, setOraclePrices] = useState<OraclePricesType>();
-  const [vaults, setVaults] = useState<Array<VaultsType>>([]);
+  const [vaultsRatio, setVaultsRatio] = useState<VaultsRatioType>();
+  const [vaultsTotals, setVaultsTotals] = useState<VaultsTotalsType>(totalsDefault);
+  const [vaultList, setVaultList] = useState<Array<VaultsType>>([]);
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
+  const [loadMore, setLoadMore] = useState(false);
   const [pricesUpdated, setPricesUpdated] = useState(false);
   const [owner, setOwner] = useState("");
   const [radioValue, setRadioValue] = useState("1");
@@ -65,7 +88,7 @@ export const Monitoring = () => {
     let vaultFilter = "";
     let statusFilter = "";
     if (radioValue === "2" && owner !== "") {
-      ownerFilter = `owner: "${owner}"`;
+      ownerFilter = `, owner: "${owner}"`;
     }
     if (tokenSymbol !== "all") {
       vaultFilter = `tokenSymbol: "${tokenSymbol.toUpperCase()}"`;
@@ -81,21 +104,24 @@ export const Monitoring = () => {
 
     filter = ownerFilter;
     if (vaultFilter !== "") {
-      filter = filter === "" ? `${vaultFilter}` : filter.concat(`, ${vaultFilter}`);
+      filter = filter.concat(`, ${vaultFilter}`);
     }
     if (statusFilter !== "") {
-      filter = filter === "" ? `${statusFilter}` : filter.concat(`, ${statusFilter}`);
+      filter = filter.concat(`, ${statusFilter}`);
     }
     if (filter !== "") {
-      filter = `, where: { ${filter} }`;
+      if (loadMore) {
+        filter = `, where: { blockTS_gt: "${pagination.lastId}" ${filter} }`;
+      } else {
+        filter = `, where: { blockTS_gt: "0" ${filter} }`;
+      }
     }
-
     return filter;
   };
 
   const str =
     "query allVaults {" +
-    `vaults(first: 20 ${buildFilters()}) {` +
+    `vaults(first: 1000, orderBy: blockTS ${buildFilters()}) {` +
     "id " +
     "vaultId " +
     "owner " +
@@ -103,6 +129,7 @@ export const Monitoring = () => {
     "debt " +
     "currentRatio " +
     "tokenSymbol " +
+    "blockTS " +
     "} " +
     "}";
 
@@ -143,8 +170,8 @@ export const Monitoring = () => {
       let daiOraclePrice = BigNumber.from(0);
       let aaveOraclePrice = BigNumber.from(0);
       let linkOraclePrice = BigNumber.from(0);
-      let uniOraclePrice = BigNumber.from(0);
       let snxOraclePrice = BigNumber.from(0);
+      let uniOraclePrice = BigNumber.from(0);
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
@@ -163,7 +190,7 @@ export const Monitoring = () => {
       }
 
       setOraclePrices({
-        tcapOraclePrice: ethers.utils.formatEther(tcapOraclePrice.mul(10000000000)),
+        tcapOraclePrice: ethers.utils.formatEther(tcapOraclePrice),
         wethOraclePrice: ethers.utils.formatEther(wethOraclePrice.mul(10000000000)),
         daiOraclePrice: ethers.utils.formatEther(daiOraclePrice.mul(10000000000)),
         aaveOraclePrice: ethers.utils.formatEther(aaveOraclePrice.mul(10000000000)),
@@ -177,20 +204,63 @@ export const Monitoring = () => {
     }
   };
 
-  useEffect(
-    () => {
-      if (!pricesUpdated) {
-        loadPrices();
+  const loadRatios = async () => {
+    if (signer && vaults && validVaults(currentNetwork.chainId || 1, vaults)) {
+      const wethRatioCall = await vaults.wethVaultRead?.ratio();
+      const daiRatioCall = await vaults.daiVaultRead?.ratio();
+      const ethcalls = [wethRatioCall, daiRatioCall];
+
+      if (isInLayer1(currentNetwork.chainId)) {
+        const aaveRatioCall = await vaults.aaveVaultRead?.ratio();
+        const linkRatioCall = await vaults.linkVaultRead?.ratio();
+        ethcalls.push(aaveRatioCall);
+        ethcalls.push(linkRatioCall);
       }
-    },
-    // eslint-disable-next-line
-    [oracles, currentNetwork.chainId]
-  );
+      if (isOptimism(currentNetwork.chainId)) {
+        const linkRatioCall = await vaults.linkVaultRead?.ratio();
+        const snxRatioCall = await vaults.snxVaultRead?.ratio();
+        const uniRatioCall = await vaults.uniVaultRead?.ratio();
+        ethcalls.push(linkRatioCall);
+        ethcalls.push(snxRatioCall);
+        ethcalls.push(uniRatioCall);
+      }
+      let ethRatio = 0;
+      let daiRatio = 0;
+      let aaveRatio = 0;
+      let linkRatio = 0;
+      let snxRatio = 0;
+      let uniRatio = 0;
+
+      if (isInLayer1(currentNetwork.chainId)) {
+        // @ts-ignore
+        [ethRatio, daiRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
+      } else if (isOptimism(currentNetwork.chainId)) {
+        // @ts-ignore
+        [ethRatio, daiRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
+          ethcalls
+        );
+      }
+      setVaultsRatio({
+        ethRatio,
+        wethRatio: ethRatio,
+        daiRatio,
+        aaveRatio,
+        linkRatio,
+        uniRatio,
+        snxRatio,
+        maticRatio: 0,
+        wbtcRatio: 0,
+      });
+    }
+  };
 
   const getCollateralPrice = (symbol: string) => {
     let price = "0";
     switch (symbol) {
       case "ETH":
+        price = oraclePrices?.wethOraclePrice || "0";
+        break;
+      case "WETH":
         price = oraclePrices?.wethOraclePrice || "0";
         break;
       case "DAI":
@@ -220,15 +290,56 @@ export const Monitoring = () => {
     return price;
   };
 
+  const getMinRatio = (symbol: string) => {
+    let minRatio = 200;
+    switch (symbol) {
+      case "ETH":
+        minRatio = vaultsRatio?.ethRatio || 200;
+        break;
+      case "WETH":
+        minRatio = vaultsRatio?.ethRatio || 200;
+        break;
+      case "DAI":
+        minRatio = vaultsRatio?.daiRatio || 200;
+        break;
+      case "AAVE":
+        minRatio = vaultsRatio?.aaveRatio || 200;
+        break;
+      case "LINK":
+        minRatio = vaultsRatio?.linkRatio || 200;
+        break;
+      case "UNI":
+        minRatio = vaultsRatio?.uniRatio || 200;
+        break;
+      case "SNX":
+        minRatio = vaultsRatio?.snxRatio || 200;
+        break;
+      case "MATIC":
+        minRatio = vaultsRatio?.maticRatio || 200;
+        break;
+      case "WBTC":
+        minRatio = vaultsRatio?.wbtcRatio || 200;
+        break;
+      default:
+        break;
+    }
+    return minRatio;
+  };
+
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
+    const totals = { ...totalsDefault };
+
+    setSkipQuery(true);
+    setLoadMore(false);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
       const collateral = ethers.utils.formatEther(v.collateral);
       const debt = ethers.utils.formatEther(v.debt);
       const collateralPrice = getCollateralPrice(v.tokenSymbol);
       const collateralUSD = toUSD(collateral, collateralPrice);
-      const debtUSD = toUSD(debt, collateralPrice);
+      const debtUSD = toUSD(debt, oraclePrices?.tcapOraclePrice || "0");
+      const minRatio = getMinRatio(v.tokenSymbol);
       const ratio = getRatio2(
         collateral,
         collateralPrice,
@@ -240,47 +351,85 @@ export const Monitoring = () => {
         status = "empty";
       } else if (collateralUSD > 0 && debtUSD === 0) {
         status = "ready";
-      } else if (ratio >= 150) {
+      } else if (ratio >= minRatio) {
         status = "active";
       }
-      vData.push({
-        id: v.id,
-        collateralSymbol: v.tokenSymbol,
-        collateralValue: collateral,
-        collateralUsd: collateralUSD.toFixed(2),
-        debt,
-        debtUsd: debtUSD.toFixed(2),
-        ratio,
-        minRatio: "",
-        status,
-      });
+
+      let addVault = true;
+      if (currentStatus === "active" || currentStatus === "liquidation") {
+        addVault = currentStatus === status;
+      }
+
+      if (addVault) {
+        vData.push({
+          id: v.id,
+          collateralSymbol: v.tokenSymbol,
+          collateralValue: collateral,
+          collateralUsd: collateralUSD.toFixed(2),
+          debt,
+          debtUsd: debtUSD.toFixed(2),
+          ratio,
+          minRatio: "",
+          status,
+          blockTS: v.blockTS,
+        });
+
+        totals.vaults += 1;
+        totals.collateral = (parseFloat(totals.collateral) + parseFloat(collateral)).toFixed(4);
+        totals.collateralUSD = (parseFloat(totals.collateralUSD) + collateralUSD).toFixed(2);
+        totals.debt = (parseFloat(totals.debt) + parseFloat(debt)).toFixed(4);
+        totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
+      }
     });
-    setVaults(vData);
-    const lastVaultId = vData[vData.length - 1].id;
-    const itemsCount = pagination.itemsCount + vData.length;
-    const pages = Math.ceil(itemsCount / pagination.itemsPerPage);
-    const pag = {
-      previous: 0,
-      current: 1,
-      next: 2,
-      pages,
-      itemsPerPage: pagination.itemsPerPage,
-      itemsCount,
-      lastId: lastVaultId,
-    };
-    setPagination(pag);
+    setVaultList(vData);
+    setVaultsTotals(totals);
+    // Set pagination ddata
+    if (vData.length > 0) {
+      console.log("--- Len -----");
+      console.log(vData.length);
+      const lastVaultId = vData[vData.length - 1].blockTS;
+      const itemsCount = vData.length;
+      const pages = Math.ceil(itemsCount / pagination.itemsPerPage);
+      const pag = {
+        previous: 0,
+        current: 1,
+        next: 2,
+        pages,
+        itemsPerPage: pagination.itemsPerPage,
+        itemsCount,
+        lastId: lastVaultId,
+      };
+      setPagination(pag);
+    } else {
+      setPagination(pagDefault);
+    }
   };
 
-  const { data, error } = useQuery(vaultsQuery, {
+  const { loading, data, error } = useQuery(vaultsQuery, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
+    skip: skipQuery,
     onError: () => {
       console.log(error);
     },
     onCompleted: () => {
+      console.log("--- query ---");
       loadVaults(data);
     },
   });
+
+  useEffect(
+    () => {
+      if (!pricesUpdated) {
+        loadPrices();
+        loadRatios();
+      } else {
+        loadVaults(data);
+      }
+    },
+    // eslint-disable-next-line
+    [signer, currentNetwork.chainId]
+  );
 
   const tokensSymbols = (): Array<DropdownItemType> => {
     const symbols = [{ key: "all", name: "All" }];
@@ -305,6 +454,7 @@ export const Monitoring = () => {
   };
 
   const handleRadioBtnChange = (value: string) => {
+    setSkipQuery(false);
     setRadioValue(value);
     if (value === "1") {
       setOwner("");
@@ -314,52 +464,24 @@ export const Monitoring = () => {
   };
 
   const handleStatusChange = (newStatus: string) => {
+    setSkipQuery(false);
     setCurrentStatus(newStatus);
   };
 
   const handleTokenChange = (newToken: string) => {
+    setSkipQuery(false);
     setTokenSymbol(newToken);
   };
 
-  const VaultPages = () => {
-    const midPage = Math.floor(pagination.pages / 2);
-    return (
-      <>
-        <Pagination.Item active={pagination.current === 1}>{1}</Pagination.Item>
-        <Pagination.Ellipsis />
-        <Pagination.Item active={pagination.current === midPage - 2}>{midPage - 2}</Pagination.Item>
-        <Pagination.Item active={pagination.current === midPage - 1}>{midPage - 1}</Pagination.Item>
-        <Pagination.Item active={pagination.current === midPage}>midPage</Pagination.Item>
-        <Pagination.Item active={pagination.current === midPage + 1}>{midPage + 1}</Pagination.Item>
-        <Pagination.Item active={pagination.current === midPage + 2}>{midPage + 2}</Pagination.Item>
-        <Pagination.Ellipsis />
-        <Pagination.Item active={pagination.current === pagination.pages}>
-          {pagination.pages}
-        </Pagination.Item>
-      </>
-    );
-  };
-
-  const VaultPagination = () => {
-    const pag = Array.from(Array(10).keys());
-    const activePag = pagination.current;
-    return (
-      <Pagination>
-        <Pagination.First />
-        <Pagination.Prev />
-        {pagination.pages >= 10 ? (
-          <VaultPages />
-        ) : (
-          pag.map((item) => (
-            <Pagination.Item key={item} active={activePag === item + 1}>
-              {item + 1}
-            </Pagination.Item>
-          ))
-        )}
-        <Pagination.Next />
-        <Pagination.Last />
-      </Pagination>
-    );
+  const onPageSelected = (pageNumber: number) => {
+    const nextPage = pageNumber === pagination.pages ? 0 : pageNumber + 1;
+    const newPagination = {
+      ...pagination,
+      previous: pageNumber === 1 ? 0 : pageNumber - 1,
+      current: pageNumber,
+      next: nextPage,
+    };
+    setPagination(newPagination);
   };
 
   return (
@@ -372,22 +494,22 @@ export const Monitoring = () => {
           <Col md={12} className="container">
             <Col md={3} className="total-box">
               <h6>Vaults</h6>
-              <span className="number">1,200</span>
+              <span className="number">{vaultsTotals.vaults}</span>
             </Col>
             <Col md={3} className="total-box">
               <h6>Collateral (USD)</h6>
-              <span className="number">$2,580,200.55</span>
+              <span className="number">${numberFormatStr(vaultsTotals.collateralUSD, 2)}</span>
             </Col>
             <Col md={3} className="total-box">
               <div className="debt">
                 <h6>Debt</h6>
                 <TcapIcon className="tcap-icon" />
               </div>
-              <span className="number">5,210.55</span>
+              <span className="number">{numberFormatStr(vaultsTotals.debt, 4)}</span>
             </Col>
             <Col md={3} className="total-box">
               <h6>Debt (USD)</h6>
-              <span className="number">$988,180.81</span>
+              <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2)}</span>
             </Col>
           </Col>
         </Card.Body>
@@ -429,28 +551,36 @@ export const Monitoring = () => {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            <div className="dd-container">
-              <ButtonGroup className="mb-2">
-                {radios.map((radio, idx) => (
-                  <ToggleButton
-                    key={idx}
-                    id={`radio-${idx}`}
-                    type="radio"
-                    variant="secondary"
-                    name="radio"
-                    value={radio.value}
-                    checked={radioValue === radio.value}
-                    onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
-                  >
-                    {radio.name}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
-            </div>
+            {currentAddress !== "" && (
+              <div className="dd-container">
+                <ButtonGroup className="mb-2">
+                  {radios.map((radio, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`radio-${idx}`}
+                      type="radio"
+                      variant="secondary"
+                      name="radio"
+                      value={radio.value}
+                      checked={radioValue === radio.value}
+                      onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+                    >
+                      {radio.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
+            )}
           </Col>
-          <Vaults vaults={vaults} />
+          {loading ? (
+            <Loading title="Loading Vaults" />
+          ) : (
+            <Vaults vaults={vaultList} pagination={pagination} />
+          )}
           <Col md={12} className="pag-container">
-            {pagination.pages > 0 && <VaultPagination />}
+            {pagination.pages > 0 && !loading && (
+              <VaultPagination pagination={pagination} onPageSelected={onPageSelected} />
+            )}
           </Col>
         </Card.Body>
       </Card>
