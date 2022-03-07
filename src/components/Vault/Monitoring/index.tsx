@@ -349,9 +349,9 @@ export const Monitoring = () => {
         oraclePrices?.tcapOraclePrice || "1"
       );
       let status = "liquidation";
-      if (collateralUSD === 0) {
+      if (parseFloat(collateral) < 0.0000001) {
         status = "empty";
-      } else if (collateralUSD > 0 && debtUSD === 0) {
+      } else if (parseFloat(collateral) >= 0.0000001 && parseFloat(debt) < 0.0000001) {
         status = "ready";
       } else if (ratio >= minRatio) {
         status = "active";
