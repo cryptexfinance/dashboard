@@ -114,7 +114,6 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
         <Nav.Item>
           <Link
             to="/vault-monitoring"
-            className="active"
             onClick={() => {
               setActive("/vault-monitoring");
             }}

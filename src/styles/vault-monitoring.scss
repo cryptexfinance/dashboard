@@ -4,6 +4,9 @@
 .vault-monitoring {
   padding: 1rem 3rem;
   
+  .row {
+    display: block;
+  }
 
   .card {
     padding: 1.5rem 2.8125rem;
@@ -95,7 +98,6 @@
         display: none;
       }
     }
-
     .vaults {
       margin-top: 1.8rem !important;  
       margin-bottom: 0.2rem;
@@ -167,6 +169,10 @@
           -webkit-animation: fire 2s infinite alternate;
           animation: fire 2s infinite alternate;
           color: #fff !important;
+          button {
+            background: transparent;
+            border: 0.8px solid #f28040;
+          }
         }
         .empty {
           text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
@@ -185,7 +191,6 @@
         }
       }
     }
-
     .pag-container{
       display: flex;
       justify-content: center;
@@ -242,5 +247,11 @@
   }
   .card-body {
     padding: 1.25rem 0rem;
+  }
+
+  @media (max-width: 600px) {
+    .row {
+      display: flex;
+    }
   }
 }
