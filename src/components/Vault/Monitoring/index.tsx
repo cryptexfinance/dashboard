@@ -405,7 +405,7 @@ export const Monitoring = () => {
     }
   };
 
-  const { loading, data, error } = useQuery(vaultsQuery, {
+  const { loading, data, refetch, error } = useQuery(vaultsQuery, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     skip: skipQuery,
@@ -482,6 +482,14 @@ export const Monitoring = () => {
       next: nextPage,
     };
     setPagination(newPagination);
+  };
+
+  const refresh = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      // catch error in case the vault screen is changed
+    }
   };
 
   return (
@@ -586,6 +594,7 @@ export const Monitoring = () => {
                   currentAddress={currentAddress}
                   vaults={vaultList}
                   pagination={pagination}
+                  refresh={() => refresh()}
                 />
               )}
               <Col md={12} className="pag-container">

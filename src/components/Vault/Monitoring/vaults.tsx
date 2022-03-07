@@ -12,9 +12,10 @@ type dataType = {
   currentAddress: string;
   vaults: Array<VaultsType>;
   pagination: PaginationType;
+  refresh: () => void;
 };
 
-export const Vaults = ({ currentAddress, vaults, pagination }: dataType) => {
+export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType) => {
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultId, setVaultId] = useState("");
   const [vaultType, setVaultType] = useState("");
@@ -115,6 +116,7 @@ export const Vaults = ({ currentAddress, vaults, pagination }: dataType) => {
           setVaultType("");
           setShowLiquidate(false);
         }}
+        refresh={() => refresh()}
       />
     </>
   );

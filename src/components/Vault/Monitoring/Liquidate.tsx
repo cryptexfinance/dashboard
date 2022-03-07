@@ -2,10 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { ethers, BigNumber } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
+import NumberFormat from "react-number-format";
 import "../../../styles/modal.scss";
+import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
 import VaultContext from "../../../state/VaultsContext";
 import { errorNotification, notifyUser } from "../../../utils/utils";
+import { NETWORKS } from "../../../utils/constants";
 
 type props = {
   show: boolean;
@@ -13,14 +16,17 @@ type props = {
   vaultId: string;
   vaultType: string;
   onHide: () => void;
+  refresh: () => void;
 };
 
-const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide }: props) => {
+const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }: props) => {
+  const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const vaults = useContext(VaultContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
   const [requiredTcap, setRequiredTcap] = useState("0");
   const [maxTcap, setMaxTcap] = useState("0");
+  const [liquidationFee, setLiquidationFee] = useState("0");
   const [canLiquidate, setCanLiquidate] = useState(true);
 
   useEffect(() => {
@@ -68,7 +74,12 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide }: props) 
           // @ts-ignore
           const [reqTcap] = await signer.ethcallProvider?.all([reqTcapCall]);
           const reqTcapText = ethers.utils.formatEther(reqTcap);
+
+          const currentLiqFee = await cVault?.getFee(reqTcap);
+          const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+          const ethFee = ethers.utils.formatEther(increasedFee);
           setRequiredTcap(reqTcapText);
+          setLiquidationFee(ethFee.toString());
         }
       }
     }
@@ -92,15 +103,20 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide }: props) 
       if (maxTcap && parseFloat(maxTcap) > 0) {
         if (parseFloat(maxTcap) >= parseFloat(requiredTcap)) {
           try {
+            const currentLiqFee = await currentVault?.getFee(ethers.utils.parseEther(requiredTcap));
+            const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+            const ethFee = ethers.utils.formatEther(increasedFee);
+            setLiquidationFee(ethFee);
             const tx = await currentVault.liquidateVault(
               BigNumber.from(vaultId),
-              ethers.utils.parseEther(maxTcap)
+              ethers.utils.parseEther(maxTcap),
+              { value: increasedFee }
             );
-            notifyUser(tx);
+            notifyUser(tx, refresh);
             setMaxTcap("");
             onHide();
           } catch (error) {
-            errorNotification("Not enough CTX balance.");
+            errorNotification("Burn fee less than required.");
           }
         } else {
           errorNotification("Tcap amount is less than required");
@@ -144,6 +160,17 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide }: props) 
                 value={maxTcap}
                 onChange={onChangeMaxTcap}
               />
+              <Form.Text className="text-muted liquidation-fee">
+                Liquidation Fee:{" "}
+                <NumberFormat
+                  className="number neon-pink"
+                  value={liquidationFee}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={4}
+                />{" "}
+                {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
+              </Form.Text>
             </>
           </Form.Group>
         </Form>
