@@ -100,7 +100,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide }: props) 
             setMaxTcap("");
             onHide();
           } catch (error) {
-            errorNotification("Not enough CTX balance.");
+            errorNotification("Burn fee less than required.");
           }
         } else {
           errorNotification("Tcap amount is less than required");
