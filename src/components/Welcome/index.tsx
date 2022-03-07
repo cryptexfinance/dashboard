@@ -14,7 +14,7 @@ type props = {
   signerAddress: string;
 };
 
-const Wrapper = ({ signerAddress }: props) => {
+const WelcomeWrapper = ({ signerAddress }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
@@ -49,4 +49,4 @@ const Wrapper = ({ signerAddress }: props) => {
   );
 };
 
-export default Wrapper;
+export default WelcomeWrapper;

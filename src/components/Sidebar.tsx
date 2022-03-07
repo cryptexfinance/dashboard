@@ -32,6 +32,9 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
     case "/vault":
       activeVal = "vault";
       break;
+    case "/vault-monitoring":
+      activeVal = "/vault-monitoring";
+      break;
     case "/graph":
       activeVal = "graph";
       break;
@@ -107,6 +110,16 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
               <VaultIcon />
             </Link>
           )}
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/vault-monitoring"
+            onClick={() => {
+              setActive("/vault-monitoring");
+            }}
+          >
+            <VaultIcon />
+          </Link>
         </Nav.Item>
         {isInLayer1(currentNetwork.chainId) && (
           <Nav.Item>

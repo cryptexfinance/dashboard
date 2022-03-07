@@ -27,6 +27,7 @@ import {
   isPolygon,
   isUndefined,
   toUSD,
+  validOracles,
 } from "../utils/utils";
 import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
@@ -64,34 +65,6 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
-  const validOracles = (): boolean => {
-    let valid =
-      !isUndefined(oracles.wethOracleRead) &&
-      !isUndefined(oracles.daiOracleRead) &&
-      !isUndefined(oracles.tcapOracleRead) &&
-      !isUndefined(tokens.tcapTokenRead);
-
-    if (isInLayer1(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.aaveOracle) &&
-        !isUndefined(oracles.linkOracle) &&
-        !isUndefined(tokens.ctxPoolTokenRead);
-    }
-    if (isOptimism(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.linkOracleRead) &&
-        !isUndefined(oracles.snxOracleRead) &&
-        !isUndefined(oracles.uniOracleRead);
-    }
-
-    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
-      valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
-    }
-    return valid;
-  };
-
   const getMaticUSD = async () => {
     const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
     // @ts-ignore
@@ -102,7 +75,15 @@ const Graph = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data && signer && validOracles()) {
+      if (
+        oracles &&
+        tokens &&
+        data &&
+        signer &&
+        !isUndefined(tokens.tcapTokenRead) &&
+        !isUndefined(tokens.ctxPoolTokenRead) &&
+        validOracles(currentNetwork.chainId || 1, oracles)
+      ) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
