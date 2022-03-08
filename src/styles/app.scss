@@ -264,6 +264,12 @@ html,
   padding: 0.8rem;
 }
 
+.vaults-tooltip > .tooltip-inner {
+  width: auto;
+  text-align: right;
+  padding: 0.9rem;
+}
+
 form {
   .field-error {
     color: $orange;

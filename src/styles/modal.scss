@@ -99,9 +99,15 @@
       text-align: left;
       font-size: 0.8rem;
     }
-    .text-muted.liquidation-fee {
+    .text-muted.liquidation-fee,
+    .text-muted.liquidation-reward {
       color: #9ca5ad !important;
       font-size: 0.9rem;
+    }
+    .liquidation-data {
+      display: flex;
+      margin-top: 5px;
+      justify-content: space-between;
     }
 
     input[type="text"].neon-green {

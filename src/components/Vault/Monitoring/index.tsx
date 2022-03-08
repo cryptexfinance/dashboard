@@ -75,6 +75,14 @@ export const Monitoring = () => {
     { name: "All Vaults", value: "1" },
     { name: "My Vaults", value: "2" },
   ];
+  const viewsList = [
+    { key: "5", name: "5" },
+    { key: "10", name: "10" },
+    { key: "15", name: "15" },
+    { key: "20", name: "20" },
+    { key: "25", name: "25" },
+    { key: "30", name: "30" },
+  ];
   const statusList = [
     { key: "all", name: "All" },
     { key: "empty", name: "Empty" },
@@ -328,6 +336,26 @@ export const Monitoring = () => {
     return minRatio;
   };
 
+  const confPagination = (vData: Array<VaultsType>, itemsPerPage: number) => {
+    if (vData.length > 0) {
+      const lastVaultId = vData[vData.length - 1].blockTS;
+      const itemsCount = vData.length;
+      const pages = Math.ceil(itemsCount / itemsPerPage);
+      const pag = {
+        previous: 0,
+        current: 1,
+        next: 2,
+        pages,
+        itemsPerPage,
+        itemsCount,
+        lastId: lastVaultId,
+      };
+      setPagination(pag);
+    } else {
+      setPagination(pagDefault);
+    }
+  };
+
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
     const totals = { ...totalsDefault };
@@ -371,7 +399,7 @@ export const Monitoring = () => {
           debt,
           debtUsd: debtUSD.toFixed(2),
           ratio,
-          minRatio: "",
+          minRatio: minRatio.toString(),
           status,
           blockTS: v.blockTS,
         });
@@ -385,24 +413,8 @@ export const Monitoring = () => {
     });
     setVaultList(vData);
     setVaultsTotals(totals);
-    // Set pagination ddata
-    if (vData.length > 0) {
-      const lastVaultId = vData[vData.length - 1].blockTS;
-      const itemsCount = vData.length;
-      const pages = Math.ceil(itemsCount / pagination.itemsPerPage);
-      const pag = {
-        previous: 0,
-        current: 1,
-        next: 2,
-        pages,
-        itemsPerPage: pagination.itemsPerPage,
-        itemsCount,
-        lastId: lastVaultId,
-      };
-      setPagination(pag);
-    } else {
-      setPagination(pagDefault);
-    }
+    // Set pagination data
+    confPagination(vData, pagination.itemsPerPage);
   };
 
   const { loading, data, refetch, error } = useQuery(vaultsQuery, {
@@ -451,6 +463,11 @@ export const Monitoring = () => {
     }
 
     return symbols;
+  };
+
+  const handleItemsViewChange = (number: string) => {
+    setSkipQuery(true);
+    confPagination(vaultList, parseInt(number));
   };
 
   const handleRadioBtnChange = (value: string) => {
@@ -508,84 +525,115 @@ export const Monitoring = () => {
                 </Col>
                 <Col md={3} className="total-box">
                   <h6>Collateral (USD)</h6>
-                  <span className="number">${numberFormatStr(vaultsTotals.collateralUSD, 2)}</span>
+                  <span className="number">
+                    ${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}
+                  </span>
                 </Col>
                 <Col md={3} className="total-box">
                   <div className="debt">
                     <h6>Debt</h6>
                     <TcapIcon className="tcap-icon" />
                   </div>
-                  <span className="number">{numberFormatStr(vaultsTotals.debt, 4)}</span>
+                  <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
                 </Col>
                 <Col md={3} className="total-box">
                   <h6>Debt (USD)</h6>
-                  <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2)}</span>
+                  <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
                 </Col>
               </Col>
             </Card.Body>
           </Card>
           <Card className="diamond mb-2">
             <Card.Body>
-              <Col md={12} className="filters">
-                <div className="dd-container">
-                  <h6 className="titles">Collateral:</h6>
-                  <Dropdown onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}>
-                    <Dropdown.Toggle
-                      variant="secondary"
-                      id="dropdown-filters"
-                      className="text-left"
-                    >
-                      <div className="collateral-toggle">
-                        <CollateralIcon name={tokenSymbol} />
-                        <span>{tokenSymbol.toUpperCase()}</span>
-                      </div>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {tokensSymbols().map((item) => (
-                        <Dropdown.Item key={item.key} eventKey={item.key}>
-                          {item.name}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-                <div className="dd-container">
-                  <h6 className="titles">Status:</h6>
-                  <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
-                    <Dropdown.Toggle variant="secondary" id="dropdown-flags" className="text-left">
-                      <div className="status-toggle">
-                        <span>{capitalize(currentStatus)}</span>
-                      </div>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {statusList.map((item) => (
-                        <Dropdown.Item key={item.key} eventKey={item.key}>
-                          {item.name}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-                {currentAddress !== "" && (
+              <Col md={12} className="actions">
+                <div className="items-view">
                   <div className="dd-container">
-                    <ButtonGroup className="mb-2">
-                      {radios.map((radio, idx) => (
-                        <ToggleButton
-                          key={idx}
-                          id={`radio-${idx}`}
-                          type="radio"
-                          variant="secondary"
-                          name="radio"
-                          value={radio.value}
-                          checked={radioValue === radio.value}
-                          onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
-                        >
-                          {radio.name}
-                        </ToggleButton>
-                      ))}
-                    </ButtonGroup>
+                    <h6 className="titles">View:</h6>
+                    <Dropdown onSelect={(eventKey) => handleItemsViewChange(eventKey || "15")}>
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-filters"
+                        className="text-left"
+                      >
+                        <div className="items-view-toggle">
+                          <span>{pagination.itemsPerPage}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {viewsList.map((item) => (
+                          <Dropdown.Item key={item.key} eventKey={item.key}>
+                            {item.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
-                )}
+                </div>
+                <div className="filters">
+                  <div className="dd-container">
+                    <h6 className="titles">Collateral:</h6>
+                    <Dropdown onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}>
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-filters"
+                        className="text-left"
+                      >
+                        <div className="collateral-toggle">
+                          <CollateralIcon name={tokenSymbol} />
+                          <span>{tokenSymbol.toUpperCase()}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {tokensSymbols().map((item) => (
+                          <Dropdown.Item key={item.key} eventKey={item.key}>
+                            {item.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  <div className="dd-container">
+                    <h6 className="titles">Status:</h6>
+                    <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-flags"
+                        className="text-left"
+                      >
+                        <div className="status-toggle">
+                          <span>{capitalize(currentStatus)}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {statusList.map((item) => (
+                          <Dropdown.Item key={item.key} eventKey={item.key}>
+                            {item.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  {currentAddress !== "" && (
+                    <div className="dd-container">
+                      <ButtonGroup className="mb-2">
+                        {radios.map((radio, idx) => (
+                          <ToggleButton
+                            key={idx}
+                            id={`radio-${idx}`}
+                            type="radio"
+                            variant="secondary"
+                            name="radio"
+                            value={radio.value}
+                            checked={radioValue === radio.value}
+                            onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+                          >
+                            {radio.name}
+                          </ToggleButton>
+                        ))}
+                      </ButtonGroup>
+                    </div>
+                  )}
+                </div>
               </Col>
               {loading || !pricesUpdated ? (
                 <Spinner variant="danger" className="spinner" animation="border" />

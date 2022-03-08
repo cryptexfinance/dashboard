@@ -26,6 +26,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
   const [requiredTcap, setRequiredTcap] = useState("0");
   const [maxTcap, setMaxTcap] = useState("0");
+  const [reward, setReward] = useState("0");
   const [liquidationFee, setLiquidationFee] = useState("0");
   const [canLiquidate, setCanLiquidate] = useState(true);
 
@@ -71,14 +72,20 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
         if (vaultId !== "" && cVault && cVaultRead) {
           setCurrentVault(cVault);
           const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
+          const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
           // @ts-ignore
-          const [reqTcap] = await signer.ethcallProvider?.all([reqTcapCall]);
+          const [reqTcap, liqReward] = await signer.ethcallProvider?.all([
+            reqTcapCall,
+            liqRewardCall,
+          ]);
           const reqTcapText = ethers.utils.formatEther(reqTcap);
+          const liqRewardText = ethers.utils.formatEther(liqReward);
 
           const currentLiqFee = await cVault?.getFee(reqTcap);
           const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
           const ethFee = ethers.utils.formatEther(increasedFee);
           setRequiredTcap(reqTcapText);
+          setReward(liqRewardText);
           setLiquidationFee(ethFee.toString());
         }
       }
@@ -150,7 +157,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
               <Form.Label>Amount of TCAP</Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
-                  MIN
+                  MIN REQUIRED
                 </a>
               </Form.Label>
               <Form.Control
@@ -160,17 +167,30 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
                 value={maxTcap}
                 onChange={onChangeMaxTcap}
               />
-              <Form.Text className="text-muted liquidation-fee">
-                Liquidation Fee:{" "}
-                <NumberFormat
-                  className="number neon-pink"
-                  value={liquidationFee}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={4}
-                />{" "}
-                {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
-              </Form.Text>
+              <div className="liquidation-data">
+                <Form.Text className="text-muted liquidation-reward">
+                  Reward:{" "}
+                  <NumberFormat
+                    className="number neon-pink"
+                    value={reward}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={4}
+                  />{" "}
+                  {vaultType === "WETH" ? "ETH" : vaultType}
+                </Form.Text>
+                <Form.Text className="text-muted liquidation-fee">
+                  Burn Fee:{" "}
+                  <NumberFormat
+                    className="number neon-pink"
+                    value={liquidationFee}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={4}
+                  />{" "}
+                  {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
+                </Form.Text>
+              </div>
             </>
           </Form.Group>
         </Form>
