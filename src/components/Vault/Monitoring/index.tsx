@@ -67,10 +67,11 @@ export const Monitoring = () => {
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
   const [loadMore, setLoadMore] = useState(false);
   const [pricesUpdated, setPricesUpdated] = useState(false);
-  const [owner, setOwner] = useState("");
+  const [ownerAddress, setOwnerAddress] = useState("");
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
+  const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
     { name: "My Vaults", value: "2" },
@@ -97,8 +98,8 @@ export const Monitoring = () => {
     let ownerFilter = "";
     let vaultFilter = "";
     let statusFilter = "";
-    if (radioValue === "2" && owner !== "") {
-      ownerFilter = `, owner: "${owner}"`;
+    if (radioValue === "2" && ownerAddress !== "") {
+      ownerFilter = `, owner: "${ownerAddress}"`;
     }
     if (tokenSymbol !== "all") {
       vaultFilter = `tokenSymbol: "${tokenSymbol.toUpperCase()}"`;
@@ -356,6 +357,35 @@ export const Monitoring = () => {
     }
   };
 
+  const calculateVaultData = (
+    collateralWei: ethers.BigNumberish,
+    debtWei: ethers.BigNumberish,
+    symbol: string
+  ) => {
+    const collateralText = ethers.utils.formatEther(collateralWei);
+    const debtText = ethers.utils.formatEther(debtWei);
+    const collateralPrice = getCollateralPrice(symbol);
+    const collateralUSD = toUSD(collateralText, collateralPrice);
+    const debtUSD = toUSD(debtText, oraclePrices?.tcapOraclePrice || "0");
+    const minRatio = getMinRatio(symbol);
+    const ratio = getRatio2(
+      collateralText,
+      collateralPrice,
+      debtText,
+      oraclePrices?.tcapOraclePrice || "1"
+    );
+
+    let status = "liquidation";
+    if (parseFloat(collateralText) < 0.0000001) {
+      status = "empty";
+    } else if (parseFloat(collateralText) >= 0.0000001 && parseFloat(debtText) < 0.0000001) {
+      status = "ready";
+    } else if (ratio >= minRatio) {
+      status = "active";
+    }
+    return { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status };
+  };
+
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
     const totals = { ...totalsDefault };
@@ -364,26 +394,8 @@ export const Monitoring = () => {
     setLoadMore(false);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
-      const collateral = ethers.utils.formatEther(v.collateral);
-      const debt = ethers.utils.formatEther(v.debt);
-      const collateralPrice = getCollateralPrice(v.tokenSymbol);
-      const collateralUSD = toUSD(collateral, collateralPrice);
-      const debtUSD = toUSD(debt, oraclePrices?.tcapOraclePrice || "0");
-      const minRatio = getMinRatio(v.tokenSymbol);
-      const ratio = getRatio2(
-        collateral,
-        collateralPrice,
-        debt,
-        oraclePrices?.tcapOraclePrice || "1"
-      );
-      let status = "liquidation";
-      if (parseFloat(collateral) < 0.0000001) {
-        status = "empty";
-      } else if (parseFloat(collateral) >= 0.0000001 && parseFloat(debt) < 0.0000001) {
-        status = "ready";
-      } else if (ratio >= minRatio) {
-        status = "active";
-      }
+      const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
+        calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
       let addVault = true;
       if (currentStatus === "active" || currentStatus === "liquidation") {
@@ -394,9 +406,9 @@ export const Monitoring = () => {
         vData.push({
           id: v.vaultId,
           collateralSymbol: v.tokenSymbol,
-          collateralValue: collateral,
+          collateralValue: collateralText,
           collateralUsd: collateralUSD.toFixed(2),
-          debt,
+          debt: debtText,
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
@@ -405,9 +417,9 @@ export const Monitoring = () => {
         });
 
         totals.vaults += 1;
-        totals.collateral = (parseFloat(totals.collateral) + parseFloat(collateral)).toFixed(4);
+        totals.collateral = (parseFloat(totals.collateral) + parseFloat(collateralText)).toFixed(4);
         totals.collateralUSD = (parseFloat(totals.collateralUSD) + collateralUSD).toFixed(2);
-        totals.debt = (parseFloat(totals.debt) + parseFloat(debt)).toFixed(4);
+        totals.debt = (parseFloat(totals.debt) + parseFloat(debtText)).toFixed(4);
         totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
       }
     });
@@ -417,7 +429,7 @@ export const Monitoring = () => {
     confPagination(vData, pagination.itemsPerPage);
   };
 
-  const { loading, data, refetch, error } = useQuery(vaultsQuery, {
+  const { loading, data, error } = useQuery(vaultsQuery, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     skip: skipQuery,
@@ -474,9 +486,9 @@ export const Monitoring = () => {
     setSkipQuery(false);
     setRadioValue(value);
     if (value === "1") {
-      setOwner("");
+      setOwnerAddress("");
     } else {
-      setOwner(currentAddress);
+      setOwnerAddress(currentAddress);
     }
   };
 
@@ -501,12 +513,54 @@ export const Monitoring = () => {
     setPagination(newPagination);
   };
 
-  const refresh = async () => {
-    try {
-      await refetch();
-    } catch (error) {
-      // catch error in case the vault screen is changed
+  const updateLiquidatedVault = async (index: number, symbol: string) => {
+    let currentVault = vaults?.wethVault;
+    switch (symbol) {
+      case "DAI":
+        currentVault = vaults?.daiVault;
+        break;
+      case "AAVE":
+        currentVault = vaults?.aaveVault;
+        break;
+      case "LINK":
+        currentVault = vaults?.linkVault;
+        break;
+      case "UNI":
+        currentVault = vaults?.uniVault;
+        break;
+      case "SNX":
+        currentVault = vaults?.snxVault;
+        break;
+      case "MATIC":
+        currentVault = vaults?.maticVault;
+        break;
+      case "WBTC":
+        currentVault = vaults?.wbtcVault;
+        break;
+      default:
+        break;
     }
+    const [vaultId, collateral, , debt] = await currentVault?.getVault(
+      BigNumber.from(vaultList[index].id)
+    );
+    const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
+      calculateVaultData(collateral, debt, symbol);
+    const allVaults = vaultList;
+    const v = {
+      id: vaultId,
+      collateralSymbol: symbol,
+      collateralValue: collateralText,
+      collateralUsd: collateralUSD.toFixed(2),
+      debt: debtText,
+      debtUsd: debtUSD.toFixed(2),
+      ratio,
+      minRatio: minRatio.toString(),
+      status,
+      blockTS: vaultList[index].blockTS,
+    };
+    allVaults[index] = v;
+    setVaultList(allVaults);
+    setRenderTable(!renderTable);
   };
 
   return (
@@ -642,7 +696,7 @@ export const Monitoring = () => {
                   currentAddress={currentAddress}
                   vaults={vaultList}
                   pagination={pagination}
-                  refresh={() => refresh()}
+                  refresh={updateLiquidatedVault}
                 />
               )}
               <Col md={12} className="pag-container">

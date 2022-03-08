@@ -120,6 +120,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
               { value: increasedFee }
             );
             notifyUser(tx, refresh);
+            refresh();
             setMaxTcap("");
             onHide();
           } catch (error) {
