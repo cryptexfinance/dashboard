@@ -545,7 +545,6 @@ export const Monitoring = () => {
     );
     const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
       calculateVaultData(collateral, debt, symbol);
-    console.log(status);
     const allVaults = vaultList;
     const v = {
       id: vaultId,
@@ -556,7 +555,7 @@ export const Monitoring = () => {
       debtUsd: debtUSD.toFixed(2),
       ratio,
       minRatio: minRatio.toString(),
-      status: "active",
+      status,
       blockTS: vaultList[index].blockTS,
     };
     allVaults[index] = v;
