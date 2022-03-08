@@ -4,6 +4,8 @@ import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
 import { FEATURES, NETWORKS } from "./constants";
+import { OraclesContext } from "../state/OraclesContext";
+import { VaultsContext } from "../state/VaultsContext";
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -127,6 +129,21 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
 };
 
 export const getRatio = async (
+  collateral: string,
+  collateralPrice: string,
+  debt: string,
+  tcapPrice: string
+) => {
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const d = parseFloat(debt);
+  const tp = parseFloat(tcapPrice);
+  if (d === 0 || tp === 0) return 0;
+  const ratio = (c * cp * 100) / (d * tp);
+  return ratio;
+};
+
+export const getRatio2 = (
   collateral: string,
   collateralPrice: string,
   debt: string,
@@ -314,4 +331,47 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
     });
   }
   return provider;
+};
+
+export const validOracles = (chainId: number, oracles: OraclesContext): boolean => {
+  let valid =
+    !isUndefined(oracles.wethOracleRead) &&
+    !isUndefined(oracles.daiOracleRead) &&
+    !isUndefined(oracles.tcapOracleRead);
+
+  if (isInLayer1(chainId)) {
+    valid = valid && !isUndefined(oracles.aaveOracleRead) && !isUndefined(oracles.linkOracleRead);
+  }
+  if (isOptimism(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(oracles.linkOracleRead) &&
+      !isUndefined(oracles.snxOracleRead) &&
+      !isUndefined(oracles.uniOracleRead);
+  }
+
+  if (chainId === NETWORKS.polygon.chainId) {
+    valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
+  }
+  return valid;
+};
+
+export const validVaults = (chainId: number, vaults: VaultsContext): boolean => {
+  let valid = !isUndefined(vaults.wethVaultRead) && !isUndefined(vaults.daiVaultRead);
+
+  if (isInLayer1(chainId)) {
+    valid = valid && !isUndefined(vaults.aaveVaultRead) && !isUndefined(vaults.linkVaultRead);
+  }
+  if (isOptimism(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(vaults.linkVaultRead) &&
+      !isUndefined(vaults.snxVaultRead) &&
+      !isUndefined(vaults.uniVaultRead);
+  }
+
+  if (chainId === NETWORKS.polygon.chainId) {
+    valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
+  }
+  return valid;
 };

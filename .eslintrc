@@ -77,6 +77,7 @@
         "props": false
       }
     ],
+    "no-array-constructor": "off",
     "no-console": 0,
     "import/prefer-default-export": 0,
     "import": 0,
@@ -154,7 +155,7 @@
         "custom": "enforce",
         "exceptions": [
           "Container"
-        ],
+        ]
       }
     ],
     "react/jsx-no-bind": 0

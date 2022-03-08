@@ -15,9 +15,9 @@ import Container from "react-bootstrap/esm/Container";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
-import Wrapper from "./components/Welcome/index";
+import WelcomeWrapper from "./components/Welcome/index";
 import Graph from "./components/Graph";
-import Vault from "./components/Vault/Vault";
+import { Vault, Monitoring } from "./components/Vault";
 import Pool from "./components/Pool";
 import Delegators from "./components/Governance/Delegators";
 import Loading from "./components/Loading";
@@ -789,7 +789,7 @@ const App = () => {
                       <ToastContainer />
                       <Switch>
                         <Route path={`${match.url}/`}>
-                          <Wrapper
+                          <WelcomeWrapper
                             signerAddress={currentSignerAddress}
                             loadingContracts={isLoadingContracts}
                           />
@@ -800,6 +800,9 @@ const App = () => {
                           </Route>
                           <Route path={`${match.url}vault`}>
                             <Vault />
+                          </Route>
+                          <Route path={`${match.url}vault-monitoring`}>
+                            <Monitoring />
                           </Route>
                           <Route path={`${match.url}farm`}>
                             <Farm />

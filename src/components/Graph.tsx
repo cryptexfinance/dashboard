@@ -29,6 +29,7 @@ import {
   isPolygon,
   isUndefined,
   toUSD,
+  validOracles,
 } from "../utils/utils";
 import { NETWORKS } from "../utils/constants";
 import Loading from "./Loading";
@@ -68,39 +69,6 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
-  const validOracles = (): boolean => {
-    let valid =
-      !isUndefined(oracles.daiOracleRead) &&
-      !isUndefined(oracles.tcapOracleRead) &&
-      !isUndefined(tokens.tcapTokenRead);
-
-    if (isInLayer1(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.wethOracleRead) &&
-        !isUndefined(oracles.aaveOracle) &&
-        !isUndefined(oracles.linkOracle) &&
-        !isUndefined(tokens.ctxPoolTokenRead);
-    }
-    if (isOptimism(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.linkOracleRead) &&
-        !isUndefined(oracles.snxOracleRead) &&
-        !isUndefined(oracles.uniOracleRead);
-    }
-
-    if (isPolygon(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.maticOracle) &&
-        !isUndefined(oracles.maticOracleRead) &&
-        !isUndefined(oracles.wbtcOracle) &&
-        !isUndefined(oracles.wbtcOracleRead);
-    }
-    return valid;
-  };
-
   const getMaticUSD = async () => {
     const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
     // @ts-ignore
@@ -111,7 +79,15 @@ const Graph = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data && signer && validOracles()) {
+      if (
+        oracles &&
+        tokens &&
+        data &&
+        signer &&
+        !isUndefined(tokens.tcapTokenRead) &&
+        !isUndefined(tokens.ctxPoolTokenRead) &&
+        validOracles(currentNetwork.chainId || 1, oracles)
+      ) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();

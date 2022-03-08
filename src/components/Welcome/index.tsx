@@ -15,7 +15,7 @@ type props = {
   loadingContracts: boolean;
 };
 
-const Wrapper = ({ signerAddress, loadingContracts }: props) => {
+const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
@@ -53,4 +53,4 @@ const Wrapper = ({ signerAddress, loadingContracts }: props) => {
   );
 };
 
-export default Wrapper;
+export default WelcomeWrapper;
