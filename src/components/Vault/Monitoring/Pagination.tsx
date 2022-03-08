@@ -44,7 +44,10 @@ export const VaultPagination = ({ pagination, onPageSelected }: props) => {
         {pagination.current < pagination.pages - 1 && pagination.current > midPages[4] && (
           <Pagination.Ellipsis />
         )}
-        <Pagination.Item active={pagination.current === pagination.pages}>
+        <Pagination.Item
+          active={pagination.current === pagination.pages}
+          onClick={() => onPageSelected(pagination.pages)}
+        >
           {pagination.pages}
         </Pagination.Item>
       </>

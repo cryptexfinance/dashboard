@@ -9,6 +9,7 @@ import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
+import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
 import { ReactComponent as PoolsIcon } from "../assets/images/welcome/pool.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
@@ -114,11 +115,12 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
         <Nav.Item>
           <Link
             to="/vault-monitoring"
+            className={active === "vault-monitoring" ? "active" : ""}
             onClick={() => {
-              setActive("/vault-monitoring");
+              setActive("vault-monitoring");
             }}
           >
-            <VaultIcon />
+            <VaultMonitoringIcon />
           </Link>
         </Nav.Item>
         {isInLayer1(currentNetwork.chainId) && (

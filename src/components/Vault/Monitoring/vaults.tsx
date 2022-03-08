@@ -50,7 +50,7 @@ export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
                 <td>
                   <div className="status">
-                    {v.status === "liquidation" ? (
+                    {v.status === "liquidation" && currentAddress !== "" ? (
                       <Button onClick={() => liquidateVault(v.id, v.collateralSymbol)}>
                         <span className={v.status}>{capitalize(v.status)}</span>
                       </Button>
@@ -60,45 +60,65 @@ export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType
                   </div>
                 </td>
                 <td>
-                  <div className="collateral">
+                  <OverlayTrigger
+                    key="top"
+                    placement="bottom"
+                    trigger={["focus", "hover"]}
+                    overlay={
+                      <Tooltip id="ttip-collateral" className="vaults-tooltip">
+                        {numberFormatStr(v.collateralValue, 4, 12)}
+                      </Tooltip>
+                    }
+                  >
+                    <div className="collateral">
+                      <span className="number">{numberFormatStr(v.collateralValue, 4, 4)}</span>
+                      <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
+                    </div>
+                  </OverlayTrigger>
+                </td>
+                <td>
+                  <div className="collateral-usd">
+                    <span className="number">${numberFormatStr(v.collateralUsd, 2, 2)}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="debt">
                     <OverlayTrigger
                       key="top"
-                      placement="right"
-                      trigger={["hover", "click"]}
+                      placement="bottom"
+                      trigger={["hover", "focus"]}
                       overlay={
-                        <Tooltip id="ttip-current-reward" className="farm-tooltip">
-                          {v.collateralValue}
+                        <Tooltip id="ttip-debt" className="vaults-tooltip">
+                          {numberFormatStr(v.debt, 4, 12)}
                         </Tooltip>
                       }
                     >
-                      <>
-                        <span className="number">{numberFormatStr(v.collateralValue, 4)}</span>
-                        <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
-                      </>
+                      <span className="number">{numberFormatStr(v.debt, 4, 4)}</span>
                     </OverlayTrigger>
                   </div>
                 </td>
                 <td>
-                  <div className="collateral-usd">
-                    <span className="number">${numberFormatStr(v.collateralUsd, 2)}</span>
-                  </div>
-                </td>
-                <td>
                   <div className="debt">
-                    <span className="number">{numberFormatStr(v.debt, 4)}</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="debt">
-                    <span className="number">${numberFormatStr(v.debtUsd, 2)}</span>
+                    <span className="number">${numberFormatStr(v.debtUsd, 2, 2)}</span>
                   </div>
                 </td>
                 <td>
                   <div className="ratio">
-                    <span className={v.status}>
-                      {v.ratio.toFixed(0)}
-                      {v.ratio === 0 ? "" : "%"}
-                    </span>
+                    <OverlayTrigger
+                      key="top"
+                      placement="bottom"
+                      trigger={["focus", "hover"]}
+                      overlay={
+                        <Tooltip id="ttip-collateral" className="vaults-tooltip">
+                          Min Ratio: {v.minRatio}%
+                        </Tooltip>
+                      }
+                    >
+                      <span className={v.status}>
+                        {v.ratio.toFixed(0)}
+                        {v.ratio === 0 ? "" : "%"}
+                      </span>
+                    </OverlayTrigger>
                   </div>
                 </td>
               </tr>

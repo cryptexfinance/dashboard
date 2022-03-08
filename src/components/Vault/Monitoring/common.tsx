@@ -39,11 +39,17 @@ export const CollateralIcon = ({ name }: iconProps) => {
   }
 };
 
-export const numberFormat = new Intl.NumberFormat();
-
-export const numberFormatStr = (value: string, decimals: number | undefined) => {
-  if (decimals) {
-    return numberFormat.format(parseFloat(parseFloat(value).toFixed(decimals)));
+export const numberFormatStr = (
+  value: string,
+  minDecimals: number | undefined,
+  maxDecimals: number | undefined
+) => {
+  const numberFormat = new Intl.NumberFormat([], {
+    minimumFractionDigits: minDecimals,
+    maximumFractionDigits: maxDecimals,
+  });
+  if (minDecimals) {
+    return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
   }
   return numberFormat.format(parseFloat(value));
 };

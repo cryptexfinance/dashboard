@@ -6,28 +6,18 @@
   
   .row {
     display: block;
+    margin-top: 2rem;
   }
 
   .card {
     padding: 1.5rem 2.8125rem;
-
-    .filters {
+    width: 100%;
+    .actions {
       display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      padding: 0px;
-      
-      div[class*="col-"] {
-        padding: 0px;
-      }
       .dd-container {
         display: flex;
         align-items: center;
         margin-left: 1rem;
-      }
-      .titles {
-        color: $white;
-        margin-bottom: 0px;
       }
       .dropdown {
         padding-left: 0.5rem;
@@ -94,8 +84,40 @@
            background-color: $neon-highlight;
          }
       }
-      input[type="radio"] {
-        display: none;
+      .filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        padding: 0px;
+        width: 100%;
+        input[type="radio"] {
+          display: none;
+        }
+      }
+      .items-view {
+        .dd-container {
+          margin-left: 0rem; 
+        }
+        .dropdown {
+          .dropdown-toggle {
+            height: 2.1rem;
+            width: 80px;
+          }
+          .dropdown-toggle::after {
+            margin-left: 50%;
+          }
+          .dropdown-menu {
+            width: 120px;
+            min-width: 120px;
+          }
+        }
+      }
+      div[class*="col-"] {
+        padding: 0px;
+      }
+      .titles {
+        color: $white;
+        margin-bottom: 0px;
       }
     }
     .vaults {
@@ -147,6 +169,7 @@
           align-items: center;
           span {
             flex: 2;
+            margin-right: -15px;
           }
           svg {
             flex: 1;
@@ -248,10 +271,15 @@
   .card-body {
     padding: 1.25rem 0rem;
   }
-
-  @media (max-width: 600px) {
+  @media (max-width: 800px) {
     .row {
       display: flex;
+      margin-top: 1rem;
+    }
+    .card {
+      .items-view {
+        display: flex;
+      }
     }
   }
 }
