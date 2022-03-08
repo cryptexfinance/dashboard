@@ -1,3 +1,3 @@
-export * from "./vault";
+export * from "./Vault";
 
 export * from "./Monitoring/index";
