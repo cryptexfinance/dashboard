@@ -12,16 +12,18 @@ type dataType = {
   currentAddress: string;
   vaults: Array<VaultsType>;
   pagination: PaginationType;
-  refresh: () => void;
+  refresh: (index: number, symbol: string) => void;
 };
 
 export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType) => {
   const [showLiquidate, setShowLiquidate] = useState(false);
+  const [vaultIndex, setVaultIndex] = useState(-1);
   const [vaultId, setVaultId] = useState("");
   const [vaultType, setVaultType] = useState("");
 
-  const liquidateVault = (id: string, type: string) => {
+  const liquidateVault = (index: number, id: string, type: string) => {
     setVaultId(id);
+    setVaultIndex(index);
     setVaultType(type);
     setShowLiquidate(true);
   };
@@ -51,7 +53,7 @@ export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType
                 <td>
                   <div className="status">
                     {v.status === "liquidation" && currentAddress !== "" ? (
-                      <Button onClick={() => liquidateVault(v.id, v.collateralSymbol)}>
+                      <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
                         <span className={v.status}>{capitalize(v.status)}</span>
                       </Button>
                     ) : (
@@ -134,9 +136,10 @@ export const Vaults = ({ currentAddress, vaults, pagination, refresh }: dataType
         onHide={() => {
           setVaultId("");
           setVaultType("");
+          setVaultIndex(-1);
           setShowLiquidate(false);
         }}
-        refresh={() => refresh()}
+        refresh={() => refresh(vaultIndex, vaultType)}
       />
     </>
   );
