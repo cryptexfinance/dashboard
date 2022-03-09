@@ -18,6 +18,7 @@ import {
   getRatio2,
   isInLayer1,
   isOptimism,
+  isPolygon,
   isUndefined,
   toUSD,
   validOracles,
@@ -176,6 +177,12 @@ export const Monitoring = () => {
         ethcalls.push(snxOraclePriceCall);
         ethcalls.push(uniOraclePriceCall);
       }
+      if (isPolygon(currentNetwork.chainId)) {
+        const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
+        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+        ethcalls.push(maticOraclePriceCall);
+        ethcalls.push(wbtcOraclePriceCall);
+      }
       let tcapOraclePrice = BigNumber.from(0);
       let wethOraclePrice = BigNumber.from(0);
       let daiOraclePrice = BigNumber.from(0);
@@ -183,6 +190,8 @@ export const Monitoring = () => {
       let linkOraclePrice = BigNumber.from(0);
       let snxOraclePrice = BigNumber.from(0);
       let uniOraclePrice = BigNumber.from(0);
+      let maticOraclePrice = BigNumber.from(0);
+      let wbtcOraclePrice = BigNumber.from(0);
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
@@ -198,6 +207,10 @@ export const Monitoring = () => {
           snxOraclePrice,
           uniOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
+      } else if (isPolygon(currentNetwork.chainId)) {
+        // @ts-ignore
+        [tcapOraclePrice, daiOraclePrice, maticOraclePrice, wbtcOraclePrice] =
+          await signer.ethcallProvider?.all(ethcalls);
       }
 
       setOraclePrices({
@@ -208,8 +221,8 @@ export const Monitoring = () => {
         linkOraclePrice: ethers.utils.formatEther(linkOraclePrice.mul(10000000000)),
         uniOraclePrice: ethers.utils.formatEther(uniOraclePrice.mul(10000000000)),
         snxOraclePrice: ethers.utils.formatEther(snxOraclePrice.mul(10000000000)),
-        maticOraclePrice: "0",
-        wbtcOraclePrice: "0",
+        maticOraclePrice: ethers.utils.formatEther(maticOraclePrice.mul(10000000000)),
+        wbtcOraclePrice: ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000)),
       });
       setPricesUpdated(true);
     }
@@ -217,23 +230,32 @@ export const Monitoring = () => {
 
   const loadRatios = async () => {
     if (signer && vaults && validVaults(currentNetwork.chainId || 1, vaults)) {
-      const wethRatioCall = await vaults.wethVaultRead?.ratio();
       const daiRatioCall = await vaults.daiVaultRead?.ratio();
-      const ethcalls = [wethRatioCall, daiRatioCall];
+      const ethcalls = [daiRatioCall];
 
       if (isInLayer1(currentNetwork.chainId)) {
+        const wethRatioCall = await vaults.wethVaultRead?.ratio();
         const aaveRatioCall = await vaults.aaveVaultRead?.ratio();
         const linkRatioCall = await vaults.linkVaultRead?.ratio();
+        ethcalls.push(wethRatioCall);
         ethcalls.push(aaveRatioCall);
         ethcalls.push(linkRatioCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
+        const wethRatioCall = await vaults.wethVaultRead?.ratio();
         const linkRatioCall = await vaults.linkVaultRead?.ratio();
         const snxRatioCall = await vaults.snxVaultRead?.ratio();
         const uniRatioCall = await vaults.uniVaultRead?.ratio();
+        ethcalls.push(wethRatioCall);
         ethcalls.push(linkRatioCall);
         ethcalls.push(snxRatioCall);
         ethcalls.push(uniRatioCall);
+      }
+      if (isPolygon(currentNetwork.chainId)) {
+        const maticRatioCall = await vaults.maticVaultRead?.ratio();
+        const wbtcRatioCall = await vaults.wbtcVaultRead?.ratio();
+        ethcalls.push(maticRatioCall);
+        ethcalls.push(wbtcRatioCall);
       }
       let ethRatio = 0;
       let daiRatio = 0;
@@ -241,15 +263,20 @@ export const Monitoring = () => {
       let linkRatio = 0;
       let snxRatio = 0;
       let uniRatio = 0;
+      let maticRatio = 0;
+      let wbtcRatio = 0;
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
-        [ethRatio, daiRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
+        [daiRatio, ethRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
-        [ethRatio, daiRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
+        [daiRatio, ethRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
           ethcalls
         );
+      } else if (isPolygon(currentNetwork.chainId)) {
+        // @ts-ignore
+        [daiRatio, maticRatio, wbtcRatio] = await signer.ethcallProvider?.all(ethcalls);
       }
       setVaultsRatio({
         ethRatio,
@@ -259,8 +286,8 @@ export const Monitoring = () => {
         linkRatio,
         uniRatio,
         snxRatio,
-        maticRatio: 0,
-        wbtcRatio: 0,
+        maticRatio,
+        wbtcRatio,
       });
     }
   };
@@ -472,6 +499,7 @@ export const Monitoring = () => {
     } else {
       symbols.push({ key: "matic", name: "MATIC" });
       symbols.push({ key: "dai", name: "DAI" });
+      symbols.push({ key: "wbtc", name: "WBTC" });
     }
 
     return symbols;

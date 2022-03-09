@@ -334,43 +334,50 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
 };
 
 export const validOracles = (chainId: number, oracles: OraclesContext): boolean => {
-  let valid =
-    !isUndefined(oracles.wethOracleRead) &&
-    !isUndefined(oracles.daiOracleRead) &&
-    !isUndefined(oracles.tcapOracleRead);
+  let valid = !isUndefined(oracles.daiOracleRead) && !isUndefined(oracles.tcapOracleRead);
 
   if (isInLayer1(chainId)) {
-    valid = valid && !isUndefined(oracles.aaveOracleRead) && !isUndefined(oracles.linkOracleRead);
+    valid =
+      valid &&
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.aaveOracleRead) &&
+      !isUndefined(oracles.linkOracleRead);
   }
   if (isOptimism(chainId)) {
     valid =
       valid &&
+      !isUndefined(oracles.wethOracleRead) &&
       !isUndefined(oracles.linkOracleRead) &&
       !isUndefined(oracles.snxOracleRead) &&
       !isUndefined(oracles.uniOracleRead);
   }
 
-  if (chainId === NETWORKS.polygon.chainId) {
+  if (isPolygon(chainId)) {
     valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
   }
   return valid;
 };
 
 export const validVaults = (chainId: number, vaults: VaultsContext): boolean => {
-  let valid = !isUndefined(vaults.wethVaultRead) && !isUndefined(vaults.daiVaultRead);
+  let valid = !isUndefined(vaults.daiVaultRead);
 
   if (isInLayer1(chainId)) {
-    valid = valid && !isUndefined(vaults.aaveVaultRead) && !isUndefined(vaults.linkVaultRead);
+    valid =
+      valid &&
+      !isUndefined(vaults.wethVaultRead) &&
+      !isUndefined(vaults.aaveVaultRead) &&
+      !isUndefined(vaults.linkVaultRead);
   }
   if (isOptimism(chainId)) {
     valid =
       valid &&
+      !isUndefined(vaults.wethVaultRead) &&
       !isUndefined(vaults.linkVaultRead) &&
       !isUndefined(vaults.snxVaultRead) &&
       !isUndefined(vaults.uniVaultRead);
   }
 
-  if (chainId === NETWORKS.polygon.chainId) {
+  if (isPolygon(chainId)) {
     valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
   }
   return valid;
