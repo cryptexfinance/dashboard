@@ -97,10 +97,12 @@ const Graph = () => {
           const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
           const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+          const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
           ethcalls.push(wethOraclePriceCall);
           ethcalls.push(aaveOraclePriceCall);
           ethcalls.push(linkOraclePriceCall);
+          ethcalls.push(wbtcOraclePriceCall);
           ethcalls.push(reservesCtxPoolCall);
         }
         if (isOptimism(currentNetwork.chainId)) {
@@ -137,6 +139,7 @@ const Graph = () => {
             wethOraclePrice,
             aaveOraclePrice,
             linkOraclePrice,
+            wbtcOraclePrice,
             reservesCtxPool,
           ] = await signer.ethcallProvider?.all(ethcalls);
         } else if (isOptimism(currentNetwork.chainId)) {
@@ -205,6 +208,7 @@ const Graph = () => {
             if (cAddress === contracts.MATICVaultHandler.address.toLowerCase()) {
               currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
             }
+          } else if (isInLayer1(currentNetwork.chainId) || isPolygon(currentNetwork.chainId)) {
             // @ts-ignore
             if (cAddress === contracts.WBTCVaultHandler.address.toLowerCase()) {
               currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
@@ -268,6 +272,7 @@ const Graph = () => {
           ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
           aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+          wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
         }
         if (isOptimism(currentNetwork.chainId)) {
           ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
@@ -454,34 +459,34 @@ const Graph = () => {
           </>
         )}
         {isPolygon(currentNetwork.chainId) && (
-          <>
-            <Card>
-              <POLYGONIcon className="eth" />
-              <h4>{t("graph.staked-matic")}</h4>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={MATICStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />{" "}
-                MATIC
-              </h5>
-            </Card>
-            <Card>
-              <WBTCIcon className="eth" />
-              <h4>Total Staked in WBTC</h4>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={wbtcStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />{" "}
-                WBTC
-              </h5>
-            </Card>
-          </>
+          <Card>
+            <POLYGONIcon className="eth" />
+            <h4>{t("graph.staked-matic")}</h4>
+            <h5 className="number neon-blue">
+              <NumberFormat
+                value={MATICStake}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              MATIC
+            </h5>
+          </Card>
+        )}
+        {!isOptimism(currentNetwork.chainId) && (
+          <Card>
+            <WBTCIcon className="eth" />
+            <h4>Total Staked in WBTC</h4>
+            <h5 className="number neon-blue">
+              <NumberFormat
+                value={wbtcStake}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              WBTC
+            </h5>
+          </Card>
         )}
       </div>
     </div>

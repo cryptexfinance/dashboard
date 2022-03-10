@@ -366,7 +366,8 @@ export const validVaults = (chainId: number, vaults: VaultsContext): boolean => 
       valid &&
       !isUndefined(vaults.wethVaultRead) &&
       !isUndefined(vaults.aaveVaultRead) &&
-      !isUndefined(vaults.linkVaultRead);
+      !isUndefined(vaults.linkVaultRead) &&
+      !isUndefined(vaults.wbtcVaultRead);
   }
   if (isOptimism(chainId)) {
     valid =

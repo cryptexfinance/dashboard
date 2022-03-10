@@ -955,7 +955,7 @@ const Details = ({ address, t }: props) => {
 
   useEffect(() => {
     async function load() {
-      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
+      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK", "WBTC"];
       if (isOptimism(currentNetwork.chainId)) {
         vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
       }
