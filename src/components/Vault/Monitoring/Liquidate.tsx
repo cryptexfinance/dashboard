@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { ethers, BigNumber } from "ethers";
+import InputGroup from "react-bootstrap/esm/InputGroup";
 import Modal from "react-bootstrap/esm/Modal";
 import NumberFormat from "react-number-format";
 import "../../../styles/modal.scss";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
 import VaultContext from "../../../state/VaultsContext";
-import { errorNotification, notifyUser } from "../../../utils/utils";
+import OracleContext from "../../../state/OraclesContext";
+import { errorNotification, notifyUser, toUSD } from "../../../utils/utils";
 import { NETWORKS } from "../../../utils/constants";
 
 type props = {
@@ -23,10 +25,14 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const vaults = useContext(VaultContext);
+  const oracles = useContext(OracleContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
+  const [tcapPrice, setTcapPrice] = useState("0");
   const [requiredTcap, setRequiredTcap] = useState("0");
   const [maxTcap, setMaxTcap] = useState("0");
+  const [maxTcapUSD, setMaxTcapUSD] = useState("0");
   const [reward, setReward] = useState("0");
+  const [rewardUSD, setRewardUSD] = useState("0");
   const [liquidationFee, setLiquidationFee] = useState("0");
   const [canLiquidate, setCanLiquidate] = useState(true);
 
@@ -35,57 +41,75 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
       if (currentAddress !== "" && vaults) {
         let cVault = vaults.wethVault;
         let cVaultRead = vaults.wethVaultRead;
+        let oracleRead = oracles.wethOracleRead;
         switch (vaultType) {
           case "DAI":
             cVault = vaults.daiVault;
             cVaultRead = vaults.daiVaultRead;
+            oracleRead = oracles.daiOracleRead;
             break;
           case "AAVE":
             cVault = vaults.aaveVault;
             cVaultRead = vaults.aaveVaultRead;
+            oracleRead = oracles.aaveOracleRead;
             break;
           case "LINK":
             cVault = vaults.linkVault;
             cVaultRead = vaults.linkVaultRead;
+            oracleRead = oracles.linkOracleRead;
             break;
           case "SNX":
             cVault = vaults.snxVault;
             cVaultRead = vaults.snxVaultRead;
+            oracleRead = oracles.snxOracleRead;
             break;
           case "UNI":
             cVault = vaults.uniVault;
             cVaultRead = vaults.uniVaultRead;
+            oracleRead = oracles.uniOracleRead;
             break;
           case "MATIC":
             cVault = vaults.maticVault;
             cVaultRead = vaults.maticVaultRead;
+            oracleRead = oracles.maticOracleRead;
             break;
           case "WBTC":
             cVault = vaults.wbtcVault;
             cVaultRead = vaults.wbtcVaultRead;
+            oracleRead = oracles.wbtcOracleRead;
             break;
           default:
             cVault = vaults.wethVault;
             cVaultRead = vaults.wethVaultRead;
+            oracleRead = oracles.wethOracleRead;
             break;
         }
         if (vaultId !== "" && cVault && cVaultRead) {
           setCurrentVault(cVault);
+          const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
           const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
           const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
+          const oraclePriceCall = await oracleRead?.getLatestAnswer();
           // @ts-ignore
-          const [reqTcap, liqReward] = await signer.ethcallProvider?.all([
-            reqTcapCall,
-            liqRewardCall,
-          ]);
+          const [tcapOraclePrice, reqTcap, liqReward, collateralPrice] =
+            await signer.ethcallProvider?.all([
+              tcapPriceCall,
+              reqTcapCall,
+              liqRewardCall,
+              oraclePriceCall,
+            ]);
+          const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
           const reqTcapText = ethers.utils.formatEther(reqTcap);
           const liqRewardText = ethers.utils.formatEther(liqReward);
-
+          const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
           const currentLiqFee = await cVault?.getFee(reqTcap);
           const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
           const ethFee = ethers.utils.formatEther(increasedFee);
+
+          setTcapPrice(tcapPriceText);
           setRequiredTcap(reqTcapText);
           setReward(liqRewardText);
+          setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
           setLiquidationFee(ethFee.toString());
         }
       }
@@ -96,11 +120,13 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
 
   const onChangeMaxTcap = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMaxTcap(event.target.value);
+    setMaxTcapUSD(toUSD(event.target.value, tcapPrice).toFixed(2));
   };
 
   const minTcap = async (e: React.MouseEvent) => {
     e.preventDefault();
     setMaxTcap(requiredTcap);
+    setMaxTcapUSD(toUSD(requiredTcap, tcapPrice).toFixed(2));
   };
 
   const liquidate = async (event: React.MouseEvent) => {
@@ -161,25 +187,51 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
                   MIN REQUIRED
                 </a>
               </Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="0"
-                className="neon-green"
-                value={maxTcap}
-                onChange={onChangeMaxTcap}
-              />
-              <div className="liquidation-data">
-                <Form.Text className="text-muted liquidation-reward">
-                  Reward:{" "}
+              <InputGroup className="liquidate-input">
+                <Form.Control
+                  type="text"
+                  placeholder="0"
+                  className="neon-green"
+                  value={maxTcap}
+                  onChange={onChangeMaxTcap}
+                />
+                <Form.Text className="text-muted">
                   <NumberFormat
-                    className="number neon-pink"
-                    value={reward}
+                    className="number"
+                    value={maxTcapUSD}
                     displayType="text"
                     thousandSeparator
-                    decimalScale={4}
-                  />{" "}
-                  {vaultType === "WETH" ? "ETH" : vaultType}
+                    prefix="$"
+                    decimalScale={2}
+                  />
                 </Form.Text>
+              </InputGroup>
+              <div className="liquidation-data">
+                <Form.Text className="text-muted liquidation-reward">
+                  <div>
+                    Reward:{" "}
+                    <NumberFormat
+                      className="number neon-pink"
+                      value={reward}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={4}
+                    />{" "}
+                    {vaultType === "WETH" ? "ETH" : vaultType}
+                  </div>
+                  <div>
+                    USD:{"    "}
+                    <NumberFormat
+                      className="number neon-pink"
+                      value={rewardUSD}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={4}
+                      prefix=" $"
+                    />
+                  </div>
+                </Form.Text>
+
                 <Form.Text className="text-muted liquidation-fee">
                   Burn Fee:{" "}
                   <NumberFormat
