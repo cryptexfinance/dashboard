@@ -169,7 +169,8 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
       aria-labelledby="contained-modal-title-vcenter"
       centered
       onHide={() => {
-        setMaxTcap("");
+        setMaxTcap("0");
+        setMaxTcapUSD("0");
         onHide();
       }}
     >
