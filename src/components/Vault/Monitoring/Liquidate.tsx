@@ -220,9 +220,9 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
                     {vaultType === "WETH" ? "ETH" : vaultType}
                   </div>
                   <div>
-                    USD:{"    "}
+                    USD:{" "}
                     <NumberFormat
-                      className="number neon-pink"
+                      className="number neon-pink  reward-usd"
                       value={rewardUSD}
                       displayType="text"
                       thousandSeparator

@@ -108,6 +108,10 @@
       display: flex;
       margin-top: 5px;
       justify-content: space-between;
+
+      .reward-usd {
+        padding-left: 25px;
+      }
     }
 
     input[type="text"].neon-green {

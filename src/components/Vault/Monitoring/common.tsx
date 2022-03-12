@@ -1,4 +1,5 @@
 import React from "react";
+import { VaultsType } from "./types";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../../assets/images/graph/aave.svg";
@@ -53,3 +54,25 @@ export const numberFormatStr = (
   }
   return numberFormat.format(parseFloat(value));
 };
+
+export const sortCollateralAsc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(a.collateralValue) - parseFloat(b.collateralValue);
+
+export const sortCollateralDesc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(b.collateralValue) - parseFloat(a.collateralValue);
+
+export const sortCollateralUsdAsc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(a.collateralUsd) - parseFloat(b.collateralUsd);
+
+export const sortCollateralUsdDesc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(b.collateralUsd) - parseFloat(a.collateralUsd);
+
+export const sortDebtAsc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(a.collateralValue) - parseFloat(b.collateralValue);
+
+export const sortDebtDesc = (a: VaultsType, b: VaultsType) =>
+  parseFloat(b.debt) - parseFloat(a.debt);
+
+export const sortRatioAsc = (a: VaultsType, b: VaultsType) => a.ratio - b.ratio;
+
+export const sortRatioDesc = (a: VaultsType, b: VaultsType) => b.ratio - a.ratio;
