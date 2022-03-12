@@ -695,6 +695,7 @@ export const Monitoring = () => {
                 <Vaults
                   currentAddress={currentAddress}
                   vaults={vaultList}
+                  setVaults={(v: Array<VaultsType>) => setVaultList(v)}
                   pagination={pagination}
                   refresh={updateLiquidatedVault}
                 />

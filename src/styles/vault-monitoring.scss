@@ -129,6 +129,10 @@
         text-align: right;
         font-size: 0.8rem;
       }
+      .btn {
+        margin-top: 0px;
+        padding: 0.3rem 0.6rem;
+      }
       thead {
         th {
           text-align: center;
@@ -140,7 +144,7 @@
           text-align: right;
         }
         .collateral {
-          padding-right: 60px;    
+          padding-right: 40px;    
         }
         .debt {
           display: flex;
@@ -150,6 +154,20 @@
           .tcap {
             width: 30px;
             margin-right: 10px;
+          }
+        }
+        .sort {
+          background-color: transparent;
+          border: 0 solid transparent;
+          padding-right: 0px;
+          svg {
+            color: $white;
+          }
+          .asc {
+            margin-top: 5px;
+          }
+          .desc {
+            margin-top: -8px;
           }
         }
       }
