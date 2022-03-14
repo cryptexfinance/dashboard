@@ -263,11 +263,24 @@ html,
   text-align: left;
   padding: 0.8rem;
 }
-.farm-tooltip.error > .tooltip-inner {
-  border: 0.3px solid $orange;
-  color: #f4c9b1;
+.vaults-status-tooltip > .tooltip-inner {
+  min-width: 400px;
+  width: 400px;
+  text-align: left;
+  padding: 0.9rem;
+  .empty {
+    text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+  }
+  .ready {
+    text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
+  }
+  .active {
+    text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
+  }
+  .liquidation {
+    text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
+  }
 }
-
 .vaults-tooltip > .tooltip-inner {
   width: auto;
   text-align: right;
