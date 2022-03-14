@@ -7,8 +7,9 @@ import NumberFormat from "react-number-format";
 import "../../../styles/modal.scss";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
-import VaultContext from "../../../state/VaultsContext";
 import OracleContext from "../../../state/OraclesContext";
+import TokensContext from "../../../state/TokensContext";
+import VaultContext from "../../../state/VaultsContext";
 import { errorNotification, notifyUser, toUSD } from "../../../utils/utils";
 import { NETWORKS } from "../../../utils/constants";
 
@@ -24,9 +25,11 @@ type props = {
 const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
-  const vaults = useContext(VaultContext);
   const oracles = useContext(OracleContext);
+  const vaults = useContext(VaultContext);
+  const tokens = useContext(TokensContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
+  const [tcapBalance, setTcapBalance] = useState("0");
   const [tcapPrice, setTcapPrice] = useState("0");
   const [requiredTcap, setRequiredTcap] = useState("0");
   const [maxTcap, setMaxTcap] = useState("0");
@@ -86,18 +89,21 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
         }
         if (vaultId !== "" && cVault && cVaultRead) {
           setCurrentVault(cVault);
+          const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
           const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
           const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
           const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
           const oraclePriceCall = await oracleRead?.getLatestAnswer();
           // @ts-ignore
-          const [tcapOraclePrice, reqTcap, liqReward, collateralPrice] =
+          const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice] =
             await signer.ethcallProvider?.all([
+              tcapBalanceCall,
               tcapPriceCall,
               reqTcapCall,
               liqRewardCall,
               oraclePriceCall,
             ]);
+          const tcapBalanceText = ethers.utils.formatEther(balance);
           const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
           const reqTcapText = ethers.utils.formatEther(reqTcap);
           const liqRewardText = ethers.utils.formatEther(liqReward);
@@ -106,6 +112,9 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
           const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
           const ethFee = ethers.utils.formatEther(increasedFee);
 
+          console.log("---- Balance ----");
+          console.log(tcapBalanceText);
+          setTcapBalance(tcapBalanceText);
           setTcapPrice(tcapPriceText);
           setRequiredTcap(reqTcapText);
           setReward(liqRewardText);
@@ -133,27 +142,34 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
     event.preventDefault();
     if (currentAddress && canLiquidate && currentVault) {
       setCanLiquidate(false);
-      if (maxTcap && parseFloat(maxTcap) > 0) {
-        if (parseFloat(maxTcap) >= parseFloat(requiredTcap)) {
-          try {
-            const currentLiqFee = await currentVault?.getFee(ethers.utils.parseEther(requiredTcap));
-            const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
-            const ethFee = ethers.utils.formatEther(increasedFee);
-            setLiquidationFee(ethFee);
-            const tx = await currentVault.liquidateVault(
-              BigNumber.from(vaultId),
-              ethers.utils.parseEther(maxTcap),
-              { value: increasedFee }
-            );
-            notifyUser(tx, refresh);
-            refresh();
-            setMaxTcap("");
-            onHide();
-          } catch (error) {
-            errorNotification("Burn fee less than required.");
+      const maxAmountTcap = parseFloat(maxTcap);
+      if (maxTcap && maxAmountTcap > 0) {
+        if (maxAmountTcap >= parseFloat(requiredTcap)) {
+          if (maxAmountTcap <= parseFloat(tcapBalance)) {
+            try {
+              const currentLiqFee = await currentVault?.getFee(
+                ethers.utils.parseEther(requiredTcap)
+              );
+              const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+              const ethFee = ethers.utils.formatEther(increasedFee);
+              setLiquidationFee(ethFee);
+              const tx = await currentVault.liquidateVault(
+                BigNumber.from(vaultId),
+                ethers.utils.parseEther(maxTcap),
+                { value: increasedFee }
+              );
+              notifyUser(tx, refresh);
+              refresh();
+              setMaxTcap("");
+              onHide();
+            } catch (error) {
+              errorNotification("Burn fee less than required.");
+            }
+          } else {
+            errorNotification("Not enough TCAP balance.");
           }
         } else {
-          errorNotification("Tcap amount is less than required");
+          errorNotification("Tcap amount is less than required.");
         }
       } else {
         errorNotification("Field can't be empty");

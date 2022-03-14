@@ -83,6 +83,13 @@ const Details = ({ address, t }: props) => {
         currency = "MATIC";
       }
       break;
+    case "wbtc":
+      currency = "WBTC";
+      if (isOptimism(currentNetwork.chainId)) {
+        history?.push(`/vault/ETH`);
+        currency = "ETH";
+      }
+      break;
     case "dai":
       currency = "DAI";
       break;
