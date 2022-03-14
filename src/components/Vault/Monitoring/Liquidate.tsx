@@ -112,8 +112,6 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
           const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
           const ethFee = ethers.utils.formatEther(increasedFee);
 
-          console.log("---- Balance ----");
-          console.log(tcapBalanceText);
           setTcapBalance(tcapBalanceText);
           setTcapPrice(tcapPriceText);
           setRequiredTcap(reqTcapText);
