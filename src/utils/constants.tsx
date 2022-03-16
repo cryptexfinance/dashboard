@@ -68,6 +68,11 @@ export const NETWORKS = {
   },
 };
 
+export const UNIV3 = {
+  NFPositionManager: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+  Staker: "0xe34139463bA50bD61336E0c446Bd8C0867c6fE65",
+};
+
 export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {

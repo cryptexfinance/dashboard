@@ -728,6 +728,9 @@ const App = () => {
                       <Route path={`${match.url}/`}>
                         <WelcomeWrapper signerAddress={currentSignerAddress} />
                       </Route>
+                      <Route path={`${match.url}farm`}>
+                        <Farm />
+                      </Route>
                       <ApolloProvider client={apolloClient}>
                         <Route path={`${match.url}graph`}>
                           <Graph />
@@ -737,9 +740,6 @@ const App = () => {
                         </Route>
                         <Route path={`${match.url}vault-monitoring`}>
                           <Monitoring />
-                        </Route>
-                        <Route path={`${match.url}farm`}>
-                          <Farm />
                         </Route>
                         <Route path={`${match.url}governance`}>
                           <Delegators currentSignerAddress={currentSignerAddress} />
