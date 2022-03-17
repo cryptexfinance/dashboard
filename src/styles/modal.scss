@@ -194,6 +194,20 @@
       }
     }
   }
+  table.liq-info {
+    margin-top: 3rem !important;
+    th {
+      text-align: right;
+      border-bottom: 1px;
+    }
+    td {
+      text-align: right;
+    }
+    .net-reward {
+      font-size: 18px;
+      text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
+    }
+  }
 
   .progress {
     height: 2rem;

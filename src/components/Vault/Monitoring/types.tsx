@@ -41,8 +41,10 @@ export type VaultsType = {
   debtUsd: string;
   ratio: number;
   minRatio: string;
+  netReward: number;
   status: string;
   blockTS: string;
+  url: string;
 };
 
 export type VaultsTotalsType = {

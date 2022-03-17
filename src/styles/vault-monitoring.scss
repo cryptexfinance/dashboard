@@ -214,6 +214,9 @@
             background: transparent;
             border: 0.8px solid #f28040;
           }
+          a {
+            color: $white;
+          }
         }
         .empty {
           text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;

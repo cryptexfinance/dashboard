@@ -117,6 +117,27 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
     return <SortUpIcon className="asc" />;
   };
 
+  const statusTag = (index: number, v: VaultsType) => {
+    if (currentAddress === "") {
+      return <span className={v.status}>{capitalize(v.status)}</span>;
+    }
+    if (v.status === "liquidation") {
+      return (
+        <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
+          <span className={v.status}>{capitalize(v.status)}</span>
+        </Button>
+      );
+    }
+    if (v.url !== "") {
+      return (
+        <a href={v.url}>
+          <span className={v.status}>{capitalize(v.status)}</span>
+        </a>
+      );
+    }
+    return <span className={v.status}>{capitalize(v.status)}</span>;
+  };
+
   return (
     <>
       <Table hover className="mt-2 vaults">
@@ -178,15 +199,7 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
             return (
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
                 <td>
-                  <div className="status">
-                    {v.status === "liquidation" && currentAddress !== "" ? (
-                      <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
-                        <span className={v.status}>{capitalize(v.status)}</span>
-                      </Button>
-                    ) : (
-                      <span className={v.status}>{capitalize(v.status)}</span>
-                    )}
-                  </div>
+                  <div className="status">{statusTag(index, v)}</div>
                 </td>
                 <td>
                   <OverlayTrigger

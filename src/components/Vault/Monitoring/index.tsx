@@ -384,6 +384,72 @@ export const Monitoring = () => {
     }
   };
 
+  /* const calculateNetRewardUsd = async (vaultId: string, vaultType: string) => {
+    let cVault = vaults.wethVault;
+    let cVaultRead = vaults.wethVaultRead;
+    let vaultPrice = oraclePrices?.wethOraclePrice;
+
+    switch (vaultType) {
+      case "DAI":
+        cVault = vaults.daiVault;
+        cVaultRead = vaults.daiVaultRead;
+        vaultPrice = oraclePrices?.daiOraclePrice;
+        break;
+      case "AAVE":
+        cVault = vaults.aaveVault;
+        cVaultRead = vaults.aaveVaultRead;
+        vaultPrice = oraclePrices?.aaveOraclePrice;
+        break;
+      case "LINK":
+        cVault = vaults.linkVault;
+        cVaultRead = vaults.linkVaultRead;
+        vaultPrice = oraclePrices?.linkOraclePrice;
+        break;
+      case "SNX":
+        cVault = vaults.snxVault;
+        cVaultRead = vaults.snxVaultRead;
+        vaultPrice = oraclePrices?.snxOraclePrice;
+        break;
+      case "UNI":
+        cVault = vaults.uniVault;
+        cVaultRead = vaults.uniVaultRead;
+        vaultPrice = oraclePrices?.uniOraclePrice;
+        break;
+      case "MATIC":
+        cVault = vaults.maticVault;
+        cVaultRead = vaults.maticVaultRead;
+        vaultPrice = oraclePrices?.maticOraclePrice;
+        break;
+      case "WBTC":
+        cVault = vaults.wbtcVault;
+        cVaultRead = vaults.wbtcVaultRead;
+        vaultPrice = oraclePrices?.wbtcOraclePrice;
+        break;
+      default:
+        cVault = vaults.wethVault;
+        cVaultRead = vaults.wethVaultRead;
+        vaultPrice = oraclePrices?.wethOraclePrice;
+        break;
+    }
+
+    const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
+    const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
+    // @ts-ignore
+    const [reqTcap, liqReward] = await signer.ethcallProvider?.all([reqTcapCall, liqRewardCall]);
+
+    const reqTcapText = ethers.utils.formatEther(reqTcap);
+    const liqRewardText = ethers.utils.formatEther(liqReward);
+    const currentLiqFee = await cVault?.getFee(reqTcap);
+    const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+    const ethFee = ethers.utils.formatEther(increasedFee);
+
+    return (
+      toUSD(liqRewardText, vaultPrice || "0") -
+      toUSD(reqTcapText, oraclePrices?.tcapOraclePrice || "0") -
+      toUSD(ethFee, oraclePrices?.wethOraclePrice || "0")
+    );
+  }; */
+
   const calculateVaultData = (
     collateralWei: ethers.BigNumberish,
     debtWei: ethers.BigNumberish,
@@ -420,7 +486,7 @@ export const Monitoring = () => {
     setSkipQuery(true);
     setLoadMore(false);
     // @ts-ignore
-    vaultsData.vaults.forEach((v) => {
+    vaultsData.vaults.forEach(async (v) => {
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
         calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
@@ -430,6 +496,16 @@ export const Monitoring = () => {
       }
 
       if (addVault) {
+        let vaultUrl = "";
+        const netReward = 0;
+        const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
+        if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
+          vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
+        }
+        /* if (currentStatus === "liquidation") {
+          netReward = await calculateNetRewardUsd(v.vaultId, symbol);
+        } */
+
         vData.push({
           id: v.vaultId,
           collateralSymbol: v.tokenSymbol,
@@ -439,8 +515,10 @@ export const Monitoring = () => {
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
+          netReward,
           status,
           blockTS: v.blockTS,
+          url: vaultUrl,
         });
 
         totals.vaults += 1;
@@ -583,8 +661,10 @@ export const Monitoring = () => {
       debtUsd: debtUSD.toFixed(2),
       ratio,
       minRatio: minRatio.toString(),
+      netReward: 0,
       status,
       blockTS: vaultList[index].blockTS,
+      url: vaultList[index].url,
     };
     allVaults[index] = v;
     setVaultList(allVaults);
