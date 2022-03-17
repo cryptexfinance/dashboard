@@ -77,6 +77,6 @@ export const sortRatioAsc = (a: VaultsType, b: VaultsType) => a.ratio - b.ratio;
 
 export const sortRatioDesc = (a: VaultsType, b: VaultsType) => b.ratio - a.ratio;
 
-export const sortRewardAsc = (a: VaultsType, b: VaultsType) => a.ratio - b.ratio;
+export const sortRewardAsc = (a: VaultsType, b: VaultsType) => a.netReward - b.netReward;
 
-export const sortRewardDesc = (a: VaultsType, b: VaultsType) => a.ratio - b.ratio;
+export const sortRewardDesc = (a: VaultsType, b: VaultsType) => b.netReward - a.netReward;

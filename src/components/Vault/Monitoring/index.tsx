@@ -54,6 +54,12 @@ const totalsDefault = {
   debtUSD: "0",
 };
 
+type liqVaultsTempType = {
+  vaultId: string;
+  vaultType: string;
+};
+const showAllVaults = true;
+
 export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
@@ -72,6 +78,7 @@ export const Monitoring = () => {
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
+  const [liqLoaded, setLiqLoaded] = useState(false);
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
@@ -384,7 +391,7 @@ export const Monitoring = () => {
     }
   };
 
-  /* const calculateNetRewardUsd = async (vaultId: string, vaultType: string) => {
+  const calculateNetRewardUsd = async (vaultId: string, vaultType: string) => {
     let cVault = vaults.wethVault;
     let cVaultRead = vaults.wethVaultRead;
     let vaultPrice = oraclePrices?.wethOraclePrice;
@@ -448,7 +455,7 @@ export const Monitoring = () => {
       toUSD(reqTcapText, oraclePrices?.tcapOraclePrice || "0") -
       toUSD(ethFee, oraclePrices?.wethOraclePrice || "0")
     );
-  }; */
+  };
 
   const calculateVaultData = (
     collateralWei: ethers.BigNumberish,
@@ -481,12 +488,14 @@ export const Monitoring = () => {
 
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
+    const vLiquidables = new Array<liqVaultsTempType>();
     const totals = { ...totalsDefault };
 
     setSkipQuery(true);
     setLoadMore(false);
+    setLiqLoaded(currentStatus !== "liquidation");
     // @ts-ignore
-    vaultsData.vaults.forEach(async (v) => {
+    vaultsData.vaults.forEach((v) => {
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
         calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
@@ -494,17 +503,21 @@ export const Monitoring = () => {
       if (currentStatus === "active" || currentStatus === "liquidation") {
         addVault = currentStatus === status;
       }
-
+      if (!showAllVaults) {
+        addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
+      }
       if (addVault) {
         let vaultUrl = "";
-        const netReward = 0;
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
           vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
         }
-        /* if (currentStatus === "liquidation") {
-          netReward = await calculateNetRewardUsd(v.vaultId, symbol);
-        } */
+        if (currentStatus === "liquidation") {
+          vLiquidables.push({
+            vaultId: v.vaultId,
+            vaultType: v.tokenSymbol,
+          });
+        }
 
         vData.push({
           id: v.vaultId,
@@ -515,7 +528,7 @@ export const Monitoring = () => {
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
-          netReward,
+          netReward: 0,
           status,
           blockTS: v.blockTS,
           url: vaultUrl,
@@ -528,8 +541,25 @@ export const Monitoring = () => {
         totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
       }
     });
-    setVaultList(vData);
-    setVaultsTotals(totals);
+    if (currentStatus !== "liquidation") {
+      setVaultList(vData);
+      setVaultsTotals(totals);
+    } else {
+      const loadNetReward = async () => {
+        vLiquidables.forEach((l, index) => {
+          calculateNetRewardUsd(l.vaultId, l.vaultType).then((result) => {
+            vData[index].netReward = result;
+          });
+        });
+      };
+      loadNetReward().then(() => {
+        setTimeout(function () {
+          setVaultList(vData);
+          setVaultsTotals(totals);
+          setLiqLoaded(true);
+        }, 500);
+      });
+    }
     // Set pagination data
     confPagination(vData, pagination.itemsPerPage);
   };
@@ -566,14 +596,18 @@ export const Monitoring = () => {
     if (isInLayer1(currentNetwork.chainId)) {
       symbols.push({ key: "weth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      symbols.push({ key: "aave", name: "AAVE" });
-      symbols.push({ key: "link", name: "LINK" });
+      if (showAllVaults) {
+        symbols.push({ key: "aave", name: "AAVE" });
+        symbols.push({ key: "link", name: "LINK" });
+      }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      symbols.push({ key: "link", name: "LINK" });
-      symbols.push({ key: "uni", name: "UNI" });
-      symbols.push({ key: "snx", name: "SNX" });
+      if (showAllVaults) {
+        symbols.push({ key: "link", name: "LINK" });
+        symbols.push({ key: "uni", name: "UNI" });
+        symbols.push({ key: "snx", name: "SNX" });
+      }
     } else {
       symbols.push({ key: "matic", name: "MATIC" });
       symbols.push({ key: "dai", name: "DAI" });
@@ -797,13 +831,14 @@ export const Monitoring = () => {
                   )}
                 </div>
               </Col>
-              {loading || !pricesUpdated ? (
+              {loading || !pricesUpdated || !liqLoaded ? (
                 <Spinner variant="danger" className="spinner" animation="border" />
               ) : (
                 <Vaults
                   currentAddress={currentAddress}
                   vaults={vaultList}
                   setVaults={(v: Array<VaultsType>) => setVaultList(v)}
+                  currentStatus={currentStatus}
                   pagination={pagination}
                   refresh={updateLiquidatedVault}
                 />
