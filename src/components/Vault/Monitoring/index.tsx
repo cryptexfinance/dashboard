@@ -500,11 +500,11 @@ export const Monitoring = () => {
         calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
       let addVault = true;
-      if (currentStatus === "active" || currentStatus === "liquidation") {
-        addVault = currentStatus === status;
-      }
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
+      }
+      if (addVault && (currentStatus === "active" || currentStatus === "liquidation")) {
+        addVault = currentStatus === status;
       }
       if (addVault) {
         let vaultUrl = "";
