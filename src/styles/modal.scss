@@ -75,9 +75,11 @@
     }
 
     .avatar {
-      height: 92%;
-      width: 80%;
       position: absolute;
+      height: 92%;
+      width: 65%;
+      margin-left: 20px;
+      cursor: pointer;
     }
 
     .image-group {
@@ -91,7 +93,7 @@
       }
       a {
         position: absolute;
-        margin-left: 20px;
+        margin-left: 35px;
       }
     }
 
@@ -134,8 +136,10 @@
     }
     input[type="file"] {
       background-color: $dark;
-      height: 90%;
+      height: 100%;
       width: 90%;
+      margin-left: 20px;
+      cursor: pointer;
     }
     .custom-file-label {
       border-color: $green;
@@ -188,6 +192,20 @@
         font-size: 0.9rem;
         padding: 0.7rem 0.75rem 0.375rem 0.75rem;
       }
+    }
+  }
+  table.liq-info {
+    margin-top: 3rem !important;
+    th {
+      text-align: right;
+      border-bottom: 1px;
+    }
+    td {
+      text-align: right;
+    }
+    .net-reward {
+      font-size: 18px;
+      text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
     }
   }
 
@@ -244,5 +262,4 @@
       overflow-x: scroll;
     }
   }
-
 }

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import Table from "react-bootstrap/Table";
 import { ethers, BigNumber } from "ethers";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import Modal from "react-bootstrap/esm/Modal";
@@ -7,10 +8,11 @@ import NumberFormat from "react-number-format";
 import "../../../styles/modal.scss";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
-import VaultContext from "../../../state/VaultsContext";
 import OracleContext from "../../../state/OraclesContext";
-import { errorNotification, notifyUser, toUSD } from "../../../utils/utils";
-import { NETWORKS } from "../../../utils/constants";
+import TokensContext from "../../../state/TokensContext";
+import VaultContext from "../../../state/VaultsContext";
+import { errorNotification, isPolygon, notifyUser, toUSD } from "../../../utils/utils";
+import { numberFormatStr } from "./common";
 
 type props = {
   show: boolean;
@@ -24,16 +26,19 @@ type props = {
 const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
-  const vaults = useContext(VaultContext);
   const oracles = useContext(OracleContext);
+  const vaults = useContext(VaultContext);
+  const tokens = useContext(TokensContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
+  const [tcapBalance, setTcapBalance] = useState("0");
   const [tcapPrice, setTcapPrice] = useState("0");
   const [requiredTcap, setRequiredTcap] = useState("0");
   const [maxTcap, setMaxTcap] = useState("0");
   const [maxTcapUSD, setMaxTcapUSD] = useState("0");
   const [reward, setReward] = useState("0");
   const [rewardUSD, setRewardUSD] = useState("0");
-  const [liquidationFee, setLiquidationFee] = useState("0");
+  const [burnFee, setBurnFee] = useState("0");
+  const [burnFeeUsd, setBurnFeeUsd] = useState("0");
   const [canLiquidate, setCanLiquidate] = useState(true);
 
   useEffect(() => {
@@ -86,31 +91,40 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
         }
         if (vaultId !== "" && cVault && cVaultRead) {
           setCurrentVault(cVault);
+          const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
           const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
           const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
           const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
           const oraclePriceCall = await oracleRead?.getLatestAnswer();
+          const ethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+
           // @ts-ignore
-          const [tcapOraclePrice, reqTcap, liqReward, collateralPrice] =
+          const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice, ethPrice] =
             await signer.ethcallProvider?.all([
+              tcapBalanceCall,
               tcapPriceCall,
               reqTcapCall,
               liqRewardCall,
               oraclePriceCall,
+              ethOraclePriceCall,
             ]);
+          const tcapBalanceText = ethers.utils.formatEther(balance);
           const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
           const reqTcapText = ethers.utils.formatEther(reqTcap);
           const liqRewardText = ethers.utils.formatEther(liqReward);
           const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
+          const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
           const currentLiqFee = await cVault?.getFee(reqTcap);
           const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
           const ethFee = ethers.utils.formatEther(increasedFee);
 
+          setTcapBalance(tcapBalanceText);
           setTcapPrice(tcapPriceText);
           setRequiredTcap(reqTcapText);
           setReward(liqRewardText);
           setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
-          setLiquidationFee(ethFee.toString());
+          setBurnFee(ethFee);
+          setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
         }
       }
     }
@@ -133,27 +147,34 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
     event.preventDefault();
     if (currentAddress && canLiquidate && currentVault) {
       setCanLiquidate(false);
-      if (maxTcap && parseFloat(maxTcap) > 0) {
-        if (parseFloat(maxTcap) >= parseFloat(requiredTcap)) {
-          try {
-            const currentLiqFee = await currentVault?.getFee(ethers.utils.parseEther(requiredTcap));
-            const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
-            const ethFee = ethers.utils.formatEther(increasedFee);
-            setLiquidationFee(ethFee);
-            const tx = await currentVault.liquidateVault(
-              BigNumber.from(vaultId),
-              ethers.utils.parseEther(maxTcap),
-              { value: increasedFee }
-            );
-            notifyUser(tx, refresh);
-            refresh();
-            setMaxTcap("");
-            onHide();
-          } catch (error) {
-            errorNotification("Burn fee less than required.");
+      const maxAmountTcap = parseFloat(maxTcap);
+      if (maxTcap && maxAmountTcap > 0) {
+        if (maxAmountTcap >= parseFloat(requiredTcap)) {
+          if (maxAmountTcap <= parseFloat(tcapBalance)) {
+            try {
+              const currentLiqFee = await currentVault?.getFee(
+                ethers.utils.parseEther(requiredTcap)
+              );
+              const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+              const ethFee = ethers.utils.formatEther(increasedFee);
+              setBurnFee(ethFee);
+              const tx = await currentVault.liquidateVault(
+                BigNumber.from(vaultId),
+                ethers.utils.parseEther(maxTcap),
+                { value: increasedFee }
+              );
+              notifyUser(tx, refresh);
+              refresh();
+              setMaxTcap("");
+              onHide();
+            } catch (error) {
+              errorNotification("Burn fee less than required.");
+            }
+          } else {
+            errorNotification("Not enough TCAP balance.");
           }
         } else {
-          errorNotification("Tcap amount is less than required");
+          errorNotification("Tcap amount is less than required.");
         }
       } else {
         errorNotification("Field can't be empty");
@@ -162,6 +183,8 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
     }
   };
 
+  const netReward = parseFloat(rewardUSD) - parseFloat(maxTcapUSD) - parseFloat(burnFeeUsd);
+
   return (
     <Modal
       show={show}
@@ -169,7 +192,8 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
       aria-labelledby="contained-modal-title-vcenter"
       centered
       onHide={() => {
-        setMaxTcap("");
+        setMaxTcap("0");
+        setMaxTcapUSD("0");
         onHide();
       }}
     >
@@ -219,34 +243,38 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
                     />{" "}
                     {vaultType === "WETH" ? "ETH" : vaultType}
                   </div>
+                </Form.Text>
+                <Form.Text className="text-muted liquidation-fee">
                   <div>
-                    USD:{" "}
+                    Burn Fee:{" "}
                     <NumberFormat
-                      className="number neon-pink  reward-usd"
-                      value={rewardUSD}
+                      className="number neon-pink"
+                      value={burnFee}
                       displayType="text"
                       thousandSeparator
                       decimalScale={4}
-                      prefix=" $"
-                    />
+                    />{" "}
+                    {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
                   </div>
-                </Form.Text>
-
-                <Form.Text className="text-muted liquidation-fee">
-                  Burn Fee:{" "}
-                  <NumberFormat
-                    className="number neon-pink"
-                    value={liquidationFee}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={4}
-                  />{" "}
-                  {currentNetwork.chainId === NETWORKS.polygon.chainId ? "MATIC" : "ETH"}
                 </Form.Text>
               </div>
             </>
           </Form.Group>
         </Form>
+        <Table hover className="mt-2 liq-info">
+          <thead>
+            <th>Reward</th>
+            <th>Required TCAP</th>
+            <th>Burn Fee</th>
+            <th>Net Reward</th>
+          </thead>
+          <tbody>
+            <td>${numberFormatStr(rewardUSD, 2, 2)}</td>
+            <td>${numberFormatStr(maxTcapUSD, 2, 2)}</td>
+            <td>${numberFormatStr(burnFeeUsd, 2, 2)}</td>
+            <td className="net-reward">${numberFormatStr(netReward.toFixed(2), 2, 2)}</td>
+          </tbody>
+        </Table>
       </Modal.Body>
       <Modal.Footer>
         <Button

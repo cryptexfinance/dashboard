@@ -21,17 +21,27 @@ import {
   sortDebtAsc,
   sortRatioDesc,
   sortRatioAsc,
+  sortRewardDesc,
+  sortRewardAsc,
 } from "./common";
 
 type dataType = {
   currentAddress: string;
   vaults: Array<VaultsType>;
   setVaults: (v: Array<VaultsType>) => void;
+  currentStatus: string;
   pagination: PaginationType;
   refresh: (index: number, symbol: string) => void;
 };
 
-export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh }: dataType) => {
+export const Vaults = ({
+  currentAddress,
+  vaults,
+  setVaults,
+  currentStatus,
+  pagination,
+  refresh,
+}: dataType) => {
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
   const [vaultId, setVaultId] = useState("");
@@ -40,6 +50,16 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
   const [collateralUsdSort, setCollateralUsdSort] = useState(0);
   const [debtSort, setDebtSort] = useState(0);
   const [ratioSort, setRatioSort] = useState(0);
+  const [rewardSort, setRewardSort] = useState(0);
+  // const [renderReward, setRenderReward] = useState(false);
+
+  /* useEffect(() => {
+    if (loadingLiq) {
+      console.log("ntra aqui");
+      setRenderReward(!renderReward);
+    }
+    // eslint-disable-next-line
+  }, [loadingLiq]); */
 
   const liquidateVault = (index: number, id: string, type: string) => {
     setVaultId(id);
@@ -60,6 +80,9 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
     }
     if (current !== 4) {
       setRatioSort(0);
+    }
+    if (current !== 5) {
+      setRewardSort(0);
     }
   };
 
@@ -107,6 +130,17 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
     resetSortTypes(4);
   };
 
+  const onSortRewardClick = () => {
+    const sortType = rewardSort === 1 ? 2 : 1;
+    if (sortType === 1) {
+      setVaults(vaults.sort(sortRewardDesc));
+    } else {
+      setVaults(vaults.sort(sortRewardAsc));
+    }
+    setRewardSort(sortType);
+    resetSortTypes(5);
+  };
+
   const sortingIncon = (sortOrder: number) => {
     if (sortOrder === 0) {
       return <SortIcon />;
@@ -115,6 +149,27 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
       return <SortDownIcon className="desc" />;
     }
     return <SortUpIcon className="asc" />;
+  };
+
+  const statusTag = (index: number, v: VaultsType) => {
+    if (currentAddress === "") {
+      return <span className={v.status}>{capitalize(v.status)}</span>;
+    }
+    if (v.status === "liquidation") {
+      return (
+        <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
+          <span className={v.status}>{capitalize(v.status)}</span>
+        </Button>
+      );
+    }
+    if (v.url !== "") {
+      return (
+        <a href={v.url}>
+          <span className={v.status}>{capitalize(v.status)}</span>
+        </a>
+      );
+    }
+    return <span className={v.status}>{capitalize(v.status)}</span>;
   };
 
   return (
@@ -170,6 +225,14 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
                 {sortingIncon(ratioSort)}
               </button>
             </th>
+            {currentStatus === "liquidation" && (
+              <th className="ratio">
+                Net Reward
+                <button type="button" className="sort" onClick={() => onSortRewardClick()}>
+                  {sortingIncon(rewardSort)}
+                </button>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -178,15 +241,7 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
             return (
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
                 <td>
-                  <div className="status">
-                    {v.status === "liquidation" && currentAddress !== "" ? (
-                      <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
-                        <span className={v.status}>{capitalize(v.status)}</span>
-                      </Button>
-                    ) : (
-                      <span className={v.status}>{capitalize(v.status)}</span>
-                    )}
-                  </div>
+                  <div className="status">{statusTag(index, v)}</div>
                 </td>
                 <td>
                   <OverlayTrigger
@@ -250,6 +305,13 @@ export const Vaults = ({ currentAddress, vaults, setVaults, pagination, refresh 
                     </OverlayTrigger>
                   </div>
                 </td>
+                {currentStatus === "liquidation" && (
+                  <td>
+                    <div className="ratio">
+                      <span className="active">${v.netReward.toFixed(2)}</span>
+                    </div>
+                  </td>
+                )}
               </tr>
             );
           })}
