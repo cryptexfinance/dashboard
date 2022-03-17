@@ -557,7 +557,7 @@ export const Monitoring = () => {
           setVaultList(vData);
           setVaultsTotals(totals);
           setLiqLoaded(true);
-        }, 500);
+        }, 560);
       });
     }
     // Set pagination data
