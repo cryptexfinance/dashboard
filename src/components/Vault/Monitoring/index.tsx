@@ -18,6 +18,7 @@ import {
   getRatio2,
   isInLayer1,
   isOptimism,
+  isPolygon,
   isUndefined,
   toUSD,
   validOracles,
@@ -53,6 +54,12 @@ const totalsDefault = {
   debtUSD: "0",
 };
 
+type liqVaultsTempType = {
+  vaultId: string;
+  vaultType: string;
+};
+const showAllVaults = true;
+
 export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
@@ -71,6 +78,7 @@ export const Monitoring = () => {
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
+  const [liqLoaded, setLiqLoaded] = useState(false);
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
@@ -176,6 +184,12 @@ export const Monitoring = () => {
         ethcalls.push(snxOraclePriceCall);
         ethcalls.push(uniOraclePriceCall);
       }
+      if (isPolygon(currentNetwork.chainId)) {
+        const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
+        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+        ethcalls.push(maticOraclePriceCall);
+        ethcalls.push(wbtcOraclePriceCall);
+      }
       let tcapOraclePrice = BigNumber.from(0);
       let wethOraclePrice = BigNumber.from(0);
       let daiOraclePrice = BigNumber.from(0);
@@ -183,6 +197,8 @@ export const Monitoring = () => {
       let linkOraclePrice = BigNumber.from(0);
       let snxOraclePrice = BigNumber.from(0);
       let uniOraclePrice = BigNumber.from(0);
+      let maticOraclePrice = BigNumber.from(0);
+      let wbtcOraclePrice = BigNumber.from(0);
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
@@ -198,6 +214,10 @@ export const Monitoring = () => {
           snxOraclePrice,
           uniOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
+      } else if (isPolygon(currentNetwork.chainId)) {
+        // @ts-ignore
+        [tcapOraclePrice, daiOraclePrice, maticOraclePrice, wbtcOraclePrice] =
+          await signer.ethcallProvider?.all(ethcalls);
       }
 
       setOraclePrices({
@@ -208,8 +228,8 @@ export const Monitoring = () => {
         linkOraclePrice: ethers.utils.formatEther(linkOraclePrice.mul(10000000000)),
         uniOraclePrice: ethers.utils.formatEther(uniOraclePrice.mul(10000000000)),
         snxOraclePrice: ethers.utils.formatEther(snxOraclePrice.mul(10000000000)),
-        maticOraclePrice: "0",
-        wbtcOraclePrice: "0",
+        maticOraclePrice: ethers.utils.formatEther(maticOraclePrice.mul(10000000000)),
+        wbtcOraclePrice: ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000)),
       });
       setPricesUpdated(true);
     }
@@ -217,23 +237,32 @@ export const Monitoring = () => {
 
   const loadRatios = async () => {
     if (signer && vaults && validVaults(currentNetwork.chainId || 1, vaults)) {
-      const wethRatioCall = await vaults.wethVaultRead?.ratio();
       const daiRatioCall = await vaults.daiVaultRead?.ratio();
-      const ethcalls = [wethRatioCall, daiRatioCall];
+      const ethcalls = [daiRatioCall];
 
       if (isInLayer1(currentNetwork.chainId)) {
+        const wethRatioCall = await vaults.wethVaultRead?.ratio();
         const aaveRatioCall = await vaults.aaveVaultRead?.ratio();
         const linkRatioCall = await vaults.linkVaultRead?.ratio();
+        ethcalls.push(wethRatioCall);
         ethcalls.push(aaveRatioCall);
         ethcalls.push(linkRatioCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
+        const wethRatioCall = await vaults.wethVaultRead?.ratio();
         const linkRatioCall = await vaults.linkVaultRead?.ratio();
         const snxRatioCall = await vaults.snxVaultRead?.ratio();
         const uniRatioCall = await vaults.uniVaultRead?.ratio();
+        ethcalls.push(wethRatioCall);
         ethcalls.push(linkRatioCall);
         ethcalls.push(snxRatioCall);
         ethcalls.push(uniRatioCall);
+      }
+      if (isPolygon(currentNetwork.chainId)) {
+        const maticRatioCall = await vaults.maticVaultRead?.ratio();
+        const wbtcRatioCall = await vaults.wbtcVaultRead?.ratio();
+        ethcalls.push(maticRatioCall);
+        ethcalls.push(wbtcRatioCall);
       }
       let ethRatio = 0;
       let daiRatio = 0;
@@ -241,15 +270,20 @@ export const Monitoring = () => {
       let linkRatio = 0;
       let snxRatio = 0;
       let uniRatio = 0;
+      let maticRatio = 0;
+      let wbtcRatio = 0;
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
-        [ethRatio, daiRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
+        [daiRatio, ethRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
-        [ethRatio, daiRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
+        [daiRatio, ethRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
           ethcalls
         );
+      } else if (isPolygon(currentNetwork.chainId)) {
+        // @ts-ignore
+        [daiRatio, maticRatio, wbtcRatio] = await signer.ethcallProvider?.all(ethcalls);
       }
       setVaultsRatio({
         ethRatio,
@@ -259,8 +293,8 @@ export const Monitoring = () => {
         linkRatio,
         uniRatio,
         snxRatio,
-        maticRatio: 0,
-        wbtcRatio: 0,
+        maticRatio,
+        wbtcRatio,
       });
     }
   };
@@ -357,6 +391,72 @@ export const Monitoring = () => {
     }
   };
 
+  const calculateNetRewardUsd = async (vaultId: string, vaultType: string) => {
+    let cVault = vaults.wethVault;
+    let cVaultRead = vaults.wethVaultRead;
+    let vaultPrice = oraclePrices?.wethOraclePrice;
+
+    switch (vaultType) {
+      case "DAI":
+        cVault = vaults.daiVault;
+        cVaultRead = vaults.daiVaultRead;
+        vaultPrice = oraclePrices?.daiOraclePrice;
+        break;
+      case "AAVE":
+        cVault = vaults.aaveVault;
+        cVaultRead = vaults.aaveVaultRead;
+        vaultPrice = oraclePrices?.aaveOraclePrice;
+        break;
+      case "LINK":
+        cVault = vaults.linkVault;
+        cVaultRead = vaults.linkVaultRead;
+        vaultPrice = oraclePrices?.linkOraclePrice;
+        break;
+      case "SNX":
+        cVault = vaults.snxVault;
+        cVaultRead = vaults.snxVaultRead;
+        vaultPrice = oraclePrices?.snxOraclePrice;
+        break;
+      case "UNI":
+        cVault = vaults.uniVault;
+        cVaultRead = vaults.uniVaultRead;
+        vaultPrice = oraclePrices?.uniOraclePrice;
+        break;
+      case "MATIC":
+        cVault = vaults.maticVault;
+        cVaultRead = vaults.maticVaultRead;
+        vaultPrice = oraclePrices?.maticOraclePrice;
+        break;
+      case "WBTC":
+        cVault = vaults.wbtcVault;
+        cVaultRead = vaults.wbtcVaultRead;
+        vaultPrice = oraclePrices?.wbtcOraclePrice;
+        break;
+      default:
+        cVault = vaults.wethVault;
+        cVaultRead = vaults.wethVaultRead;
+        vaultPrice = oraclePrices?.wethOraclePrice;
+        break;
+    }
+
+    const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
+    const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
+    // @ts-ignore
+    const [reqTcap, liqReward] = await signer.ethcallProvider?.all([reqTcapCall, liqRewardCall]);
+
+    const reqTcapText = ethers.utils.formatEther(reqTcap);
+    const liqRewardText = ethers.utils.formatEther(liqReward);
+    const currentLiqFee = await cVault?.getFee(reqTcap);
+    const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+    const ethFee = ethers.utils.formatEther(increasedFee);
+
+    return (
+      toUSD(liqRewardText, vaultPrice || "0") -
+      toUSD(reqTcapText, oraclePrices?.tcapOraclePrice || "0") -
+      toUSD(ethFee, oraclePrices?.wethOraclePrice || "0")
+    );
+  };
+
   const calculateVaultData = (
     collateralWei: ethers.BigNumberish,
     debtWei: ethers.BigNumberish,
@@ -388,10 +488,12 @@ export const Monitoring = () => {
 
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
+    const vLiquidables = new Array<liqVaultsTempType>();
     const totals = { ...totalsDefault };
 
     setSkipQuery(true);
     setLoadMore(false);
+    setLiqLoaded(currentStatus !== "liquidation");
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
@@ -401,8 +503,22 @@ export const Monitoring = () => {
       if (currentStatus === "active" || currentStatus === "liquidation") {
         addVault = currentStatus === status;
       }
-
+      if (!showAllVaults) {
+        addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
+      }
       if (addVault) {
+        let vaultUrl = "";
+        const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
+        if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
+          vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
+        }
+        if (currentStatus === "liquidation") {
+          vLiquidables.push({
+            vaultId: v.vaultId,
+            vaultType: v.tokenSymbol,
+          });
+        }
+
         vData.push({
           id: v.vaultId,
           collateralSymbol: v.tokenSymbol,
@@ -412,8 +528,10 @@ export const Monitoring = () => {
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
+          netReward: 0,
           status,
           blockTS: v.blockTS,
+          url: vaultUrl,
         });
 
         totals.vaults += 1;
@@ -423,8 +541,25 @@ export const Monitoring = () => {
         totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
       }
     });
-    setVaultList(vData);
-    setVaultsTotals(totals);
+    if (currentStatus !== "liquidation") {
+      setVaultList(vData);
+      setVaultsTotals(totals);
+    } else {
+      const loadNetReward = async () => {
+        vLiquidables.forEach((l, index) => {
+          calculateNetRewardUsd(l.vaultId, l.vaultType).then((result) => {
+            vData[index].netReward = result;
+          });
+        });
+      };
+      loadNetReward().then(() => {
+        setTimeout(function () {
+          setVaultList(vData);
+          setVaultsTotals(totals);
+          setLiqLoaded(true);
+        }, 500);
+      });
+    }
     // Set pagination data
     confPagination(vData, pagination.itemsPerPage);
   };
@@ -461,17 +596,22 @@ export const Monitoring = () => {
     if (isInLayer1(currentNetwork.chainId)) {
       symbols.push({ key: "weth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      symbols.push({ key: "aave", name: "AAVE" });
-      symbols.push({ key: "link", name: "LINK" });
+      if (showAllVaults) {
+        symbols.push({ key: "aave", name: "AAVE" });
+        symbols.push({ key: "link", name: "LINK" });
+      }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      symbols.push({ key: "link", name: "LINK" });
-      symbols.push({ key: "uni", name: "UNI" });
-      symbols.push({ key: "snx", name: "SNX" });
+      if (showAllVaults) {
+        symbols.push({ key: "link", name: "LINK" });
+        symbols.push({ key: "uni", name: "UNI" });
+        symbols.push({ key: "snx", name: "SNX" });
+      }
     } else {
       symbols.push({ key: "matic", name: "MATIC" });
       symbols.push({ key: "dai", name: "DAI" });
+      symbols.push({ key: "wbtc", name: "WBTC" });
     }
 
     return symbols;
@@ -555,8 +695,10 @@ export const Monitoring = () => {
       debtUsd: debtUSD.toFixed(2),
       ratio,
       minRatio: minRatio.toString(),
+      netReward: 0,
       status,
       blockTS: vaultList[index].blockTS,
+      url: vaultList[index].url,
     };
     allVaults[index] = v;
     setVaultList(allVaults);
@@ -689,13 +831,14 @@ export const Monitoring = () => {
                   )}
                 </div>
               </Col>
-              {loading || !pricesUpdated ? (
+              {loading || !pricesUpdated || !liqLoaded ? (
                 <Spinner variant="danger" className="spinner" animation="border" />
               ) : (
                 <Vaults
                   currentAddress={currentAddress}
                   vaults={vaultList}
                   setVaults={(v: Array<VaultsType>) => setVaultList(v)}
+                  currentStatus={currentStatus}
                   pagination={pagination}
                   refresh={updateLiquidatedVault}
                 />
