@@ -58,7 +58,7 @@ type liqVaultsTempType = {
   vaultId: string;
   vaultType: string;
 };
-const showAllVaults = true;
+const showAllVaults = false;
 
 export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);

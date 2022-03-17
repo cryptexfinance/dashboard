@@ -51,15 +51,6 @@ export const Vaults = ({
   const [debtSort, setDebtSort] = useState(0);
   const [ratioSort, setRatioSort] = useState(0);
   const [rewardSort, setRewardSort] = useState(0);
-  // const [renderReward, setRenderReward] = useState(false);
-
-  /* useEffect(() => {
-    if (loadingLiq) {
-      console.log("ntra aqui");
-      setRenderReward(!renderReward);
-    }
-    // eslint-disable-next-line
-  }, [loadingLiq]); */
 
   const liquidateVault = (index: number, id: string, type: string) => {
     setVaultId(id);
