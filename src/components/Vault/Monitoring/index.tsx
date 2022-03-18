@@ -34,7 +34,7 @@ import {
   VaultsType,
   VaultsTotalsType,
 } from "./types";
-import { capitalize, CollateralIcon, numberFormatStr } from "./common";
+import { capitalize, CollateralIcon, numberFormatStr, VAULT_STATUS } from "./common";
 
 const pagDefault = {
   previous: 0,
@@ -78,7 +78,7 @@ export const Monitoring = () => {
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
-  const [liqLoaded, setLiqLoaded] = useState(false);
+  // const [liqLoaded, setLiqLoaded] = useState(false);
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
@@ -94,10 +94,10 @@ export const Monitoring = () => {
   ];
   const statusList = [
     { key: "all", name: "All" },
-    { key: "empty", name: "Empty" },
-    { key: "ready", name: "Ready" },
-    { key: "active", name: "Active" },
-    { key: "liquidation", name: "Liquidation" },
+    { key: VAULT_STATUS.empty, name: "Empty" },
+    { key: VAULT_STATUS.ready, name: "Ready" },
+    { key: VAULT_STATUS.active, name: "Active" },
+    { key: VAULT_STATUS.liquidation, name: "Liquidation" },
   ];
 
   const buildFilters = () => {
@@ -475,13 +475,13 @@ export const Monitoring = () => {
       oraclePrices?.tcapOraclePrice || "1"
     );
 
-    let status = "liquidation";
-    if (parseFloat(collateralText) < 0.0000001) {
-      status = "empty";
-    } else if (parseFloat(collateralText) >= 0.0000001 && parseFloat(debtText) < 0.0000001) {
-      status = "ready";
+    let status = VAULT_STATUS.liquidation;
+    if (parseFloat(collateralText) < 0.0000000001) {
+      status = VAULT_STATUS.empty;
+    } else if (parseFloat(collateralText) >= 0.0000000001 && parseFloat(debtText) < 0.0000000001) {
+      status = VAULT_STATUS.ready;
     } else if (ratio >= minRatio) {
-      status = "active";
+      status = VAULT_STATUS.active;
     }
     return { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status };
   };
@@ -493,14 +493,14 @@ export const Monitoring = () => {
 
     setSkipQuery(true);
     setLoadMore(false);
-    setLiqLoaded(currentStatus !== "liquidation");
+    // setLiqLoaded(currentStatus !== VAULT_STATUS.liquidation);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
         calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
       let addVault = true;
-      if (currentStatus === "active" || currentStatus === "liquidation") {
+      if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
         addVault = currentStatus === status;
       }
       if (!showAllVaults) {
@@ -512,7 +512,7 @@ export const Monitoring = () => {
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
           vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
         }
-        if (currentStatus === "liquidation") {
+        if (currentStatus === VAULT_STATUS.liquidation) {
           vLiquidables.push({
             vaultId: v.vaultId,
             vaultType: v.tokenSymbol,
@@ -541,23 +541,23 @@ export const Monitoring = () => {
         totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
       }
     });
-    if (currentStatus !== "liquidation") {
+    if (currentStatus !== VAULT_STATUS.liquidation) {
       setVaultList(vData);
       setVaultsTotals(totals);
     } else {
       const loadNetReward = async () => {
         vLiquidables.forEach((l, index) => {
           calculateNetRewardUsd(l.vaultId, l.vaultType).then((result) => {
-            vData[index].netReward = result;
+            const newA = [...vData];
+            newA[index].netReward = result;
+            setVaultList(newA);
           });
         });
       };
       loadNetReward().then(() => {
-        setTimeout(function () {
-          setVaultList(vData);
-          setVaultsTotals(totals);
-          setLiqLoaded(true);
-        }, 500);
+        setVaultList(vData);
+        setVaultsTotals(totals);
+        // setLiqLoaded(true);
       });
     }
     // Set pagination data
@@ -831,7 +831,7 @@ export const Monitoring = () => {
                   )}
                 </div>
               </Col>
-              {loading || !pricesUpdated || !liqLoaded ? (
+              {loading || !pricesUpdated ? (
                 <Spinner variant="danger" className="spinner" animation="border" />
               ) : (
                 <Vaults
