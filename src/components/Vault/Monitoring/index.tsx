@@ -505,7 +505,7 @@ export const Monitoring = () => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
-      if (addVault) {
+      if (addVault && v.tokenSymbol !== "WBTC") {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
