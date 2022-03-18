@@ -946,7 +946,7 @@ const Details = ({ address }: props) => {
         vOptions.push("LINK");
       }
       if (isOptimism(currentNetwork.chainId)) {
-        vOptions = ["ETH", "DAI"];
+        vOptions = ["ETH", "WETH", "DAI"];
         if (FEATURES.NEW_VAULTS) {
           vOptions.push("LINK");
           vOptions.push("UNI");
