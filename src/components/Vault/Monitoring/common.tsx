@@ -13,6 +13,13 @@ type iconProps = {
   name: string;
 };
 
+export const VAULT_STATUS = {
+  empty: "empty",
+  ready: "ready",
+  active: "active",
+  liquidation: "liquidation",
+};
+
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const CollateralIcon = ({ name }: iconProps) => {
