@@ -23,6 +23,7 @@ import {
   sortRatioAsc,
   sortRewardDesc,
   sortRewardAsc,
+  VAULT_STATUS,
 } from "./common";
 
 type dataType = {
@@ -146,7 +147,7 @@ export const Vaults = ({
     if (currentAddress === "") {
       return <span className={v.status}>{capitalize(v.status)}</span>;
     }
-    if (v.status === "liquidation") {
+    if (v.status === VAULT_STATUS.liquidation) {
       return (
         <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
           <span className={v.status}>{capitalize(v.status)}</span>
@@ -299,7 +300,9 @@ export const Vaults = ({
                 {currentStatus === "liquidation" && (
                   <td>
                     <div className="ratio">
-                      <span className="active">${v.netReward.toFixed(2)}</span>
+                      <span className={VAULT_STATUS.active}>
+                        ${numberFormatStr(v.netReward.toFixed(2), 2, 2)}
+                      </span>
                     </div>
                   </td>
                 )}
