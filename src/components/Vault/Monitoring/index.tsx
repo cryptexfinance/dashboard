@@ -14,6 +14,7 @@ import OraclesContext from "../../../state/OraclesContext";
 import SignerContext from "../../../state/SignerContext";
 import vaultsContext from "../../../state/VaultsContext";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
+import { FEATURES } from "../../../utils/constants";
 import {
   getRatio2,
   isInLayer1,
@@ -58,7 +59,6 @@ type liqVaultsTempType = {
   vaultId: string;
   vaultType: string;
 };
-const showAllVaults = false;
 
 export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);
@@ -499,7 +499,7 @@ export const Monitoring = () => {
         calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
 
       let addVault = true;
-      if (!showAllVaults) {
+      if (!FEATURES.NEW_VAULTS) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
       if (addVault && (currentStatus === "active" || currentStatus === "liquidation")) {
@@ -594,14 +594,14 @@ export const Monitoring = () => {
     if (isInLayer1(currentNetwork.chainId)) {
       symbols.push({ key: "weth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      if (showAllVaults) {
+      if (FEATURES.NEW_VAULTS) {
         symbols.push({ key: "aave", name: "AAVE" });
         symbols.push({ key: "link", name: "LINK" });
       }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });
       symbols.push({ key: "dai", name: "DAI" });
-      if (showAllVaults) {
+      if (FEATURES.NEW_VAULTS) {
         symbols.push({ key: "link", name: "LINK" });
         symbols.push({ key: "uni", name: "UNI" });
         symbols.push({ key: "snx", name: "SNX" });

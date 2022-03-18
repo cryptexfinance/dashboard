@@ -80,7 +80,7 @@ const Details = ({ address }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      if (isInLayer1(currentNetwork.chainId)) {
+      if (isInLayer1(currentNetwork.chainId) && FEATURES.NEW_VAULTS) {
         currency = "AAVE";
       } else {
         currency = "ETH";
@@ -88,8 +88,24 @@ const Details = ({ address }: props) => {
       }
       break;
     case "link":
-      if (!isPolygon(currentNetwork.chainId)) {
+      if (!isPolygon(currentNetwork.chainId) && FEATURES.NEW_VAULTS) {
         currency = "LINK";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
+      break;
+    case "uni":
+      if (isOptimism(currentNetwork.chainId) && FEATURES.NEW_VAULTS) {
+        currency = "UNI";
+      } else {
+        currency = "ETH";
+        history?.push(`/vault/ETH`);
+      }
+      break;
+    case "snx":
+      if (isOptimism(currentNetwork.chainId) && FEATURES.NEW_VAULTS) {
+        currency = "SNX";
       } else {
         currency = "ETH";
         history?.push(`/vault/ETH`);
@@ -924,9 +940,18 @@ const Details = ({ address }: props) => {
 
   useEffect(() => {
     async function load() {
-      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
+      let vOptions = ["ETH", "WETH", "DAI"];
+      if (isInLayer1(currentNetwork.chainId) && FEATURES.NEW_VAULTS) {
+        vOptions.push("AAVE");
+        vOptions.push("LINK");
+      }
       if (isOptimism(currentNetwork.chainId)) {
-        vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
+        vOptions = ["ETH", "DAI"];
+        if (FEATURES.NEW_VAULTS) {
+          vOptions.push("LINK");
+          vOptions.push("UNI");
+          vOptions.push("SNX");
+        }
       }
       if (isPolygon(currentNetwork.chainId)) {
         vOptions = ["MATIC", "DAI"];

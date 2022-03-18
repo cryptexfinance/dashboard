@@ -80,7 +80,7 @@ export const GRAPHQL_ENDPOINT = {
 
 export const FEATURES = {
   KEEPERS_API: false,
-  NEW_VAULTS: true,
+  NEW_VAULTS: false,
   OPTIMISM: true,
   POLYGON: false,
 };
