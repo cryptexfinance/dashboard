@@ -71,6 +71,10 @@ export const NETWORKS = {
 export const UNIV3 = {
   NFPositionManager: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
   Staker: "0xe34139463bA50bD61336E0c446Bd8C0867c6fE65",
+  pools: [
+    "0x0001fcbba8eb491c3ccfeddc5a5caba1a98c4c28",
+    "0x0002e63328169d7feea121f1e32e4f620abf0352",
+  ]
 };
 
 export const API_ENDPOINT = "https://api.cryptex.finance";
@@ -82,6 +86,11 @@ export const GRAPHQL_ENDPOINT = {
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
 };
+
+export const GRAPHQL_UNIV3_ENDPOINT = {
+  mainnet: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
+  rinkeby: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
+}
 
 export const FEATURES = {
   KEEPERS_API: false,

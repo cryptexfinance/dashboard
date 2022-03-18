@@ -4,7 +4,7 @@ import { Contract } from "ethers-multicall";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
-import { GRAPHQL_ENDPOINT, NETWORKS, UNIV3 } from "../../../utils/constants";
+import { GRAPHQL_UNIV3_ENDPOINT, NETWORKS, UNIV3 } from "../../../utils/constants";
 import { toFragment } from "../../../utils/utils";
 import NonfungiblePositionManager from "../../../contracts/NonfungiblePositionManager.json";
 import Rewards from "./Rewards";
@@ -24,7 +24,7 @@ const UniV3Rewards = ({ address }: props) => {
   const signer = useContext(SignerContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_UNIV3_ENDPOINT.mainnet : GRAPHQL_UNIV3_ENDPOINT.rinkeby
     )
   );
   const [lpTokens, setLpTokens] = useState([]);
@@ -64,17 +64,6 @@ const UniV3Rewards = ({ address }: props) => {
   useEffect(() => {
     const load = () => {
       loadLPTokens();
-      switch (currentNetwork.chainId) {
-        case NETWORKS.mainnet.chainId:
-          setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
-          break;
-        case NETWORKS.rinkeby.chainId:
-          setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
-          break;
-        default:
-          setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
-          break;
-      }
     };
     load();
     // eslint-disable-next-line
