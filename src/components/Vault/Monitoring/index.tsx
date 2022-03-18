@@ -78,7 +78,6 @@ export const Monitoring = () => {
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
-  // const [liqLoaded, setLiqLoaded] = useState(false);
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
@@ -557,7 +556,6 @@ export const Monitoring = () => {
       loadNetReward().then(() => {
         setVaultList(vData);
         setVaultsTotals(totals);
-        // setLiqLoaded(true);
       });
     }
     // Set pagination data
