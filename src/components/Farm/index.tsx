@@ -449,9 +449,9 @@ const Farm = () => {
         <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
-            <UniV3Rewards address={address} />
+            <UniV3Rewards signer={signer} />
             {phase > 1 && (
-              <Card className="diamond mb-2">
+              <Card className="diamond mt-4">
                 <h2>Liquidity Rewards </h2>
                 <Table hover className="mt-2">
                   <thead>

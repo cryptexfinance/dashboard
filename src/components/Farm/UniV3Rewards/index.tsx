@@ -1,12 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-import NetworkContext from "../../../state/NetworkContext";
-import SignerContext from "../../../state/SignerContext";
-import { GRAPHQL_UNIV3_ENDPOINT, NETWORKS, UNIV3 } from "../../../utils/constants";
-import { toFragment } from "../../../utils/utils";
+import UniswapV3Staker from "../../../contracts/UniswapV3Staker.json";
 import NonfungiblePositionManager from "../../../contracts/NonfungiblePositionManager.json";
+import NetworkContext from "../../../state/NetworkContext";
+import { SignerContext } from "../../../state/SignerContext";
+import { NETWORKS } from "../../../utils/constants";
+import { GRAPHQL_UNIV3_ENDPOINT, UNIV3 } from "../../../utils/univ3";
+import { toFragment } from "../../../utils/utils";
+
 import Rewards from "./Rewards";
 
 const clientOracle = (graphqlEndpoint: string) =>
@@ -16,62 +19,72 @@ const clientOracle = (graphqlEndpoint: string) =>
   });
 
 type props = {
-  address: string;
+  signer: SignerContext;
 };
 
-const UniV3Rewards = ({ address }: props) => {
+const UniV3Rewards = ({ signer }: props) => {
   const currentNetwork = useContext(NetworkContext);
-  const signer = useContext(SignerContext);
+  const [ownerAddress, setOwnerAddress] = useState("");
+  const [stakerContract, setStakerContract] = useState<ethers.Contract | undefined>();
+  const [stakerContractRead, setStakerContractRead] = useState<Contract | undefined>();
+  const [nfpmContract, setNfpmContract] = useState<ethers.Contract | undefined>();
+  const [nfpmContractRead, setNfpmContractRead] = useState<Contract | undefined>();
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_UNIV3_ENDPOINT.mainnet : GRAPHQL_UNIV3_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1"
+        ? GRAPHQL_UNIV3_ENDPOINT.mainnet
+        : GRAPHQL_UNIV3_ENDPOINT.rinkeby
     )
   );
-  const [lpTokens, setLpTokens] = useState([]);
-
-  const loadLPTokens = async () => {
-    if (signer.signer) {
-      const positionManager = new ethers.Contract(
-        UNIV3.NFPositionManager,
-        NonfungiblePositionManager,
-        signer.signer
-      );
-      const positionManagerRead = new Contract(
-        UNIV3.NFPositionManager,
-        toFragment(NonfungiblePositionManager)
-      );
-
-      const noOfTokensOwnedByUser = await positionManager.balanceOf(
-        "0x11e4857bb9993a50c685a79afad4e6f65d518dda"
-      );
-      console.log("Tokens by user");
-      console.log(noOfTokensOwnedByUser.toNumber());
-      if (!noOfTokensOwnedByUser.isZero()) {
-        const ethcalls = [];
-        for (let i = 0; i < noOfTokensOwnedByUser.toNumber(); i += 1) {
-          const currentTokenOfOwner = await positionManagerRead.tokenOfOwnerByIndex(
-            "0x11e4857bb9993a50c685a79afad4e6f65d518dda",
-            i
-          );
-          ethcalls.push(currentTokenOfOwner);
-        }
-        const tokensId = await signer.ethcallProvider?.all(ethcalls);
-        console.log(tokensId);
-      }
-    }
-  };
 
   useEffect(() => {
-    const load = () => {
-      loadLPTokens();
+    const load = async () => {
+      switch (currentNetwork.chainId) {
+        case NETWORKS.mainnet.chainId:
+          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
+          break;
+        case NETWORKS.rinkeby.chainId:
+          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.rinkeby));
+          break;
+        default:
+          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
+          break;
+      }
+      if (signer.signer) {
+        const stakerRead = new Contract(UNIV3.stakerAddress, UniswapV3Staker);
+        const staker = new ethers.Contract(UNIV3.stakerAddress, UniswapV3Staker, signer.signer);
+        const nfpmRead = new Contract(
+          UNIV3.NFPositionManagerAddress,
+          toFragment(NonfungiblePositionManager)
+        );
+        const nfpm = new ethers.Contract(
+          UNIV3.NFPositionManagerAddress,
+          NonfungiblePositionManager,
+          signer.signer
+        );
+
+        setStakerContractRead(stakerRead);
+        setStakerContract(staker);
+        setNfpmContract(nfpm);
+        setNfpmContractRead(nfpmRead);
+        const oAddress = await signer.signer.getAddress();
+        setOwnerAddress(oAddress);
+      }
     };
     load();
     // eslint-disable-next-line
-  }, [currentNetwork.chainId, address]);
+  }, [currentNetwork.chainId]);
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Rewards />
+      <Rewards
+        ownerAddress={ownerAddress}
+        signer={signer}
+        stakerContract={stakerContract}
+        stakerContractRead={stakerContractRead}
+        nfpmContract={nfpmContract}
+        nfpmContractRead={nfpmContractRead}
+      />
     </ApolloProvider>
   );
 };

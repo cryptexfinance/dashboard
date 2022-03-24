@@ -7,6 +7,8 @@ import { FEATURES, NETWORKS } from "./constants";
 import { OraclesContext } from "../state/OraclesContext";
 import { VaultsContext } from "../state/VaultsContext";
 
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
     .substr(address.length - 4, address.length)
@@ -106,8 +108,6 @@ export const errorNotification = async (body: string) => {
   const title = "❌ Whoopsie!";
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
-
-// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
