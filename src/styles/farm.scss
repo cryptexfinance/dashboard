@@ -2,7 +2,7 @@
 @import "./fonts";
 
 .farm {
-  padding: 1rem 3rem;
+  padding: 3rem 3rem;
   padding-bottom: 2rem;
 
   // Small devices (landscape phones, 576px and up)
@@ -378,6 +378,44 @@
           }
           .not_approved {
             text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
+          }
+          .empty-lp{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .lp-box {
+              border: 1px solid $light;
+              border-radius: 5px;
+              background-color: #281e31a3;
+            }
+            .lp-info {
+              display: flex;
+              padding: 15px;
+            }
+            .icons {
+              padding: 5px;
+            }
+            .description {
+              padding: 5px;
+            }
+            .btn-box {
+              width: 100%;
+            }
+            .btn {
+              font-size: 0.9rem;
+              height: 2.5rem;
+              width: 100%;
+              border: 0px;
+              border-top: 0.8px solid $light;
+              background-color: #281e31;
+              margin: 0px;
+              padding-top: 8px;
+              border-bottom-left-radius: 5px;
+              border-bottom-right-radius: 5px;
+            }
+            .btn:hover {
+              color: $white;
+            }
           }
         }
       }

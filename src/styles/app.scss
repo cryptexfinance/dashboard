@@ -358,6 +358,19 @@ form {
   color: $highlight !important;
 }
 
+.info-message {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+
+  h5, h6 {
+    color: #bc99d7;
+  }
+  h6 {
+    font-size: 1.3rem;
+  }
+}
+
 #WEB3_CONNECT_MODAL_ID {
   .web3modal-provider-container {
     transition: background-color 0s ease-in-out 0s;

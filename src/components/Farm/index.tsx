@@ -452,9 +452,7 @@ const Farm = () => {
         <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
-            {signer.signer && isInLayer1(currentNetwork.chainId) && (
-              <UniV3Rewards signer={signer} />
-            )}
+            {isInLayer1(currentNetwork.chainId) && <UniV3Rewards signer={signer} />}
             {phase > 1 && (
               <Card className="diamond mt-4">
                 <h2>Liquidity Rewards </h2>

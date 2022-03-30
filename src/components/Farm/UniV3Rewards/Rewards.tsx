@@ -4,6 +4,7 @@ import Card from "react-bootstrap/esm/Card";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import Spinner from "react-bootstrap/Spinner";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
@@ -32,6 +33,10 @@ type props = {
 
 type btnProps = {
   position: PositionType;
+};
+
+type infoMsgProps = {
+  message: string;
 };
 
 const positionDefault = {
@@ -142,10 +147,11 @@ const Rewards = ({
     variables: { owner: ownerAddress.toLowerCase() },
     onError: () => {
       console.log(error);
-      console.log(loading);
     },
     onCompleted: () => {
-      loadData(data);
+      if (signer.signer && ownerAddress !== "") {
+        loadData(data);
+      }
     },
   });
 
@@ -159,9 +165,12 @@ const Rewards = ({
 
   const lpUrl = () => {
     const tcapAddress = tokens.tcapToken?.address;
-    const wethAddress = tokens.wethToken?.address;
+    let wethAddress = tokens.wethToken?.address;
+    if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
+      wethAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+    }
 
-    return `https://app.uniswap.org/add/${wethAddress}/${tcapAddress}?chain=${currentNetwork.name}`;
+    return `https://app.uniswap.org/#/add/${wethAddress}/${tcapAddress}?chain=${currentNetwork.name}`;
   };
 
   const ClaimButton = () => {
@@ -196,136 +205,181 @@ const Rewards = ({
     );
   };
 
-  return (
-    <Card className="diamond mb-2 univ3">
-      <Card.Body>
-        <h2>Uniswap V3 Liquidity Rewards</h2>
-        <div className="rewards">
-          <div className="rewards-total">
-            <h6>Available to Claim:</h6>
-            <div className="amount">
-              <NumberFormat
-                className="number"
-                value={availableReward}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={4}
-              />
-              <CtxIcon />
-            </div>
-          </div>
-          <div className="claim-button">
-            <ClaimButton />
+  const InfoMessage = ({ message }: infoMsgProps) => (
+    <div className="info-message">
+      <h6>{message}</h6>
+    </div>
+  );
+
+  const RenderRewards = () => (
+    <>
+      <div className="rewards">
+        <div className="rewards-total">
+          <h6>Available to Claim:</h6>
+          <div className="amount">
+            <NumberFormat
+              className="number"
+              value={availableReward}
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              decimalScale={4}
+            />
+            <CtxIcon />
           </div>
         </div>
-        <Table hover className="mt-2">
-          <thead>
-            <th />
-            <th>Description</th>
-            <th>Balance</th>
-            <th className="status">
-              Status
-              <OverlayTrigger
-                key="top"
-                placement="right"
-                trigger={["hover", "click"]}
-                overlay={
-                  <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                    <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
-                    approved in order to be staked. <br />
-                    <span className={StakeStatus.empty}>Empty</span>: LP token hasn't been staked or
-                    deposited. <br />
-                    <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be
-                    stake to earn rewards. <br />
-                    <span className={StakeStatus.staked}>Staked</span>: LP token is staked and
-                    earning rewards. <br />
-                  </Tooltip>
-                }
-              >
-                <Button variant="dark">?</Button>
-              </OverlayTrigger>
-            </th>
-            <th>
-              Current Reward
-              <OverlayTrigger
-                key="top"
-                placement="auto"
-                trigger={["hover", "click"]}
-                overlay={
-                  <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                    Amount of CTX that it's been earn while the LP token is staked. You must unstake
-                    the LP token in order to claim the reward.
-                  </Tooltip>
-                }
-              >
-                <Button variant="dark">?</Button>
-              </OverlayTrigger>
-            </th>
-            <th />
-          </thead>
-          <tbody>
-            {ethTcapPositions.map((position, index) => {
-              console.log("");
-              return (
-                <tr key={index}>
-                  <td>
-                    <WETHIcon className="weth" />
-                    <TcapIcon className="tcap" />
-                  </td>
-                  <td>
-                    <a target="_blank" rel="noreferrer" href={lpUrl()}>
-                      WETH/TCAP Pool <br /> <small> Uniswap </small>
-                    </a>
-                  </td>
-                  <td className="number">
-                    <NumberFormat
-                      className="number"
-                      value={position.liquidity}
-                      displayType="text"
-                      thousandSeparator
-                      prefix=""
-                      decimalScale={2}
-                    />{" "}
-                  </td>
-                  <td>
-                    <div className="status">
-                      <span className={position.status}>
-                        {position.status === StakeStatus.not_approved
-                          ? "Pending"
-                          : capitalize(position.status)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="number">
-                    <NumberFormat
-                      className="number"
-                      value={position.reward}
-                      displayType="text"
-                      thousandSeparator
-                      prefix=""
-                      decimalScale={2}
-                    />{" "}
-                    CTX
-                  </td>
-                  <td align="right">
-                    <>
-                      <Stake
-                        ownerAddress={ownerAddress}
-                        position={position}
-                        incentive={ethTcapIncentive[0]}
-                        nfpmContract={nfpmContract}
-                        stakerContract={stakerContract}
-                        refresh={() => refresh()}
-                      />
-                      <WithdrawButton position={position} />
-                    </>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+        <div className="claim-button">
+          <ClaimButton />
+        </div>
+      </div>
+      <Table hover className="mt-2">
+        <thead>
+          <th />
+          <th>Description</th>
+          <th>Balance</th>
+          <th className="status">
+            Status
+            <OverlayTrigger
+              key="top"
+              placement="right"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                  <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
+                  approved in order to be staked. <br />
+                  <span className={StakeStatus.empty}>Empty</span>: LP token hasn't been staked or
+                  deposited. <br />
+                  <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be
+                  stake to earn rewards. <br />
+                  <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
+                  rewards. <br />
+                </Tooltip>
+              }
+            >
+              <Button variant="dark">?</Button>
+            </OverlayTrigger>
+          </th>
+          <th>
+            Current Reward
+            <OverlayTrigger
+              key="top"
+              placement="auto"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                  Amount of CTX that it's been earn while the LP token is staked. You must unstake
+                  the LP token in order to claim the reward.
+                </Tooltip>
+              }
+            >
+              <Button variant="dark">?</Button>
+            </OverlayTrigger>
+          </th>
+          <th />
+        </thead>
+        <tbody>
+          {ethTcapPositions.map((position, index) => {
+            console.log("");
+            return (
+              <tr key={index}>
+                <td>
+                  <WETHIcon className="weth" />
+                  <TcapIcon className="tcap" />
+                </td>
+                <td>
+                  <a target="_blank" rel="noreferrer" href={lpUrl()}>
+                    WETH/TCAP Pool <br /> <small> Uniswap </small>
+                  </a>
+                </td>
+                <td className="number">
+                  <NumberFormat
+                    className="number"
+                    value={position.liquidity}
+                    displayType="text"
+                    thousandSeparator
+                    prefix=""
+                    decimalScale={2}
+                  />{" "}
+                </td>
+                <td>
+                  <div className="status">
+                    <span className={position.status}>
+                      {position.status === StakeStatus.not_approved
+                        ? "Pending"
+                        : capitalize(position.status)}
+                    </span>
+                  </div>
+                </td>
+                <td className="number">
+                  <NumberFormat
+                    className="number"
+                    value={position.reward}
+                    displayType="text"
+                    thousandSeparator
+                    prefix=""
+                    decimalScale={2}
+                  />{" "}
+                  CTX
+                </td>
+                <td align="right">
+                  <>
+                    <Stake
+                      ownerAddress={ownerAddress}
+                      position={position}
+                      incentive={ethTcapIncentive[0]}
+                      nfpmContract={nfpmContract}
+                      stakerContract={stakerContract}
+                      refresh={() => refresh()}
+                    />
+                    <WithdrawButton position={position} />
+                  </>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    </>
+  );
+
+  const RenderEmptyLP = () => (
+    <div className="empty-lp">
+      <div className="lp-box">
+        <div className="lp-info">
+          <div className="icons">
+            <WETHIcon className="weth" />
+            <TcapIcon className="tcap" />
+          </div>
+          <div className="description">
+            <a target="_blank" rel="noreferrer" href={lpUrl()}>
+              WETH/TCAP Pool <br /> <small> Uniswap </small>
+            </a>
+          </div>
+        </div>
+        <a className="btn" target="_blank" rel="noreferrer" href={lpUrl()}>
+          Create Position
+        </a>
+      </div>
+    </div>
+  );
+
+  return (
+    <Card className="diamond mb-2 univ3">
+      <Card.Header>
+        <h2>Uniswap V3 Liquidity Rewards</h2>
+      </Card.Header>
+      <Card.Body>
+        {ownerAddress !== "" ? (
+          <>
+            {loading ? (
+              <Spinner variant="danger" className="spinner" animation="border" />
+            ) : (
+              <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>
+            )}
+          </>
+        ) : (
+          <InfoMessage message="Connect your Wallet" />
+        )}
       </Card.Body>
       <ClaimReward
         show={showClaim}
