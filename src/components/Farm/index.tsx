@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import SignerContext from "../../state/SignerContext";
 import TokensContext from "../../state/TokensContext";
+import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import GovernanceContext from "../../state/GovernanceContext";
 import RewardsContext from "../../state/RewardsContext";
@@ -24,6 +25,7 @@ import {
   errorNotification,
   tsToDateString,
   getPriceInUSDFromPair,
+  isInLayer1,
 } from "../../utils/utils";
 import { Stake } from "../modals/Stake";
 
@@ -47,6 +49,7 @@ const Farm = () => {
   const [vestingEndTime, setVestingEndTime] = useState(0);
   const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
   const [updateData, setUpdateData] = useState(false);
+  const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
@@ -449,7 +452,9 @@ const Farm = () => {
         <h3>Farming</h3>{" "}
         <Row className="card-wrapper">
           <Row>
-            <UniV3Rewards signer={signer} />
+            {signer.signer && isInLayer1(currentNetwork.chainId) && (
+              <UniV3Rewards signer={signer} />
+            )}
             {phase > 1 && (
               <Card className="diamond mt-4">
                 <h2>Liquidity Rewards </h2>

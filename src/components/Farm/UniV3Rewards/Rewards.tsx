@@ -1,12 +1,15 @@
 import React, { useContext, useState } from "react";
 import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
 import { useQuery, gql } from "@apollo/client";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
+import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
 import NetworkContext from "../../../state/NetworkContext";
 import { SignerContext } from "../../../state/SignerContext";
@@ -14,8 +17,9 @@ import TokensContext from "../../../state/TokensContext";
 import { NETWORKS } from "../../../utils/constants";
 import { UNIV3, computeIncentiveId } from "../../../utils/univ3";
 import { capitalize } from "../../../utils/utils";
-import Stake from "./Stake";
 import { IncentiveType, PositionType, StakeStatus } from "./types";
+import ClaimReward from "./ClaimReward";
+import Stake from "./Stake";
 
 type props = {
   ownerAddress: string;
@@ -53,28 +57,16 @@ const Rewards = ({
   const currentNetwork = useContext(NetworkContext);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
+  const [availableReward, setAvailableReward] = useState(0);
+  const [showClaim, setShowClaim] = useState(false);
 
   const OWNER_POSITIONS = gql`
     query ownerPools($owner: String!) {
-      positions(where: { owner: $owner }) {
+      positions(orderBy: id, where: { owner: $owner }) {
         id
-        pool {
-          id
-        }
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-        tickLower {
-          tickIdx
-        }
-        tickUpper {
-          tickIdx
-        }
+        poolAddress
+        tickLower
+        tickUpper
         liquidity
       }
     }
@@ -92,44 +84,54 @@ const Rewards = ({
     }
     setEthTcapIncentive(ethTcapPool.incentives);
     const ethPositions = new Array<PositionType>();
-    console.log("-- pos ---");
-    console.log(positionsData.positions);
     positionsData.positions.forEach(async (p: any) => {
-      if (p.pool.id === ethTcapPool.id.toLowerCase()) {
+      if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
         const position = { ...positionDefault };
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
         position.lpTokenId = p.id;
-        position.poolId = p.pool.id;
-        position.tickLower = p.tickLower.tickIdx;
-        position.tickUpper = p.tickUpper.tickIdx;
+        position.poolId = p.poolAddress;
+        position.tickLower = p.tickLower;
+        position.tickUpper = p.tickUpper;
         position.incetiveId = incentiveId;
         position.liquidity = ethers.utils.formatEther(p.liquidity);
 
         const nfpCall = await nfpmContractRead?.getApproved(p.id);
         const lpDepositsCall = await stakerContractRead?.deposits(p.id);
         const lpStakesCall = await stakerContractRead?.stakes(p.id, incentiveId);
-
+        const availableRewardCall = await stakerContractRead?.rewards(
+          ethTcapPool.incentives[0].rewardToken,
+          ownerAddress
+        );
         // @ts-ignore
-        const [nfpAddress, depositsEth, stakesEth] = await signer.ethcallProvider?.all([
-          nfpCall,
-          lpDepositsCall,
-          lpStakesCall,
-        ]);
-        if (nfpAddress.toLowerCase() !== UNIV3.stakerAddress.toLowerCase()) {
-          position.status = StakeStatus.not_approved;
-        } else if (
+        const [nfpAddress, depositsEth, stakesEth, availableRewardWei] =
+          await signer.ethcallProvider?.all([
+            nfpCall,
+            lpDepositsCall,
+            lpStakesCall,
+            availableRewardCall,
+          ]);
+        setAvailableReward(parseFloat(ethers.utils.formatEther(availableRewardWei)));
+        if (
           depositsEth.owner === ownerAddress &&
           depositsEth.tickLower === position.tickLower &&
           depositsEth.tickUpper === position.tickUpper
         ) {
           position.status = StakeStatus.deposited;
-
           if (stakesEth.liquidity > BigNumber.from("0")) {
             position.status = StakeStatus.staked;
+            const rewardInfoCall = await stakerContractRead?.getRewardInfo(
+              ethTcapPool.incentives[0],
+              p.id
+            );
+            // @ts-ignore
+            const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
+            position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
           }
+        } else if (nfpAddress.toLowerCase() !== UNIV3.stakerAddress.toLowerCase()) {
+          position.status = StakeStatus.not_approved;
         }
         ethPositions.push(position);
-        setEthTcapPositions(ethPositions);
+        setEthTcapPositions([...ethPositions]);
       }
     });
   };
@@ -137,7 +139,7 @@ const Rewards = ({
   const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
-    variables: { owner: ownerAddress },
+    variables: { owner: ownerAddress.toLowerCase() },
     onError: () => {
       console.log(error);
       console.log(loading);
@@ -162,29 +164,26 @@ const Rewards = ({
     return `https://app.uniswap.org/add/${wethAddress}/${tcapAddress}?chain=${currentNetwork.name}`;
   };
 
-  const ClaimButton = ({ position }: btnProps) => {
-    let btnDisabled = true;
-
-    // eslint-disable-next-line
-    if (position.status !== StakeStatus.staked) {
-      btnDisabled = !(position.reward > 0);
-    }
+  const ClaimButton = () => {
+    const btnDisabled = !(availableReward > 0);
     return (
-      <Button variant="success" className=" ml-4 small" disabled={btnDisabled}>
+      <Button
+        onClick={() => {
+          setShowClaim(true);
+        }}
+        variant="success"
+        className=" ml-4 claim"
+        disabled={btnDisabled}
+      >
         Claim
       </Button>
     );
   };
 
   const WithdrawButton = ({ position }: btnProps) => {
-    let title = "Exit";
+    const title = "Exit";
     let btnDisabled = true;
 
-    // eslint-disable-next-line
-    if (position.status === StakeStatus.staked) {
-      title = "Unstake";
-      btnDisabled = false;
-    }
     // eslint-disable-next-line
     if (position.status === StakeStatus.deposited) {
       btnDisabled = false;
@@ -199,89 +198,146 @@ const Rewards = ({
 
   return (
     <Card className="diamond mb-2 univ3">
-      <Table hover className="mt-2">
-        <thead>
-          <th />
-          <th>Description</th>
-          <th className="right">Token ID</th>
-          <th className="right">Liquidity</th>
-          <th className="center">Status</th>
-          <th className="right">Reward</th>
-          <th className="right">APY</th>
-          <th />
-        </thead>
-        <tbody>
-          {ethTcapPositions.map((position, index) => {
-            console.log("");
-            return (
-              <tr key={index}>
-                <td>
-                  <WETHIcon className="weth" />
-                  <TcapIcon className="tcap" />
-                </td>
-                <td>
-                  <a target="_blank" rel="noreferrer" href={lpUrl()}>
-                    WETH/TCAP Pool <br /> <small> Uniswap </small>
-                  </a>
-                </td>
-                <td align="right">{position.lpTokenId}</td>
-                <td className="number" align="right">
-                  <NumberFormat
-                    className="number"
-                    value={position.liquidity}
-                    displayType="text"
-                    thousandSeparator
-                    prefix=""
-                    decimalScale={2}
-                  />{" "}
-                </td>
-                <td align="center">
-                  {position.status === StakeStatus.not_approved
-                    ? "Not Approved"
-                    : capitalize(position.status)}
-                </td>
-                <td className="number" align="right">
-                  <NumberFormat
-                    className="number"
-                    value={0}
-                    displayType="text"
-                    thousandSeparator
-                    prefix=""
-                    decimalScale={2}
-                  />{" "}
-                  CTX
-                </td>
-                <td className="number" align="right">
-                  <b className="fire">
+      <Card.Body>
+        <h2>Uniswap V3 Liquidity Rewards</h2>
+        <div className="rewards">
+          <div className="rewards-total">
+            <h6>Available to Claim:</h6>
+            <div className="amount">
+              <NumberFormat
+                className="number"
+                value={availableReward}
+                displayType="text"
+                thousandSeparator
+                prefix=""
+                decimalScale={4}
+              />
+              <CtxIcon />
+            </div>
+          </div>
+          <div className="claim-button">
+            <ClaimButton />
+          </div>
+        </div>
+        <Table hover className="mt-2">
+          <thead>
+            <th />
+            <th>Description</th>
+            <th>Balance</th>
+            <th className="status">
+              Status
+              <OverlayTrigger
+                key="top"
+                placement="right"
+                trigger={["hover", "click"]}
+                overlay={
+                  <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                    <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
+                    approved in order to be staked. <br />
+                    <span className={StakeStatus.empty}>Empty</span>: LP token hasn't been staked or
+                    deposited. <br />
+                    <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be
+                    stake to earn rewards. <br />
+                    <span className={StakeStatus.staked}>Staked</span>: LP token is staked and
+                    earning rewards. <br />
+                  </Tooltip>
+                }
+              >
+                <Button variant="dark">?</Button>
+              </OverlayTrigger>
+            </th>
+            <th>
+              Current Reward
+              <OverlayTrigger
+                key="top"
+                placement="auto"
+                trigger={["hover", "click"]}
+                overlay={
+                  <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                    Amount of CTX that it's been earn while the LP token is staked. You must unstake
+                    the LP token in order to claim the reward.
+                  </Tooltip>
+                }
+              >
+                <Button variant="dark">?</Button>
+              </OverlayTrigger>
+            </th>
+            <th />
+          </thead>
+          <tbody>
+            {ethTcapPositions.map((position, index) => {
+              console.log("");
+              return (
+                <tr key={index}>
+                  <td>
+                    <WETHIcon className="weth" />
+                    <TcapIcon className="tcap" />
+                  </td>
+                  <td>
+                    <a target="_blank" rel="noreferrer" href={lpUrl()}>
+                      WETH/TCAP Pool <br /> <small> Uniswap </small>
+                    </a>
+                  </td>
+                  <td className="number">
                     <NumberFormat
                       className="number"
-                      value={0}
+                      value={position.liquidity}
                       displayType="text"
                       thousandSeparator
+                      prefix=""
                       decimalScale={2}
-                    />
-                    %
-                  </b>
-                </td>
-                <td align="right">
-                  <>
-                    <Stake
-                      ownerAddress={ownerAddress}
-                      position={position}
-                      incentive={ethTcapIncentive[0]}
-                      nfpmContract={nfpmContract}
-                      stakerContract={stakerContract}
-                      refresh={() => refresh()}
-                    />
-                    <ClaimButton position={position} />
-                    <WithdrawButton position={position} />
-                  </>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
+                    />{" "}
+                  </td>
+                  <td>
+                    <div className="status">
+                      <span className={position.status}>
+                        {position.status === StakeStatus.not_approved
+                          ? "Pending"
+                          : capitalize(position.status)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="number">
+                    <NumberFormat
+                      className="number"
+                      value={position.reward}
+                      displayType="text"
+                      thousandSeparator
+                      prefix=""
+                      decimalScale={2}
+                    />{" "}
+                    CTX
+                  </td>
+                  <td align="right">
+                    <>
+                      <Stake
+                        ownerAddress={ownerAddress}
+                        position={position}
+                        incentive={ethTcapIncentive[0]}
+                        nfpmContract={nfpmContract}
+                        stakerContract={stakerContract}
+                        refresh={() => refresh()}
+                      />
+                      <WithdrawButton position={position} />
+                    </>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      </Card.Body>
+      <ClaimReward
+        show={showClaim}
+        ownerAddress={ownerAddress}
+        currentReward={availableReward}
+        incentive={ethTcapIncentive[0]}
+        stakerContract={stakerContract}
+        onHide={() => {
+          setShowClaim(false);
+        }}
+        refresh={() => refresh()}
+      />
     </Card>
   );
 };

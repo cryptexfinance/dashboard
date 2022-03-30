@@ -28,13 +28,14 @@ const Stake = ({
   useEffect(() => {
     const cDate = new Date();
     const currentTime = cDate.getTime() / 1000;
-    console.log("--- Time ----");
-    console.log(currentTime);
     let btnTitle = "Stake";
     let bDisabled = true;
     if (position.status === StakeStatus.not_approved) {
       btnTitle = "Approve";
       bDisabled = false;
+    } else if (position.status === StakeStatus.staked) {
+      bDisabled = false;
+      btnTitle = "Unstake";
     } else if (currentTime < incentive.startTime) {
       bDisabled = false;
       btnTitle = "Deposit";
@@ -48,20 +49,23 @@ const Stake = ({
     setTitle(btnTitle);
     setBtnDisabled(bDisabled);
     // eslint-disable-next-line
-  }, []);
+  }, [position]);
 
   const approve = async () => {
     try {
+      setBtnDisabled(true);
       const tx = await nfpmContract?.approve(UNIV3.stakerAddress, position.lpTokenId);
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
       errorNotification("Transaction rejected");
     }
+    setBtnDisabled(false);
   };
 
   const deposit = async () => {
     try {
+      setBtnDisabled(true);
       const tx = await nfpmContract?.safeTransferFrom(
         ownerAddress,
         UNIV3.stakerAddress,
@@ -73,28 +77,43 @@ const Stake = ({
       console.log(error);
       errorNotification("Transaction rejected");
     }
+    setBtnDisabled(false);
   };
 
   const stake = async () => {
     try {
+      setBtnDisabled(true);
       const tx = await stakerContract?.stakeToken(incentive, position.lpTokenId);
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
       errorNotification("Transaction rejected");
     }
+    setBtnDisabled(false);
+  };
+
+  const unstake = async () => {
+    try {
+      setBtnDisabled(true);
+      const tx = await stakerContract?.unstakeToken(incentive, position.lpTokenId);
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error);
+      errorNotification("Transaction rejected");
+    }
+    setBtnDisabled(false);
   };
 
   const handleOnClick = () => {
-    setBtnDisabled(true);
     if (position.status === StakeStatus.not_approved) {
       approve();
     } else if (position.status === StakeStatus.empty) {
       deposit();
     } else if (position.status === StakeStatus.deposited) {
       stake();
+    } else if (position.status === StakeStatus.staked) {
+      unstake();
     }
-    setBtnDisabled(false);
   };
 
   return (
