@@ -6,28 +6,29 @@ import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
-import NumberFormat from "react-number-format";
-import { useQuery, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import SignerContext from "../state/SignerContext";
-import TokensContext from "../state/TokensContext";
-import VaultsContext from "../state/VaultsContext";
-import OraclesContext from "../state/OraclesContext";
-import GovernanceContext from "../state/GovernanceContext";
-import RewardsContext from "../state/RewardsContext";
-import "../styles/farm.scss";
-import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
-import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
-import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
-import Loading from "./Loading";
+import NumberFormat from "react-number-format";
+import SignerContext from "../../state/SignerContext";
+import TokensContext from "../../state/TokensContext";
+import NetworkContext from "../../state/NetworkContext";
+import OraclesContext from "../../state/OraclesContext";
+import GovernanceContext from "../../state/GovernanceContext";
+import RewardsContext from "../../state/RewardsContext";
+import MintingRewards from "./MintingRewards/index";
+import UniV3Rewards from "./UniV3Rewards/index";
+import "../../styles/farm.scss";
+import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
+import Loading from "../Loading";
 import {
   notifyUser,
   errorNotification,
   tsToDateString,
   getPriceInUSDFromPair,
-} from "../utils/utils";
-import { Stake } from "./modals/Stake";
+  isInLayer1,
+} from "../../utils/utils";
+import { Stake } from "../modals/Stake";
 
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
@@ -41,8 +42,6 @@ const Farm = () => {
   const [ctxPoolRewards, setCtxPoolRewards] = useState("0.0");
   const [vethPoolRewards, setVEthPoolRewards] = useState("0.0");
   const [vctxPoolRewards, setVCtxPoolRewards] = useState("0.0");
-  const [ethDebt, setEthDebt] = useState("0.0");
-  const [daiDebt, setDaiDebt] = useState("0.0");
   const [ethPoolStake, setEthPoolStake] = useState("0.0");
   const [ctxPoolStake, setCtxPoolStake] = useState("0.0");
   const [ethPoolBalance, setEthPoolBalance] = useState("0.0");
@@ -52,9 +51,9 @@ const Farm = () => {
   const [vestingEndTime, setVestingEndTime] = useState(0);
   const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
   const [updateData, setUpdateData] = useState(false);
+  const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
-  const vaults = useContext(VaultsContext);
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const rewards = useContext(RewardsContext);
@@ -73,21 +72,6 @@ const Farm = () => {
 
   const lpURL = "https://app.sushi.com";
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
-
-  const USER_VAULTS = gql`
-    query getVault($owner: String!) {
-      vaults(where: { owner: $owner }) {
-        id
-        vaultId
-        owner
-        collateral
-        debt
-        currentRatio
-        address
-        owner
-      }
-    }
-  `;
 
   async function getAPYFromVaultRewards(
     totalTcapDebt: number,
@@ -118,38 +102,9 @@ const Farm = () => {
     return apy.toString();
   }
 
-  async function setDebt(vaultData: any) {
-    // TODO: fix if no graph
-    await vaultData.vaults.forEach((v: any) => {
-      switch (v.address.toLowerCase()) {
-        case vaults?.wethVault?.address.toLowerCase():
-          setEthDebt(ethers.utils.formatEther(v.debt));
-          break;
-        case vaults?.wbtcVault?.address.toLowerCase():
-          // setWbtcDebt(ethers.utils.formatEther(v.debt));
-          break;
-        case vaults?.daiVault?.address.toLowerCase():
-          setDaiDebt(ethers.utils.formatEther(v.debt));
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  const { data, refetch } = useQuery(USER_VAULTS, {
-    variables: { owner: address },
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    onCompleted: () => {
-      setDebt(data);
-    },
-  });
-
   const refresh = async () => {
     try {
       setUpdateData(!updateData);
-      await refetch();
     } catch (error) {
       // catch error in case the vault screen is changed
     }
@@ -374,7 +329,7 @@ const Farm = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [data, updateData]);
+  }, [updateData]);
 
   if (isLoading) {
     return <Loading title={t("loading")} message={t("wait")} />;
@@ -499,166 +454,7 @@ const Farm = () => {
         <h3>{t("farming.farming")}</h3>{" "}
         <Row className="card-wrapper">
           <Row>
-            <Card className="diamond mb-2">
-              <h2>{t("farming.minting")}</h2>
-              <Table hover className="mt-2">
-                <thead>
-                  <tr>
-                    <th />
-                    <th>{t("description")}</th>
-                    <th>{t("farming.current-mint")}</th>
-                    <th>
-                      <div className="rewards">
-                        <div className="title-current">{t("farming.current-reward")}</div>
-                        <div className="button-current">
-                          <OverlayTrigger
-                            key="top"
-                            placement="right"
-                            trigger={["hover", "click"]}
-                            overlay={
-                              <Tooltip id="ttip-current-reward" className="farm-tooltip">
-                                {t("farming.current-info")}
-                              </Tooltip>
-                            }
-                          >
-                            <Button variant="dark">?</Button>
-                          </OverlayTrigger>
-                        </div>
-                      </div>
-                    </th>{" "}
-                    <th>APY</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <WETHIcon className="weth" />
-                    </td>
-                    <td>
-                      <a href="vault/ETH">{t("farming.token-vault", { token: "ETH" })}</a>
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethDebt}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      TCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={ethRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <b className="fire">{t("inactive")}</b>
-                    </td>
-                    <td align="right">
-                      {address === "" ? (
-                        <>
-                          <Button variant="dark" className="" disabled>
-                            {t("mint")}
-                          </Button>
-
-                          <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button variant="primary" className="" href="vault/ETH">
-                            {t("mint")}
-                          </Button>
-
-                          <Button
-                            variant="success"
-                            className=" ml-4"
-                            onClick={() => {
-                              claimRewards("ETH");
-                            }}
-                          >
-                            {t("claim")}
-                          </Button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <DAIIcon className="dai" />
-                    </td>
-                    <td>
-                      <a href="vault/DAI">{t("farming.token-vault", { token: "DAI" })}</a>
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiDebt}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      TCAP
-                    </td>
-                    <td className="number">
-                      <NumberFormat
-                        className="number"
-                        value={daiRewards}
-                        displayType="text"
-                        thousandSeparator
-                        prefix=""
-                        decimalScale={2}
-                      />{" "}
-                      CTX
-                    </td>
-                    <td>
-                      <b className="fire">{t("inactive")}</b>
-                    </td>
-                    <td align="right">
-                      {address === "" ? (
-                        <>
-                          <Button variant="dark" className="" disabled>
-                            {t("mint")}
-                          </Button>
-
-                          <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button variant="primary" className="" href="vault/DAI">
-                            {t("mint")}
-                          </Button>
-
-                          <Button
-                            variant="success"
-                            className="ml-4"
-                            onClick={() => {
-                              claimRewards("DAI");
-                            }}
-                          >
-                            {t("claim")}
-                          </Button>
-                        </>
-                      )}
-                    </td>{" "}
-                  </tr>
-                </tbody>
-              </Table>
-            </Card>
-
+            {isInLayer1(currentNetwork.chainId) && <UniV3Rewards signer={signer} />}
             {phase > 1 && (
               <Card className="diamond mt-4">
                 <h2>{t("farming.liquidity")}</h2>
@@ -996,6 +792,12 @@ const Farm = () => {
                 </Table>
               </Card>
             )}
+            <MintingRewards
+              address={address}
+              ethRewards={ethRewards}
+              daiRewards={daiRewards}
+              claimRewards={claimRewards}
+            />
           </Row>
         </Row>
       </div>
@@ -1011,4 +813,5 @@ const Farm = () => {
     </div>
   );
 };
+
 export default Farm;

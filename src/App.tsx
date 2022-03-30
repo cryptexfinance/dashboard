@@ -147,23 +147,11 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentAAVEVault(currentAAVEVault);
-    const currentWBTCVault = new ethers.Contract(
-      contracts.WBTCVaultHandler.address,
-      contracts.WBTCVaultHandler.abi,
-      currentSigner
-    );
-    vaults.setCurrentWBTCVault(currentWBTCVault);
-
     const currentAVEEVaultRead = new Contract(
       contracts.AaveVaultHandler.address,
       contracts.AaveVaultHandler.abi
     );
     vaults.setCurrentAAVEVaultRead(currentAVEEVaultRead);
-    const currentWBTCVaultRead = new Contract(
-      contracts.WBTCVaultHandler.address,
-      contracts.WBTCVaultHandler.abi
-    );
-    vaults.setCurrentWBTCVaultRead(currentWBTCVaultRead);
 
     // Tokens
     const currentAAVEToken = new ethers.Contract(
@@ -172,17 +160,9 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentAAVEToken(currentAAVEToken);
-    const currentWBTCToken = new ethers.Contract(
-      contracts.WBTC.address,
-      contracts.WBTC.abi,
-      currentSigner
-    );
-    tokens.setCurrentWBTCToken(currentWBTCToken);
 
     const currentAAVETokenRead = new Contract(contracts.AAVE.address, contracts.AAVE.abi);
     tokens.setCurrentAAVETokenRead(currentAAVETokenRead);
-    const currentWBTCTokenRead = new Contract(contracts.WBTC.address, contracts.WBTC.abi);
-    tokens.setCurrentWBTCTokenRead(currentWBTCTokenRead);
 
     // Set Rewards
     const currentWETHReward = new ethers.Contract(
@@ -232,21 +212,20 @@ const App = () => {
     );
     rewards.setCurrentWETHPoolRewardRead(currentWETHPoolRewardRead);
 
-    if (chainId === NETWORKS.mainnet.chainId) {
-      const currentCTXPoolReward = new ethers.Contract(
-        // @ts-ignore
-        contracts.CTXLiquidityReward.address, // @ts-ignore
-        contracts.CTXLiquidityReward.abi,
-        currentSigner
-      );
-      rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
+    const currentCTXPoolReward = new ethers.Contract(
+      // @ts-ignore
+      contracts.CTXLiquidityReward.address, // @ts-ignore
+      contracts.CTXLiquidityReward.abi,
+      currentSigner
+    );
+    rewards.setCurrentCTXPoolReward(currentCTXPoolReward);
 
-      const currentCTXPoolRewardRead = new Contract( // @ts-ignore
-        contracts.CTXLiquidityReward.address, // @ts-ignore
-        contracts.CTXLiquidityReward.abi
-      );
-      rewards.setCurrentCTXPoolRewardRead(currentCTXPoolRewardRead);
-    }
+    const currentCTXPoolRewardRead = new Contract( // @ts-ignore
+      contracts.CTXLiquidityReward.address, // @ts-ignore
+      contracts.CTXLiquidityReward.abi
+    );
+    rewards.setCurrentCTXPoolRewardRead(currentCTXPoolRewardRead);
+
     // Oracles
     const currentAAVEOracle = new ethers.Contract(
       contracts.AaveOracle.address,
@@ -254,42 +233,25 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentAAVEOracle(currentAAVEOracle);
-    const currentWBTCOracle = new ethers.Contract(
-      contracts.WBTCOracle.address,
-      contracts.WBTCOracle.abi,
-      currentSigner
-    );
-    oracles.setCurrentWBTCOracle(currentWBTCOracle);
-
     const currentAAVEOracleRead = new Contract(
       contracts.AaveOracle.address,
       contracts.AaveOracle.abi
     );
     oracles.setCurrentAAVEOracleRead(currentAAVEOracleRead);
-    const currentWBTCOracleRead = new Contract(
-      contracts.WBTCOracle.address,
-      contracts.WBTCOracle.abi
-    );
-    oracles.setCurrentWBTCOracleRead(currentWBTCOracleRead);
 
     // Set Governance
-    if (chainId === NETWORKS.mainnet.chainId) {
-      const currentDelegatorFactory = new ethers.Contract(
-        // @ts-ignore
-        contracts.DelegatorFactory.address,
-        // @ts-ignore
-        contracts.DelegatorFactory.abi,
-        currentSigner
-      );
-      governance.setCurrentDelegatorFactory(currentDelegatorFactory);
-      const currentDelegatorFactoryRead = new Contract(
-        // @ts-ignore
-        contracts.DelegatorFactory.address,
-        // @ts-ignore
-        contracts.DelegatorFactory.abi
-      );
-      governance.setCurrentDelegatorFactoryRead(currentDelegatorFactoryRead);
-    }
+    const currentDelegatorFactory = new ethers.Contract(
+      contracts.DelegatorFactory.address,
+      contracts.DelegatorFactory.abi,
+      currentSigner
+    );
+    governance.setCurrentDelegatorFactory(currentDelegatorFactory);
+    const currentDelegatorFactoryRead = new Contract(
+      contracts.DelegatorFactory.address,
+      contracts.DelegatorFactory.abi
+    );
+    governance.setCurrentDelegatorFactoryRead(currentDelegatorFactoryRead);
+
     // TODO:remove this once other pools work
     if (ethPoolAddress && ctxPoolAddress) {
       const currentWETHPoolToken = new ethers.Contract(
@@ -832,6 +794,9 @@ const App = () => {
                             loadingContracts={isLoadingContracts}
                           />
                         </Route>
+                        <Route path={`${match.url}farm`}>
+                          <Farm />
+                        </Route>
                         <ApolloProvider client={apolloClient}>
                           <Route path={`${match.url}graph`}>
                             <Graph />
@@ -841,9 +806,6 @@ const App = () => {
                           </Route>
                           <Route path={`${match.url}vault-monitoring`}>
                             <Monitoring />
-                          </Route>
-                          <Route path={`${match.url}farm`}>
-                            <Farm />
                           </Route>
                           <Route path={`${match.url}governance`}>
                             <Delegators currentSignerAddress={currentSignerAddress} />
