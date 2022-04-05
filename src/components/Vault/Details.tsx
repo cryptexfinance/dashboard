@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import Button from "react-bootstrap/esm/Button";
+import ButtonGroup from "react-bootstrap/esm/ButtonGroup";
 import Card from "react-bootstrap/esm/Card";
+import Dropdown from "react-bootstrap/Dropdown";
 import Form from "react-bootstrap/esm/Form";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { Contract } from "ethers-multicall";
 import { ethers, BigNumber } from "ethers";
@@ -14,6 +17,7 @@ import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import TokensContext from "../../state/TokensContext";
 import VaultsContext from "../../state/VaultsContext";
+import HardVaultsContext from "../../state/HardVaultsContext";
 import SignerContext from "../../state/SignerContext";
 import "../../styles/vault.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
@@ -24,14 +28,6 @@ import { ReactComponent as UNIIconSmall } from "../../assets/images/vault/uni.sv
 import { ReactComponent as SNXIconSmall } from "../../assets/images/vault/snx2.svg";
 import { ReactComponent as POLYGONIconSmall } from "../../assets/images/vault/polygon.svg";
 import { ReactComponent as WBTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
-import { ReactComponent as ETHIcon } from "../../assets/images/graph/weth.svg";
-import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
-import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
-import { ReactComponent as LINKIcon } from "../../assets/images/graph/chainlink.svg";
-import { ReactComponent as SNXIcon } from "../../assets/images/graph/snx.svg";
-import { ReactComponent as UNIIcon } from "../../assets/images/graph/uni.svg";
-import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon3.svg";
-import { ReactComponent as WBTCIcon } from "../../assets/images/graph/wbtc.svg";
 import { ReactComponent as RatioIcon } from "../../assets/images/vault/ratio.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import {
@@ -62,11 +58,18 @@ const Details = ({ address, t }: props) => {
   const oracles = useContext(OraclesContext);
   const tokens = useContext(TokensContext);
   const vaults = useContext(VaultsContext);
+  const hardVaults = useContext(HardVaultsContext);
   const signer = useContext(SignerContext);
-
+  const [vaultMode, setVaultMode] = useState("normal");
+  const radios = [
+    { name: "Regular Mode", value: "normal" },
+    { name: "Hard Mode", value: "hard" },
+  ];
   let currency = !isPolygon(currentNetwork.chainId) ? "ETH" : "MATIC";
   const match = useRouteMatch("/vault/:currency");
   const history = useHistory();
+  const isHardMode = () => vaultMode === "hard";
+
   // @ts-ignore
   switch (match?.params?.currency?.toLowerCase()) {
     case "eth":
@@ -85,7 +88,7 @@ const Details = ({ address, t }: props) => {
       break;
     case "wbtc":
       currency = "WBTC";
-      if (isOptimism(currentNetwork.chainId)) {
+      if (isOptimism(currentNetwork.chainId) || isHardMode()) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
@@ -94,7 +97,7 @@ const Details = ({ address, t }: props) => {
       currency = "DAI";
       break;
     case "aave":
-      if (isInLayer1(currentNetwork.chainId)) {
+      if (isInLayer1(currentNetwork.chainId) && !isHardMode()) {
         currency = "AAVE";
       } else {
         currency = "ETH";
@@ -102,7 +105,7 @@ const Details = ({ address, t }: props) => {
       }
       break;
     case "link":
-      if (!isPolygon(currentNetwork.chainId)) {
+      if (!isPolygon(currentNetwork.chainId) && !isHardMode()) {
         currency = "LINK";
       } else {
         currency = "ETH";
@@ -111,10 +114,11 @@ const Details = ({ address, t }: props) => {
       break;
     case "matic":
       currency = "MATIC";
-      if (!FEATURES.POLYGON && !isPolygon(currentNetwork.chainId)) {
+      if ((!FEATURES.POLYGON && !isPolygon(currentNetwork.chainId)) || isHardMode()) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
+      setVaultMode("normal");
       break;
     default:
       currency = FEATURES.POLYGON && isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH";
@@ -175,6 +179,7 @@ const Details = ({ address, t }: props) => {
         debt
         address
         owner
+        hardVault
       }
       _meta {
         block {
@@ -285,16 +290,16 @@ const Details = ({ address, t }: props) => {
       );
       switch (vaultType) {
         case "ETH":
-          currentVault = vaults.wethVault;
-          currentVaultRead = vaults.wethVaultRead;
+          currentVault = !isHardMode() ? vaults.wethVault : hardVaults.wethVault;
+          currentVaultRead = !isHardMode() ? vaults.wethVaultRead : hardVaults.wethVaultRead;
           currentToken = tokens.wethToken;
           currentOracleRead = oracles.wethOracleRead;
           currentTokenRead = tokens.wethTokenRead;
           balance = await provider.getBalance(address);
           break;
         case "WETH":
-          currentVault = vaults.wethVault;
-          currentVaultRead = vaults.wethVaultRead;
+          currentVault = !isHardMode() ? vaults.wethVault : hardVaults.wethVault;
+          currentVaultRead = !isHardMode() ? vaults.wethVaultRead : hardVaults.wethVaultRead;
           currentToken = tokens.wethToken;
           currentOracleRead = oracles.wethOracleRead;
           currentTokenRead = tokens.wethTokenRead;
@@ -370,8 +375,7 @@ const Details = ({ address, t }: props) => {
       let currentBlock = await provider.getBlockNumber();
       currentBlock -= 10;
       if (
-        (currentNetwork.chainId === NETWORKS.mainnet.chainId ||
-          currentNetwork.chainId === NETWORKS.rinkeby.chainId) &&
+        isInLayer1(currentNetwork.chainId) &&
         vaultData.vaults.length > 0 &&
         !vaultData._meta.hasIndexingErrors &&
         graphBlock >= currentBlock
@@ -541,6 +545,11 @@ const Details = ({ address, t }: props) => {
     setMintUSD("0");
     setBurnUSD("0");
     setBurnTxt("");
+  };
+
+  const handleRadioBtnChange = (value: string) => {
+    setVaultMode(value);
+    refresh();
   };
 
   const changeVault = async (newRatio: number, reset = false) => {
@@ -940,11 +949,11 @@ const Details = ({ address, t }: props) => {
     }
   };
 
-  const onChangeVault = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTokenChange = async (value: string) => {
     setIsApproved(false);
     setTokenBalance("0");
     setTokenBalanceUSD("0");
-    setSelectedVault(event.target.value);
+    setSelectedVault(value);
     // Clean form
     setAddCollateralTxt("");
     setAddCollateralUSD("0");
@@ -956,17 +965,20 @@ const Details = ({ address, t }: props) => {
     setBurnUSD("0");
     setBurnFee("0");
     // Load values
-    history?.push(`/vault/${event.target.value}`);
+    history?.push(`/vault/${value}`);
     await refetch();
   };
 
   useEffect(() => {
     async function load() {
       let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK", "WBTC"];
-      if (isOptimism(currentNetwork.chainId)) {
+      if (isHardMode()) {
+        vOptions = ["ETH", "WETH"];
+      }
+      if (isOptimism(currentNetwork.chainId) && !isHardMode()) {
         vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
       }
-      if (isPolygon(currentNetwork.chainId)) {
+      if (isPolygon(currentNetwork.chainId) && !isHardMode()) {
         vOptions = ["MATIC", "DAI", "WBTC"];
       }
       setVaultOptions(vOptions);
@@ -987,128 +999,151 @@ const Details = ({ address, t }: props) => {
     );
   }
 
-  return (
-    <>
-      <p>{t("vault.subtitle1")}</p>
-      <div className="icon-container">
+  const CollateralDropdown = () => (
+    <div className="dd-collateral">
+      <h6 className="titles">Collateral:</h6>
+      <Dropdown onSelect={(eventKey) => handleTokenChange(eventKey || "ETH")}>
+        <Dropdown.Toggle variant="secondary" id="dropdown-filters" className="text-left">
+          <div className="collateral-toggle">
+            <span>{selectedVault.toUpperCase()}</span>
+          </div>
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {vaultOptions.map((item) => (
+            <Dropdown.Item key={item} eventKey={item}>
+              {item}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+    </div>
+  );
+
+  const CollateralBalance = () => (
+    <div className="collateral-balance">
+      <div className="amount">
         {(() => {
           switch (selectedVault) {
             case "DAI":
-              return <DAIIconSmall className="dai" />;
+              return <DAIIconSmall className="dai small" />;
             case "AAVE":
-              return <AAVEIconSmall className="btc" />;
+              return <AAVEIconSmall className="aave small" />;
             case "LINK":
-              return <LINKIconSmall className="link" />;
+              return <LINKIconSmall className="link small" />;
             case "UNI":
-              return <UNIIconSmall className="uni" />;
+              return <UNIIconSmall className="uni small" />;
             case "SNX":
-              return <SNXIconSmall className="link" />;
+              return <SNXIconSmall className="snx small" />;
             case "MATIC":
-              return <POLYGONIconSmall className="dai" />;
+              return <POLYGONIconSmall className="btc small" />;
             case "WBTC":
               return <WBTCIconSmall className="btc small" />;
             default:
-              return <ETHIconSmall className="weth" />;
+              return <ETHIconSmall className="small" />;
           }
         })()}
+        <h4 className=" ml-2 number neon-highlight">
+          <NumberFormat
+            className="number"
+            value={tokenBalance}
+            displayType="text"
+            thousandSeparator
+            decimalScale={tokenBalanceDecimals}
+          />
+        </h4>
+      </div>
+      <p className="number">
+        <NumberFormat
+          className="number"
+          value={tokenBalanceUSD}
+          displayType="text"
+          thousandSeparator
+          prefix="$"
+          decimalScale={parseFloat(tokenBalanceUSD) > 1000 ? 0 : 2}
+        />
+      </p>
+    </div>
+  );
 
-        <div className="select-container">
-          <Form.Control as="select" onChange={onChangeVault} value={selectedVault}>
-            {vaultOptions.map((val) => (
-              <option key={val}>{val}</option>
-            ))}
-          </Form.Control>
-          <p className="number">
-            <NumberFormat
-              className="number"
-              value={tokenBalance}
-              displayType="text"
-              thousandSeparator
-              decimalScale={2}
-            />{" "}
-            {selectedVault} /{" "}
-            <NumberFormat
-              className="number"
-              value={tokenBalanceUSD}
-              displayType="text"
-              thousandSeparator
-              prefix="$"
-              decimalScale={2}
-            />
-          </p>
-        </div>
+  const CollateralBalance2 = () => (
+    <div className="collateral-balance">
+      <div className="amount">
+        {(() => {
+          switch (selectedVault) {
+            case "DAI":
+              return <DAIIconSmall className="dai small" />;
+            case "AAVE":
+              return <AAVEIconSmall className="aave small" />;
+            case "LINK":
+              return <LINKIconSmall className="link small" />;
+            case "UNI":
+              return <UNIIconSmall className="uni small" />;
+            case "SNX":
+              return <SNXIconSmall className="snx small" />;
+            case "MATIC":
+              return <POLYGONIconSmall className="btc small" />;
+            case "WBTC":
+              return <WBTCIconSmall className="btc small" />;
+            default:
+              return <ETHIconSmall className="small" />;
+          }
+        })()}
+        <h4 className=" ml-2 number neon-highlight">
+          <NumberFormat
+            className="number"
+            value={tokenBalance}
+            displayType="text"
+            thousandSeparator
+            decimalScale={tokenBalanceDecimals}
+          />
+        </h4>
+        <span className="number">/</span>
+      </div>
+      <NumberFormat
+        className="number"
+        value={tokenBalanceUSD}
+        displayType="text"
+        thousandSeparator
+        prefix="$"
+        decimalScale={parseFloat(tokenBalanceUSD) > 1000 ? 0 : 2}
+      />
+    </div>
+  );
+
+  return (
+    <>
+      <div className="icon-container">
+        <ButtonGroup className="mb-2">
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant="secondary"
+              name="radio"
+              value={radio.value}
+              checked={vaultMode === radio.value}
+              onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </div>
       {isApproved ? (
         <>
           <div className="actions-container">
             <div className="balance">
               <Card>
-                {(() => {
-                  switch (selectedVault) {
-                    case "DAI":
-                      return <DAIIcon className="eth" />;
-                    case "AAVE":
-                      return <AAVEIcon className="eth" />;
-                    case "LINK":
-                      return <LINKIcon className="eth" />;
-                    case "UNI":
-                      return <UNIIcon className="eth" />;
-                    case "SNX":
-                      return <SNXIcon className="eth" />;
-                    case "MATIC":
-                      return <POLYGONIcon className="eth" />;
-                    case "WBTC":
-                      return <WBTCIcon className="eth" />;
-                    default:
-                      return <ETHIcon className="eth" />;
-                  }
-                })()}
-                <div className="info">
-                  <h4>{t("vault.balance-title", { vault: selectedVault })}</h4>
-                  <div>
-                    <div className="amount">
-                      {(() => {
-                        switch (selectedVault) {
-                          case "DAI":
-                            return <DAIIconSmall className="dai small" />;
-                          case "AAVE":
-                            return <AAVEIconSmall className="aave small" />;
-                          case "LINK":
-                            return <LINKIconSmall className="link small" />;
-                          case "UNI":
-                            return <UNIIconSmall className="uni small" />;
-                          case "SNX":
-                            return <SNXIconSmall className="snx small" />;
-                          case "MATIC":
-                            return <POLYGONIconSmall className="btc small" />;
-                          case "WBTC":
-                            return <WBTCIconSmall className="btc small" />;
-                          default:
-                            return <ETHIconSmall className="small" />;
-                        }
-                      })()}
-                      <h4 className=" ml-2 number neon-highlight">
-                        <NumberFormat
-                          className="number"
-                          value={tokenBalance}
-                          displayType="text"
-                          thousandSeparator
-                          decimalScale={tokenBalanceDecimals}
-                        />
-                      </h4>
-                    </div>
-                    <p className="number">
-                      <NumberFormat
-                        className="number"
-                        value={tokenBalanceUSD}
-                        displayType="text"
-                        thousandSeparator
-                        prefix="$"
-                        decimalScale={parseFloat(tokenBalanceUSD) > 1000 ? 0 : 2}
-                      />
-                    </p>
+                <Card.Header>
+                  <CollateralDropdown />
+                </Card.Header>
+                <Card.Body>
+                  <div className="info">
+                    <h4>{t("vault.balance-title", { vault: selectedVault })}</h4>
+                    <CollateralBalance />
                   </div>
-                </div>
+                </Card.Body>
               </Card>
               <Card>
                 <RatioIcon className="ratio" />
@@ -1377,11 +1412,19 @@ const Details = ({ address, t }: props) => {
         </>
       ) : (
         <div className="pre-actions">
-          <h5 className="action-title">{title}</h5>
-          <p>{text}</p>
-          <Button variant="pink neon-pink" onClick={action} disabled={btnDisabled}>
-            {title}
-          </Button>
+          <Card className="form-card">
+            <Card.Header>
+              <CollateralDropdown />
+              <CollateralBalance2 />
+            </Card.Header>
+            <Card.Body>
+              <h5 className="action-title">{title}</h5>
+              <p>{text}</p>
+              <Button variant="pink neon-pink" onClick={action} disabled={btnDisabled}>
+                {title}
+              </Button>
+            </Card.Body>
+          </Card>
         </div>
       )}
     </>

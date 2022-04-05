@@ -10,7 +10,6 @@ import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
 import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
-import { ReactComponent as PoolsIcon } from "../assets/images/welcome/pool.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
@@ -123,30 +122,6 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <VaultMonitoringIcon />
           </Link>
         </Nav.Item>
-        {isInLayer1(currentNetwork.chainId) && (
-          <Nav.Item>
-            {active === "pools" ? (
-              <Link
-                to="/pools"
-                className="active"
-                onClick={() => {
-                  setActive("pools");
-                }}
-              >
-                <PoolsIcon />
-              </Link>
-            ) : (
-              <Link
-                to="/pools"
-                onClick={() => {
-                  setActive("pools");
-                }}
-              >
-                <PoolsIcon />
-              </Link>
-            )}
-          </Nav.Item>
-        )}
         <Nav.Item>
           {active === "farm" ? (
             <Link

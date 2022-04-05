@@ -71,18 +71,17 @@
         }
       }
       .btn-group {
-         border: 1px solid #dfd1ea;
-         border-radius: 5px;
-         margin-bottom: 0rem !important;
-
-         .btn-secondary {
-           margin-bottom: 0rem;
-           font-size: 0.8rem;
-           background-color: #281e31;
-         }
-         .btn-secondary.active {
-           background-color: $neon-highlight;
-         }
+        border: 1px solid #dfd1ea;
+        border-radius: 5px;
+        margin-bottom: 0rem !important;
+        .btn-secondary {
+          margin-bottom: 0rem;
+          font-size: 0.8rem;
+          background-color: #281e31;
+        }
+        .btn-secondary.active {
+          background-color: $neon-highlight;
+        }
       }
       .filters {
         display: flex;

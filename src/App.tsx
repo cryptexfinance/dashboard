@@ -18,7 +18,6 @@ import Topbar from "./components/Topbar";
 import WelcomeWrapper from "./components/Welcome/index";
 import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
-import Pool from "./components/Pool";
 import Delegators from "./components/Governance/Delegators";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
@@ -26,6 +25,7 @@ import Warnings from "./components/Warnings";
 import { useSigner } from "./hooks/useSigner";
 import { useNetworks } from "./hooks/useNetworks";
 import { useVaults } from "./hooks/useVaults";
+import { useHardVaults } from "./hooks/useHardVaults";
 import { useTokens } from "./hooks/useTokens";
 import { useOracles } from "./hooks/useOracles";
 import { useGovernance } from "./hooks/useGovernance";
@@ -33,6 +33,7 @@ import { useRewards } from "./hooks/useRewards";
 import signerContext from "./state/SignerContext";
 import NetworkContext from "./state/NetworkContext";
 import vaultsContext from "./state/VaultsContext";
+import hardVaultsContext from "./state/HardVaultsContext";
 import tokensContext from "./state/TokensContext";
 import oraclesContext from "./state/OraclesContext";
 import governanceContext from "./state/GovernanceContext";
@@ -73,6 +74,7 @@ const App = () => {
   const networks = useNetworks();
   const [currentSignerAddress, setCurrentSignerAddress] = useState("");
   const vaults = useVaults();
+  const hardVaults = useHardVaults();
   const tokens = useTokens();
   const oracles = useOracles();
   const governance = useGovernance();
@@ -147,11 +149,23 @@ const App = () => {
       currentSigner
     );
     vaults.setCurrentAAVEVault(currentAAVEVault);
+    const currentHardWETHVault = new ethers.Contract(
+      contracts.HardWETHVaultHandler.address,
+      contracts.HardWETHVaultHandler.abi,
+      currentSigner
+    );
+    hardVaults.setCurrentWETHVault(currentHardWETHVault);
+
     const currentAVEEVaultRead = new Contract(
       contracts.AaveVaultHandler.address,
       contracts.AaveVaultHandler.abi
     );
     vaults.setCurrentAAVEVaultRead(currentAVEEVaultRead);
+    const currentHardWETHVaultRead = new Contract(
+      contracts.HardWETHVaultHandler.address,
+      toFragment(contracts.HardWETHVaultHandler.abi)
+    );
+    hardVaults.setCurrentWETHVaultRead(currentHardWETHVaultRead);
 
     // Tokens
     const currentAAVEToken = new ethers.Contract(
@@ -770,55 +784,54 @@ const App = () => {
         <tokensContext.Provider value={tokens}>
           <oraclesContext.Provider value={oracles}>
             <vaultsContext.Provider value={vaults}>
-              <governanceContext.Provider value={governance}>
-                <rewardsContext.Provider value={rewards}>
-                  <Sidebar
-                    showSidebar={showSidebar}
-                    setShowSidebar={setShowSidebar}
-                    isMobile={isMobile}
-                  />
-                  <Topbar
-                    showSidebar={showSidebar}
-                    setShowSidebar={setShowSidebar}
-                    isMobile={isMobile}
-                  />
-                  <Suspense fallback={<Loading position="total" />}>
-                    <Container fluid className="wrapper" {...handlers}>
-                      <Warnings />
-                      <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
-                      <ToastContainer />
-                      <Switch>
-                        <Route path={`${match.url}/`}>
-                          <WelcomeWrapper
-                            signerAddress={currentSignerAddress}
-                            loadingContracts={isLoadingContracts}
-                          />
-                        </Route>
-                        <Route path={`${match.url}farm`}>
-                          <Farm />
-                        </Route>
-                        <ApolloProvider client={apolloClient}>
-                          <Route path={`${match.url}graph`}>
-                            <Graph />
+              <hardVaultsContext.Provider value={hardVaults}>
+                <governanceContext.Provider value={governance}>
+                  <rewardsContext.Provider value={rewards}>
+                    <Sidebar
+                      showSidebar={showSidebar}
+                      setShowSidebar={setShowSidebar}
+                      isMobile={isMobile}
+                    />
+                    <Topbar
+                      showSidebar={showSidebar}
+                      setShowSidebar={setShowSidebar}
+                      isMobile={isMobile}
+                    />
+                    <Suspense fallback={<Loading position="total" />}>
+                      <Container fluid className="wrapper" {...handlers}>
+                        <Warnings />
+                        <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
+                        <ToastContainer />
+                        <Switch>
+                          <Route path={`${match.url}/`}>
+                            <WelcomeWrapper
+                              signerAddress={currentSignerAddress}
+                              loadingContracts={isLoadingContracts}
+                            />
                           </Route>
-                          <Route path={`${match.url}vault`}>
-                            <Vault />
+                          <Route path={`${match.url}farm`}>
+                            <Farm />
                           </Route>
-                          <Route path={`${match.url}vault-monitoring`}>
-                            <Monitoring />
-                          </Route>
-                          <Route path={`${match.url}governance`}>
-                            <Delegators currentSignerAddress={currentSignerAddress} />
-                          </Route>
-                          <Route path={`${match.url}pools`}>
-                            <Pool />
-                          </Route>
-                        </ApolloProvider>
-                      </Switch>
-                    </Container>
-                  </Suspense>
-                </rewardsContext.Provider>
-              </governanceContext.Provider>
+                          <ApolloProvider client={apolloClient}>
+                            <Route path={`${match.url}graph`}>
+                              <Graph />
+                            </Route>
+                            <Route path={`${match.url}vault`}>
+                              <Vault />
+                            </Route>
+                            <Route path={`${match.url}vault-monitoring`}>
+                              <Monitoring />
+                            </Route>
+                            <Route path={`${match.url}governance`}>
+                              <Delegators currentSignerAddress={currentSignerAddress} />
+                            </Route>
+                          </ApolloProvider>
+                        </Switch>
+                      </Container>
+                    </Suspense>
+                  </rewardsContext.Provider>
+                </governanceContext.Provider>
+              </hardVaultsContext.Provider>
             </vaultsContext.Provider>
           </oraclesContext.Provider>
         </tokensContext.Provider>
