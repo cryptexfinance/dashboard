@@ -7,7 +7,7 @@ import GovernanceContext from "../../state/GovernanceContext";
 import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
-const sixMonthCtxRewardAmount = 60000;
+const sixMonthCtxRewardAmount = 12654;
 const apyShowDate = new Date(1633654800 * 1000);
 type props = {
   refresh: () => void;
@@ -80,7 +80,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
   const apy = (): string => {
     const currentDate = new Date();
     if (parseFloat(totalStaked) > 0 && currentDate > apyShowDate) {
-      const a = Math.round(((2 * sixMonthCtxRewardAmount) / parseFloat(totalStaked)) * 100);
+      const a = Math.round(((4 * sixMonthCtxRewardAmount) / parseFloat(totalStaked)) * 100);
       return a
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
