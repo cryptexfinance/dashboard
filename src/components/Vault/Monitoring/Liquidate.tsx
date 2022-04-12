@@ -11,8 +11,13 @@ import SignerContext from "../../../state/SignerContext";
 import OracleContext from "../../../state/OraclesContext";
 import TokensContext from "../../../state/TokensContext";
 import VaultContext from "../../../state/VaultsContext";
-import { errorNotification, isPolygon, notifyUser, toUSD } from "../../../utils/utils";
-import { numberFormatStr } from "./common";
+import {
+  errorNotification,
+  isPolygon,
+  notifyUser,
+  numberFormatStr,
+  toUSD,
+} from "../../../utils/utils";
 
 type props = {
   show: boolean;

@@ -47,21 +47,6 @@ export const CollateralIcon = ({ name }: iconProps) => {
   }
 };
 
-export const numberFormatStr = (
-  value: string,
-  minDecimals: number | undefined,
-  maxDecimals: number | undefined
-) => {
-  const numberFormat = new Intl.NumberFormat([], {
-    minimumFractionDigits: minDecimals,
-    maximumFractionDigits: maxDecimals,
-  });
-  if (minDecimals) {
-    return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
-  }
-  return numberFormat.format(parseFloat(value));
-};
-
 export const sortCollateralAsc = (a: VaultsType, b: VaultsType) =>
   parseFloat(a.collateralValue) - parseFloat(b.collateralValue);
 

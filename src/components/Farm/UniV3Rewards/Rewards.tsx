@@ -12,12 +12,13 @@ import { useQuery, gql } from "@apollo/client";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
+import { ReactComponent as UNIIconSmall } from "../../../assets/images/vault/uni.svg";
 import NetworkContext from "../../../state/NetworkContext";
 import { SignerContext } from "../../../state/SignerContext";
 import TokensContext from "../../../state/TokensContext";
 import { NETWORKS } from "../../../utils/constants";
 import { UNIV3, computeIncentiveId } from "../../../utils/univ3";
-import { capitalize } from "../../../utils/utils";
+import { capitalize, errorNotification, notifyUser, numberFormatStr } from "../../../utils/utils";
 import { IncentiveType, PositionType, StakeStatus } from "./types";
 import ClaimReward from "./ClaimReward";
 import Stake from "./Stake";
@@ -44,7 +45,11 @@ const positionDefault = {
   poolId: "",
   liquidity: "0.00",
   tickLower: 0,
+  tickLowerPrice0: 1,
+  tickLowerPrice1: 1,
   tickUpper: 0,
+  tickUpperPrice0: 1,
+  tickUpperPrice1: 1,
   incetiveId: "",
   reward: 0,
   status: StakeStatus.empty,
@@ -70,8 +75,16 @@ const Rewards = ({
       positions(orderBy: id, where: { owner: $owner }) {
         id
         poolAddress
-        tickLower
-        tickUpper
+        tickLower {
+          tickIdx
+          price0
+          price1
+        }
+        tickUpper {
+          tickIdx
+          price0
+          price1
+        }
         liquidity
       }
     }
@@ -95,8 +108,12 @@ const Rewards = ({
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
         position.lpTokenId = p.id;
         position.poolId = p.poolAddress;
-        position.tickLower = p.tickLower;
-        position.tickUpper = p.tickUpper;
+        position.tickLower = parseInt(p.tickLower.tickIdx);
+        position.tickLowerPrice0 = p.tickLower.price0;
+        position.tickLowerPrice1 = p.tickLower.price1;
+        position.tickUpper = parseInt(p.tickUpper.tickIdx);
+        position.tickUpperPrice0 = p.tickUpper.price0;
+        position.tickUpperPrice1 = p.tickUpper.price1;
         position.incetiveId = incentiveId;
         position.liquidity = ethers.utils.formatEther(p.liquidity);
 
@@ -165,12 +182,27 @@ const Rewards = ({
 
   const lpUrl = () => {
     const tcapAddress = tokens.tcapToken?.address;
+    let { feeTier } = UNIV3.mainnet.tcapPool;
     let wethAddress = tokens.wethToken?.address;
     if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
+      feeTier = UNIV3.rinkeby.tcapPool.feeTier;
       wethAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
     }
 
-    return `https://app.uniswap.org/#/add/${wethAddress}/${tcapAddress}?chain=${currentNetwork.name}`;
+    return `https://app.uniswap.org/#/add/${wethAddress}/${tcapAddress}/${feeTier}?chain=${currentNetwork.name}`;
+  };
+
+  const withdraw = async (lpTokenId: number) => {
+    if (stakerContract) {
+      try {
+        const tx = await stakerContract.withdrawToken(lpTokenId, ownerAddress, "0x");
+        notifyUser(tx, refresh);
+        refresh();
+      } catch (error) {
+        errorNotification("Transaction Rejected");
+        console.log(error);
+      }
+    }
   };
 
   const ClaimButton = () => {
@@ -199,7 +231,12 @@ const Rewards = ({
     }
 
     return (
-      <Button variant="warning" className=" ml-4 small" disabled={btnDisabled}>
+      <Button
+        variant="warning"
+        className=" ml-4 small"
+        disabled={btnDisabled}
+        onClick={() => withdraw(position.lpTokenId)}
+      >
         {title}
       </Button>
     );
@@ -236,7 +273,7 @@ const Rewards = ({
         <thead>
           <th />
           <th>Description</th>
-          <th>Balance</th>
+          <th>Range (TCAP per WETH)</th>
           <th className="status">
             Status
             <OverlayTrigger
@@ -288,18 +325,16 @@ const Rewards = ({
                 </td>
                 <td>
                   <a target="_blank" rel="noreferrer" href={lpUrl()}>
-                    WETH/TCAP Pool <br /> <small> Uniswap </small>
+                    TCAP/WETH Pool <br /> <small> Uniswap </small>
                   </a>
                 </td>
-                <td className="number">
-                  <NumberFormat
-                    className="number"
-                    value={position.liquidity}
-                    displayType="text"
-                    thousandSeparator
-                    prefix=""
-                    decimalScale={2}
-                  />{" "}
+                <td>
+                  <div className="min-range">
+                    <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
+                  </div>
+                  <div className="max-range">
+                    <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
+                  </div>
                 </td>
                 <td>
                   <div className="status">
@@ -352,7 +387,9 @@ const Rewards = ({
           </div>
           <div className="description">
             <a target="_blank" rel="noreferrer" href={lpUrl()}>
-              WETH/TCAP Pool <br /> <small> Uniswap </small>
+              WETH/TCAP Pool <br />
+              <UNIIconSmall className="uni" />
+              <small> Fee tier: 0.3%</small>
             </a>
           </div>
         </div>

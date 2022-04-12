@@ -20,6 +20,7 @@ import {
   isOptimism,
   isPolygon,
   isUndefined,
+  numberFormatStr,
   toUSD,
   validOracles,
   validVaults,
@@ -34,7 +35,7 @@ import {
   VaultsType,
   VaultsTotalsType,
 } from "./types";
-import { capitalize, CollateralIcon, numberFormatStr, VAULT_STATUS } from "./common";
+import { capitalize, CollateralIcon, VAULT_STATUS } from "./common";
 
 const pagDefault = {
   previous: 0,
@@ -58,6 +59,7 @@ type liqVaultsTempType = {
   vaultId: string;
   vaultType: string;
 };
+
 const showAllVaults = true;
 
 export const Monitoring = () => {

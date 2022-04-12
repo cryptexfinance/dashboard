@@ -61,6 +61,7 @@ const Details = ({ address, t }: props) => {
   const hardVaults = useContext(HardVaultsContext);
   const signer = useContext(SignerContext);
   const [vaultMode, setVaultMode] = useState("normal");
+  const [loadingMode, setLoadingMode] = useState(false);
   const radios = [
     { name: "Regular Mode", value: "normal" },
     { name: "Hard Mode", value: "hard" },
@@ -519,6 +520,7 @@ const Details = ({ address, t }: props) => {
         setSelectedVault("MATIC");
       }
       loadVault(vaultType, data);
+      setLoadingMode(false);
     },
   });
 
@@ -548,6 +550,7 @@ const Details = ({ address, t }: props) => {
   };
 
   const handleRadioBtnChange = (value: string) => {
+    setLoadingMode(true);
     setVaultMode(value);
     refresh();
   };
@@ -991,7 +994,7 @@ const Details = ({ address, t }: props) => {
     // eslint-disable-next-line
   }, [address, data]);
 
-  if (isLoading) {
+  if (isLoading || loadingMode) {
     return (
       <div className="loading-container">
         <Loading title={t("loading")} message={t("wait")} />
@@ -1109,6 +1112,10 @@ const Details = ({ address, t }: props) => {
       />
     </div>
   );
+
+  /* if (loadingMode) {
+    return <Spinner variant="danger" className="spinner" animation="border" />;
+  } */
 
   return (
     <>

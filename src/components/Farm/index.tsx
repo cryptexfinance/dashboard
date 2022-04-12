@@ -14,7 +14,6 @@ import NetworkContext from "../../state/NetworkContext";
 import OraclesContext from "../../state/OraclesContext";
 import GovernanceContext from "../../state/GovernanceContext";
 import RewardsContext from "../../state/RewardsContext";
-import MintingRewards from "./MintingRewards/index";
 import UniV3Rewards from "./UniV3Rewards/index";
 import "../../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
@@ -36,8 +35,8 @@ const Farm = () => {
   const { t } = useTranslation();
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [ethRewards, setEthRewards] = useState("0");
-  const [daiRewards, setDaiRewards] = useState("0");
+  /* const [ethRewards, setEthRewards] = useState("0");
+  const [daiRewards, setDaiRewards] = useState("0"); */
   const [ethPoolRewards, setEthPoolRewards] = useState("0.0");
   const [ctxPoolRewards, setCtxPoolRewards] = useState("0.0");
   const [vethPoolRewards, setVEthPoolRewards] = useState("0.0");
@@ -245,8 +244,8 @@ const Farm = () => {
           const currentAddress = await signer.signer.getAddress();
           setAddress(currentAddress);
 
-          const currentEthRewardCall = await rewards?.wethRewardRead?.earned(currentAddress);
-          const currentDaiRewardCall = await rewards?.daiRewardRead?.earned(currentAddress);
+          /* const currentEthRewardCall = await rewards?.wethRewardRead?.earned(currentAddress);
+          const currentDaiRewardCall = await rewards?.daiRewardRead?.earned(currentAddress); */
           const currentEthPoolRewardCall = await rewards.wethPoolRewardRead?.earned(currentAddress);
           const currentVEthPoolRewardCall = await rewards.wethPoolRewardRead?.vestingAmounts(
             currentAddress
@@ -270,8 +269,6 @@ const Farm = () => {
 
           // @ts-ignore
           const [
-            currentEthReward,
-            currentDaiReward,
             currentEthPoolReward,
             currentVEthPoolReward,
             currentEthPoolStake,
@@ -281,8 +278,6 @@ const Farm = () => {
             currentCtxPoolStake,
             currentCtxPoolBalance,
           ] = await signer.ethcallProvider?.all([
-            currentEthRewardCall,
-            currentDaiRewardCall,
             currentEthPoolRewardCall,
             currentVEthPoolRewardCall,
             currentEthPoolStakeCall,
@@ -293,8 +288,8 @@ const Farm = () => {
             currentCtxPoolBalanceCall,
           ]);
 
-          setEthRewards(ethers.utils.formatEther(currentEthReward));
-          setDaiRewards(ethers.utils.formatEther(currentDaiReward));
+          /* setEthRewards(ethers.utils.formatEther(currentEthReward));
+          setDaiRewards(ethers.utils.formatEther(currentDaiReward)); */
 
           setEthVestAmount(currentVEthPoolReward);
           setCtxVestAmount(currentVCtxPoolReward);
@@ -792,12 +787,6 @@ const Farm = () => {
                 </Table>
               </Card>
             )}
-            <MintingRewards
-              address={address}
-              ethRewards={ethRewards}
-              daiRewards={daiRewards}
-              claimRewards={claimRewards}
-            />
           </Row>
         </Row>
       </div>

@@ -9,10 +9,10 @@ import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
 import Liquidate from "./Liquidate";
 import { PaginationType, VaultsType } from "./types";
+import { numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
   CollateralIcon,
-  numberFormatStr,
   sortCollateralDesc,
   sortCollateralAsc,
   sortCollateralUsdDesc,

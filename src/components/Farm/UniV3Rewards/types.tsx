@@ -18,7 +18,11 @@ export type PositionType = {
   poolId: string;
   liquidity: string;
   tickLower: number;
+  tickLowerPrice0: number;
+  tickLowerPrice1: number;
   tickUpper: number;
+  tickUpperPrice0: number;
+  tickUpperPrice1: number;
   incetiveId: string;
   reward: number;
   status: string;

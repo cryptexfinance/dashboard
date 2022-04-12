@@ -383,3 +383,18 @@ export const validVaults = (chainId: number, vaults: VaultsContext): boolean => 
   }
   return valid;
 };
+
+export const numberFormatStr = (
+  value: string,
+  minDecimals: number | undefined,
+  maxDecimals: number | undefined
+) => {
+  const numberFormat = new Intl.NumberFormat([], {
+    minimumFractionDigits: minDecimals,
+    maximumFractionDigits: maxDecimals,
+  });
+  if (minDecimals) {
+    return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
+  }
+  return numberFormat.format(parseFloat(value));
+};

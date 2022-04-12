@@ -6,6 +6,7 @@ export const UNIV3 = {
   mainnet: {
     tcapPool: {
       id: "0xfb7BDD5B703f57BC7807b9D731503050EdC8c722",
+      feeTier: 3000,
       incentives: [
         {
           rewardToken: "0xAa715DbD2ED909B7B7727dC864F3B78276D14A19",
@@ -20,6 +21,7 @@ export const UNIV3 = {
   rinkeby: {
     tcapPool: {
       id: "0xfb7BDD5B703f57BC7807b9D731503050EdC8c722",
+      feeTier: 3000,
       incentives: [
         {
           rewardToken: "0xAa715DbD2ED909B7B7727dC864F3B78276D14A19",
