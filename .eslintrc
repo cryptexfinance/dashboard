@@ -50,8 +50,9 @@
     "no-unused-vars": [
       1,
       {
-        "ignoreSiblings": true,
-        "argsIgnorePattern": "res|next|^err"
+        "vars": "all",
+        "ignoreRestSiblings": true,
+        "args": "all"
       }
     ],
     "prefer-const": [
@@ -155,7 +156,8 @@
           "Container"
         ],
       }
-    ]
+    ],
+    "react/jsx-no-bind": 0
   },
   "plugins": [
     "html",

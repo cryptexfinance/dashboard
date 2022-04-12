@@ -41,7 +41,7 @@ export const Vote = ({ show, onHide, proposal, forVote, against, endTime, status
         notifyUser(tx);
         onHide();
       } catch (error) {
-        if (error.code === 4001) {
+        if (error.code === 4001 || error.code === -32603) {
           errorNotification("Transaction rejected");
         } else {
           onHide();

@@ -39,32 +39,34 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
         );
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
         // @ts-ignore
-        const [
-          totalSupply,
-          currentStake,
-          currentReward,
-          currentWaitTime,
-        ] = await signer.ethcallProvider?.all([
-          totalSupplyCall,
-          currentStakeCall,
-          currentRewardCall,
-          currentWaitTimeCall,
-        ]);
+        const [totalSupply, currentStake, currentReward, currentWaitTime] =
+          await signer.ethcallProvider?.all([
+            totalSupplyCall,
+            currentStakeCall,
+            currentRewardCall,
+            currentWaitTimeCall,
+          ]);
         setTotalStaked(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
         setWaitTime(currentWT);
       }
+    }
+    load();
+    // eslint-disable-next-line
+  }, [signer, updateData,]);
+
+  useEffect(() => {
+    async function load() {
       if (withdrawTimes.length > 0) {
         const lastDate = new Date();
-        lastDate.setTime(withdrawTimes[0] - currentWT * 1000);
+        lastDate.setTime(withdrawTimes[0] - waitTime * 1000);
         setLastStakeDate(lastDate);
       }
     }
     load();
-    // eslint-disable-next-line
-  }, [signer, updateData, withdrawTimes, updateTimes]);
+  }, [withdrawTimes, updateTimes, waitTime]);
 
   const claimRewards = async () => {
     if (governance.delegatorFactory) {

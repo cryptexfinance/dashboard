@@ -13,6 +13,7 @@ export const useSigner = (): SignerContext => {
   const setCurrentEthcallProvider = React.useCallback((currentProvider: Provider): void => {
     setEthcallProvider(currentProvider);
   }, []);
+
   return {
     signer,
     setCurrentSigner,

@@ -70,7 +70,7 @@ const Farm = () => {
 
   const oneYear = 60 * 60 * 24 * 365;
 
-  const lpURL = process.env.REACT_APP_LP_URL;
+  const lpURL = "https://app.sushi.com";
   const phase = process.env.REACT_APP_PHASE ? parseInt(process.env.REACT_APP_PHASE) : 0;
 
   const USER_VAULTS = gql`
@@ -415,7 +415,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Insufficient funds to stake");
@@ -454,7 +454,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Error claiming vest");
@@ -484,7 +484,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
-      if (error.code === 4001) {
+      if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
         errorNotification("Insufficient funds to exit");
