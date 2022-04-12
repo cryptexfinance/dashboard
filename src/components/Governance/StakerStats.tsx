@@ -7,7 +7,7 @@ import GovernanceContext from "../../state/GovernanceContext";
 import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
-const sixMonthCtxRewardAmount = 60000;
+const sixMonthCtxRewardAmount = 12654;
 const apyShowDate = new Date(1633654800 * 1000);
 type props = {
   refresh: () => void;
