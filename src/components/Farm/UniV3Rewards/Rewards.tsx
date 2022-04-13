@@ -9,6 +9,7 @@ import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
 import { useQuery, gql } from "@apollo/client";
+import { FaArrowsAltH } from "react-icons/fa";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
@@ -18,8 +19,14 @@ import { SignerContext } from "../../../state/SignerContext";
 import TokensContext from "../../../state/TokensContext";
 import { NETWORKS } from "../../../utils/constants";
 import { UNIV3, computeIncentiveId } from "../../../utils/univ3";
-import { capitalize, errorNotification, notifyUser, numberFormatStr } from "../../../utils/utils";
-import { IncentiveType, PositionType, StakeStatus } from "./types";
+import {
+  capitalize,
+  calculateCumulativePrice,
+  errorNotification,
+  notifyUser,
+  numberFormatStr,
+} from "../../../utils/utils";
+import { IncentiveType, PositionType, positionDefaultValues, StakeStatus } from "./types";
 import ClaimReward from "./ClaimReward";
 import Stake from "./Stake";
 
@@ -30,6 +37,7 @@ type props = {
   stakerContractRead: Contract | undefined;
   nfpmContract: ethers.Contract | undefined;
   nfpmContractRead: Contract | undefined;
+  poolContractRead: Contract | undefined;
 };
 
 type btnProps = {
@@ -40,21 +48,6 @@ type infoMsgProps = {
   message: string;
 };
 
-const positionDefault = {
-  lpTokenId: 0,
-  poolId: "",
-  liquidity: "0.00",
-  tickLower: 0,
-  tickLowerPrice0: 1,
-  tickLowerPrice1: 1,
-  tickUpper: 0,
-  tickUpperPrice0: 1,
-  tickUpperPrice1: 1,
-  incetiveId: "",
-  reward: 0,
-  status: StakeStatus.empty,
-};
-
 const Rewards = ({
   ownerAddress,
   signer,
@@ -62,17 +55,19 @@ const Rewards = ({
   stakerContractRead,
   nfpmContract,
   nfpmContractRead,
+  poolContractRead,
 }: props) => {
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
+  const [cumulativePrice, setCumulativePrice] = useState(0);
   const [availableReward, setAvailableReward] = useState(0);
   const [showClaim, setShowClaim] = useState(false);
 
   const OWNER_POSITIONS = gql`
     query ownerPools($owner: String!) {
-      positions(orderBy: id, where: { owner: $owner }) {
+      positions(orderBy: id, where: { owner: $owner, liquidity_gt: 0 }) {
         id
         poolAddress
         tickLower {
@@ -102,9 +97,20 @@ const Rewards = ({
     }
     setEthTcapIncentive(ethTcapPool.incentives);
     const ethPositions = new Array<PositionType>();
+
+    // Read pool price
+    const poolObserveCall = await poolContractRead?.observe([0, 10]);
+    // @ts-ignore
+    const [observations] = await signer.ethcallProvider?.all([poolObserveCall]);
+    const tickCumulative0 = observations.tickCumulatives[0];
+    const tickCumulative1 = observations.tickCumulatives[1];
+
+    const currentCumPrice = calculateCumulativePrice(tickCumulative0, tickCumulative1, 10);
+    setCumulativePrice(currentCumPrice);
+
     positionsData.positions.forEach(async (p: any) => {
       if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
-        const position = { ...positionDefault };
+        const position = { ...positionDefaultValues };
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
         position.lpTokenId = p.id;
         position.poolId = p.poolAddress;
@@ -152,6 +158,12 @@ const Rewards = ({
         } else if (nfpAddress.toLowerCase() !== UNIV3.stakerAddress.toLowerCase()) {
           position.status = StakeStatus.not_approved;
         }
+
+        // Check if it is in range
+        position.priceInRange =
+          currentCumPrice >= position.tickUpperPrice1 &&
+          currentCumPrice <= position.tickLowerPrice1;
+
         ethPositions.push(position);
         setEthTcapPositions([...ethPositions]);
       }
@@ -272,8 +284,26 @@ const Rewards = ({
       <Table hover className="mt-2">
         <thead>
           <th />
-          <th>Description</th>
-          <th>Range (TCAP per WETH)</th>
+          <th>
+            Position
+            <OverlayTrigger
+              key="top"
+              placement="right"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-position" className="univ3-status-tooltip">
+                  Position Min and Max price represents TCAP per WETH. <br />
+                  Current price is{" "}
+                  <span className={StakeStatus.staked}>
+                    {numberFormatStr(cumulativePrice.toString(), 4, 4)}
+                  </span>{" "}
+                  TCAP per WETH
+                </Tooltip>
+              }
+            >
+              <Button variant="dark">?</Button>
+            </OverlayTrigger>
+          </th>
           <th className="status">
             Status
             <OverlayTrigger
@@ -290,6 +320,8 @@ const Rewards = ({
                   stake to earn rewards. <br />
                   <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
                   rewards. <br />
+                  <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
+                  rewards beacause the price is out of your position range.
                 </Tooltip>
               }
             >
@@ -323,26 +355,32 @@ const Rewards = ({
                   <WETHIcon className="weth" />
                   <TcapIcon className="tcap" />
                 </td>
-                <td>
-                  <a target="_blank" rel="noreferrer" href={lpUrl()}>
-                    TCAP/WETH Pool <br /> <small> Uniswap </small>
-                  </a>
-                </td>
-                <td>
-                  <div className="min-range">
-                    <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
+                <td className="position">
+                  <div className="ranges">
+                    <div className="min-range">
+                      <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
+                    </div>
+                    <FaArrowsAltH />
+                    <div className="max-range">
+                      <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
+                    </div>
                   </div>
-                  <div className="max-range">
-                    <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
+                  <div className="description">
+                    <span className="tokens">TCAP/WETH Pool</span>
+                    <small>Uniswap</small>
                   </div>
                 </td>
                 <td>
                   <div className="status">
-                    <span className={position.status}>
-                      {position.status === StakeStatus.not_approved
-                        ? "Pending"
-                        : capitalize(position.status)}
-                    </span>
+                    {position.priceInRange ? (
+                      <span className={position.status}>
+                        {position.status === StakeStatus.not_approved
+                          ? "Pending"
+                          : capitalize(position.status)}
+                      </span>
+                    ) : (
+                      <span className={StakeStatus.out_range}>Out of range</span>
+                    )}
                   </div>
                 </td>
                 <td className="number">

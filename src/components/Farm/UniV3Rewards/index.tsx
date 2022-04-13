@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 import UniswapV3Staker from "../../../contracts/UniswapV3Staker.json";
 import NonfungiblePositionManager from "../../../contracts/NonfungiblePositionManager.json";
+import UniV3Pool from "../../../contracts/UniV3Pool.json";
 import NetworkContext from "../../../state/NetworkContext";
 import { SignerContext } from "../../../state/SignerContext";
 import { NETWORKS } from "../../../utils/constants";
@@ -29,6 +30,7 @@ const UniV3Rewards = ({ signer }: props) => {
   const [stakerContractRead, setStakerContractRead] = useState<Contract | undefined>();
   const [nfpmContract, setNfpmContract] = useState<ethers.Contract | undefined>();
   const [nfpmContractRead, setNfpmContractRead] = useState<Contract | undefined>();
+  const [poolContractRead, setPoolContractRead] = useState<Contract | undefined>();
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
       process.env.REACT_APP_NETWORK_ID === "1"
@@ -62,11 +64,13 @@ const UniV3Rewards = ({ signer }: props) => {
           NonfungiblePositionManager,
           signer.signer
         );
+        const poolRead = new Contract(UNIV3.rinkeby.tcapPool.id, toFragment(UniV3Pool));
 
         setStakerContractRead(stakerRead);
         setStakerContract(staker);
         setNfpmContract(nfpm);
         setNfpmContractRead(nfpmRead);
+        setPoolContractRead(poolRead);
         const oAddress = await signer.signer.getAddress();
         setOwnerAddress(oAddress);
       }
@@ -84,6 +88,7 @@ const UniV3Rewards = ({ signer }: props) => {
         stakerContractRead={stakerContractRead}
         nfpmContract={nfpmContract}
         nfpmContractRead={nfpmContractRead}
+        poolContractRead={poolContractRead}
       />
     </ApolloProvider>
   );

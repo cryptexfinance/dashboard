@@ -1,5 +1,5 @@
 import React from "react";
-import { ethers, utils } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
 import toasty from "../assets/images/toasty.png";
@@ -397,4 +397,18 @@ export const numberFormatStr = (
     return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
   }
   return numberFormat.format(parseFloat(value));
+};
+
+// token0 = TCAP, and token1 = WETH
+export const calculateCumulativePrice = (
+  tickCumulative0: BigNumber,
+  tickCumulative1: BigNumber,
+  timeElapsed: number
+): number => {
+  const difference = tickCumulative1.sub(tickCumulative0);
+  const tickReading = difference.div(BigNumber.from(timeElapsed));
+  // p(i) = 1.0001**i
+  const price = 1.0001 ** tickReading.toNumber();
+
+  return price;
 };

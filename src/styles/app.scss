@@ -302,7 +302,10 @@ html,
     text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
   }
   .not_approved {
-    text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
+    text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
+  }
+  .out_range {
+    text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
   }
 }
 
