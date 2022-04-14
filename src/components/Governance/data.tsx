@@ -136,7 +136,7 @@ export const delegatorsInfo = [
     address: "0x3DE2EE1A6f7397653C8C7981ca7473487dE30c39",
     name: "Noon",
     eth_name: "0x3DE2EE1A6f7397653C8C7981ca7473487dE30c39",
-    image: "",
+    image: "noontide.png",
     expertise: ["Brand", "Market and Customer Analysis"],
     why: "My academic background is in logical analysis and psychology. My professional expertise is market management and customer analysis via bleeding edge psychometric science in conjunction with psychoanalytic pragmatics.My essential aim is to ensure that the Cryptex system is continually moving towards a higher intrinsic value to the crypto community through rigorous analysis of its potential use cases. I believe Cryptex has not only the potential to become a fundamental institution of the future of finance, but it is incumbent upon it to do so as a consequence of its profoundly innovative architecture.What are my principles?1. My first and foremost priority is the development of potential use cases for the Cryptex system2. Priority two is the in-depth analysis of the needs of the Crypto community as it pertains to the potential use cases of the Cryptex System that are most desirable to it3. Priority three is ensuring the long term stability and profitability of Cryptex as a decentralized platform through",
     discord: "Noon#0954",
