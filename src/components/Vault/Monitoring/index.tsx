@@ -13,6 +13,7 @@ import NetworkContext from "../../../state/NetworkContext";
 import OraclesContext from "../../../state/OraclesContext";
 import SignerContext from "../../../state/SignerContext";
 import vaultsContext from "../../../state/VaultsContext";
+import hardVaultsContext from "../../../state/HardVaultsContext";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import {
   getRatio2,
@@ -66,6 +67,7 @@ export const Monitoring = () => {
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const vaults = useContext(vaultsContext);
+  const hardVaults = useContext(hardVaultsContext);
   const signer = useContext(SignerContext);
   const [skipQuery, setSkipQuery] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
@@ -149,6 +151,7 @@ export const Monitoring = () => {
     "debt " +
     "currentRatio " +
     "tokenSymbol " +
+    "hardVault " +
     "blockTS " +
     "} " +
     "}";
@@ -171,9 +174,11 @@ export const Monitoring = () => {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
         const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+        const usdcOraclePriceCall = await oracles.usdcOracleRead?.getLatestAnswer();
         ethcalls.push(wethOraclePriceCall);
         ethcalls.push(aaveOraclePriceCall);
         ethcalls.push(linkOraclePriceCall);
+        ethcalls.push(usdcOraclePriceCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
@@ -200,11 +205,18 @@ export const Monitoring = () => {
       let uniOraclePrice = BigNumber.from(0);
       let maticOraclePrice = BigNumber.from(0);
       let wbtcOraclePrice = BigNumber.from(0);
+      let usdcOraclePrice = BigNumber.from(0);
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
-        [tcapOraclePrice, daiOraclePrice, wethOraclePrice, aaveOraclePrice, linkOraclePrice] =
-          await signer.ethcallProvider?.all(ethcalls);
+        [
+          tcapOraclePrice,
+          daiOraclePrice,
+          wethOraclePrice,
+          aaveOraclePrice,
+          linkOraclePrice,
+          usdcOraclePrice,
+        ] = await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
         [
@@ -231,6 +243,7 @@ export const Monitoring = () => {
         snxOraclePrice: ethers.utils.formatEther(snxOraclePrice.mul(10000000000)),
         maticOraclePrice: ethers.utils.formatEther(maticOraclePrice.mul(10000000000)),
         wbtcOraclePrice: ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000)),
+        usdcOraclePrice: ethers.utils.formatEther(usdcOraclePrice.mul(10000000000)),
       });
       setPricesUpdated(true);
     }
@@ -245,9 +258,15 @@ export const Monitoring = () => {
         const wethRatioCall = await vaults.wethVaultRead?.ratio();
         const aaveRatioCall = await vaults.aaveVaultRead?.ratio();
         const linkRatioCall = await vaults.linkVaultRead?.ratio();
+        const hardWethRatioCall = await hardVaults.wethVaultRead?.ratio();
+        const hardDaiRatioCall = await hardVaults.daiVaultRead?.ratio();
+        const hardUsdcRatioCall = await hardVaults.usdcVaultRead?.ratio();
         ethcalls.push(wethRatioCall);
         ethcalls.push(aaveRatioCall);
         ethcalls.push(linkRatioCall);
+        ethcalls.push(hardWethRatioCall);
+        ethcalls.push(hardDaiRatioCall);
+        ethcalls.push(hardUsdcRatioCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
         const wethRatioCall = await vaults.wethVaultRead?.ratio();
@@ -273,10 +292,14 @@ export const Monitoring = () => {
       let uniRatio = 0;
       let maticRatio = 0;
       let wbtcRatio = 0;
+      let hardEthRatio = 0;
+      let hardDaiRatio = 0;
+      let hardUsdcRatio = 0;
 
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
-        [daiRatio, ethRatio, aaveRatio, linkRatio] = await signer.ethcallProvider?.all(ethcalls);
+        [daiRatio, ethRatio, aaveRatio, linkRatio, hardEthRatio, hardDaiRatio, hardUsdcRatio] =
+          await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
         [daiRatio, ethRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
@@ -296,6 +319,10 @@ export const Monitoring = () => {
         snxRatio,
         maticRatio,
         wbtcRatio,
+        hardEthRatio,
+        hardWethRatio: hardEthRatio,
+        hardDaiRatio,
+        hardUsdcRatio,
       });
     }
   };
@@ -330,23 +357,38 @@ export const Monitoring = () => {
       case "WBTC":
         price = oraclePrices?.wbtcOraclePrice || "0";
         break;
+      case "USDC":
+        price = oraclePrices?.usdcOraclePrice || "0";
+        break;
       default:
         break;
     }
     return price;
   };
 
-  const getMinRatio = (symbol: string) => {
+  const getMinRatio = (symbol: string, isHardVault: boolean) => {
     let minRatio = 200;
     switch (symbol) {
       case "ETH":
-        minRatio = vaultsRatio?.ethRatio || 200;
+        if (isHardVault) {
+          minRatio = vaultsRatio?.hardEthRatio || 1100;
+        } else {
+          minRatio = vaultsRatio?.ethRatio || 200;
+        }
         break;
       case "WETH":
-        minRatio = vaultsRatio?.ethRatio || 200;
+        if (isHardVault) {
+          minRatio = vaultsRatio?.hardWethRatio || 110;
+        } else {
+          minRatio = vaultsRatio?.ethRatio || 200;
+        }
         break;
       case "DAI":
-        minRatio = vaultsRatio?.daiRatio || 200;
+        if (isHardVault) {
+          minRatio = vaultsRatio?.hardDaiRatio || 110;
+        } else {
+          minRatio = vaultsRatio?.daiRatio || 200;
+        }
         break;
       case "AAVE":
         minRatio = vaultsRatio?.aaveRatio || 200;
@@ -365,6 +407,9 @@ export const Monitoring = () => {
         break;
       case "WBTC":
         minRatio = vaultsRatio?.wbtcRatio || 200;
+        break;
+      case "USDC":
+        minRatio = vaultsRatio?.hardUsdcRatio || 110;
         break;
       default:
         break;
@@ -461,14 +506,15 @@ export const Monitoring = () => {
   const calculateVaultData = (
     collateralWei: ethers.BigNumberish,
     debtWei: ethers.BigNumberish,
-    symbol: string
+    symbol: string,
+    isHardVault: boolean
   ) => {
     const collateralText = ethers.utils.formatEther(collateralWei);
     const debtText = ethers.utils.formatEther(debtWei);
     const collateralPrice = getCollateralPrice(symbol);
     const collateralUSD = toUSD(collateralText, collateralPrice);
     const debtUSD = toUSD(debtText, oraclePrices?.tcapOraclePrice || "0");
-    const minRatio = getMinRatio(symbol);
+    const minRatio = getMinRatio(symbol, isHardVault);
     const ratio = getRatio2(
       collateralText,
       collateralPrice,
@@ -498,7 +544,7 @@ export const Monitoring = () => {
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
-        calculateVaultData(v.collateral, v.debt, v.tokenSymbol);
+        calculateVaultData(v.collateral, v.debt, v.tokenSymbol, v.hardVault);
 
       let addVault = true;
       if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
@@ -507,7 +553,7 @@ export const Monitoring = () => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
-      if (addVault && v.tokenSymbol !== "WBTC") {
+      if (addVault && v.tokenSymbol !== "WBTC" && v.tokenSymbol !== "USDC") {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -529,6 +575,7 @@ export const Monitoring = () => {
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
+          isHardVault: v.hardVault,
           netReward: 0,
           status,
           blockTS: v.blockTS,
@@ -655,9 +702,16 @@ export const Monitoring = () => {
 
   const updateLiquidatedVault = async (index: number, symbol: string) => {
     let currentVault = vaults?.wethVault;
+    if (vaultList[index].isHardVault) {
+      currentVault = hardVaults?.wethVault;
+    }
     switch (symbol) {
       case "DAI":
-        currentVault = vaults?.daiVault;
+        if (vaultList[index].isHardVault) {
+          currentVault = hardVaults?.daiVault;
+        } else {
+          currentVault = vaults?.daiVault;
+        }
         break;
       case "AAVE":
         currentVault = vaults?.aaveVault;
@@ -677,6 +731,9 @@ export const Monitoring = () => {
       case "WBTC":
         currentVault = vaults?.wbtcVault;
         break;
+      case "USDC":
+        currentVault = hardVaults?.usdcVault;
+        break;
       default:
         break;
     }
@@ -684,7 +741,7 @@ export const Monitoring = () => {
       BigNumber.from(vaultList[index].id)
     );
     const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
-      calculateVaultData(collateral, debt, symbol);
+      calculateVaultData(collateral, debt, symbol, vaultList[index].isHardVault);
     const allVaults = vaultList;
     const v = {
       id: vaultId,
@@ -695,6 +752,7 @@ export const Monitoring = () => {
       debtUsd: debtUSD.toFixed(2),
       ratio,
       minRatio: minRatio.toString(),
+      isHardVault: vaultList[index].isHardVault,
       netReward: 0,
       status,
       blockTS: vaultList[index].blockTS,

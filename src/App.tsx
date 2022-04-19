@@ -155,6 +155,18 @@ const App = () => {
       currentSigner
     );
     hardVaults.setCurrentWETHVault(currentHardWETHVault);
+    const currentHardDAIVault = new ethers.Contract(
+      contracts.HardDaiVaultHandler.address,
+      contracts.HardDaiVaultHandler.abi,
+      currentSigner
+    );
+    hardVaults.setCurrentDAIVault(currentHardDAIVault);
+    const currentHardUSDCVault = new ethers.Contract(
+      contracts.HardUSDCVaultHandler.address,
+      contracts.HardUSDCVaultHandler.abi,
+      currentSigner
+    );
+    hardVaults.setCurrentUSDCVault(currentHardUSDCVault);
 
     const currentAVEEVaultRead = new Contract(
       contracts.AaveVaultHandler.address,
@@ -166,6 +178,16 @@ const App = () => {
       toFragment(contracts.HardWETHVaultHandler.abi)
     );
     hardVaults.setCurrentWETHVaultRead(currentHardWETHVaultRead);
+    const currentHardDAIVaultRead = new Contract(
+      contracts.HardDaiVaultHandler.address,
+      toFragment(contracts.HardDaiVaultHandler.abi)
+    );
+    hardVaults.setCurrentDAIVaultRead(currentHardDAIVaultRead);
+    const currentHardUSDCVaultRead = new Contract(
+      contracts.HardUSDCVaultHandler.address,
+      toFragment(contracts.HardUSDCVaultHandler.abi)
+    );
+    hardVaults.setCurrentUSDCVaultRead(currentHardUSDCVaultRead);
 
     // Tokens
     const currentAAVEToken = new ethers.Contract(
@@ -174,9 +196,17 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentAAVEToken(currentAAVEToken);
+    const currentUSDCToken = new ethers.Contract(
+      contracts.USDC.address,
+      contracts.USDC.abi,
+      currentSigner
+    );
+    tokens.setCurrentUSDCToken(currentUSDCToken);
 
     const currentAAVETokenRead = new Contract(contracts.AAVE.address, contracts.AAVE.abi);
     tokens.setCurrentAAVETokenRead(currentAAVETokenRead);
+    const currentUSDCTokenRead = new Contract(contracts.USDC.address, contracts.USDC.abi);
+    tokens.setCurrentUSDCTokenRead(currentUSDCTokenRead);
 
     // Set Rewards
     const currentWETHReward = new ethers.Contract(
@@ -247,11 +277,22 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentAAVEOracle(currentAAVEOracle);
+    const currentUSDCOracle = new ethers.Contract(
+      contracts.USDCOracle.address,
+      contracts.USDCOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentUSDCOracle(currentUSDCOracle);
     const currentAAVEOracleRead = new Contract(
       contracts.AaveOracle.address,
       contracts.AaveOracle.abi
     );
     oracles.setCurrentAAVEOracleRead(currentAAVEOracleRead);
+    const currentUSDCOracleRead = new Contract(
+      contracts.USDCOracle.address,
+      contracts.USDCOracle.abi
+    );
+    oracles.setCurrentUSDCOracleRead(currentUSDCOracleRead);
 
     // Set Governance
     const currentDelegatorFactory = new ethers.Contract(

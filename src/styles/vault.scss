@@ -232,6 +232,10 @@
         width: 1.3rem;
         filter: drop-shadow(0px 0px 5px $highlight);
       }
+      &.usdc.small {
+        margin-top: -5px;
+        width: 1.3rem;
+      }
     }
   }
 
@@ -402,6 +406,10 @@
             width: 1.5rem;
             margin-top: -3px;
           }
+          &.usdc {
+            margin-top: 5px;
+            width: 1.7rem;
+          }
         }
       }
 
@@ -539,6 +547,10 @@
           margin-top: -3px;
           width: 1.5rem;
           filter: drop-shadow(0px 0px 5px $highlight);
+        }
+        &.usdc.small {
+          margin-top: -5px;
+          width: 1.7rem;
         }
       }
     }
