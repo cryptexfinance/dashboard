@@ -163,9 +163,10 @@ export const getSafeMint = async (
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
-  debt: string
+  debt: string,
+  isHardMode: boolean
 ) => {
-  const r = parseFloat(ratio) + 50;
+  const r = parseFloat(ratio) + (isHardMode ? 20 : 50);
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);
@@ -185,9 +186,10 @@ export const getSafeRemoveCollateral = async (
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
-  debt: string
+  debt: string,
+  isHardMode: boolean
 ) => {
-  const r = parseFloat(ratio) + 50;
+  const r = parseFloat(ratio) + (isHardMode ? 20 : 50);
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);

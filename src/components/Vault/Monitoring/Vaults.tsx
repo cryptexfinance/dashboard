@@ -44,8 +44,7 @@ export const Vaults = ({
 }: dataType) => {
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
-  const [vaultId, setVaultId] = useState("");
-  const [vaultType, setVaultType] = useState("");
+  const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
   const [collateralSort, setCollateralSort] = useState(0);
   const [collateralUsdSort, setCollateralUsdSort] = useState(0);
   const [debtSort, setDebtSort] = useState(0);
@@ -61,10 +60,9 @@ export const Vaults = ({
     // eslint-disable-next-line
   }, [loadingLiq]); */
 
-  const liquidateVault = (index: number, id: string, type: string) => {
-    setVaultId(id);
+  const liquidateVault = (index: number, lVault: VaultsType) => {
     setVaultIndex(index);
-    setVaultType(type);
+    setLiqVault(lVault);
     setShowLiquidate(true);
   };
 
@@ -157,7 +155,7 @@ export const Vaults = ({
     }
     if (v.status === "liquidation") {
       return (
-        <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
+        <Button onClick={() => liquidateVault(index, v)}>
           <span className={v.status}>{capitalize(v.status)}</span>
         </Button>
       );
@@ -320,15 +318,13 @@ export const Vaults = ({
       <Liquidate
         show={showLiquidate}
         currentAddress={currentAddress}
-        vaultId={vaultId}
-        vaultType={vaultType}
+        liqVault={liqVault}
         onHide={() => {
-          setVaultId("");
-          setVaultType("");
+          setLiqVault(null);
           setVaultIndex(-1);
           setShowLiquidate(false);
         }}
-        refresh={() => refresh(vaultIndex, vaultType)}
+        refresh={() => refresh(vaultIndex, liqVault !== null ? liqVault.collateralSymbol : "ETH")}
       />
     </>
   );

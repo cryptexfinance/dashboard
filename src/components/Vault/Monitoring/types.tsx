@@ -46,6 +46,7 @@ export type VaultsType = {
   debtUsd: string;
   ratio: number;
   minRatio: string;
+  decimals: number;
   isHardVault: boolean;
   netReward: number;
   status: string;

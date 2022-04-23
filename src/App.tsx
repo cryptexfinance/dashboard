@@ -155,6 +155,12 @@ const App = () => {
       currentSigner
     );
     hardVaults.setCurrentWETHVault(currentHardWETHVault);
+    const currentWBTCVault = new ethers.Contract(
+      contracts.WBTCVaultHandler.address,
+      contracts.WBTCVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentWBTCVault(currentWBTCVault);
     const currentHardDAIVault = new ethers.Contract(
       contracts.HardDaiVaultHandler.address,
       contracts.HardDaiVaultHandler.abi,
@@ -178,6 +184,11 @@ const App = () => {
       toFragment(contracts.HardWETHVaultHandler.abi)
     );
     hardVaults.setCurrentWETHVaultRead(currentHardWETHVaultRead);
+    const currentWBTCVaultRead = new Contract(
+      contracts.WBTCVaultHandler.address,
+      contracts.WBTCVaultHandler.abi
+    );
+    vaults.setCurrentWBTCVaultRead(currentWBTCVaultRead);
     const currentHardDAIVaultRead = new Contract(
       contracts.HardDaiVaultHandler.address,
       toFragment(contracts.HardDaiVaultHandler.abi)
@@ -196,6 +207,12 @@ const App = () => {
       currentSigner
     );
     tokens.setCurrentAAVEToken(currentAAVEToken);
+    const currentWBTCToken = new ethers.Contract(
+      contracts.WBTC.address,
+      contracts.WBTC.abi,
+      currentSigner
+    );
+    tokens.setCurrentWBTCToken(currentWBTCToken);
     const currentUSDCToken = new ethers.Contract(
       contracts.USDC.address,
       contracts.USDC.abi,
@@ -205,6 +222,8 @@ const App = () => {
 
     const currentAAVETokenRead = new Contract(contracts.AAVE.address, contracts.AAVE.abi);
     tokens.setCurrentAAVETokenRead(currentAAVETokenRead);
+    const currentWBTCTokenRead = new Contract(contracts.WBTC.address, ERC20.abi);
+    tokens.setCurrentWBTCTokenRead(currentWBTCTokenRead);
     const currentUSDCTokenRead = new Contract(contracts.USDC.address, contracts.USDC.abi);
     tokens.setCurrentUSDCTokenRead(currentUSDCTokenRead);
 
@@ -277,6 +296,12 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentAAVEOracle(currentAAVEOracle);
+    const currentWBTCOracle = new ethers.Contract(
+      contracts.WBTCOracle.address,
+      contracts.WBTCOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentWBTCOracle(currentWBTCOracle);
     const currentUSDCOracle = new ethers.Contract(
       contracts.USDCOracle.address,
       contracts.USDCOracle.abi,
@@ -288,6 +313,11 @@ const App = () => {
       contracts.AaveOracle.abi
     );
     oracles.setCurrentAAVEOracleRead(currentAAVEOracleRead);
+    const currentWBTCOracleRead = new Contract(
+      contracts.WBTCOracle.address,
+      contracts.WBTCOracle.abi
+    );
+    oracles.setCurrentWBTCOracleRead(currentWBTCOracleRead);
     const currentUSDCOracleRead = new Contract(
       contracts.USDCOracle.address,
       contracts.USDCOracle.abi

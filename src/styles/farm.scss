@@ -392,9 +392,16 @@
             }
             .ranges {
               display: flex;
+              width: 82%;
               flex-direction: row;
               align-items: center;
               justify-content: space-between;
+              @media (max-width: 1500px) {
+                width: 90%;
+              }
+              @media (max-width: 1400px) {
+                width: 100%;
+              }
               .min-range {
                 font-size: 1rem;
               }

@@ -19,7 +19,7 @@ import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as UNIIcon } from "../assets/images/graph/uni.svg";
 import { ReactComponent as SNXIcon } from "../assets/images/graph/snx.svg";
-import { ReactComponent as WBTCIcon } from "../assets/images/graph/wbtc.svg";
+import { ReactComponent as WBTCIcon } from "../assets/images/graph/usdc.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
 import {

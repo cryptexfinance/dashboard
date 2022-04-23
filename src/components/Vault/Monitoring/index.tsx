@@ -59,6 +59,8 @@ const totalsDefault = {
 type liqVaultsTempType = {
   vaultId: string;
   vaultType: string;
+  decimals: number;
+  hardVault: boolean;
 };
 
 const showAllVaults = true;
@@ -153,6 +155,11 @@ export const Monitoring = () => {
     "tokenSymbol " +
     "hardVault " +
     "blockTS " +
+    "underlyingProtocol { " +
+    "underlyingToken { " +
+    "decimals " +
+    "} " +
+    "}" +
     "} " +
     "}";
 
@@ -437,15 +444,29 @@ export const Monitoring = () => {
     }
   };
 
-  const calculateNetRewardUsd = async (vaultId: string, vaultType: string) => {
+  const calculateNetRewardUsd = async (
+    vaultId: string,
+    vaultType: string,
+    isHardVault: boolean,
+    decimals: number
+  ) => {
     let cVault = vaults.wethVault;
     let cVaultRead = vaults.wethVaultRead;
     let vaultPrice = oraclePrices?.wethOraclePrice;
+    if (isHardVault) {
+      cVault = hardVaults.wethVault;
+      cVaultRead = hardVaults.wethVaultRead;
+    }
 
     switch (vaultType) {
       case "DAI":
-        cVault = vaults.daiVault;
-        cVaultRead = vaults.daiVaultRead;
+        if (isHardVault) {
+          cVault = hardVaults.daiVault;
+          cVaultRead = hardVaults.daiVaultRead;
+        } else {
+          cVault = vaults.daiVault;
+          cVaultRead = vaults.daiVaultRead;
+        }
         vaultPrice = oraclePrices?.daiOraclePrice;
         break;
       case "AAVE":
@@ -478,9 +499,19 @@ export const Monitoring = () => {
         cVaultRead = vaults.wbtcVaultRead;
         vaultPrice = oraclePrices?.wbtcOraclePrice;
         break;
+      case "USDC":
+        cVault = hardVaults.usdcVault;
+        cVaultRead = hardVaults.usdcVaultRead;
+        vaultPrice = oraclePrices?.usdcOraclePrice;
+        break;
       default:
-        cVault = vaults.wethVault;
-        cVaultRead = vaults.wethVaultRead;
+        if (isHardVault) {
+          cVault = hardVaults.wethVault;
+          cVaultRead = hardVaults.wethVaultRead;
+        } else {
+          cVault = vaults.wethVault;
+          cVaultRead = vaults.wethVaultRead;
+        }
         vaultPrice = oraclePrices?.wethOraclePrice;
         break;
     }
@@ -491,7 +522,7 @@ export const Monitoring = () => {
     const [reqTcap, liqReward] = await signer.ethcallProvider?.all([reqTcapCall, liqRewardCall]);
 
     const reqTcapText = ethers.utils.formatEther(reqTcap);
-    const liqRewardText = ethers.utils.formatEther(liqReward);
+    const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
     const currentLiqFee = await cVault?.getFee(reqTcap);
     const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
     const ethFee = ethers.utils.formatEther(increasedFee);
@@ -507,14 +538,16 @@ export const Monitoring = () => {
     collateralWei: ethers.BigNumberish,
     debtWei: ethers.BigNumberish,
     symbol: string,
-    isHardVault: boolean
+    isHardVault: boolean,
+    decimals: number
   ) => {
-    const collateralText = ethers.utils.formatEther(collateralWei);
+    const collateralText = ethers.utils.formatUnits(collateralWei, decimals);
     const debtText = ethers.utils.formatEther(debtWei);
     const collateralPrice = getCollateralPrice(symbol);
     const collateralUSD = toUSD(collateralText, collateralPrice);
     const debtUSD = toUSD(debtText, oraclePrices?.tcapOraclePrice || "0");
     const minRatio = getMinRatio(symbol, isHardVault);
+
     const ratio = getRatio2(
       collateralText,
       collateralPrice,
@@ -543,8 +576,9 @@ export const Monitoring = () => {
     // setLiqLoaded(currentStatus !== VAULT_STATUS.liquidation);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
+      const cVaultDecimals = v.underlyingProtocol.underlyingToken.decimals;
       const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
-        calculateVaultData(v.collateral, v.debt, v.tokenSymbol, v.hardVault);
+        calculateVaultData(v.collateral, v.debt, v.tokenSymbol, v.hardVault, cVaultDecimals);
 
       let addVault = true;
       if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
@@ -553,7 +587,7 @@ export const Monitoring = () => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
-      if (addVault && v.tokenSymbol !== "WBTC" && v.tokenSymbol !== "USDC") {
+      if (addVault && v.tokenSymbol !== "WBTC") {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -563,6 +597,8 @@ export const Monitoring = () => {
           vLiquidables.push({
             vaultId: v.vaultId,
             vaultType: v.tokenSymbol,
+            decimals: cVaultDecimals,
+            hardVault: v.hardVault,
           });
         }
 
@@ -575,6 +611,7 @@ export const Monitoring = () => {
           debtUsd: debtUSD.toFixed(2),
           ratio,
           minRatio: minRatio.toString(),
+          decimals: cVaultDecimals,
           isHardVault: v.hardVault,
           netReward: 0,
           status,
@@ -595,7 +632,7 @@ export const Monitoring = () => {
     } else {
       const loadNetReward = async () => {
         vLiquidables.forEach((l, index) => {
-          calculateNetRewardUsd(l.vaultId, l.vaultType).then((result) => {
+          calculateNetRewardUsd(l.vaultId, l.vaultType, l.hardVault, l.decimals).then((result) => {
             const newA = [...vData];
             newA[index].netReward = result;
             setVaultList(newA);
@@ -741,7 +778,13 @@ export const Monitoring = () => {
       BigNumber.from(vaultList[index].id)
     );
     const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
-      calculateVaultData(collateral, debt, symbol, vaultList[index].isHardVault);
+      calculateVaultData(
+        collateral,
+        debt,
+        symbol,
+        vaultList[index].isHardVault,
+        vaultList[index].decimals
+      );
     const allVaults = vaultList;
     const v = {
       id: vaultId,
@@ -752,6 +795,7 @@ export const Monitoring = () => {
       debtUsd: debtUSD.toFixed(2),
       ratio,
       minRatio: minRatio.toString(),
+      decimals: vaultList[index].decimals,
       isHardVault: vaultList[index].isHardVault,
       netReward: 0,
       status,

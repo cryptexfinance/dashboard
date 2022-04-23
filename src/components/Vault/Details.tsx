@@ -389,7 +389,7 @@ const Details = ({ address, t }: props) => {
       let currentVaultData: any;
       // Removed GRAPH
       // if data is empty load vault data from contract
-      const graphBlock = vaultData._meta.block.number;
+      /* const graphBlock = vaultData._meta.block.number;
       let currentBlock = await provider.getBlockNumber();
       currentBlock -= 10;
       if (
@@ -413,6 +413,15 @@ const Details = ({ address, t }: props) => {
             debt: vault.Debt,
           };
         }
+      } */
+      const vaultID = await currentVault.userToVault(address);
+      if (!vaultID.eq(0)) {
+        const vault = await currentVault.vaults(vaultID);
+        currentVaultData = {
+          vaultId: vaultID,
+          collateral: vault.Collateral,
+          debt: vault.Debt,
+        };
       }
 
       if (vaultType !== "ETH") {
@@ -459,14 +468,23 @@ const Details = ({ address, t }: props) => {
         setSelectedVaultId(vaultId);
 
         if (!allowance.isZero() || vaultType === "ETH") {
+          const safeValue = isHardMode() ? 20 : 50;
+          const warnValue = isHardMode() ? 10 : 30;
+
           setMinRatio(currentMinRatio.toString());
           setIsApproved(true);
           setVaultRatio(currentRatio.toString());
           if (currentRatio.toString() === "0") {
             setVaultStatus("N/A");
-          } else if (currentRatio.toString() >= parseFloat(currentMinRatio.toString()) + 50) {
+          } else if (
+            currentRatio.toString() >=
+            parseFloat(currentMinRatio.toString()) + safeValue
+          ) {
             setVaultStatus("safe");
-          } else if (currentRatio.toString() >= parseFloat(currentMinRatio.toString()) + 30) {
+          } else if (
+            currentRatio.toString() >=
+            parseFloat(currentMinRatio.toString()) + warnValue
+          ) {
             setVaultStatus("warning");
           } else {
             setVaultStatus("danger");
@@ -580,7 +598,10 @@ const Details = ({ address, t }: props) => {
   };
 
   const changeVault = async (newRatio: number, reset = false) => {
+    const safeValue = isHardMode() ? 20 : 50;
+    const warnValue = isHardMode() ? 10 : 30;
     let r = newRatio;
+
     if (reset) {
       r = parseFloat(tempRatio);
       setVaultRatio(tempRatio);
@@ -596,9 +617,9 @@ const Details = ({ address, t }: props) => {
 
     if (r === 0) {
       setVaultStatus(t("vault.status.na"));
-    } else if (r >= parseFloat(minRatio) + 50) {
+    } else if (r >= parseFloat(minRatio) + safeValue) {
       setVaultStatus(t("vault.status.safe"));
-    } else if (r >= parseFloat(minRatio) + 30) {
+    } else if (r >= parseFloat(minRatio) + warnValue) {
       setVaultStatus(t("vault.status.warning"));
     } else if (r >= parseFloat(minRatio)) {
       setVaultStatus(t("vault.status.danger"));
@@ -807,7 +828,8 @@ const Details = ({ address, t }: props) => {
       vaultCollateral,
       currentPrice,
       currentTcapPrice,
-      vaultDebt
+      vaultDebt,
+      isHardMode()
     );
     if (selectedVaultDecimals === 8) {
       collateralToRemove = parseFloat(collateralToRemove.toFixed(8)) - 0.00000001;
@@ -825,10 +847,6 @@ const Details = ({ address, t }: props) => {
   };
 
   const mintTCAP = async () => {
-    /* tokens.daiToken?.mint(
-      "0xF6a16a48099497C59e8abEAa37Bb37B2F9B793d4",
-      BigNumber.from("100000000000")
-    ); */
     if (mintTxt) {
       setBtnDisabled(true);
       try {
@@ -860,7 +878,8 @@ const Details = ({ address, t }: props) => {
       vaultCollateral,
       currentPrice,
       currentTcapPrice,
-      vaultDebt
+      vaultDebt,
+      isHardMode()
     );
     setMintTxt(safeMint.toString());
     let usd = toUSD(currentTcapPrice, safeMint.toString());

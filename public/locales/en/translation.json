@@ -51,7 +51,7 @@
   "vault": {
     "warning": "",
     "loading": "Loading Vault",
-    "title1": "The Vault",
+    "title1": "Vaults",
     "subtitle1": "Select your Collateral",
     "no-connected": "No wallet connected. Please Connect your wallet to Create a Vault and approve your collateral to start minting TCAP tokens.",
     "approve": "Approve Vault",
@@ -127,7 +127,8 @@
     "form": {
       "create": "Create Crypt Keeper",
       "keeper": "Keeper eth name or address",
-      "name": "Name"
+      "name": "Name",
+      "why": "Why should users delegate to you?"
     },
     "success": {
       "title": "Crypt. Keepers",
