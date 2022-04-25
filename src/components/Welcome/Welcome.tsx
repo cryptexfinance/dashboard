@@ -44,17 +44,6 @@ const Welcome = ({ signerAddress, loadingContracts }: props) => {
   const tokens = useContext(TokensContext);
   const oracles = useContext(OraclesContext);
 
-  /*
-  const TCAP_PRICE = gql`
-    query {
-      oracles(first: 1, orderBy: updatedAt, orderDirection: desc) {
-        answer
-      }
-    }
-  `;
-
-  const { data } = useQuery(TCAP_PRICE);
- */
   useEffect(() => {
     const loadAddress = async () => {
       if (oracles.tcapOracleRead) {

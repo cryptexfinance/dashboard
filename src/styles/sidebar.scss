@@ -1,7 +1,7 @@
 @import "./colors";
 
 .sidebar {
-  width: 5rem;
+  width: 5.3rem;
   height: 100%;
   background-color: $darker;
   border-right: solid 2px $dark;
@@ -25,6 +25,13 @@
       margin-right: auto;
       display: block;
     }
+    
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: $light;
+    }
 
     a svg {
       &:hover {
@@ -39,6 +46,18 @@
     }
 
     a.active svg {
+      -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+      filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
+    }
+    .title {
+      font-size: 0.75rem;
+      margin-top: 2px;
+    }
+    .title.active {
+      -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+      filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
+    }
+    .title:hover  {
       -webkit-filter: drop-shadow(3px 3px 2px $highlight);
       filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
     }

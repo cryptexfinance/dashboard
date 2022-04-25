@@ -64,6 +64,7 @@ const Rewards = ({
   const [cumulativePrice, setCumulativePrice] = useState(0);
   const [availableReward, setAvailableReward] = useState(0);
   const [showClaim, setShowClaim] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const OWNER_POSITIONS = gql`
     query ownerPools($owner: String!) {
@@ -172,6 +173,7 @@ const Rewards = ({
 
   const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
+    pollInterval: 60000,
     notifyOnNetworkStatusChange: true,
     variables: { owner: ownerAddress.toLowerCase() },
     onError: () => {
@@ -180,6 +182,7 @@ const Rewards = ({
     onCompleted: () => {
       if (signer.signer && ownerAddress !== "") {
         loadData(data);
+        setFirstLoad(false);
       }
     },
   });
@@ -446,7 +449,7 @@ const Rewards = ({
       <Card.Body>
         {ownerAddress !== "" ? (
           <>
-            {loading ? (
+            {loading && firstLoad ? (
               <Spinner variant="danger" className="spinner" animation="border" />
             ) : (
               <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>

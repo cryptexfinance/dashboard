@@ -68,48 +68,28 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
       <Nav className={sidebarClass()}>
         <Nav.Item className="mt-4 mb-1">{sideBarLogo()}</Nav.Item>
         <Nav.Item>
-          {active === "dashboard" ? (
-            <Link
-              to="/"
-              className="active"
-              onClick={() => {
-                setActive("dashboard");
-              }}
-            >
-              <DashboardIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/"
-              onClick={() => {
-                setActive("dashboard");
-              }}
-            >
-              <DashboardIcon />
-            </Link>
-          )}
+          <Link
+            to="/"
+            className={active === "dashboard" ? "active" : ""}
+            onClick={() => {
+              setActive("dashboard");
+            }}
+          >
+            <DashboardIcon />
+            <span className={active === "dashboard" ? "title active" : "title"}>Summary</span>
+          </Link>
         </Nav.Item>
         <Nav.Item>
-          {active === "vault" ? (
-            <Link
-              to="/vault"
-              className="active"
-              onClick={() => {
-                setActive("vault");
-              }}
-            >
-              <VaultIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/vault"
-              onClick={() => {
-                setActive("vault");
-              }}
-            >
-              <VaultIcon />
-            </Link>
-          )}
+          <Link
+            to="/vault"
+            className={active === "vault" ? "active" : ""}
+            onClick={() => {
+              setActive("vault");
+            }}
+          >
+            <VaultIcon />
+            <span className={active === "vault" ? "title active" : "title"}>Vaults</span>
+          </Link>
         </Nav.Item>
         <Nav.Item>
           <Link
@@ -120,75 +100,48 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             }}
           >
             <VaultMonitoringIcon />
+            <span className={active === "vault-monitoring" ? "title active" : "title"}>
+              Liquidate
+            </span>
           </Link>
         </Nav.Item>
         <Nav.Item>
-          {active === "farm" ? (
-            <Link
-              to="/farm"
-              className="active"
-              onClick={() => {
-                setActive("farm");
-              }}
-            >
-              <FarmIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/farm"
-              onClick={() => {
-                setActive("farm");
-              }}
-            >
-              <FarmIcon />
-            </Link>
-          )}
+          <Link
+            to="/farm"
+            className={active === "farm" ? "active" : ""}
+            onClick={() => {
+              setActive("farm");
+            }}
+          >
+            <FarmIcon />
+            <span className={active === "farm" ? "title active" : "title"}>Farm</span>
+          </Link>
         </Nav.Item>
         {isInLayer1(currentNetwork.chainId) && (
           <Nav.Item>
-            {active === "governance" ? (
-              <Link
-                to="/governance"
-                className="active"
-                onClick={() => {
-                  setActive("governance");
-                }}
-              >
-                <StakeIcon className="governance" />
-              </Link>
-            ) : (
-              <Link
-                to="/governance"
-                onClick={() => {
-                  setActive("governance");
-                }}
-              >
-                <StakeIcon className="governance" />
-              </Link>
-            )}
+            <Link
+              to="/governance"
+              className={active === "governance" ? "active" : ""}
+              onClick={() => {
+                setActive("governance");
+              }}
+            >
+              <StakeIcon className="governance" />
+              <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
+            </Link>
           </Nav.Item>
         )}
         <Nav.Item>
-          {active === "graph" ? (
-            <Link
-              to="/graph"
-              className="active"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/graph"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
-            </Link>
-          )}
+          <Link
+            to="/graph"
+            className={active === "graph" ? "active" : ""}
+            onClick={() => {
+              setActive("graph");
+            }}
+          >
+            <GraphIcon />
+            <span className={active === "graph" ? "title active" : "title"}>Stats</span>
+          </Link>
         </Nav.Item>
         <Nav.Item>
           <Link
@@ -200,6 +153,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             }}
           >
             <LogoutIcon />
+            <span className="title">Disconnect</span>
           </Link>
         </Nav.Item>
       </Nav>

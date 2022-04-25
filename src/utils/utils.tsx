@@ -391,14 +391,17 @@ export const numberFormatStr = (
   minDecimals: number | undefined,
   maxDecimals: number | undefined
 ) => {
-  const numberFormat = new Intl.NumberFormat([], {
-    minimumFractionDigits: minDecimals,
-    maximumFractionDigits: maxDecimals,
-  });
-  if (minDecimals) {
-    return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
+  if (parseFloat(value) < 103849213185522) {
+    const numberFormat = new Intl.NumberFormat([], {
+      minimumFractionDigits: minDecimals,
+      maximumFractionDigits: maxDecimals,
+    });
+    if (minDecimals) {
+      return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
+    }
+    return numberFormat.format(parseFloat(value));
   }
-  return numberFormat.format(parseFloat(value));
+  return Number.parseFloat(value).toExponential(minDecimals);
 };
 
 // token0 = TCAP, and token1 = WETH
