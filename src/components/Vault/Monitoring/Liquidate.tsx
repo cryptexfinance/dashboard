@@ -289,7 +289,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               <Form.Label>Amount of TCAP</Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
-                  MAX REWARD
+                  MIN REQUIRED
                 </a>
               </Form.Label>
               <InputGroup className="liquidate-input">
