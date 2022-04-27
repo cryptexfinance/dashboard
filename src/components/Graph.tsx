@@ -81,7 +81,6 @@ const Graph = () => {
         data &&
         signer &&
         !isUndefined(tokens.tcapTokenRead) &&
-        !isUndefined(tokens.ctxPoolTokenRead) &&
         validOracles(currentNetwork.chainId || 1, oracles)
       ) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
