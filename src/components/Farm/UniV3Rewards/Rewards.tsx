@@ -68,7 +68,7 @@ const Rewards = ({
 
   const OWNER_POSITIONS = gql`
     query ownerPools($owner: String!) {
-      positions(orderBy: id, where: { owner: $owner, liquidity_gt: 0 }) {
+      positions(where: { owner: $owner, liquidity_gt: 0 }, orderBy: id) {
         id
         poolAddress
         tickLower {
@@ -263,6 +263,8 @@ const Rewards = ({
     </div>
   );
 
+  const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
+
   const RenderRewards = () => (
     <>
       <div className="rewards">
@@ -336,7 +338,7 @@ const Rewards = ({
                   <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
                   rewards. <br />
                   <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
-                  rewards beacause the price is out of your position range.
+                  rewards because the price is out of your position range.
                 </Tooltip>
               }
             >
@@ -362,7 +364,7 @@ const Rewards = ({
           <th />
         </thead>
         <tbody>
-          {ethTcapPositions.map((position, index) => {
+          {ethTcapPositions.sort(sortPositions).map((position, index) => {
             console.log("");
             return (
               <tr key={index}>
