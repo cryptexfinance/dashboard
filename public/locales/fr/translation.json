@@ -59,6 +59,8 @@
     "balance-title": "{{vault}} Solde",
     "ratio-title": "Proportion de collatéral",
     "ratio-warning": "Le ratio de collatéral doit être > {{minRatio}}% ou votre collatéral sera liquidé.",
+    "hard-mode-info": "Hard mode vaults have a min required ratio of 110%.",
+    "hard-mode-info2": "You're required to mint a minimum of 20 TCAP on hard mode.",
     "collateral": {
       "title": "Collatéral Bloqué",
       "add": "Ajouter du Collatéral",
@@ -79,7 +81,9 @@
     },
     "errors": {
       "no-collateral": "Pas assez de collatéral dans le Coffre-fort",
-      "burn-too-high": "La valeur à bruler est trop élevée"
+      "burn-too-high": "La valeur à bruler est trop élevée",
+      "min-tcap": "You need to mint a minimum of 20 TCAP on hard mode.",
+      "min-tcap2": "Afte burning the minimum amount of debt should be 20 TCAP."
     }
   },
   "pools": {

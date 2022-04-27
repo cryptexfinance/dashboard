@@ -118,45 +118,51 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
             break;
         }
         if (liqVault.id !== "" && cVault && cVaultRead) {
-          setCurrentVault(cVault);
-          const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
-          const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-          const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(
-            BigNumber.from(liqVault.id)
-          );
-          const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(liqVault.id));
-          const oraclePriceCall = await oracleRead?.getLatestAnswer();
-          const ethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+          try {
+            setCurrentVault(cVault);
+            const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
+            const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+            const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(
+              BigNumber.from(liqVault.id)
+            );
+            const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(liqVault.id));
+            const oraclePriceCall = await oracleRead?.getLatestAnswer();
+            const ethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+            // @ts-ignore
+            const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice, ethPrice] =
+              await signer.ethcallProvider?.all([
+                tcapBalanceCall,
+                tcapPriceCall,
+                reqTcapCall,
+                liqRewardCall,
+                oraclePriceCall,
+                ethOraclePriceCall,
+              ]);
+            const tcapBalanceText = ethers.utils.formatEther(balance);
+            const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
+            const reqTcapText = ethers.utils.formatEther(reqTcap);
+            const liqRewardText = ethers.utils.formatUnits(liqReward, liqVault.decimals);
+            const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
+            const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
+            const currentLiqFee = await cVault?.getFee(reqTcap);
+            const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+            const ethFee = ethers.utils.formatEther(increasedFee);
 
-          // @ts-ignore
-          const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice, ethPrice] =
-            await signer.ethcallProvider?.all([
-              tcapBalanceCall,
-              tcapPriceCall,
-              reqTcapCall,
-              liqRewardCall,
-              oraclePriceCall,
-              ethOraclePriceCall,
-            ]);
-          const tcapBalanceText = ethers.utils.formatEther(balance);
-          const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
-          const reqTcapText = ethers.utils.formatEther(reqTcap);
-          const liqRewardText = ethers.utils.formatUnits(liqReward, liqVault.decimals);
-          const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
-          const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
-          const currentLiqFee = await cVault?.getFee(reqTcap);
-          const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
-          const ethFee = ethers.utils.formatEther(increasedFee);
-
-          setTcapBalance(tcapBalanceText);
-          setTcapPrice(tcapPriceText);
-          setRequiredTcap(reqTcapText);
-          setMaxTcap(reqTcapText);
-          setMaxTcapUSD(toUSD(reqTcapText, tcapPriceText).toFixed(2));
-          setReward(liqRewardText);
-          setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
-          setBurnFee(ethFee);
-          setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
+            setTcapBalance(tcapBalanceText);
+            setTcapPrice(tcapPriceText);
+            setRequiredTcap(reqTcapText);
+            setMaxTcap(reqTcapText);
+            setMaxTcapUSD(toUSD(reqTcapText, tcapPriceText).toFixed(2));
+            setReward(liqRewardText);
+            setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
+            setBurnFee(ethFee);
+            setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
+          } catch (error) {
+            // Error happens when trying to calculate reward on a not liquidable vault
+            if (error.code !== "UNPREDICTABLE_GAS_LIMIT") {
+              console.log(error.code);
+            }
+          }
         }
       }
     }
@@ -196,7 +202,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                 { value: increasedFee }
               );
               notifyUser(tx, refresh);
-              refresh();
+              await refresh();
               setMaxTcap("");
               onHide();
             } catch (error) {

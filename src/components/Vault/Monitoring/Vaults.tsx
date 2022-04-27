@@ -3,6 +3,7 @@ import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { FaGopuram } from "react-icons/fa";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
@@ -239,7 +240,10 @@ export const Vaults = ({
             return (
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
                 <td>
-                  <div className="status">{statusTag(index, v)}</div>
+                  <div className="status">
+                    {statusTag(index, v)}
+                    {v.isHardVault && <FaGopuram className={v.status} />}
+                  </div>
                 </td>
                 <td>
                   <OverlayTrigger

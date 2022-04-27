@@ -61,6 +61,8 @@
     "balance-title": "{{vault}} 余额",
     "ratio-title": "保险库比率",
     "ratio-warning": "比率必须大于 {{minRatio}}% 以避免被清算。",
+    "hard-mode-info": "Hard mode vaults have a min required ratio of 110%.",
+    "hard-mode-info2": "You're required to mint a minimum of 20 TCAP on hard mode.",
     "collateral": {
       "title": "抵押担保品",
       "add": "添加抵押品",
@@ -82,7 +84,9 @@
     "errors": {
       "no-collateral": "保险库没有足够的抵押品",
       "burn-too-high": "销毁值太高",
-      "burn-balance-low": "Burn value is greater than your balance."
+      "burn-balance-low": "Burn value is greater than your balance.",
+      "min-tcap": "You need to mint a minimum of 20 TCAP on hard mode.",
+      "min-tcap2": "Afte burning the minimum amount of debt should be 20 TCAP."
     }
   },
   "pools": {

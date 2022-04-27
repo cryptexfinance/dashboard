@@ -1,6 +1,6 @@
 export const StakeStatus = {
   not_approved: "not_approved",
-  empty: "empty",
+  empty: "unstaked",
   deposited: "deposited",
   staked: "staked",
   out_range: "out_range",

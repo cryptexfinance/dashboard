@@ -630,6 +630,20 @@ const Details = ({ address, t }: props) => {
   };
 
   // forms
+  const isMinRequiredTcap = (amount: number, isMint: boolean): boolean => {
+    if (isHardMode()) {
+      const d = parseFloat(vaultDebt);
+      let newDebt = 0;
+      if (isMint) {
+        newDebt = amount + d;
+      } else {
+        newDebt = d - amount;
+      }
+      return newDebt >= 20 || newDebt === 0;
+    }
+    return true;
+  };
+
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddCollateralTxt(event.target.value);
     if (event.target.value !== "") {
@@ -848,22 +862,26 @@ const Details = ({ address, t }: props) => {
 
   const mintTCAP = async () => {
     if (mintTxt) {
-      setBtnDisabled(true);
-      try {
-        const amount = ethers.utils.parseEther(mintTxt);
-        const tx = await selectedVaultContract?.mint(amount);
-        notifyUser(tx, refresh);
-      } catch (error) {
-        console.error(error);
-        if (error.code === 4001) {
-          errorNotification(t("errors.tran-rejected"));
-        } else {
-          errorNotification(t("vault.errors.no-collateral"));
+      if (isMinRequiredTcap(parseFloat(mintTxt), true)) {
+        setBtnDisabled(true);
+        try {
+          const amount = ethers.utils.parseEther(mintTxt);
+          const tx = await selectedVaultContract?.mint(amount);
+          notifyUser(tx, refresh);
+        } catch (error) {
+          console.error(error);
+          if (error.code === 4001) {
+            errorNotification(t("errors.tran-rejected"));
+          } else {
+            errorNotification(t("vault.errors.no-collateral"));
+          }
         }
+        setBtnDisabled(false);
+        setMintTxt("");
+        setMintUSD("0");
+      } else {
+        errorNotification(t("vault.errors.min-tcap"));
       }
-      setBtnDisabled(false);
-      setMintTxt("");
-      setMintUSD("0");
     } else {
       errorNotification(t("errors.empty"));
     }
@@ -894,34 +912,31 @@ const Details = ({ address, t }: props) => {
 
   const burnTCAP = async () => {
     if (burnTxt) {
-      const amount = ethers.utils.parseEther(burnTxt);
-      // const currentBalanceCall = await tokens.tcapTokenRead?.balanceOf(address);
-      // @ts-ignore
-      // const [currentBalance] = await signer.ethcallProvider?.all([currentBalanceCall]);
-      // if (amount.lt(currentBalance)) {
-      setBtnDisabled(true);
-      try {
-        const currentBurnFee = await selectedVaultContract?.getFee(amount);
-        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
-        const ethFee = ethers.utils.formatEther(increasedFee);
-        setBurnFee(ethFee.toString());
-        const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
-        notifyUser(tx, refresh);
-      } catch (error) {
-        console.error(error);
-        if (error.code === 4001) {
-          errorNotification(t("errors.tran-rejected"));
-        } else {
-          errorNotification(t("vault.errors.burn-too-high"));
+      if (isMinRequiredTcap(parseFloat(burnTxt), false)) {
+        const amount = ethers.utils.parseEther(burnTxt);
+        setBtnDisabled(true);
+        try {
+          const currentBurnFee = await selectedVaultContract?.getFee(amount);
+          const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+          const ethFee = ethers.utils.formatEther(increasedFee);
+          setBurnFee(ethFee.toString());
+          const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
+          notifyUser(tx, refresh);
+        } catch (error) {
+          console.error(error);
+          if (error.code === 4001) {
+            errorNotification(t("errors.tran-rejected"));
+          } else {
+            errorNotification(t("vault.errors.burn-too-high"));
+          }
         }
+        setBtnDisabled(false);
+        setBurnTxt("");
+        setBurnUSD("0");
+        setBurnFee("0");
+      } else {
+        errorNotification(t("vault.errors.min-tcap2"));
       }
-      setBtnDisabled(false);
-      setBurnTxt("");
-      setBurnUSD("0");
-      setBurnFee("0");
-      /* } else {
-        errorNotification(t("vault.errors.burn-balance-low"));
-      } */
     } else {
       errorNotification(t("errors.empty"));
     }
@@ -1187,6 +1202,20 @@ const Details = ({ address, t }: props) => {
             </ToggleButton>
           ))}
         </ButtonGroup>
+        {isHardMode() && (
+          <OverlayTrigger
+            key="top"
+            placement="auto"
+            overlay={
+              <Tooltip id="tooltip-top" className="ttip-hard-vault">
+                {t("vault.hard-mode-info")} <br />
+                {t("vault.hard-mode-info2")}
+              </Tooltip>
+            }
+          >
+            <Button variant="dark">?</Button>
+          </OverlayTrigger>
+        )}
       </div>
       {loadingMode ? (
         <div className="loading-container">

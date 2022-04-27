@@ -90,6 +90,7 @@
       border: 1px solid #dfd1ea;
       border-radius: 5px;
       margin-bottom: 0rem !important;
+      margin-right: 0.5rem;
       input[type="radio"] {
         display: none;
       }
@@ -102,6 +103,14 @@
         background-color: $neon-highlight;
       }
     }
+  }
+
+  .alert-warning {
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 1rem;
+    height: 2rem;
+    width: 70%;
   }
 
   .dd-collateral {

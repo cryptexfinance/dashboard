@@ -266,6 +266,18 @@ const Rewards = ({
   const RenderRewards = () => (
     <>
       <div className="rewards">
+        <div className="rewards-tier">
+          <h6>Fee tier:</h6>
+          <NumberFormat
+            className="number"
+            value="0.3"
+            displayType="text"
+            thousandSeparator
+            prefix=""
+            suffix="%"
+            decimalScale={4}
+          />
+        </div>
         <div className="rewards-total">
           <h6>Available to Claim:</h6>
           <div className="amount">
@@ -279,9 +291,9 @@ const Rewards = ({
             />
             <CtxIcon />
           </div>
-        </div>
-        <div className="claim-button">
-          <ClaimButton />
+          <div className="claim-button">
+            <ClaimButton />
+          </div>
         </div>
       </div>
       <Table hover className="mt-2">
@@ -317,8 +329,8 @@ const Rewards = ({
                 <Tooltip id="ttip-status" className="univ3-status-tooltip">
                   <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
                   approved in order to be staked. <br />
-                  <span className={StakeStatus.empty}>Empty</span>: LP token hasn't been staked or
-                  deposited. <br />
+                  <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked
+                  or deposited. <br />
                   <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be
                   stake to earn rewards. <br />
                   <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning

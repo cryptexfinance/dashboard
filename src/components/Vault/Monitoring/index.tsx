@@ -182,10 +182,12 @@ export const Monitoring = () => {
         const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
         const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
         const usdcOraclePriceCall = await oracles.usdcOracleRead?.getLatestAnswer();
+        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
         ethcalls.push(wethOraclePriceCall);
         ethcalls.push(aaveOraclePriceCall);
         ethcalls.push(linkOraclePriceCall);
         ethcalls.push(usdcOraclePriceCall);
+        ethcalls.push(wbtcOraclePriceCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
@@ -223,6 +225,7 @@ export const Monitoring = () => {
           aaveOraclePrice,
           linkOraclePrice,
           usdcOraclePrice,
+          wbtcOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
@@ -450,88 +453,95 @@ export const Monitoring = () => {
     isHardVault: boolean,
     decimals: number
   ) => {
-    let cVault = vaults.wethVault;
-    let cVaultRead = vaults.wethVaultRead;
-    let vaultPrice = oraclePrices?.wethOraclePrice;
-    if (isHardVault) {
-      cVault = hardVaults.wethVault;
-      cVaultRead = hardVaults.wethVaultRead;
+    try {
+      let cVault = vaults.wethVault;
+      let cVaultRead = vaults.wethVaultRead;
+      let vaultPrice = oraclePrices?.wethOraclePrice;
+      if (isHardVault) {
+        cVault = hardVaults.wethVault;
+        cVaultRead = hardVaults.wethVaultRead;
+      }
+
+      switch (vaultType) {
+        case "DAI":
+          if (isHardVault) {
+            cVault = hardVaults.daiVault;
+            cVaultRead = hardVaults.daiVaultRead;
+          } else {
+            cVault = vaults.daiVault;
+            cVaultRead = vaults.daiVaultRead;
+          }
+          vaultPrice = oraclePrices?.daiOraclePrice;
+          break;
+        case "AAVE":
+          cVault = vaults.aaveVault;
+          cVaultRead = vaults.aaveVaultRead;
+          vaultPrice = oraclePrices?.aaveOraclePrice;
+          break;
+        case "LINK":
+          cVault = vaults.linkVault;
+          cVaultRead = vaults.linkVaultRead;
+          vaultPrice = oraclePrices?.linkOraclePrice;
+          break;
+        case "SNX":
+          cVault = vaults.snxVault;
+          cVaultRead = vaults.snxVaultRead;
+          vaultPrice = oraclePrices?.snxOraclePrice;
+          break;
+        case "UNI":
+          cVault = vaults.uniVault;
+          cVaultRead = vaults.uniVaultRead;
+          vaultPrice = oraclePrices?.uniOraclePrice;
+          break;
+        case "MATIC":
+          cVault = vaults.maticVault;
+          cVaultRead = vaults.maticVaultRead;
+          vaultPrice = oraclePrices?.maticOraclePrice;
+          break;
+        case "WBTC":
+          cVault = vaults.wbtcVault;
+          cVaultRead = vaults.wbtcVaultRead;
+          vaultPrice = oraclePrices?.wbtcOraclePrice;
+          break;
+        case "USDC":
+          cVault = hardVaults.usdcVault;
+          cVaultRead = hardVaults.usdcVaultRead;
+          vaultPrice = oraclePrices?.usdcOraclePrice;
+          break;
+        default:
+          if (isHardVault) {
+            cVault = hardVaults.wethVault;
+            cVaultRead = hardVaults.wethVaultRead;
+          } else {
+            cVault = vaults.wethVault;
+            cVaultRead = vaults.wethVaultRead;
+          }
+          vaultPrice = oraclePrices?.wethOraclePrice;
+          break;
+      }
+
+      const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
+      const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
+      // @ts-ignore
+      const [reqTcap, liqReward] = await signer.ethcallProvider?.all([reqTcapCall, liqRewardCall]);
+
+      const reqTcapText = ethers.utils.formatEther(reqTcap);
+      const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
+      const currentLiqFee = await cVault?.getFee(reqTcap);
+      const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+      const ethFee = ethers.utils.formatEther(increasedFee);
+
+      return (
+        toUSD(liqRewardText, vaultPrice || "0") -
+        toUSD(reqTcapText, oraclePrices?.tcapOraclePrice || "0") -
+        toUSD(ethFee, oraclePrices?.wethOraclePrice || "0")
+      );
+    } catch (error) {
+      if (error.code !== "UNPREDICTABLE_GAS_LIMIT") {
+        console.log(error.code);
+      }
+      return 0;
     }
-
-    switch (vaultType) {
-      case "DAI":
-        if (isHardVault) {
-          cVault = hardVaults.daiVault;
-          cVaultRead = hardVaults.daiVaultRead;
-        } else {
-          cVault = vaults.daiVault;
-          cVaultRead = vaults.daiVaultRead;
-        }
-        vaultPrice = oraclePrices?.daiOraclePrice;
-        break;
-      case "AAVE":
-        cVault = vaults.aaveVault;
-        cVaultRead = vaults.aaveVaultRead;
-        vaultPrice = oraclePrices?.aaveOraclePrice;
-        break;
-      case "LINK":
-        cVault = vaults.linkVault;
-        cVaultRead = vaults.linkVaultRead;
-        vaultPrice = oraclePrices?.linkOraclePrice;
-        break;
-      case "SNX":
-        cVault = vaults.snxVault;
-        cVaultRead = vaults.snxVaultRead;
-        vaultPrice = oraclePrices?.snxOraclePrice;
-        break;
-      case "UNI":
-        cVault = vaults.uniVault;
-        cVaultRead = vaults.uniVaultRead;
-        vaultPrice = oraclePrices?.uniOraclePrice;
-        break;
-      case "MATIC":
-        cVault = vaults.maticVault;
-        cVaultRead = vaults.maticVaultRead;
-        vaultPrice = oraclePrices?.maticOraclePrice;
-        break;
-      case "WBTC":
-        cVault = vaults.wbtcVault;
-        cVaultRead = vaults.wbtcVaultRead;
-        vaultPrice = oraclePrices?.wbtcOraclePrice;
-        break;
-      case "USDC":
-        cVault = hardVaults.usdcVault;
-        cVaultRead = hardVaults.usdcVaultRead;
-        vaultPrice = oraclePrices?.usdcOraclePrice;
-        break;
-      default:
-        if (isHardVault) {
-          cVault = hardVaults.wethVault;
-          cVaultRead = hardVaults.wethVaultRead;
-        } else {
-          cVault = vaults.wethVault;
-          cVaultRead = vaults.wethVaultRead;
-        }
-        vaultPrice = oraclePrices?.wethOraclePrice;
-        break;
-    }
-
-    const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
-    const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
-    // @ts-ignore
-    const [reqTcap, liqReward] = await signer.ethcallProvider?.all([reqTcapCall, liqRewardCall]);
-
-    const reqTcapText = ethers.utils.formatEther(reqTcap);
-    const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
-    const currentLiqFee = await cVault?.getFee(reqTcap);
-    const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
-    const ethFee = ethers.utils.formatEther(increasedFee);
-
-    return (
-      toUSD(liqRewardText, vaultPrice || "0") -
-      toUSD(reqTcapText, oraclePrices?.tcapOraclePrice || "0") -
-      toUSD(ethFee, oraclePrices?.wethOraclePrice || "0")
-    );
   };
 
   const calculateVaultData = (
@@ -683,6 +693,7 @@ export const Monitoring = () => {
       if (showAllVaults) {
         symbols.push({ key: "aave", name: "AAVE" });
         symbols.push({ key: "link", name: "LINK" });
+        symbols.push({ key: "usdc", name: "USDC" });
       }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });
@@ -802,8 +813,8 @@ export const Monitoring = () => {
       blockTS: vaultList[index].blockTS,
       url: vaultList[index].url,
     };
-    allVaults[index] = v;
-    setVaultList(allVaults);
+    allVaults[index] = Object.create(v);
+    setVaultList(Array.from(allVaults));
     setRenderTable(!renderTable);
   };
 

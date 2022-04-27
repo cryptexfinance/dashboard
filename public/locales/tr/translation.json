@@ -61,6 +61,8 @@
     "balance-title": "{{vault}} Balance",
     "ratio-title": "Vault Ratio",
     "ratio-warning": "Ratio must be > {{minRatio}}% or you will be liquidated.",
+    "hard-mode-info": "Hard mode vaults have a min required ratio of 110%.",
+    "hard-mode-info2": "You're required to mint a minimum of 20 TCAP on hard mode.",
     "collateral": {
       "title": "Staked Collateral",
       "add": "Add Collateral",
@@ -81,7 +83,9 @@
     },
     "errors": {
       "no-collateral": "Not enough collateral on vault",
-      "burn-too-high": "Burn value too high"
+      "burn-too-high": "Burn value too high",
+      "min-tcap": "You need to mint a minimum of 20 TCAP on hard mode.",
+      "min-tcap2": "Afte burning the minimum amount of debt should be 20 TCAP."
     }
   },
   "pools": {
