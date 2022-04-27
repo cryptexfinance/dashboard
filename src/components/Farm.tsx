@@ -21,12 +21,7 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../assets/images/graph/DAI.svg";
 import Loading from "./Loading";
-import {
-  notifyUser,
-  errorNotification,
-  tsToDateString,
-  getPriceInUSDFromPair,
-} from "../utils/utils";
+import { notifyUser, errorNotification, getPriceInUSDFromPair } from "../utils/utils";
 import { Stake } from "./modals/Stake";
 
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
@@ -48,8 +43,6 @@ const Farm = () => {
   const [ctxPoolBalance, setCtxPoolBalance] = useState("0.0");
   const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
-  const [vestingEndTime, setVestingEndTime] = useState(0);
-  const [ctxVestingEndTime, setCtxVestingEndTime] = useState(0);
   const [updateData, setUpdateData] = useState(false);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -184,9 +177,7 @@ const Farm = () => {
         const rateCtxPoolCall = await rewards.ctxPoolRewardRead?.rewardRate();
         const ctxLPsStakedCall = await rewards.ctxPoolRewardRead?.totalSupply();
         const wethPoolVestingRatioCall = await rewards.wethPoolRewardRead?.vestingRatio();
-        const wethPoolVestingTimeCall = await rewards.wethPoolRewardRead?.vestingEnd();
         const ctxVestingRatioCall = await rewards.ctxPoolRewardRead?.vestingRatio();
-        const ctxVestingTimeCall = await rewards.ctxPoolRewardRead?.vestingEnd();
 
         // @ts-ignore
         const [
@@ -205,9 +196,7 @@ const Farm = () => {
           rateCtxPool,
           ctxLPsStaked,
           wethPoolVestingRatio,
-          wethPoolVestingTime,
           ctxVestingRatio,
-          ctxVestingTime,
         ] = await signer.ethcallProvider?.all([
           wethOracleCall,
           tcapOracleCall,
@@ -224,9 +213,7 @@ const Farm = () => {
           rateCtxPoolCall,
           ctxLPsStakedCall,
           wethPoolVestingRatioCall,
-          wethPoolVestingTimeCall,
           ctxVestingRatioCall,
-          ctxVestingTimeCall,
         ]);
 
         const currentPriceTCAP = ethers.utils.formatEther(tcapPrice);
@@ -281,9 +268,6 @@ const Farm = () => {
             parseFloat(currentPriceETH)
           )
         );
-
-        setVestingEndTime(wethPoolVestingTime);
-        setCtxVestingEndTime(ctxVestingTime);
 
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
@@ -701,7 +685,7 @@ const Farm = () => {
                               trigger={["hover", "click"]}
                               overlay={
                                 <Tooltip id="tooltip-top" className="farm-tooltip">
-                                  Rewards are unlocked 6 months after the start of the pool.
+                                  Available to claim immediately.
                                 </Tooltip>
                               }
                             >
@@ -760,23 +744,16 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>
-                      <td className="vested-reward">
-                        <div>
-                          <NumberFormat
-                            className="number"
-                            value={vethPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
-                        </div>
-                        <div>
-                          <small>
-                            <span className="end-date">{tsToDateString(vestingEndTime)}</span>
-                          </small>
-                        </div>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vethPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
                       </td>
                       <td>
                         <b className="fire">
@@ -900,23 +877,16 @@ const Farm = () => {
                         />{" "}
                         CTX
                       </td>{" "}
-                      <td className="vested-reward">
-                        <div>
-                          <NumberFormat
-                            className="number"
-                            value={vctxPoolRewards}
-                            displayType="text"
-                            thousandSeparator
-                            prefix=""
-                            decimalScale={2}
-                          />{" "}
-                          CTX
-                        </div>
-                        <div>
-                          <small>
-                            <span className="end-date">{tsToDateString(ctxVestingEndTime)}</span>
-                          </small>
-                        </div>
+                      <td className="number">
+                        <NumberFormat
+                          className="number"
+                          value={vctxPoolRewards}
+                          displayType="text"
+                          thousandSeparator
+                          prefix=""
+                          decimalScale={2}
+                        />{" "}
+                        CTX
                       </td>
                       <td>
                         <b className="fire">
