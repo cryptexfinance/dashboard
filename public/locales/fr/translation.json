@@ -59,7 +59,7 @@
     "balance-title": "{{vault}} Solde",
     "ratio-title": "Proportion de collatéral",
     "ratio-warning": "Le ratio de collatéral doit être > {{minRatio}}% ou votre collatéral sera liquidé.",
-    "hard-mode-info": "Hard mode vaults have a min required ratio of 110%.",
+    "hard-mode-info": "Hard mode vaults have a minimum required ratio of 110%.",
     "hard-mode-info2": "You're required to mint a minimum of 20 TCAP on hard mode.",
     "collateral": {
       "title": "Collatéral Bloqué",

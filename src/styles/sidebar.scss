@@ -32,9 +32,12 @@
       align-items: center;
       color: $light;
     }
-
-    a svg {
-      &:hover {
+    a:hover {
+      svg {
+        -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+        filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
+      }
+      .title {
         -webkit-filter: drop-shadow(3px 3px 2px $highlight);
         filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
       }
@@ -54,10 +57,6 @@
       margin-top: 2px;
     }
     .title.active {
-      -webkit-filter: drop-shadow(3px 3px 2px $highlight);
-      filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
-    }
-    .title:hover  {
       -webkit-filter: drop-shadow(3px 3px 2px $highlight);
       filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
     }

@@ -107,7 +107,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
               {t("last")} {t("staked")}
             </th>
             <th>{t("governance.staked-reward")}</th>
-            <th>APY</th>
+            <th>APR</th>
             <th />
           </tr>
         </thead>

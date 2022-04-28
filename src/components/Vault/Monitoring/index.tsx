@@ -84,6 +84,7 @@ export const Monitoring = () => {
   const [radioValue, setRadioValue] = useState("1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
+  const [vaultMode, setVaultMode] = useState("all");
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
     { name: "All Vaults", value: "1" },
@@ -104,6 +105,11 @@ export const Monitoring = () => {
     { key: VAULT_STATUS.active, name: "Active" },
     { key: VAULT_STATUS.liquidation, name: "Liquidation" },
   ];
+  const modeList = [
+    { key: "all", name: "All" },
+    { key: "regular", name: "Regular" },
+    { key: "hard", name: "Hard" },
+  ];
 
   const buildFilters = () => {
     const weiLimit = "100000000";
@@ -111,6 +117,7 @@ export const Monitoring = () => {
     let ownerFilter = "";
     let vaultFilter = "";
     let statusFilter = "";
+    let modeFilter = "";
     if (radioValue === "2" && ownerAddress !== "") {
       ownerFilter = `, owner: "${ownerAddress}"`;
     }
@@ -125,6 +132,10 @@ export const Monitoring = () => {
         statusFilter = `collateral_gte: "${weiLimit}", debt_lt: "${weiLimit}"`;
       }
     }
+    if (vaultMode !== "all") {
+      const isHard = vaultMode === "hard" ? "true" : "false";
+      modeFilter = "hardVault: ".concat(isHard);
+    }
 
     filter = ownerFilter;
     if (vaultFilter !== "") {
@@ -132,6 +143,9 @@ export const Monitoring = () => {
     }
     if (statusFilter !== "") {
       filter = filter.concat(`, ${statusFilter}`);
+    }
+    if (modeFilter !== "") {
+      filter = filter.concat(`, ${modeFilter}`);
     }
     if (filter !== "") {
       if (loadMore) {
@@ -737,6 +751,11 @@ export const Monitoring = () => {
     setTokenSymbol(newToken);
   };
 
+  const handleModeChange = (newMode: string) => {
+    setSkipQuery(false);
+    setVaultMode(newMode);
+  };
+
   const onPageSelected = (pageNumber: number) => {
     const nextPage = pageNumber === pagination.pages ? 0 : pageNumber + 1;
     const newPagination = {
@@ -827,7 +846,7 @@ export const Monitoring = () => {
               <h5>Totals</h5>
             </Card.Header>
             <Card.Body>
-              <Col md={12} className="container">
+              <Col md={12} className="totals-container">
                 <Col md={3} className="total-box">
                   <h6>Vaults</h6>
                   <span className="number">{vaultsTotals.vaults}</span>
@@ -881,7 +900,10 @@ export const Monitoring = () => {
                 <div className="filters">
                   <div className="dd-container">
                     <h6 className="titles">Collateral:</h6>
-                    <Dropdown onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}>
+                    <Dropdown
+                      className="dd-collateral"
+                      onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
+                    >
                       <Dropdown.Toggle
                         variant="secondary"
                         id="dropdown-filters"
@@ -915,6 +937,30 @@ export const Monitoring = () => {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         {statusList.map((item) => (
+                          <Dropdown.Item key={item.key} eventKey={item.key}>
+                            {item.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  <div className="dd-container">
+                    <h6 className="titles">Mode:</h6>
+                    <Dropdown
+                      className="dd-mode"
+                      onSelect={(eventKey) => handleModeChange(eventKey || "ALL")}
+                    >
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-flags"
+                        className="text-left"
+                      >
+                        <div className="status-toggle">
+                          <span>{capitalize(vaultMode)}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {modeList.map((item) => (
                           <Dropdown.Item key={item.key} eventKey={item.key}>
                             {item.name}
                           </Dropdown.Item>

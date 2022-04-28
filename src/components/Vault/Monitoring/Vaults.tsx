@@ -3,7 +3,6 @@ import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
-import { FaGopuram } from "react-icons/fa";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
@@ -242,7 +241,7 @@ export const Vaults = ({
                 <td>
                   <div className="status">
                     {statusTag(index, v)}
-                    {v.isHardVault && <FaGopuram className={v.status} />}
+                    {v.isHardVault && <span className="mode">Hard mode</span>}
                   </div>
                 </td>
                 <td>

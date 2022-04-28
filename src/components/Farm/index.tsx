@@ -497,7 +497,7 @@ const Farm = () => {
                         </div>
                       </div>
                     </th>{" "}
-                    <th>APY</th>
+                    <th>APR</th>
                     <th />
                   </tr>
                 </thead>
