@@ -400,21 +400,24 @@
             }
             .ranges {
               display: flex;
-              width: 82%;
+              width: 100%;
               flex-direction: row;
               align-items: center;
-              justify-content: space-between;
-              @media (max-width: 1500px) {
-                width: 90%;
-              }
-              @media (max-width: 1400px) {
-                width: 100%;
-              }
               .min-range {
                 font-size: 1rem;
+                margin-right: 2.5rem;
               }
               .max-range {
                 font-size: 1rem;
+                margin-left: 2.5rem;
+              }
+              @media (max-width: 1350px) {
+                .min-range {
+                  margin-right: 1rem;
+                }
+                .max-range {
+                  margin-left: 1rem;
+                }
               }
             }
           }

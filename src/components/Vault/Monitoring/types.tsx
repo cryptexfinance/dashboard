@@ -3,6 +3,7 @@ export type PaginationType = {
   current: number;
   next: number;
   pages: number;
+  lastDataPage: number;
   itemsPerPage: number;
   itemsCount: number;
   lastId: string;

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import NetworkContext from "../../state/NetworkContext";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "../../utils/constants";
-import Welcome from "./Welcome";
+import Summary from "./Summary";
 
 const clientOracle = (graphqlEndpoint: string) =>
   new ApolloClient({
@@ -48,7 +48,7 @@ const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Welcome signerAddress={signerAddress} loadingContracts={loadingContracts} />
+      <Summary signerAddress={signerAddress} loadingContracts={loadingContracts} />
     </ApolloProvider>
   );
 };

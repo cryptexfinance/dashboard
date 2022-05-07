@@ -61,7 +61,7 @@ const Details = ({ address, t }: props) => {
   const vaults = useContext(VaultsContext);
   const hardVaults = useContext(HardVaultsContext);
   const signer = useContext(SignerContext);
-  const [vaultMode, setVaultMode] = useState("normal");
+  const [vaultMode, setVaultMode] = useState("hard");
   const [loadingMode, setLoadingMode] = useState(false);
   const radios = [
     { name: "Regular Mode", value: "normal" },

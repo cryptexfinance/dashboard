@@ -178,6 +178,31 @@
     }
   }
 
+  .protocol {
+
+    h5 {
+      font-size: 1rem;
+    }
+    h6 {
+      color: $off-white;
+    }
+    .card-body {
+      padding: 0rem;
+    }
+    .asset {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0.5rem;
+    }
+    .staked {
+      display: flex;
+      flex-direction: column-reverse;
+      margin-left: 1rem;
+    }
+  }
+
+
   @media (max-height: 820px) and (min-width: 992px) {
     padding-top: 1rem;
     .card-wrapper {

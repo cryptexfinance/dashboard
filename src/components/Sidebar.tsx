@@ -11,7 +11,7 @@ import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashbo
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
 import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
-import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
+// import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
@@ -88,7 +88,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             }}
           >
             <VaultIcon />
-            <span className={active === "vault" ? "title active" : "title"}>Vaults</span>
+            <span className={active === "vault" ? "title active" : "title"}>Mint</span>
           </Link>
         </Nav.Item>
         <Nav.Item>
@@ -101,7 +101,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
           >
             <VaultMonitoringIcon />
             <span className={active === "vault-monitoring" ? "title active" : "title"}>
-              Liquidate
+              Monitor
             </span>
           </Link>
         </Nav.Item>
@@ -131,18 +131,6 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </Link>
           </Nav.Item>
         )}
-        <Nav.Item>
-          <Link
-            to="/graph"
-            className={active === "graph" ? "active" : ""}
-            onClick={() => {
-              setActive("graph");
-            }}
-          >
-            <GraphIcon />
-            <span className={active === "graph" ? "title active" : "title"}>Stats</span>
-          </Link>
-        </Nav.Item>
         <Nav.Item>
           <Link
             to=""

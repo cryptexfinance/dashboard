@@ -89,7 +89,6 @@
       }
     }
     @media (max-width: 600px) {
-      margin-bottom: 1rem;
       padding-left: 0rem;
       justify-content: center;
     }
@@ -158,11 +157,7 @@
     margin-top:-5px;
   }
 
-  @media (max-width: 600px) {
-    padding-right: 0rem;
-    justify-content: center;
-    margin-top: 50px;
-
+  @media (max-width: 769px) {
     .address {
       font-size: 1rem;
     }
@@ -170,6 +165,10 @@
       font-size: 1rem;
     }
     .network-container {
+      padding-left: 2rem;
+      .btn {
+        height: 2.9rem;
+      }
       .dropdown {
         width: 85%;
 
@@ -181,16 +180,70 @@
         width: 100%;
       }
       .dropdown-toggle::after {
-        margin-left: 85%;
+        margin-left: 75%;
       }
       .network-toggle {
-        svg { 
-          margin-right: 15px;
+        h6 {
+          font-size: 0.9rem;
+        }
+        svg {
+          height: 1.8rem;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+  @media (max-width: 600px) {
+    padding-right: 0rem;
+    justify-content: center;
+    margin-top: 50px;
+    
+    .address {
+      font-size: 0.9rem;
+    }
+    .neon-pink {
+      font-size: 0.9rem;
+    }
+    .network-container {
+      padding-left: 0.5rem;
+      .btn {
+        height: 2.8rem;
+      }
+      .dropdown {
+        width: 85%;
+
+        button{
+          width: 100% !important;
+        }
+      }
+      .dropdown-menu {
+        width: 100%;
+      }
+      .dropdown-toggle::after {
+        margin-left: 75%;
+      }
+      .network-toggle {
+        h6 {
+          font-size: 0.8rem;
+        }
+        svg {
+          height: 1.7rem;
         }
       }
     }
     .info {
       justify-content: center;
+    }
+  }
+  @media (max-width: 530px) {
+    .network-container {
+      margin-bottom: 1rem;
+      .dropdown-toggle::after {
+        margin-left: 82%;
+      }
+    }
+    .btn-language {
+      display: none;
     }
   }
 }

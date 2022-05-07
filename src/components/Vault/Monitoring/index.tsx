@@ -9,6 +9,7 @@ import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import Spinner from "react-bootstrap/Spinner";
 import "../../../styles/vault-monitoring.scss";
 import { useQuery, gql } from "@apollo/client";
+import { useLocation } from "react-router-dom";
 import NetworkContext from "../../../state/NetworkContext";
 import OraclesContext from "../../../state/OraclesContext";
 import SignerContext from "../../../state/SignerContext";
@@ -43,6 +44,7 @@ const pagDefault = {
   current: 0,
   next: 0,
   pages: 0,
+  lastDataPage: 0,
   itemsPerPage: 10,
   itemsCount: 0,
   lastId: "0",
@@ -71,6 +73,7 @@ export const Monitoring = () => {
   const vaults = useContext(vaultsContext);
   const hardVaults = useContext(hardVaultsContext);
   const signer = useContext(SignerContext);
+  const { state } = useLocation();
   const [skipQuery, setSkipQuery] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
   const [oraclePrices, setOraclePrices] = useState<OraclePricesType>();
@@ -80,8 +83,10 @@ export const Monitoring = () => {
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
   const [loadMore, setLoadMore] = useState(false);
   const [pricesUpdated, setPricesUpdated] = useState(false);
-  const [ownerAddress, setOwnerAddress] = useState("");
-  const [radioValue, setRadioValue] = useState("1");
+  // @ts-ignore
+  const [ownerAddress, setOwnerAddress] = useState(state && state.address ? state.address : "");
+  // @ts-ignore
+  const [radioValue, setRadioValue] = useState(state && state.address ? "2" : "1");
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
@@ -446,11 +451,13 @@ export const Monitoring = () => {
       const lastVaultId = vData[vData.length - 1].blockTS;
       const itemsCount = vData.length;
       const pages = Math.ceil(itemsCount / itemsPerPage);
+      const lastDataPage = Math.ceil(itemsCount / itemsPerPage);
       const pag = {
         previous: 0,
         current: 1,
         next: 2,
         pages,
+        lastDataPage,
         itemsPerPage,
         itemsCount,
         lastId: lastVaultId,

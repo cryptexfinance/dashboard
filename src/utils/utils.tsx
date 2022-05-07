@@ -2,7 +2,8 @@ import React from "react";
 import { BigNumber, ethers, utils } from "ethers";
 import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
-import toasty from "../assets/images/toasty.png";
+import successImg from "../assets/images/noti-success.png";
+import errorImg from "../assets/images/noti-error.png";
 import { FEATURES, NETWORKS } from "./constants";
 import { OraclesContext } from "../state/OraclesContext";
 import { VaultsContext } from "../state/VaultsContext";
@@ -86,7 +87,11 @@ export const sendNotification = async (
 ) => {
   const toastConstant = (
     <div className="body">
-      <img src={toasty} alt="toasty" className="toasty" />
+      {className === "success" ? (
+        <img src={successImg} alt="toasty" className="toasty" />
+      ) : (
+        <img src={errorImg} alt="toasty" className="toasty" />
+      )}
       <h5>{title}</h5>
       <p>{body}</p>
     </div>
