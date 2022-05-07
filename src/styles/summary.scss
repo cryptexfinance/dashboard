@@ -6,7 +6,10 @@
   flex-direction: column;
   padding: 3rem 2rem;
   padding-bottom: 2rem;
-  
+  .spinner-container {
+    padding-top: 3rem;
+    width: 100%;
+  }
   h2 {
     font-size: 1.375rem;
     margin-bottom: 0rem;
@@ -42,12 +45,17 @@
       margin-left: 5px;
     }
   }
+  .btn:disabled {
+    color: $light;
+    opacity: 0.8;
+  }
 
   #connect {
     background-color: $pink;
     width: 15rem;
     height: 3rem;
     border-radius: 0;
+    font-size: 1rem;
   }
   .prices {
     display: flex;

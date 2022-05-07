@@ -399,6 +399,10 @@ form {
   }
 }
 
+.spinner-container {
+  display: block;
+  height: 100%;
+}
 .spinner {
   margin: 5rem 50%;
   color: $highlight !important;

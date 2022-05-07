@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
+import Spinner from "react-bootstrap/Spinner";
 import { BigNumber, ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
@@ -19,7 +20,6 @@ import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/wbtc.svg";
 import { ReactComponent as USDCIcon } from "../../assets/images/graph/usdc.svg";
 import cryptexJson from "../../contracts/cryptex.json";
-import Loading from "../Loading";
 import {
   isInLayer1,
   isOptimism,
@@ -69,7 +69,6 @@ const Protocol = ({ data }: props) => {
         data &&
         signer &&
         !isUndefined(tokens.tcapTokenRead) &&
-        !isUndefined(tokens.ctxPoolTokenRead) &&
         validOracles(currentNetwork.chainId || 1, oracles)
       ) {
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
@@ -307,54 +306,40 @@ const Protocol = ({ data }: props) => {
     // eslint-disable-next-line
   }, [data]);
 
-  if (loading) {
-    return <Loading title="Loading" message="Please wait" />;
-  }
-
   return (
     <Card className="protocol">
       <Card.Header>
         <h2>Protocol Summary</h2>
       </Card.Header>
       <Card.Body>
-        <div className="detail">
-          <div className="totals">
-            <StakeIcon className="stake" />
-            <div className="staked">
-              <h6>{t("graph.staked-usd")}</h6>
-              <h5 className="number neon-green">
-                <NumberFormat
-                  value={TotalStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                  prefix="$"
-                />
-              </h5>
-            </div>
+        {loading ? (
+          <div className="spinner-container">
+            <Spinner variant="danger" className="spinner" animation="border" />
           </div>
-          <div className="totals">
-            <H24Icon className="h24" />
-            <div className="staked">
-              <h6>{t("graph.total-supply")}</h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={totalSupply}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
-            </div>
-          </div>
-          {!isPolygon(currentNetwork.chainId) && (
-            <div className="asset">
-              <WETHIcon className="weth" />
+        ) : (
+          <div className="detail">
+            <div className="totals">
+              <StakeIcon className="stake" />
               <div className="staked">
-                <h6>{t("graph.staked-eth")}</h6>
-                <h5 className="number neon-highlight">
+                <h6>{t("graph.staked-usd")}</h6>
+                <h5 className="number neon-green">
                   <NumberFormat
-                    value={ethStake}
+                    value={TotalStake}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                    prefix="$"
+                  />
+                </h5>
+              </div>
+            </div>
+            <div className="totals">
+              <H24Icon className="h24" />
+              <div className="staked">
+                <h6>{t("graph.total-supply")}</h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={totalSupply}
                     displayType="text"
                     thousandSeparator
                     decimalScale={2}
@@ -362,62 +347,14 @@ const Protocol = ({ data }: props) => {
                 </h5>
               </div>
             </div>
-          )}
-          <div className="asset">
-            <DAIIcon className="dai" />
-            <div className="staked">
-              <h6>{t("graph.staked-dai")}</h6>
-              <h5 className="number neon-orange">
-                <NumberFormat
-                  value={daiStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
-            </div>
-          </div>
-          {isInLayer1(currentNetwork.chainId) && (
-            <div className="asset">
-              <AAVEIcon className="ctx" />
-              <div className="staked">
-                <h6>{t("graph.staked-aave")}</h6>
-                <h5 className="number neon-highlight">
-                  <NumberFormat
-                    value={aaveStake}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                  />
-                </h5>
-              </div>
-            </div>
-          )}
-          {!isPolygon(currentNetwork.chainId) && (
-            <div className="asset">
-              <LINKIcon className="ctx" />
-              <div className="staked">
-                <h6>{t("graph.staked-link")}</h6>
-                <h5 className="number neon-highlight">
-                  <NumberFormat
-                    value={linkStake}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                  />
-                </h5>
-              </div>
-            </div>
-          )}
-          {isOptimism(currentNetwork.chainId) && (
-            <>
+            {!isPolygon(currentNetwork.chainId) && (
               <div className="asset">
-                <UNIIcon className="ctx" />
+                <WETHIcon className="weth" />
                 <div className="staked">
-                  <h4>{t("graph.staked-uni")}</h4>
+                  <h6>{t("graph.staked-eth")}</h6>
                   <h5 className="number neon-highlight">
                     <NumberFormat
-                      value={uniStake}
+                      value={ethStake}
                       displayType="text"
                       thousandSeparator
                       decimalScale={2}
@@ -425,13 +362,29 @@ const Protocol = ({ data }: props) => {
                   </h5>
                 </div>
               </div>
+            )}
+            <div className="asset">
+              <DAIIcon className="dai" />
+              <div className="staked">
+                <h6>{t("graph.staked-dai")}</h6>
+                <h5 className="number neon-orange">
+                  <NumberFormat
+                    value={daiStake}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                  />
+                </h5>
+              </div>
+            </div>
+            {isInLayer1(currentNetwork.chainId) && (
               <div className="asset">
-                <SNXIcon className="ctx" />
+                <AAVEIcon className="ctx" />
                 <div className="staked">
-                  <h4>{t("graph.staked-snx")}</h4>
+                  <h6>{t("graph.staked-aave")}</h6>
                   <h5 className="number neon-highlight">
                     <NumberFormat
-                      value={snxStake}
+                      value={aaveStake}
                       displayType="text"
                       thousandSeparator
                       decimalScale={2}
@@ -439,55 +392,103 @@ const Protocol = ({ data }: props) => {
                   </h5>
                 </div>
               </div>
-            </>
-          )}
-          {isPolygon(currentNetwork.chainId) && (
+            )}
+            {!isPolygon(currentNetwork.chainId) && (
+              <div className="asset">
+                <LINKIcon className="ctx" />
+                <div className="staked">
+                  <h6>{t("graph.staked-link")}</h6>
+                  <h5 className="number neon-highlight">
+                    <NumberFormat
+                      value={linkStake}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                    />
+                  </h5>
+                </div>
+              </div>
+            )}
+            {isOptimism(currentNetwork.chainId) && (
+              <>
+                <div className="asset">
+                  <UNIIcon className="ctx" />
+                  <div className="staked">
+                    <h4>{t("graph.staked-uni")}</h4>
+                    <h5 className="number neon-highlight">
+                      <NumberFormat
+                        value={uniStake}
+                        displayType="text"
+                        thousandSeparator
+                        decimalScale={2}
+                      />
+                    </h5>
+                  </div>
+                </div>
+                <div className="asset">
+                  <SNXIcon className="ctx" />
+                  <div className="staked">
+                    <h4>{t("graph.staked-snx")}</h4>
+                    <h5 className="number neon-highlight">
+                      <NumberFormat
+                        value={snxStake}
+                        displayType="text"
+                        thousandSeparator
+                        decimalScale={2}
+                      />
+                    </h5>
+                  </div>
+                </div>
+              </>
+            )}
+            {isPolygon(currentNetwork.chainId) && (
+              <div className="asset">
+                <POLYGONIcon className="eth" />
+                <div className="staked">
+                  <h6>{t("graph.staked-matic")}</h6>
+                  <h5 className="number neon-blue">
+                    <NumberFormat
+                      value={maticStake}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                    />
+                  </h5>
+                </div>
+              </div>
+            )}
+            {!isOptimism(currentNetwork.chainId) && (
+              <div className="asset">
+                <WBTCIcon className="eth" />
+                <div className="staked">
+                  <h6>{t("graph.staked-wbtc")}</h6>
+                  <h5 className="number neon-blue">
+                    <NumberFormat
+                      value={wbtcStake}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                    />
+                  </h5>
+                </div>
+              </div>
+            )}
             <div className="asset">
-              <POLYGONIcon className="eth" />
+              <USDCIcon className="eth" />
               <div className="staked">
-                <h6>{t("graph.staked-matic")}</h6>
+                <h6>{t("graph.staked-usdc")}</h6>
                 <h5 className="number neon-blue">
                   <NumberFormat
-                    value={maticStake}
+                    value={usdcStake}
                     displayType="text"
                     thousandSeparator
                     decimalScale={2}
                   />
                 </h5>
               </div>
-            </div>
-          )}
-          {!isOptimism(currentNetwork.chainId) && (
-            <div className="asset">
-              <WBTCIcon className="eth" />
-              <div className="staked">
-                <h6>{t("graph.staked-wbtc")}</h6>
-                <h5 className="number neon-blue">
-                  <NumberFormat
-                    value={wbtcStake}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                  />
-                </h5>
-              </div>
-            </div>
-          )}
-          <div className="asset">
-            <USDCIcon className="eth" />
-            <div className="staked">
-              <h6>{t("graph.staked-usdc")}</h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={usdcStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
             </div>
           </div>
-        </div>
+        )}
       </Card.Body>
     </Card>
   );

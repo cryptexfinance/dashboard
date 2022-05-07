@@ -73,6 +73,24 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
         setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
         setTcapPrice(tPrice);
 
+        let currentPriceCTX = 0;
+        if (signerAddress === "" || isInLayer1(currentNetwork.chainId)) {
+          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          // @ts-ignore
+          const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
+            wethOraclePriceCall,
+            reservesCtxPoolCall,
+          ]);
+          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+          currentPriceCTX = await getPriceInUSDFromPair(
+            reservesCtxPool[0],
+            reservesCtxPool[1],
+            parseFloat(currentPriceETH)
+          );
+          setCtxPrice(currentPriceCTX.toString());
+        }
+
         if (
           signer.signer &&
           tokens.tcapTokenRead &&
@@ -95,26 +113,12 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
           setTcapUSDBalance(tcapUSD.toString());
 
           if (isInLayer1(currentNetwork.chainId)) {
-            const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
             const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
-            const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
             // @ts-ignore
-            const [wethOraclePrice, currentCtxBalance, reservesCtxPool] =
-              await signer.ethcallProvider?.all([
-                wethOraclePriceCall,
-                currentCtxBalanceCall,
-                reservesCtxPoolCall,
-              ]);
-            const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+            const [currentCtxBalance] = await signer.ethcallProvider?.all([currentCtxBalanceCall]);
             const ctxString = ethers.utils.formatEther(currentCtxBalance);
             setCtxBalance(ctxString);
-            const currentPriceCTX = await getPriceInUSDFromPair(
-              reservesCtxPool[0],
-              reservesCtxPool[1],
-              parseFloat(currentPriceETH)
-            );
             const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
-            setCtxPrice(currentPriceCTX.toString());
             setCtxUSDBalance(ctxUSD.toString());
           }
           setCurrentAddress(signerAddress);
@@ -170,61 +174,63 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
           </h4>
           <h4>TCAP Price:</h4>
         </div>
-        <div className="token-price">
-          <h4 className="number neon-dark-blue">
-            <NumberFormat
-              className="number"
-              value={ctxPrice}
-              displayType="text"
-              thousandSeparator
-              prefix="$"
-              decimalScale={2}
-            />
-          </h4>
-          <h4>CTX Price:</h4>
-        </div>
+        {isInLayer1(currentNetwork.chainId) && (
+          <div className="token-price">
+            <h4 className="number neon-dark-blue">
+              <NumberFormat
+                className="number"
+                value={ctxPrice}
+                displayType="text"
+                thousandSeparator
+                prefix="$"
+                decimalScale={2}
+              />
+            </h4>
+            <h4>CTX Price:</h4>
+          </div>
+        )}
       </div>
       <div className="summary2">
         <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
           {address !== "" ? (
-            <>
-              <Card className="balance">
-                <Card.Header>
-                  <div className="">
-                    <h2>{t("welcome.title1")}</h2>
-                  </div>
-                </Card.Header>
-                <Card.Body>
-                  <div className="balance-section">
-                    <div className="balance-box">
-                      <div className="title">
-                        <h5 className="tcap">{t("welcome.tcap-balance")}</h5>
-                      </div>
-                      <div className="values">
-                        <div className="asset-value">
-                          <h5 className="number neon-blue">
-                            <NumberFormat
-                              className="number"
-                              value={tcapBalance}
-                              displayType="text"
-                              thousandSeparator
-                              decimalScale={2}
-                            />
-                          </h5>
-                          <TcapIcon className="tcap-neon" />
-                        </div>
-                        <p className="number usd-balance">
+            <Card className="balance">
+              <Card.Header>
+                <div className="">
+                  <h2>{t("welcome.title1")}</h2>
+                </div>
+              </Card.Header>
+              <Card.Body>
+                <div className="balance-section">
+                  <div className="balance-box">
+                    <div className="title">
+                      <h5 className="tcap">{t("welcome.tcap-balance")}</h5>
+                    </div>
+                    <div className="values">
+                      <div className="asset-value">
+                        <h5 className="number neon-blue">
                           <NumberFormat
                             className="number"
-                            value={tcapUSDBalance}
+                            value={tcapBalance}
                             displayType="text"
                             thousandSeparator
-                            prefix="$"
                             decimalScale={2}
                           />
-                        </p>
+                        </h5>
+                        <TcapIcon className="tcap-neon" />
                       </div>
+                      <p className="number usd-balance">
+                        <NumberFormat
+                          className="number"
+                          value={tcapUSDBalance}
+                          displayType="text"
+                          thousandSeparator
+                          prefix="$"
+                          decimalScale={2}
+                        />
+                      </p>
                     </div>
+                  </div>
+                  {isInLayer1(currentNetwork.chainId) && (
                     <div className="balance-box">
                       <div className="title">
                         <h5 className="tcap">{t("welcome.ctx-balance")}</h5>
@@ -254,90 +260,92 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                         </p>
                       </div>
                     </div>
-                  </div>
-                </Card.Body>
-              </Card>
-              <Card className="diamond">
-                <Card.Header>
-                  <h2>{t("welcome.title2")}</h2>
-                </Card.Header>
-                <Card.Body>
-                  <p>{t("welcome.subtitle2")}</p>
-                  <Row className="">
-                    <Col>
-                      <Button
-                        variant="primary"
-                        className="neon-pink"
-                        onClick={() => {
-                          window.open(
-                            `${NETWORKS.mainnet.lpUrl}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
-                            "_blank"
-                          );
-                        }}
-                      >
-                        {t("trade")}
-                      </Button>
-                      <Button
-                        variant="success"
-                        className="neon-green"
-                        onClick={() => {
-                          history.push("/vault");
-                        }}
-                        disabled={address === ""}
-                      >
-                        {t("mint")}
-                      </Button>
-                    </Col>
-                  </Row>
-                  <Row className="">
-                    <Col>
-                      <Button
-                        variant="info"
-                        className="neon-blue"
-                        onClick={() => {
-                          history.push("/vault-monitoring", { address: signerAddress });
-                        }}
-                        disabled={address === ""}
-                      >
-                        My Vaults
-                      </Button>
-                      <Button
-                        variant="warning"
-                        className="neon-orange"
-                        onClick={() => {
-                          history.push("/farm");
-                        }}
-                        disabled={address === ""}
-                      >
-                        {t("farm")}
-                      </Button>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </>
+                  )}
+                </div>
+              </Card.Body>
+            </Card>
           ) : (
             <Card className="balance">
-              <div className="">
+              <Card.Header>
                 <h2>{t("welcome.title3")}</h2>
-                <p>{t("welcome.subtitle3")}</p>
-              </div>
+              </Card.Header>
+              <Card.Body>
+                <Row className="">
+                  <p>{t("welcome.subtitle3")}</p>
+                  <div>
+                    <Button
+                      variant="primary"
+                      id="connect"
+                      className="neon-pink"
+                      onClick={() => {
+                        web3Modal.toggleModal();
+                      }}
+                    >
+                      {t("connect")}
+                    </Button>
+                  </div>
+                </Row>
+              </Card.Body>
+            </Card>
+          )}
+          <Card className="diamond">
+            <Card.Header>
+              <h2>{t("welcome.title2")}</h2>
+            </Card.Header>
+            <Card.Body>
+              <p>{t("welcome.subtitle2")}</p>
               <Row className="">
                 <Col>
                   <Button
                     variant="primary"
-                    id="connect"
                     className="neon-pink"
                     onClick={() => {
-                      web3Modal.toggleModal();
+                      window.open(
+                        `${NETWORKS.mainnet.lpUrl}/swap?inputCurrency=ETH?outputCurrency=${tokens.tcapToken?.address}`,
+                        "_blank"
+                      );
                     }}
                   >
-                    {t("connect")}
+                    {t("trade")}
+                  </Button>
+                  <Button
+                    variant="success"
+                    className="neon-green"
+                    onClick={() => {
+                      history.push("/vault");
+                    }}
+                    disabled={address === ""}
+                  >
+                    {t("mint")}
                   </Button>
                 </Col>
               </Row>
-            </Card>
-          )}
+              <Row className="">
+                <Col>
+                  <Button
+                    variant="info"
+                    className="neon-blue"
+                    onClick={() => {
+                      history.push("/vault-monitoring", { address: signerAddress });
+                    }}
+                    disabled={address === ""}
+                  >
+                    My Vaults
+                  </Button>
+                  <Button
+                    variant="warning"
+                    className="neon-orange"
+                    onClick={() => {
+                      history.push("/farm");
+                    }}
+                    disabled={address === ""}
+                  >
+                    {t("farm")}
+                  </Button>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
         </Col>
         <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
           <Protocol data={data} />
