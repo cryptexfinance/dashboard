@@ -189,16 +189,9 @@
 
   .collateral-balance {
     display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
+    align-items: center;
     h4 {
       margin-bottom: 0rem;
-    }
-    p {
-      margin-bottom: 0rem;
-      text-align: right;
     }
     .number {
       color: $light;
@@ -320,7 +313,6 @@
   }
 
   .actions-container {
-    display: flex;
     margin-top: 1rem;
     column-gap: 2rem;
     p {
@@ -331,7 +323,7 @@
     }
     .card-header  {
       padding: 0rem;
-      padding-bottom: 2rem;
+      padding-bottom: 1.5rem;
     }
     .card-body {
       padding: 0rem;
@@ -340,23 +332,45 @@
     .info {
       display: flex;
       align-items: top;
-      height: 8rem;
       div {
         width: 100%;
       }
       p {
         text-align: right;
-      }      
+      }
+      .collateral-balance {
+        flex-direction: column;
+      }
       .amount {
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
       }
-    } 
+    }
 
     .form-card {
       .card {
-        padding: 0;        
+        min-height: 26.3rem;
+        padding: 0;
+
+        .info {
+          border-bottom: 1px solid $dark;
+          padding: 1.5rem;
+
+          p,
+          h4 {
+            padding-bottom: 0;
+            margin-bottom: 0;
+          }
+          h4 {
+            font-size: 1.4rem;
+          }
+
+          .amount {
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
 
         svg {
           //margin-top: -5px;
@@ -368,10 +382,9 @@
           }
 
           &.tcap-neon {
-            height: 1.8rem;
-            width: 2rem;
             margin-top: 0px;
             filter: none;
+            width: 1.9rem;
           }
           &.btc {
             margin-top: 0px;
@@ -411,64 +424,16 @@
           }
         }
       }
-      .info {
-        display: flex;
-        flex-direction: column;
-        background-color: $darker;
-        border-radius: 5px;
-        // border-bottom: 1px solid $dark;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
 
-        &-values {
-          display: flex;
-          flex-direction: row;
-          padding: 0.5rem;
-          margin-top: 0.7rem;
-          border: 0.7px solid $dark;
-          border-radius: 5px;
-          background-color: #281e31;
-        }
-        p {
-          font-size: 1.1rem;
-          margin-bottom: 0rem;
-        }
-        h4 {
-          font-size: 1.2rem;
-          padding-bottom: 0;
-          margin-bottom: 0;
-        }
-        .amount {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-        }
-        svg {
-          //margin-top: -5px;
-          vertical-align: top;
-          width: 0.8rem;
-          filter: brightness(1118%) drop-shadow(0px 0px 5px rgba(6, 52, 255, 0.53));
-          @supports (-webkit-touch-callout: none) {
-            height: intrinsic;
-          }
-
-          &.tcap-neon {
-            margin-top: 0px;
-            filter: none;
-            width: 2rem;
-          }
-        }
-      }
       form {
-        padding: 1rem 1.5rem 1rem 1.5rem;
-        height: 21rem;
+        padding: 2rem 1.5rem 0rem 1.5rem;
+
         label {
           font-family: "Nineteen Ninety Seven";
           color: $white;
 
           &.max {
             float: right;
-            font-size: 0.85rem;
             @media (min-width: 992px) and (max-width: 1300px) {
               font-size: 0.9rem;
             }
@@ -481,29 +446,26 @@
             }
           }
         }
-
         .input-group {
-          padding: 0.7rem 0.5rem;
+          background-color: #281e31;
           border: 1px solid $dark;
           border-radius: 5px;
-          background-color: #281e31;
         }
-        .form-group.remove {
-          margin-top: 3rem;
-        }
+
         .text-muted {
           position: absolute;
-          text-align: right;
+          text-align: left;
           font-size: 0.85rem;
-          margin-top: -1.8rem;
-          margin-left: 1rem;
+          margin-top: -1.7rem;
+          padding-left: 1rem;
         }
 
         .burn-fee.text-muted {
           position: relative;
           text-align: right;
+          font-size: 1rem;
           margin-top: 0.5rem;
-          margin-right: 0.5rem;
+          margin-right: 0.2rem;
           margin-bottom: 0;
           padding-bottom: 0;
           font-size: 0.8rem;
@@ -511,27 +473,27 @@
         }
 
         input[type="number"] {
-          font-size: 1.1rem;
-          background: no-repeat;
-          border: 1px;
+          font-size: 1.2rem;
+          padding-bottom: 1.8rem;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          border-color: transparent;
           color: $white;
-          height: 2rem;
-          margin-right: 5px;
-          background-color: $darker;
-          border-radius: 5px;
-        }
-        input[type="number"]:focus {
-          box-shadow: inset -1px -5px 15px -19px $green;
+          height: 3.7rem;
         }
 
         .btn {
+          font-size: 0.8rem;
           background-color: $darker;
           width: 6rem;
-          height: 3.5rem;
-          border-radius: 4px;
-          font-size: 0.85rem;
+          height: 3.7rem;
+          border-top-right-radius: 5px;
+          border-bottom-right-radius: 5px;
         }
-        
+
+        .remove {
+          margin-top: 3rem;
+        }
       }
     }
 
@@ -541,18 +503,15 @@
       justify-content: space-between;
 
       .card {
-        min-height: 12rem;
+        min-height: 11rem;
       }
-      &-info {
-        display: flex;
-        flex-direction: row;
-      }      
 
       .eth {
         filter: drop-shadow(0px 0px 15px rgba(111, 19, 202, 1));
       }
 
       .ratio {
+        display: none;
         width: 1.9375rem;
         filter: drop-shadow(0px 0px 15px rgba(15, 217, 255, 0.53));
       }
@@ -563,7 +522,7 @@
       }
 
       .info {
-        margin-top: 1rem;
+        margin-top: 1.7rem;
 
         .btn {
           margin-top: 0.7rem;
@@ -635,22 +594,13 @@
       min-height: 0rem;
       min-width: 0rem;
     }
-
-    .test {
-      display: flex;
-      flex-direction: column;
-      .test2 {
-        display: flex;
-        flex-direction: row;
-      }
-    }
   }
 
   // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
     .actions-container {
-      // display: grid;
-      // grid-template-columns: auto;
+      display: grid;
+      grid-template-columns: auto;
       margin-bottom: 2rem;
     }
 
@@ -667,8 +617,8 @@
   // Large devices (desktops, 992px and up)
   @media (min-width: 992px) {
     .actions-container {
-      // display: grid;
-      // grid-template-columns: auto 33% 33%;
+      display: grid;
+      grid-template-columns: auto 33% 33%;
       margin-bottom: 0rem;
     }
     .balance {

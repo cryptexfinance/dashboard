@@ -167,7 +167,7 @@ const Mint = ({ address, t }: props) => {
   // Inputs
   const [addCollateralTxt, setAddCollateralTxt] = useState("0");
   const [addCollateralUSD, setAddCollateralUSD] = useState("0");
-  const [removeCollateralTxt, setRemoveCollateralTxt] = useState("");
+  const [removeCollateralTxt, setRemoveCollateralTxt] = useState("0");
   const [removeCollateralUSD, setRemoveCollateralUSD] = useState("0");
   const [mintTxt, setMintTxt] = useState("0");
   const [mintUSD, setMintUSD] = useState("0");
@@ -575,13 +575,13 @@ const Mint = ({ address, t }: props) => {
   const resetFields = () => {
     setBurnFee("0");
     setAddCollateralUSD("0");
-    setAddCollateralTxt("");
-    setRemoveCollateralTxt("");
+    setAddCollateralTxt("0");
+    setRemoveCollateralTxt("0");
     setRemoveCollateralUSD("0");
-    setMintTxt("");
+    setMintTxt("0");
     setMintUSD("0");
     setBurnUSD("0");
-    setBurnTxt("");
+    setBurnTxt("0");
   };
 
   const handleRadioBtnChange = async (value: string) => {
@@ -658,8 +658,20 @@ const Mint = ({ address, t }: props) => {
       changeVault(r);
       setAddCollateralUSD(usd.toString());
     } else {
-      changeVault(0, true);
+      changeVault(0, false);
       setAddCollateralUSD("0");
+    }
+  };
+
+  const onFocusAddCollateral = () => {
+    if (addCollateralTxt && parseFloat(addCollateralTxt) === 0) {
+      setAddCollateralTxt("");
+    }
+  };
+
+  const onBlurAddCollateral = () => {
+    if (!addCollateralTxt) {
+      setAddCollateralTxt("0");
     }
   };
 
@@ -677,8 +689,20 @@ const Mint = ({ address, t }: props) => {
       changeVault(r);
       setRemoveCollateralUSD(usd.toString());
     } else {
-      changeVault(0, true);
+      changeVault(0, false);
       setRemoveCollateralUSD("0");
+    }
+  };
+
+  const onFocusRemoveCollateral = () => {
+    if (removeCollateralTxt && parseFloat(removeCollateralTxt) === 0) {
+      setRemoveCollateralTxt("");
+    }
+  };
+
+  const onBlurRemoveCollateral = () => {
+    if (!removeCollateralTxt) {
+      setRemoveCollateralTxt("0");
     }
   };
 
@@ -696,8 +720,20 @@ const Mint = ({ address, t }: props) => {
       changeVault(r);
       setMintUSD(usd.toString());
     } else {
-      changeVault(0, true);
+      changeVault(0, false);
       setMintUSD("0");
+    }
+  };
+
+  const onFocusMint = () => {
+    if (mintTxt && parseFloat(mintTxt) === 0) {
+      setMintTxt("");
+    }
+  };
+
+  const onBlurMint = () => {
+    if (!mintTxt) {
+      setMintTxt("0");
     }
   };
 
@@ -727,7 +763,7 @@ const Mint = ({ address, t }: props) => {
         const ethFee = ethers.utils.formatEther(increasedFee);
         setBurnFee(ethFee.toString());
       } else {
-        changeVault(0, true);
+        changeVault(0, false);
         setBurnUSD("0");
         setBurnFee("0");
       }
@@ -739,8 +775,20 @@ const Mint = ({ address, t }: props) => {
     }
   };
 
+  const onFocusBurn = () => {
+    if (burnTxt && parseFloat(burnTxt) === 0) {
+      setBurnTxt("");
+    }
+  };
+
+  const onBlurBurn = () => {
+    if (!burnTxt) {
+      setBurnTxt("0");
+    }
+  };
+
   const addCollateral = async () => {
-    if (addCollateralTxt) {
+    if (addCollateralTxt && parseFloat(addCollateralTxt) > 0) {
       setBtnDisabled(true);
       // fix decimals
       const amount = ethers.utils.parseUnits(addCollateralTxt, selectedVaultDecimals);
@@ -770,7 +818,7 @@ const Mint = ({ address, t }: props) => {
         }
       }
       setBtnDisabled(false);
-      setAddCollateralTxt("");
+      setAddCollateralTxt("0");
       setAddCollateralUSD("0");
     } else {
       errorNotification(t("errors.empty"));
@@ -801,7 +849,7 @@ const Mint = ({ address, t }: props) => {
   };
 
   const removeCollateral = async () => {
-    if (removeCollateralTxt) {
+    if (removeCollateralTxt && parseFloat(removeCollateralTxt) > 0) {
       const amount = ethers.utils.parseUnits(removeCollateralTxt, selectedVaultDecimals);
       setBtnDisabled(true);
       try {
@@ -826,7 +874,7 @@ const Mint = ({ address, t }: props) => {
         }
       }
       setBtnDisabled(false);
-      setRemoveCollateralTxt("");
+      setRemoveCollateralTxt("0");
       setRemoveCollateralUSD("0");
     } else {
       errorNotification(t("errors.empty"));
@@ -861,7 +909,7 @@ const Mint = ({ address, t }: props) => {
   };
 
   const mintTCAP = async () => {
-    if (mintTxt) {
+    if (mintTxt && parseFloat(mintTxt) > 0) {
       if (isMinRequiredTcap(parseFloat(mintTxt), true)) {
         setBtnDisabled(true);
         try {
@@ -877,7 +925,7 @@ const Mint = ({ address, t }: props) => {
           }
         }
         setBtnDisabled(false);
-        setMintTxt("");
+        setMintTxt("0");
         setMintUSD("0");
       } else {
         errorNotification(t("vault.errors.min-tcap"));
@@ -911,32 +959,28 @@ const Mint = ({ address, t }: props) => {
   };
 
   const burnTCAP = async () => {
-    if (burnTxt) {
-      if (isMinRequiredTcap(parseFloat(burnTxt), false)) {
-        const amount = ethers.utils.parseEther(burnTxt);
-        setBtnDisabled(true);
-        try {
-          const currentBurnFee = await selectedVaultContract?.getFee(amount);
-          const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
-          const ethFee = ethers.utils.formatEther(increasedFee);
-          setBurnFee(ethFee.toString());
-          const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
-          notifyUser(tx, refresh);
-        } catch (error) {
-          console.error(error);
-          if (error.code === 4001) {
-            errorNotification(t("errors.tran-rejected"));
-          } else {
-            errorNotification(t("vault.errors.burn-too-high"));
-          }
+    if (burnTxt && parseFloat(burnTxt) > 0) {
+      const amount = ethers.utils.parseEther(burnTxt);
+      setBtnDisabled(true);
+      try {
+        const currentBurnFee = await selectedVaultContract?.getFee(amount);
+        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const ethFee = ethers.utils.formatEther(increasedFee);
+        setBurnFee(ethFee.toString());
+        const tx = await selectedVaultContract?.burn(amount, { value: increasedFee });
+        notifyUser(tx, refresh);
+      } catch (error) {
+        console.error(error);
+        if (error.code === 4001) {
+          errorNotification(t("errors.tran-rejected"));
+        } else {
+          errorNotification(t("vault.errors.burn-too-high"));
         }
-        setBtnDisabled(false);
-        setBurnTxt("");
-        setBurnUSD("0");
-        setBurnFee("0");
-      } else {
-        errorNotification(t("vault.errors.min-tcap2"));
       }
+      setBtnDisabled(false);
+      setBurnTxt("0");
+      setBurnUSD("0");
+      setBurnFee("0");
     } else {
       errorNotification(t("errors.empty"));
     }
@@ -1232,7 +1276,7 @@ const Mint = ({ address, t }: props) => {
                       <CollateralDropdown />
                     </Card.Header>
                     <Card.Body>
-                      <div className="balance-info">
+                      <div className="info">
                         <h4>{t("vault.balance-title", { vault: selectedVault })}</h4>
                         <CollateralBalance />
                       </div>
@@ -1271,251 +1315,255 @@ const Mint = ({ address, t }: props) => {
                     </div>
                   </Card>
                 </div>
-                <div className="test">
-                  <div className="test2">
-                    <div className="form-card">
-                      <div className="info">
-                        <h4>{t("vault.collateral.title")}</h4>
-                        <div className="info-values">
-                          <div className="amount">
-                            {(() => {
-                              switch (selectedVault) {
-                                case "DAI":
-                                  return <DAIIconSmall className="dai" />;
-                                case "AAVE":
-                                  return <AAVEIconSmall className="aave" />;
-                                case "LINK":
-                                  return <LINKIconSmall className="link" />;
-                                case "SNX":
-                                  return <SNXIconSmall className="snx" />;
-                                case "UNI":
-                                  return <UNIIconSmall className="uni" />;
-                                case "MATIC":
-                                  return <POLYGONIconSmall className="polygon" />;
-                                case "WBTC":
-                                  return <WBTCIconSmall className="btc small" />;
-                                case "USDC":
-                                  return <USDCIconSmall className="usdc small" />;
-                                default:
-                                  return <ETHIconSmall className="weth" />;
-                              }
-                            })()}
-                            <h4 className=" ml-2 number neon-dark-blue">
-                              <NumberFormat
-                                className="number"
-                                value={vaultCollateral}
-                                displayType="text"
-                                thousandSeparator
-                                decimalScale={2}
-                              />
-                            </h4>
-                          </div>
-                          <p className="number">
+                <div className="form-card">
+                  <Card>
+                    <div className="info">
+                      <h4>{t("vault.collateral.title")}</h4>
+                      <div>
+                        <div className="amount">
+                          {(() => {
+                            switch (selectedVault) {
+                              case "DAI":
+                                return <DAIIconSmall className="dai" />;
+                              case "AAVE":
+                                return <AAVEIconSmall className="aave" />;
+                              case "LINK":
+                                return <LINKIconSmall className="link" />;
+                              case "SNX":
+                                return <SNXIconSmall className="snx" />;
+                              case "UNI":
+                                return <UNIIconSmall className="uni" />;
+                              case "MATIC":
+                                return <POLYGONIconSmall className="polygon" />;
+                              case "WBTC":
+                                return <WBTCIconSmall className="btc small" />;
+                              case "USDC":
+                                return <USDCIconSmall className="usdc small" />;
+                              default:
+                                return <ETHIconSmall className="weth" />;
+                            }
+                          })()}
+                          <h4 className=" ml-2 number neon-dark-blue">
                             <NumberFormat
                               className="number"
-                              value={vaultCollateralUSD}
+                              value={vaultCollateral}
                               displayType="text"
                               thousandSeparator
-                              prefix="$"
-                              decimalScale={parseFloat(vaultCollateralUSD) > 1000 ? 0 : 2}
+                              decimalScale={2}
                             />
-                          </p>
+                          </h4>
                         </div>
+                        <p className="number">
+                          <NumberFormat
+                            className="number"
+                            value={vaultCollateralUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={parseFloat(vaultCollateralUSD) > 1000 ? 0 : 2}
+                          />
+                        </p>
                       </div>
-                      <Card>
-                        <Form>
-                          <Form.Group>
-                            <Form.Label>Add Collateral</Form.Label>
-                            <Form.Label className="max">
-                              <a href="/" className="number" onClick={maxAddCollateral}>
-                                {t("max")}
-                              </a>
-                            </Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                type="number"
-                                placeholder=""
-                                className="neon-green"
-                                value={addCollateralTxt}
-                                onChange={onChangeAddCollateral}
-                              />
-                              <InputGroup.Append>
-                                <Button
-                                  className="neon-green"
-                                  onClick={addCollateral}
-                                  disabled={btnDisabled}
-                                >
-                                  Add
-                                </Button>
-                              </InputGroup.Append>
-                            </InputGroup>
-                            <Form.Text className="text-muted">
-                              <NumberFormat
-                                className="number"
-                                value={addCollateralUSD}
-                                displayType="text"
-                                thousandSeparator
-                                prefix="$"
-                                decimalScale={2}
-                              />
-                            </Form.Text>
-                          </Form.Group>
-                          <Form.Group className="remove">
-                            <Form.Label>Remove Collateral</Form.Label>
-                            <Form.Label className="max">
-                              <a href="/" className="number orange" onClick={safeRemoveCollateral}>
-                                {t("max-safe")}
-                              </a>
-                            </Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                type="number"
-                                placeholder=""
-                                className="neon-orange"
-                                value={removeCollateralTxt}
-                                onChange={onChangeRemoveCollateral}
-                              />
-                              <InputGroup.Append>
-                                <Button
-                                  className="neon-orange"
-                                  onClick={removeCollateral}
-                                  disabled={btnDisabled}
-                                >
-                                  Remove
-                                </Button>
-                              </InputGroup.Append>
-                            </InputGroup>
-                            <Form.Text className="text-muted">
-                              <NumberFormat
-                                className="number"
-                                value={removeCollateralUSD}
-                                displayType="text"
-                                thousandSeparator
-                                prefix="$"
-                                decimalScale={2}
-                              />
-                            </Form.Text>
-                          </Form.Group>
-                        </Form>
-                      </Card>
                     </div>
-                    <div className="form-card">
-                      <div className="info">
-                        <h4>{t("vault.debt.title")}</h4>
-                        <div className="info-values">
-                          <div className="amount">
-                            <TcapIcon className="tcap-neon" />
-                            <h4 className=" ml-2 number neon-pink">
-                              <NumberFormat
-                                className="number"
-                                value={vaultDebt}
-                                displayType="text"
-                                thousandSeparator
-                                decimalScale={2}
-                              />
-                            </h4>
-                          </div>
-                          <p className="number">
+                    <Form>
+                      <Form.Group>
+                        <Form.Label>Add {selectedVault}</Form.Label>
+                        <Form.Label className="max">
+                          <a href="/" className="number" onClick={maxAddCollateral}>
+                            {t("max")}
+                          </a>
+                        </Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-green"
+                            value={addCollateralTxt}
+                            onChange={onChangeAddCollateral}
+                            onFocus={onFocusAddCollateral}
+                            onBlur={onBlurAddCollateral}
+                          />
+                          <InputGroup.Append>
+                            <Button
+                              className="neon-green"
+                              onClick={addCollateral}
+                              disabled={btnDisabled}
+                            >
+                              Add
+                            </Button>
+                          </InputGroup.Append>
+                        </InputGroup>
+                        <Form.Text className="text-muted">
+                          <NumberFormat
+                            className="number"
+                            value={addCollateralUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={2}
+                          />
+                        </Form.Text>
+                      </Form.Group>
+                      <Form.Group className="remove">
+                        <Form.Label>Remove {selectedVault}</Form.Label>
+                        <Form.Label className="max">
+                          <a href="/" className="number orange" onClick={safeRemoveCollateral}>
+                            {t("max-safe")}
+                          </a>
+                        </Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-orange"
+                            value={removeCollateralTxt}
+                            onChange={onChangeRemoveCollateral}
+                            onFocus={onFocusRemoveCollateral}
+                            onBlur={onBlurRemoveCollateral}
+                          />
+                          <InputGroup.Append>
+                            <Button
+                              className="neon-orange"
+                              onClick={removeCollateral}
+                              disabled={btnDisabled}
+                            >
+                              Remove
+                            </Button>
+                          </InputGroup.Append>
+                        </InputGroup>
+                        <Form.Text className="text-muted">
+                          <NumberFormat
+                            className="number"
+                            value={removeCollateralUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={2}
+                          />
+                        </Form.Text>
+                      </Form.Group>
+                    </Form>
+                  </Card>
+                </div>
+                <div className="form-card">
+                  <Card>
+                    <div className="info">
+                      <h4>{t("vault.debt.title")}</h4>
+                      <div>
+                        <div className="amount">
+                          <TcapIcon className="tcap-neon" />
+                          <h4 className=" ml-2 number neon-pink">
                             <NumberFormat
                               className="number"
-                              value={vaultDebtUSD}
+                              value={vaultDebt}
                               displayType="text"
                               thousandSeparator
-                              prefix="$"
-                              decimalScale={parseFloat(vaultDebtUSD) > 1000 ? 0 : 2}
+                              decimalScale={2}
                             />
-                          </p>
+                          </h4>
                         </div>
+                        <p className="number">
+                          <NumberFormat
+                            className="number"
+                            value={vaultDebtUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={parseFloat(vaultDebtUSD) > 1000 ? 0 : 2}
+                          />
+                        </p>
                       </div>
-                      <Card>
-                        <Form>
-                          <Form.Group>
-                            <Form.Label>{t("vault.debt.mint")}</Form.Label>
-                            <Form.Label className="max">
-                              <a href="/" className="number" onClick={safeMintTCAP}>
-                                {t("max-safe")}
-                              </a>
-                            </Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                type="number"
-                                placeholder=""
-                                className="neon-green"
-                                value={mintTxt}
-                                onChange={onChangeMint}
-                              />
-                              <InputGroup.Append>
-                                <Button
-                                  className="neon-green"
-                                  onClick={mintTCAP}
-                                  disabled={btnDisabled}
-                                >
-                                  Mint
-                                </Button>
-                              </InputGroup.Append>
-                            </InputGroup>
-                            <Form.Text className="text-muted">
-                              <NumberFormat
-                                className="number"
-                                value={mintUSD}
-                                displayType="text"
-                                thousandSeparator
-                                prefix="$"
-                                decimalScale={2}
-                              />
-                            </Form.Text>
-                          </Form.Group>
-                          <Form.Group className="remove">
-                            <Form.Label>{t("vault.debt.burn")}</Form.Label>
-                            <Form.Label className="max">
-                              <a href="/" className="number orange" onClick={maxBurnTCAP}>
-                                {t("max")}
-                              </a>
-                            </Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                type="number"
-                                placeholder=""
-                                className="neon-orange"
-                                value={burnTxt}
-                                onChange={onChangeBurn}
-                              />
-                              <InputGroup.Append>
-                                <Button
-                                  className="neon-orange"
-                                  onClick={burnTCAP}
-                                  disabled={btnDisabled}
-                                >
-                                  Burn
-                                </Button>
-                              </InputGroup.Append>
-                            </InputGroup>
-                            <Form.Text className="text-muted">
-                              <NumberFormat
-                                className="number"
-                                value={burnUSD}
-                                displayType="text"
-                                thousandSeparator
-                                prefix="$"
-                                decimalScale={2}
-                              />
-                            </Form.Text>
-                            <Form.Text className="text-muted burn-fee">
-                              {t("vault.debt.fee")}:{" "}
-                              <NumberFormat
-                                className="number neon-pink"
-                                value={burnFee}
-                                displayType="text"
-                                thousandSeparator
-                                decimalScale={4}
-                              />{" "}
-                              {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
-                            </Form.Text>
-                          </Form.Group>
-                        </Form>
-                      </Card>
                     </div>
-                  </div>
+                    <Form>
+                      <Form.Group>
+                        <Form.Label>{t("vault.debt.mint")}</Form.Label>
+                        <Form.Label className="max">
+                          <a href="/" className="number" onClick={safeMintTCAP}>
+                            {t("max-safe")}
+                          </a>
+                        </Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-green"
+                            value={mintTxt}
+                            onChange={onChangeMint}
+                            onFocus={onFocusMint}
+                            onBlur={onBlurMint}
+                          />
+                          <InputGroup.Append>
+                            <Button
+                              className="neon-green"
+                              onClick={mintTCAP}
+                              disabled={btnDisabled}
+                            >
+                              Mint
+                            </Button>
+                          </InputGroup.Append>
+                        </InputGroup>
+                        <Form.Text className="text-muted">
+                          <NumberFormat
+                            className="number"
+                            value={mintUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={2}
+                          />
+                        </Form.Text>
+                      </Form.Group>
+                      <Form.Group className="remove">
+                        <Form.Label>{t("vault.debt.burn")}</Form.Label>
+                        <Form.Label className="max">
+                          <a href="/" className="number orange" onClick={maxBurnTCAP}>
+                            {t("max")}
+                          </a>
+                        </Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-orange"
+                            value={burnTxt}
+                            onChange={onChangeBurn}
+                            onFocus={onFocusBurn}
+                            onBlur={onBlurBurn}
+                          />
+                          <InputGroup.Append>
+                            <Button
+                              className="neon-orange"
+                              onClick={burnTCAP}
+                              disabled={btnDisabled}
+                            >
+                              Burn
+                            </Button>
+                          </InputGroup.Append>
+                        </InputGroup>
+                        <Form.Text className="text-muted">
+                          <NumberFormat
+                            className="number"
+                            value={burnUSD}
+                            displayType="text"
+                            thousandSeparator
+                            prefix="$"
+                            decimalScale={2}
+                          />
+                        </Form.Text>
+                        <Form.Text className="text-muted burn-fee">
+                          {t("vault.debt.fee")}:{" "}
+                          <NumberFormat
+                            className="number neon-pink"
+                            value={burnFee}
+                            displayType="text"
+                            thousandSeparator
+                            decimalScale={4}
+                          />{" "}
+                          {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
+                        </Form.Text>
+                      </Form.Group>
+                    </Form>
+                  </Card>
                 </div>
               </div>
             </>
