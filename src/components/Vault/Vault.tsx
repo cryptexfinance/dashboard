@@ -3,10 +3,10 @@ import Button from "react-bootstrap/esm/Button";
 import { useTranslation } from "react-i18next";
 import { Web3ModalContext } from "../../state/Web3ModalContext";
 import SignerContext from "../../state/SignerContext";
-import "../../styles/vault.scss";
+import "../../styles/mint2.scss";
 
 import Loading from "../Loading";
-import Details from "./Details";
+import Mint2 from "./Mint2";
 
 export const Vault = () => {
   const { t } = useTranslation();
@@ -53,7 +53,7 @@ export const Vault = () => {
             </Button>
           </div>
         ) : (
-          <Details address={address} t={t} />
+          <Mint2 address={address} t={t} />
         )}
       </div>
     </div>

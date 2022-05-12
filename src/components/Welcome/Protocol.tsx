@@ -9,7 +9,7 @@ import TokensContext from "../../state/TokensContext";
 import SignerContext from "../../state/SignerContext";
 import OraclesContext from "../../state/OraclesContext";
 import { ReactComponent as StakeIcon } from "../../assets/images/graph/stake.svg";
-import { ReactComponent as H24Icon } from "../../assets/images/graph/24h.svg";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
@@ -334,7 +334,7 @@ const Protocol = ({ data }: props) => {
               </div>
             </div>
             <div className="totals">
-              <H24Icon className="h24" />
+              <TcapIcon className="h24" />
               <div className="staked">
                 <h6>{t("graph.total-supply")}</h6>
                 <h5 className="number neon-blue">

@@ -87,10 +87,10 @@ export const sendNotification = async (
 ) => {
   const toastConstant = (
     <div className="body">
-      {className === "success" ? (
-        <img src={successImg} alt="toasty" className="toasty" />
-      ) : (
+      {className === "error" ? (
         <img src={errorImg} alt="toasty" className="toasty" />
+      ) : (
+        <img src={successImg} alt="toasty" className="toasty" />
       )}
       <h5>{title}</h5>
       <p>{body}</p>

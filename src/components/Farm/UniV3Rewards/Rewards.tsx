@@ -281,7 +281,23 @@ const Rewards = ({
           />
         </div>
         <div className="rewards-total">
-          <h6>Available to Claim:</h6>
+          <h6>
+            Available to Claim
+            <OverlayTrigger
+              key="bottom"
+              placement="bottom"
+              overlay={
+                <Tooltip id="tooltip-bottom">
+                  In order to claim rewards, you need to unstake your token.
+                </Tooltip>
+              }
+            >
+              <Button variant="dark" className="question-small">
+                ?
+              </Button>
+            </OverlayTrigger>
+            :
+          </h6>
           <div className="amount">
             <NumberFormat
               className="number"
