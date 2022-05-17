@@ -173,6 +173,12 @@ const App = () => {
       currentSigner
     );
     hardVaults.setCurrentUSDCVault(currentHardUSDCVault);
+    const currentHardWBTCVault = new ethers.Contract(
+      contracts.HardWBTCVaultHandler.address,
+      contracts.HardWBTCVaultHandler.abi,
+      currentSigner
+    );
+    hardVaults.setCurrentWBTCVault(currentHardWBTCVault);
 
     const currentAVEEVaultRead = new Contract(
       contracts.AaveVaultHandler.address,
@@ -199,6 +205,11 @@ const App = () => {
       toFragment(contracts.HardUSDCVaultHandler.abi)
     );
     hardVaults.setCurrentUSDCVaultRead(currentHardUSDCVaultRead);
+    const currentHardWBTCVaultRead = new Contract(
+      contracts.HardWBTCVaultHandler.address,
+      toFragment(contracts.HardWBTCVaultHandler.abi)
+    );
+    hardVaults.setCurrentWBTCVaultRead(currentHardWBTCVaultRead);
 
     // Tokens
     const currentAAVEToken = new ethers.Contract(

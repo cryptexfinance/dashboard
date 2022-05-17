@@ -358,8 +358,8 @@ const Mint = ({ address, t }: props) => {
           // balance = await provider.getBalance(address);
           break;
         case "WBTC":
-          currentVault = vaults.wbtcVault;
-          currentVaultRead = vaults.wbtcVaultRead;
+          currentVault = !isHardMode() ? vaults.wbtcVault : hardVaults.wbtcVault;
+          currentVaultRead = !isHardMode() ? vaults.wbtcVaultRead : hardVaults.wbtcVaultRead;
           currentToken = tokens.wbtcToken;
           currentOracleRead = oracles.wbtcOracleRead;
           currentTokenRead = tokens.wbtcTokenRead;
@@ -1082,7 +1082,7 @@ const Mint = ({ address, t }: props) => {
     async function load() {
       let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK", "WBTC"];
       if (isHardMode()) {
-        vOptions = ["ETH", "WETH", "DAI", "USDC"];
+        vOptions = ["ETH", "WETH", "DAI", "USDC", "WBTC"];
       }
       if (isOptimism(currentNetwork.chainId) && !isHardMode()) {
         vOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];

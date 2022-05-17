@@ -7,9 +7,11 @@ export const useHardVaults = (): HardVaultsContext => {
   const [wethVault, setWETHVault] = useState<ethers.Contract>();
   const [daiVault, setDAIVault] = useState<ethers.Contract>();
   const [usdcVault, setUSDCVault] = useState<ethers.Contract>();
+  const [wbtcVault, setWBTCVault] = useState<ethers.Contract>();
   const [wethVaultRead, setWETHVaultRead] = useState<Contract>();
   const [daiVaultRead, setDAIVaultRead] = useState<Contract>();
   const [usdcVaultRead, setUSDCVaultRead] = useState<Contract>();
+  const [wbtcVaultRead, setWBTCVaultRead] = useState<Contract>();
 
   const setCurrentWETHVault = React.useCallback((currentWETHVault: ethers.Contract): void => {
     setWETHVault(currentWETHVault);
@@ -20,6 +22,9 @@ export const useHardVaults = (): HardVaultsContext => {
   const setCurrentUSDCVault = React.useCallback((currentUSDCVault: ethers.Contract): void => {
     setUSDCVault(currentUSDCVault);
   }, []);
+  const setCurrentWBTCVault = React.useCallback((currentWBTCVault: ethers.Contract): void => {
+    setWBTCVault(currentWBTCVault);
+  }, []);
   const setCurrentWETHVaultRead = React.useCallback((currentWETHVaultRead: Contract): void => {
     setWETHVaultRead(currentWETHVaultRead);
   }, []);
@@ -29,6 +34,9 @@ export const useHardVaults = (): HardVaultsContext => {
   const setCurrentUSDCVaultRead = React.useCallback((currentUSDCVaultRead: Contract): void => {
     setUSDCVaultRead(currentUSDCVaultRead);
   }, []);
+  const setCurrentWBTCVaultRead = React.useCallback((currentWBTCVaultRead: Contract): void => {
+    setWBTCVaultRead(currentWBTCVaultRead);
+  }, []);
 
   return {
     wethVault,
@@ -37,11 +45,15 @@ export const useHardVaults = (): HardVaultsContext => {
     setCurrentDAIVault,
     usdcVault,
     setCurrentUSDCVault,
+    wbtcVault,
+    setCurrentWBTCVault,
     wethVaultRead,
     setCurrentWETHVaultRead,
     daiVaultRead,
     setCurrentDAIVaultRead,
     usdcVaultRead,
     setCurrentUSDCVaultRead,
+    wbtcVaultRead,
+    setCurrentWBTCVaultRead,
   };
 };
