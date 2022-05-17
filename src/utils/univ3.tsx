@@ -11,8 +11,8 @@ export const UNIV3 = {
         {
           rewardToken: "0x321C2fE4446C7c963dc41Dd58879AF648838f98D",
           pool: "0x11456b3750E991383bB8943118ed79C1afdEE192",
-          startTime: 1652820659,
-          endTime: 1660769459,
+          startTime: 1652823662,
+          endTime: 1660772462,
           refundee: "0xa70b638B70154EdfCbb8DbbBd04900F328F32c35",
         },
       ],
