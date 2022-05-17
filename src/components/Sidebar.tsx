@@ -9,10 +9,9 @@ import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
-// import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
-import { ReactComponent as PoolsIcon } from "../assets/images/welcome/pool.svg";
+import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
-import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
+// import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
@@ -69,141 +68,69 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
       <Nav className={sidebarClass()}>
         <Nav.Item className="mt-4 mb-1">{sideBarLogo()}</Nav.Item>
         <Nav.Item>
-          {active === "dashboard" ? (
-            <Link
-              to="/"
-              className="active"
-              onClick={() => {
-                setActive("dashboard");
-              }}
-            >
-              <DashboardIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/"
-              onClick={() => {
-                setActive("dashboard");
-              }}
-            >
-              <DashboardIcon />
-            </Link>
-          )}
+          <Link
+            to="/"
+            className={active === "dashboard" ? "active" : ""}
+            onClick={() => {
+              setActive("dashboard");
+            }}
+          >
+            <DashboardIcon />
+            <span className={active === "dashboard" ? "title active" : "title"}>Summary</span>
+          </Link>
         </Nav.Item>
         <Nav.Item>
-          {active === "vault" ? (
-            <Link
-              to="/vault"
-              className="active"
-              onClick={() => {
-                setActive("vault");
-              }}
-            >
-              <VaultIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/vault"
-              onClick={() => {
-                setActive("vault");
-              }}
-            >
-              <VaultIcon />
-            </Link>
-          )}
+          <Link
+            to="/vault"
+            className={active === "vault" ? "active" : ""}
+            onClick={() => {
+              setActive("vault");
+            }}
+          >
+            <VaultIcon />
+            <span className={active === "vault" ? "title active" : "title"}>Mint</span>
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/vault-monitoring"
+            className={active === "vault-monitoring" ? "active" : ""}
+            onClick={() => {
+              setActive("vault-monitoring");
+            }}
+          >
+            <VaultMonitoringIcon />
+            <span className={active === "vault-monitoring" ? "title active" : "title"}>
+              Monitor
+            </span>
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/farm"
+            className={active === "farm" ? "active" : ""}
+            onClick={() => {
+              setActive("farm");
+            }}
+          >
+            <FarmIcon />
+            <span className={active === "farm" ? "title active" : "title"}>Farm</span>
+          </Link>
         </Nav.Item>
         {isInLayer1(currentNetwork.chainId) && (
           <Nav.Item>
-            {active === "pools" ? (
-              <Link
-                to="/pools"
-                className="active"
-                onClick={() => {
-                  setActive("pools");
-                }}
-              >
-                <PoolsIcon />
-              </Link>
-            ) : (
-              <Link
-                to="/pools"
-                onClick={() => {
-                  setActive("pools");
-                }}
-              >
-                <PoolsIcon />
-              </Link>
-            )}
+            <Link
+              to="/governance"
+              className={active === "governance" ? "active" : ""}
+              onClick={() => {
+                setActive("governance");
+              }}
+            >
+              <StakeIcon className="governance" />
+              <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
+            </Link>
           </Nav.Item>
         )}
-        <Nav.Item>
-          {active === "farm" ? (
-            <Link
-              to="/farm"
-              className="active"
-              onClick={() => {
-                setActive("farm");
-              }}
-            >
-              <FarmIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/farm"
-              onClick={() => {
-                setActive("farm");
-              }}
-            >
-              <FarmIcon />
-            </Link>
-          )}
-        </Nav.Item>
-        {isInLayer1(currentNetwork.chainId) && (
-          <Nav.Item>
-            {active === "governance" ? (
-              <Link
-                to="/governance"
-                className="active"
-                onClick={() => {
-                  setActive("governance");
-                }}
-              >
-                <StakeIcon className="governance" />
-              </Link>
-            ) : (
-              <Link
-                to="/governance"
-                onClick={() => {
-                  setActive("governance");
-                }}
-              >
-                <StakeIcon className="governance" />
-              </Link>
-            )}
-          </Nav.Item>
-        )}
-        <Nav.Item>
-          {active === "graph" ? (
-            <Link
-              to="/graph"
-              className="active"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
-            </Link>
-          ) : (
-            <Link
-              to="/graph"
-              onClick={() => {
-                setActive("graph");
-              }}
-            >
-              <GraphIcon />
-            </Link>
-          )}
-        </Nav.Item>
         <Nav.Item>
           <Link
             to=""
@@ -214,6 +141,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             }}
           >
             <LogoutIcon />
+            <span className="title">Disconnect</span>
           </Link>
         </Nav.Item>
       </Nav>

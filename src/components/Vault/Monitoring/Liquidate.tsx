@@ -5,29 +5,38 @@ import { ethers, BigNumber } from "ethers";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import Modal from "react-bootstrap/esm/Modal";
 import NumberFormat from "react-number-format";
+import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
+import Tooltip from "react-bootstrap/esm/Tooltip";
 import "../../../styles/modal.scss";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
 import OracleContext from "../../../state/OraclesContext";
 import TokensContext from "../../../state/TokensContext";
 import VaultContext from "../../../state/VaultsContext";
-import { errorNotification, isPolygon, notifyUser, toUSD } from "../../../utils/utils";
-import { numberFormatStr } from "./common";
+import HardVaultsContext from "../../../state/HardVaultsContext";
+import { VaultsType } from "./types";
+import {
+  errorNotification,
+  isPolygon,
+  notifyUser,
+  numberFormatStr,
+  toUSD,
+} from "../../../utils/utils";
 
 type props = {
   show: boolean;
   currentAddress: string;
-  vaultId: string;
-  vaultType: string;
+  liqVault: VaultsType | null;
   onHide: () => void;
   refresh: () => void;
 };
 
-const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }: props) => {
+const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const oracles = useContext(OracleContext);
   const vaults = useContext(VaultContext);
+  const hardVaults = useContext(HardVaultsContext);
   const tokens = useContext(TokensContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
   const [tcapBalance, setTcapBalance] = useState("0");
@@ -43,14 +52,23 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
 
   useEffect(() => {
     async function load() {
-      if (currentAddress !== "" && vaults) {
+      if (currentAddress !== "" && liqVault !== null && vaults) {
         let cVault = vaults.wethVault;
         let cVaultRead = vaults.wethVaultRead;
         let oracleRead = oracles.wethOracleRead;
-        switch (vaultType) {
+        if (liqVault.isHardVault) {
+          cVault = hardVaults.wethVault;
+          cVaultRead = hardVaults.wethVaultRead;
+        }
+        switch (liqVault.collateralSymbol) {
           case "DAI":
-            cVault = vaults.daiVault;
-            cVaultRead = vaults.daiVaultRead;
+            if (liqVault.isHardVault) {
+              cVault = hardVaults.daiVault;
+              cVaultRead = hardVaults.daiVaultRead;
+            } else {
+              cVault = vaults.daiVault;
+              cVaultRead = vaults.daiVaultRead;
+            }
             oracleRead = oracles.daiOracleRead;
             break;
           case "AAVE":
@@ -83,54 +101,74 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
             cVaultRead = vaults.wbtcVaultRead;
             oracleRead = oracles.wbtcOracleRead;
             break;
+          case "USDC":
+            cVault = hardVaults.usdcVault;
+            cVaultRead = hardVaults.usdcVaultRead;
+            oracleRead = oracles.usdcOracleRead;
+            break;
           default:
-            cVault = vaults.wethVault;
-            cVaultRead = vaults.wethVaultRead;
+            if (liqVault.isHardVault) {
+              cVault = hardVaults.wethVault;
+              cVaultRead = hardVaults.wethVaultRead;
+            } else {
+              cVault = vaults.wethVault;
+              cVaultRead = vaults.wethVaultRead;
+            }
             oracleRead = oracles.wethOracleRead;
             break;
         }
-        if (vaultId !== "" && cVault && cVaultRead) {
-          setCurrentVault(cVault);
-          const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
-          const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-          const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(BigNumber.from(vaultId));
-          const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(vaultId));
-          const oraclePriceCall = await oracleRead?.getLatestAnswer();
-          const ethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        if (liqVault.id !== "" && cVault && cVaultRead) {
+          try {
+            setCurrentVault(cVault);
+            const tcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(currentAddress);
+            const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+            const reqTcapCall = await cVaultRead?.requiredLiquidationTCAP(
+              BigNumber.from(liqVault.id)
+            );
+            const liqRewardCall = await cVaultRead?.liquidationReward(BigNumber.from(liqVault.id));
+            const oraclePriceCall = await oracleRead?.getLatestAnswer();
+            const ethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+            // @ts-ignore
+            const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice, ethPrice] =
+              await signer.ethcallProvider?.all([
+                tcapBalanceCall,
+                tcapPriceCall,
+                reqTcapCall,
+                liqRewardCall,
+                oraclePriceCall,
+                ethOraclePriceCall,
+              ]);
+            const tcapBalanceText = ethers.utils.formatEther(balance);
+            const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
+            const reqTcapText = ethers.utils.formatEther(reqTcap);
+            const liqRewardText = ethers.utils.formatUnits(liqReward, liqVault.decimals);
+            const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
+            const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
+            const currentLiqFee = await cVault?.getFee(reqTcap);
+            const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
+            const ethFee = ethers.utils.formatEther(increasedFee);
 
-          // @ts-ignore
-          const [balance, tcapOraclePrice, reqTcap, liqReward, collateralPrice, ethPrice] =
-            await signer.ethcallProvider?.all([
-              tcapBalanceCall,
-              tcapPriceCall,
-              reqTcapCall,
-              liqRewardCall,
-              oraclePriceCall,
-              ethOraclePriceCall,
-            ]);
-          const tcapBalanceText = ethers.utils.formatEther(balance);
-          const tcapPriceText = ethers.utils.formatEther(tcapOraclePrice);
-          const reqTcapText = ethers.utils.formatEther(reqTcap);
-          const liqRewardText = ethers.utils.formatEther(liqReward);
-          const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
-          const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
-          const currentLiqFee = await cVault?.getFee(reqTcap);
-          const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
-          const ethFee = ethers.utils.formatEther(increasedFee);
-
-          setTcapBalance(tcapBalanceText);
-          setTcapPrice(tcapPriceText);
-          setRequiredTcap(reqTcapText);
-          setReward(liqRewardText);
-          setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
-          setBurnFee(ethFee);
-          setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
+            setTcapBalance(tcapBalanceText);
+            setTcapPrice(tcapPriceText);
+            setRequiredTcap(reqTcapText);
+            setMaxTcap(reqTcapText);
+            setMaxTcapUSD(toUSD(reqTcapText, tcapPriceText).toFixed(2));
+            setReward(liqRewardText);
+            setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
+            setBurnFee(ethFee);
+            setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
+          } catch (error) {
+            // Error happens when trying to calculate reward on a not liquidable vault
+            if (error.code !== "UNPREDICTABLE_GAS_LIMIT") {
+              console.log(error.code);
+            }
+          }
         }
       }
     }
     load();
     // eslint-disable-next-line
-  }, [currentAddress, vaultId]);
+  }, [currentAddress, liqVault]);
 
   const onChangeMaxTcap = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMaxTcap(event.target.value);
@@ -145,7 +183,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
 
   const liquidate = async (event: React.MouseEvent) => {
     event.preventDefault();
-    if (currentAddress && canLiquidate && currentVault) {
+    if (currentAddress && liqVault !== null && canLiquidate && currentVault) {
       setCanLiquidate(false);
       const maxAmountTcap = parseFloat(maxTcap);
       if (maxTcap && maxAmountTcap > 0) {
@@ -159,12 +197,12 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
               const ethFee = ethers.utils.formatEther(increasedFee);
               setBurnFee(ethFee);
               const tx = await currentVault.liquidateVault(
-                BigNumber.from(vaultId),
+                BigNumber.from(liqVault.id),
                 ethers.utils.parseEther(maxTcap),
                 { value: increasedFee }
               );
               notifyUser(tx, refresh);
-              refresh();
+              await refresh();
               setMaxTcap("");
               onHide();
             } catch (error) {
@@ -184,6 +222,49 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
   };
 
   const netReward = parseFloat(rewardUSD) - parseFloat(maxTcapUSD) - parseFloat(burnFeeUsd);
+
+  const getTokeSymbol = () => {
+    if (liqVault !== null) {
+      if (liqVault.collateralSymbol === "WETH") {
+        return "ETH";
+      }
+      return liqVault.collateralSymbol;
+    }
+    return "";
+  };
+
+  const rewardHelp = () => (
+    <Tooltip id="ttip-position" className="univ3-status-tooltip">
+      Collateral amount in USD you are getting for liquidating the vault.
+    </Tooltip>
+  );
+
+  const tcapAmountHelp = () => (
+    <Tooltip id="ttip-position" className="univ3-status-tooltip">
+      Amount of TCAP in USD you need to provide to liquidate vault.
+    </Tooltip>
+  );
+
+  const netRewardHelp = () => (
+    <Tooltip id="ttip-position" className="univ3-status-tooltip">
+      Actual profit in USD you earn after liquidation: <br />
+      Net Reward = Reward - TCAP Amount - Burn Fee.
+    </Tooltip>
+  );
+
+  const helpToolTip = (column: number) => {
+    let help = rewardHelp();
+    if (column === 1) {
+      help = tcapAmountHelp();
+    } else if (column === 3) {
+      help = netRewardHelp();
+    }
+    return (
+      <OverlayTrigger key="top" placement="auto" trigger={["hover", "click"]} overlay={help}>
+        <Button variant="dark">?</Button>
+      </OverlayTrigger>
+    );
+  };
 
   return (
     <Modal
@@ -241,7 +322,7 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
                       thousandSeparator
                       decimalScale={4}
                     />{" "}
-                    {vaultType === "WETH" ? "ETH" : vaultType}
+                    {getTokeSymbol()}
                   </div>
                 </Form.Text>
                 <Form.Text className="text-muted liquidation-fee">
@@ -263,10 +344,19 @@ const Liquidate = ({ show, currentAddress, vaultId, vaultType, onHide, refresh }
         </Form>
         <Table hover className="mt-2 liq-info">
           <thead>
-            <th>Reward</th>
-            <th>Required TCAP</th>
+            <th>
+              Reward
+              {helpToolTip(0)}
+            </th>
+            <th>
+              Required TCAP
+              {helpToolTip(1)}
+            </th>
             <th>Burn Fee</th>
-            <th>Net Reward</th>
+            <th>
+              Net Reward
+              {helpToolTip(3)}
+            </th>
           </thead>
           <tbody>
             <td>${numberFormatStr(rewardUSD, 2, 2)}</td>

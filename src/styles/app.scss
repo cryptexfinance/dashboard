@@ -257,6 +257,7 @@ html,
   height: 100%;
 }
 
+
 .farm-tooltip > .tooltip-inner {
   max-width: 300px;
   width: 300px;
@@ -286,11 +287,75 @@ html,
   text-align: right;
   padding: 0.9rem;
 }
+.ttip-hard-vault > .tooltip-inner {
+  max-width: 390px;
+  width: 390px;
+  text-align: left;
+}
+
+.univ3-status-tooltip > .tooltip-inner {
+  min-width: 400px;
+  width: 400px;
+  text-align: left;
+  padding: 0.9rem;
+  .unstaked {
+    text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+  }
+  .deposited {
+    text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
+  }
+  .staked {
+    text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
+  }
+  .not_approved {
+    text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
+  }
+  .out_range {
+    text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
+  }
+}
 
 form {
   .field-error {
     color: $orange;
   }
+  .add-file-icon {
+    svg {
+      background:rgba(142, 126, 155, 0.3);
+      color: rgba(209, 194, 239, 0.65);
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+    }
+  }
+  .add-file-icon.loading {
+    svg {
+      border: 3px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 3px solid $green;
+      color: transparent;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+  }
+  .add-file-icon.error {
+    svg {
+      border: 3px solid $orange;  
+    }
+  }
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .table {
@@ -334,9 +399,26 @@ form {
   }
 }
 
+.spinner-container {
+  display: block;
+  height: 100%;
+}
 .spinner {
   margin: 5rem 50%;
   color: $highlight !important;
+}
+
+.info-message {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+
+  h5, h6 {
+    color: #bc99d7;
+  }
+  h6 {
+    font-size: 1.3rem;
+  }
 }
 
 #WEB3_CONNECT_MODAL_ID {
@@ -369,6 +451,12 @@ form {
     .web3modal-provider-description {
       display: none;
     }
+  }
+}
+
+.card {
+  &-header  {
+    background-color: transparent;
   }
 }
 

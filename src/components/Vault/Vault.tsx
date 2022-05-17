@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import Button from "react-bootstrap/esm/Button";
+import { useTranslation } from "react-i18next";
 import { Web3ModalContext } from "../../state/Web3ModalContext";
 import SignerContext from "../../state/SignerContext";
-import "../../styles/vault.scss";
+import "../../styles/mint.scss";
 
 import Loading from "../Loading";
-import Details from "./Details";
+import Mint from "./Mint";
 
 export const Vault = () => {
+  const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
 
@@ -30,31 +32,28 @@ export const Vault = () => {
   }, [signer.signer, address]);
 
   if (isLoading) {
-    return <Loading title="Loading" message="Please wait" />;
+    return <Loading title={t("loading")} message={t("wait")} />;
   }
 
   return (
     <div className="vault">
       <div>
-        <h3>The Vault</h3>
+        <h3>{t("vault.title1")}</h3>
         {!signer.signer ? (
           <div className="pre-actions">
-            <h5 className="action-title mt-4 pt-2">Connect Wallet</h5>
-            <p>
-              No wallet connected. Please Connect your wallet to Create a Vault and approve your
-              collateral to start minting TCAP tokens.
-            </p>
+            <h5 className="action-title mt-4 pt-2">{t("connect")}</h5>
+            <p>{t("vault.no-connected")}</p>
             <Button
               variant="pink neon-pink"
               onClick={() => {
                 web3Modal.toggleModal();
               }}
             >
-              Connect Wallet
+              {t("connect")}
             </Button>
           </div>
         ) : (
-          <Details address={address} />
+          <Mint address={address} t={t} />
         )}
       </div>
     </div>

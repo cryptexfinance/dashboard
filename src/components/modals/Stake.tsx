@@ -3,6 +3,7 @@ import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
 import { ethers, BigNumber } from "ethers";
+import { useTranslation } from "react-i18next";
 import SignerContext from "../../state/SignerContext";
 import "../../styles/modal.scss";
 
@@ -19,6 +20,7 @@ type props = {
 };
 
 export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refresh }: props) => {
+  const { t } = useTranslation();
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
   const signer = useContext(SignerContext);
@@ -56,14 +58,14 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           setStakeText("");
           onHide();
         } catch (error) {
-          if (error.code === 4001 || error.code === -32603) {
-            errorNotification("Transaction rejected");
+          if (error.code === 4001) {
+            errorNotification(t("errors.tran-rejected"));
           } else {
-            errorNotification("Token not Approved");
+            errorNotification(t("errors.not-approve"));
           }
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
     }
   };
@@ -77,8 +79,8 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         setStakeText("");
         setIsApproved(true);
       } catch (error) {
-        if (error.code === 4001 || error.code === -32603) {
-          errorNotification("Transaction rejected");
+        if (error.code === 4001) {
+          errorNotification(t("errors.tran-rejected"));
         } else {
           console.log(error);
         }
@@ -103,17 +105,19 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Stake {poolTitle}</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {t("stake")} {poolTitle}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>
-          Current Balance: <b>{balance}</b>
+          {t("balance2")}: <b>{balance}</b>
         </p>
         <Form>
           <Form.Group>
             {isApproved ? (
               <>
-                <Form.Label>Amount to Stake</Form.Label>
+                <Form.Label>{t("stake2")}</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
                     MAX
@@ -137,17 +141,17 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         {isApproved ? (
           <>
             <Button variant="primary" className="neon-highlight" onClick={stakeTokens}>
-              Stake Tokens
+              {t("stake")} {t("tokens")}
             </Button>
           </>
         ) : (
           <>
             <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
-              Infinite Approve
+              {t("infinite-approve")}
             </Button>
           </>
         )}{" "}
-        Tokens
+        {t("tokens")}
       </Modal.Footer>
     </Modal>
   );

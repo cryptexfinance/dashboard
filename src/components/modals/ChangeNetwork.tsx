@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
+import { useTranslation } from "react-i18next";
 import { FEATURES, NETWORKS } from "../../utils/constants";
 import { useNetworks } from "../../hooks/useNetworks";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
@@ -14,7 +15,29 @@ type props = {
 };
 
 export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
+  const { t } = useTranslation();
   const networks = useNetworks();
+
+  const PolygonNetworks = () => {
+    let { hexChainId, chainId } = NETWORKS.polygon;
+    let name = "Polygon";
+
+    if (process.env.REACT_APP_NETWORK_ID !== "1") {
+      hexChainId = NETWORKS.mumbai.hexChainId;
+      chainId = NETWORKS.mumbai.chainId;
+      name = "Mumbai";
+    }
+
+    return (
+      <Button
+        className="btn-polygon"
+        onClick={() => changeNetwork(hexChainId)}
+        disabled={networks.chainId === chainId}
+      >
+        <POLYGONIconSmall className="polygon" /> {name}
+      </Button>
+    );
+  };
 
   return (
     <Modal
@@ -27,7 +50,7 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Choose Network</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{t("choose-network")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="change-network">
@@ -64,15 +87,7 @@ export const ChangeNetwork = ({ show, onHide, changeNetwork }: props) => {
               </Button>
             </>
           )}
-          {FEATURES.POLYGON && (
-            <Button
-              className="btn-polygon"
-              onClick={() => changeNetwork(NETWORKS.polygon.hexChainId)}
-              disabled={networks.chainId === NETWORKS.polygon.chainId}
-            >
-              <POLYGONIconSmall className="polygon" /> Polygon
-            </Button>
-          )}
+          {FEATURES.POLYGON && <PolygonNetworks />}
         </div>
       </Modal.Body>
     </Modal>

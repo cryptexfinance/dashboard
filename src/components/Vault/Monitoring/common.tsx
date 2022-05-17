@@ -8,6 +8,7 @@ import { ReactComponent as UNIIcon } from "../../../assets/images/graph/uni.svg"
 import { ReactComponent as SNXIcon } from "../../../assets/images/graph/snx.svg";
 import { ReactComponent as MATICIcon } from "../../../assets/images/graph/polygon.svg";
 import { ReactComponent as WBTCIcon } from "../../../assets/images/graph/wbtc.svg";
+import { ReactComponent as USDCIcon } from "../../../assets/images/graph/usdc.svg";
 
 type iconProps = {
   name: string;
@@ -42,24 +43,11 @@ export const CollateralIcon = ({ name }: iconProps) => {
       return <MATICIcon className="matic" />;
     case "wbtc":
       return <WBTCIcon className="wbtc" />;
+    case "usdc":
+      return <USDCIcon className="eth" />;
     default:
       return <></>;
   }
-};
-
-export const numberFormatStr = (
-  value: string,
-  minDecimals: number | undefined,
-  maxDecimals: number | undefined
-) => {
-  const numberFormat = new Intl.NumberFormat([], {
-    minimumFractionDigits: minDecimals,
-    maximumFractionDigits: maxDecimals,
-  });
-  if (minDecimals) {
-    return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
-  }
-  return numberFormat.format(parseFloat(value));
 };
 
 export const sortCollateralAsc = (a: VaultsType, b: VaultsType) =>

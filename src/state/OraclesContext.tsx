@@ -21,6 +21,8 @@ export interface OraclesContext {
   setCurrentUNIOracle: (currentOracle: ethers.Contract) => void;
   maticOracle?: ethers.Contract;
   setCurrentMATICOracle: (currentOracle: ethers.Contract) => void;
+  usdcOracle?: ethers.Contract;
+  setCurrentUSDCOracle: (currentOracle: ethers.Contract) => void;
   wethOracleRead?: Contract;
   setCurrentWETHOracleRead: (currentOracle: Contract) => void;
   daiOracleRead?: Contract;
@@ -39,6 +41,8 @@ export interface OraclesContext {
   setCurrentUNIOracleRead: (currentOracle: Contract) => void;
   maticOracleRead?: Contract;
   setCurrentMATICOracleRead: (currentOracle: Contract) => void;
+  usdcOracleRead?: Contract;
+  setCurrentUSDCOracleRead: (currentOracle: Contract) => void;
 }
 
 export const ORACLES_DEFAULT_VALUE = {
@@ -51,6 +55,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentSNXOracle: () => {},
   setCurrentUNIOracle: () => {},
   setCurrentMATICOracle: () => {},
+  setCurrentUSDCOracle: () => {},
   setCurrentWETHOracleRead: () => {},
   setCurrentDAIOracleRead: () => {},
   setCurrentWBTCOracleRead: () => {},
@@ -60,6 +65,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentSNXOracleRead: () => {},
   setCurrentUNIOracleRead: () => {},
   setCurrentMATICOracleRead: () => {},
+  setCurrentUSDCOracleRead: () => {},
 };
 
 const oraclesContext = React.createContext<OraclesContext>(ORACLES_DEFAULT_VALUE);

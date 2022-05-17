@@ -9,10 +9,10 @@ import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
 import Liquidate from "./Liquidate";
 import { PaginationType, VaultsType } from "./types";
+import { numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
   CollateralIcon,
-  numberFormatStr,
   sortCollateralDesc,
   sortCollateralAsc,
   sortCollateralUsdDesc,
@@ -23,7 +23,6 @@ import {
   sortRatioAsc,
   sortRewardDesc,
   sortRewardAsc,
-  VAULT_STATUS,
 } from "./common";
 
 type dataType = {
@@ -45,18 +44,25 @@ export const Vaults = ({
 }: dataType) => {
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
-  const [vaultId, setVaultId] = useState("");
-  const [vaultType, setVaultType] = useState("");
+  const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
   const [collateralSort, setCollateralSort] = useState(0);
   const [collateralUsdSort, setCollateralUsdSort] = useState(0);
   const [debtSort, setDebtSort] = useState(0);
   const [ratioSort, setRatioSort] = useState(0);
   const [rewardSort, setRewardSort] = useState(0);
+  // const [renderReward, setRenderReward] = useState(false);
 
-  const liquidateVault = (index: number, id: string, type: string) => {
-    setVaultId(id);
+  /* useEffect(() => {
+    if (loadingLiq) {
+      console.log("ntra aqui");
+      setRenderReward(!renderReward);
+    }
+    // eslint-disable-next-line
+  }, [loadingLiq]); */
+
+  const liquidateVault = (index: number, lVault: VaultsType) => {
     setVaultIndex(index);
-    setVaultType(type);
+    setLiqVault(lVault);
     setShowLiquidate(true);
   };
 
@@ -147,9 +153,9 @@ export const Vaults = ({
     if (currentAddress === "") {
       return <span className={v.status}>{capitalize(v.status)}</span>;
     }
-    if (v.status === VAULT_STATUS.liquidation) {
+    if (v.status === "liquidation") {
       return (
-        <Button onClick={() => liquidateVault(index, v.id, v.collateralSymbol)}>
+        <Button onClick={() => liquidateVault(index, v)}>
           <span className={v.status}>{capitalize(v.status)}</span>
         </Button>
       );
@@ -233,7 +239,10 @@ export const Vaults = ({
             return (
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
                 <td>
-                  <div className="status">{statusTag(index, v)}</div>
+                  <div className="status">
+                    {statusTag(index, v)}
+                    {v.isHardVault && <span className="mode">Hard mode</span>}
+                  </div>
                 </td>
                 <td>
                   <OverlayTrigger
@@ -300,9 +309,7 @@ export const Vaults = ({
                 {currentStatus === "liquidation" && (
                   <td>
                     <div className="ratio">
-                      <span className={VAULT_STATUS.active}>
-                        ${numberFormatStr(v.netReward.toFixed(2), 2, 2)}
-                      </span>
+                      <span className="active">${v.netReward.toFixed(2)}</span>
                     </div>
                   </td>
                 )}
@@ -314,15 +321,13 @@ export const Vaults = ({
       <Liquidate
         show={showLiquidate}
         currentAddress={currentAddress}
-        vaultId={vaultId}
-        vaultType={vaultType}
+        liqVault={liqVault}
         onHide={() => {
-          setVaultId("");
-          setVaultType("");
+          setLiqVault(null);
           setVaultIndex(-1);
           setShowLiquidate(false);
         }}
-        refresh={() => refresh(vaultIndex, vaultType)}
+        refresh={() => refresh(vaultIndex, liqVault !== null ? liqVault.collateralSymbol : "ETH")}
       />
     </>
   );

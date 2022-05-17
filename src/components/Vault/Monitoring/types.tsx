@@ -3,6 +3,7 @@ export type PaginationType = {
   current: number;
   next: number;
   pages: number;
+  lastDataPage: number;
   itemsPerPage: number;
   itemsCount: number;
   lastId: string;
@@ -18,6 +19,7 @@ export type OraclePricesType = {
   snxOraclePrice: string;
   maticOraclePrice: string;
   wbtcOraclePrice: string;
+  usdcOraclePrice: string;
 };
 
 export type VaultsRatioType = {
@@ -30,6 +32,10 @@ export type VaultsRatioType = {
   snxRatio: number;
   maticRatio: number;
   wbtcRatio: number;
+  hardEthRatio: number;
+  hardWethRatio: number;
+  hardDaiRatio: number;
+  hardUsdcRatio: number;
 };
 
 export type VaultsType = {
@@ -41,6 +47,8 @@ export type VaultsType = {
   debtUsd: string;
   ratio: number;
   minRatio: string;
+  decimals: number;
+  isHardVault: boolean;
   netReward: number;
   status: string;
   blockTS: string;

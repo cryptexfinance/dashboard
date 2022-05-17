@@ -23,6 +23,8 @@ export interface TokensContext {
   setCurrentUNIToken: (currentUni: ethers.Contract) => void;
   maticToken?: ethers.Contract;
   setCurrentMATICToken: (currentMATIC: ethers.Contract) => void;
+  usdcToken?: ethers.Contract;
+  setCurrentUSDCToken: (currentUSDC: ethers.Contract) => void;
   wethPoolToken?: ethers.Contract;
   setCurrentWETHPoolToken: (currentPoolToken: ethers.Contract) => void;
   daiPoolToken?: ethers.Contract;
@@ -51,6 +53,8 @@ export interface TokensContext {
   setCurrentUNITokenRead: (currentUni: Contract) => void;
   maticTokenRead?: Contract;
   setCurrentMATICTokenRead: (currentMATIC: Contract) => void;
+  usdcTokenRead?: Contract;
+  setCurrentUSDCTokenRead: (currentUSDC: Contract) => void;
   wethPoolTokenRead?: Contract;
   setCurrentWETHPoolTokenRead: (currentPoolTokenRead: Contract) => void;
   daiPoolTokenRead?: Contract;
@@ -72,6 +76,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentSNXToken: () => {},
   setCurrentUNIToken: () => {},
   setCurrentMATICToken: () => {},
+  setCurrentUSDCToken: () => {},
   setCurrentWETHPoolToken: () => {},
   setCurrentDAIPoolToken: () => {},
   setCurrentWBTCPoolToken: () => {},
@@ -86,6 +91,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentSNXTokenRead: () => {},
   setCurrentUNITokenRead: () => {},
   setCurrentMATICTokenRead: () => {},
+  setCurrentUSDCTokenRead: () => {},
   setCurrentWETHPoolTokenRead: () => {},
   setCurrentDAIPoolTokenRead: () => {},
   setCurrentWBTCPoolTokenRead: () => {},

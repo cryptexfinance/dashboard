@@ -185,6 +185,9 @@
     }
 
     .liquidate-input {
+      .form-control {
+        z-index: 1;
+      }
       .text-muted {
         position: absolute;
         width: 100%;
@@ -196,6 +199,10 @@
   }
   table.liq-info {
     margin-top: 3rem !important;
+    .btn-dark {
+      padding-top: 5px;
+      padding-left: 10px;
+    }
     th {
       text-align: right;
       border-bottom: 1px;
