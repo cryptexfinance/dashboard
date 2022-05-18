@@ -36,7 +36,7 @@ export const UNIV3 = {
 };
 
 export const GRAPHQL_UNIV3_ENDPOINT = {
-  mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo-2",
+  mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-univ3",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
 };
 
