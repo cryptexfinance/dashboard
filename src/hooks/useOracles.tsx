@@ -13,6 +13,7 @@ export const useOracles = (): OraclesContext => {
   const [snxOracle, setSNXOracle] = useState<ethers.Contract>();
   const [uniOracle, setUNIOracle] = useState<ethers.Contract>();
   const [maticOracle, setMATICOracle] = useState<ethers.Contract>();
+  const [usdcOracle, setUSDCOracle] = useState<ethers.Contract>();
   const [wethOracleRead, setETHOracleRead] = useState<Contract>();
   const [daiOracleRead, setDAIOracleRead] = useState<Contract>();
   const [wbtcOracleRead, setWBTCOracleRead] = useState<Contract>();
@@ -22,6 +23,7 @@ export const useOracles = (): OraclesContext => {
   const [snxOracleRead, setSNXOracleRead] = useState<Contract>();
   const [uniOracleRead, setUNIOracleRead] = useState<Contract>();
   const [maticOracleRead, setMATICOracleRead] = useState<Contract>();
+  const [usdcOracleRead, setUSDCOracleRead] = useState<Contract>();
 
   const setCurrentWETHOracle = React.useCallback((currentWETHOracle: ethers.Contract): void => {
     setETHOracle(currentWETHOracle);
@@ -50,6 +52,9 @@ export const useOracles = (): OraclesContext => {
   const setCurrentMATICOracle = React.useCallback((currentMATICOracle: ethers.Contract): void => {
     setMATICOracle(currentMATICOracle);
   }, []);
+  const setCurrentUSDCOracle = React.useCallback((currentUSDCOracle: ethers.Contract): void => {
+    setUSDCOracle(currentUSDCOracle);
+  }, []);
   const setCurrentWETHOracleRead = React.useCallback((currentWETHOracleRead: Contract): void => {
     setETHOracleRead(currentWETHOracleRead);
   }, []);
@@ -77,6 +82,9 @@ export const useOracles = (): OraclesContext => {
   const setCurrentMATICOracleRead = React.useCallback((currentMATICOracleRead: Contract): void => {
     setMATICOracleRead(currentMATICOracleRead);
   }, []);
+  const setCurrentUSDCOracleRead = React.useCallback((currentUSDCOracleRead: Contract): void => {
+    setUSDCOracleRead(currentUSDCOracleRead);
+  }, []);
   return {
     wethOracle,
     setCurrentWETHOracle,
@@ -96,6 +104,8 @@ export const useOracles = (): OraclesContext => {
     setCurrentUNIOracle,
     maticOracle,
     setCurrentMATICOracle,
+    usdcOracle,
+    setCurrentUSDCOracle,
     wethOracleRead,
     setCurrentWETHOracleRead,
     daiOracleRead,
@@ -114,5 +124,7 @@ export const useOracles = (): OraclesContext => {
     setCurrentUNIOracleRead,
     maticOracleRead,
     setCurrentMATICOracleRead,
+    usdcOracleRead,
+    setCurrentUSDCOracleRead,
   };
 };

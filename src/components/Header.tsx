@@ -4,6 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
@@ -14,7 +15,7 @@ import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
 import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
@@ -24,8 +25,12 @@ type props = {
   signerAddress: string;
   isMobile: boolean;
 };
+/* type propsDD = {
+  className: string;
+}; */
 
 const Header = ({ signerAddress, isMobile }: props) => {
+  const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
@@ -34,6 +39,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  // const [language, setLanguage] = useState("EN");
   const [loading, setLoading] = useState(false);
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
@@ -71,6 +77,13 @@ const Header = ({ signerAddress, isMobile }: props) => {
       symbol = "MATIC";
       rpcUrl = "https://rpc-mainnet.maticvigil.com/";
       blockExplorerUrl = "https://polygonscan.com/";
+    }
+    if (newChainId === NETWORKS.mumbai.hexChainId) {
+      chainName = "Mumbai";
+      currency = "Matic Token";
+      symbol = "MATIC";
+      rpcUrl = "https://rpc-mumbai.maticvigil.com/";
+      blockExplorerUrl = "https://mumbai.polygonscan.com/";
     }
 
     try {
@@ -164,11 +177,43 @@ const Header = ({ signerAddress, isMobile }: props) => {
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
         setLoading(false);
       }
+      /* let lng = localStorage.getItem("language");
+      if (lng) {
+        if (lng === "en-US") lng = "en";
+        setLanguage(lng.toUpperCase());
+      } */
     };
 
     loadAddress();
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
+
+  /* const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLanguage(lng.toUpperCase());
+    localStorage.setItem("language", lng);
+  }; */
+
+  /* const handleOnSelect = (eventKey: any, event: Object) => {
+    console.log(event);
+    changeLanguage(eventKey);
+  }; */
+
+  /* const LangDropDown = ({ className }: propsDD) => (
+    <Dropdown onSelect={handleOnSelect} className={className}>
+      <Dropdown.Toggle variant="success" id="dropdown-basic">
+        {language}
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.Item eventKey="en">English</Dropdown.Item>
+        <Dropdown.Item eventKey="fr">French</Dropdown.Item>
+        <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  ); */
+
+  const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
 
   const EthereumToggle = () => (
     <>
@@ -178,7 +223,18 @@ const Header = ({ signerAddress, isMobile }: props) => {
   );
 
   const EthereumOpt = () => (
-    <Dropdown.Item key={NETWORKS.mainnet.chainId} eventKey={NETWORKS.mainnet.hexChainId}>
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.mainnet.chainId
+          : NETWORKS.rinkeby.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.mainnet.hexChainId
+          : NETWORKS.rinkeby.hexChainId
+      }
+    >
       {EthereumToggle()}
     </Dropdown.Item>
   );
@@ -191,7 +247,18 @@ const Header = ({ signerAddress, isMobile }: props) => {
   );
 
   const OptimismOpt = () => (
-    <Dropdown.Item key={NETWORKS.optimism.chainId} eventKey={NETWORKS.optimism.hexChainId}>
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.optimism.chainId
+          : NETWORKS.okovan.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.optimism.hexChainId
+          : NETWORKS.okovan.hexChainId
+      }
+    >
       {OptimismToggle()}
     </Dropdown.Item>
   );
@@ -203,12 +270,22 @@ const Header = ({ signerAddress, isMobile }: props) => {
     </>
   );
 
-  const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
-  /* const PolygonOpt = () => (
-    <Dropdown.Item key={NETWORKS.polygon.chainId} eventKey={NETWORKS.polygon.hexChainId}>
+  const PolygonOpt = () => (
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.polygon.chainId
+          : NETWORKS.mumbai.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.polygon.hexChainId
+          : NETWORKS.mumbai.hexChainId
+      }
+    >
       {PolygonToggle()}
     </Dropdown.Item>
-  ); */
+  );
 
   return (
     <Nav className="header">
@@ -232,6 +309,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 <Dropdown.Menu>
                   {EthereumOpt()}
                   {OptimismOpt()}
+                  {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>
             </div>
@@ -260,6 +338,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
+            {/* <LangDropDown className="btn-language small" /> */}
           </div>
           <ChangeNetwork
             show={showChangeNetwork}
@@ -268,15 +347,18 @@ const Header = ({ signerAddress, isMobile }: props) => {
           />
         </>
       ) : (
-        <Button
-          variant="pink"
-          className="neon-pink"
-          onClick={() => {
-            web3Modal.toggleModal();
-          }}
-        >
-          Connect Wallet
-        </Button>
+        <>
+          <Button
+            variant="pink"
+            className="neon-pink"
+            onClick={() => {
+              web3Modal.toggleModal();
+            }}
+          >
+            {t("connect")}
+          </Button>
+          {/* <LangDropDown className="btn-language" /> */}
+        </>
       )}
     </Nav>
   );

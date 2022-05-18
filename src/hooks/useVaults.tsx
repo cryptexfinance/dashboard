@@ -42,7 +42,6 @@ export const useVaults = (): VaultsContext => {
   const setCurrentUNIVault = React.useCallback((currentUNIVault: ethers.Contract): void => {
     setUNIVault(currentUNIVault);
   }, []);
-
   const setCurrentMaticVault = React.useCallback((currentMaticVault: ethers.Contract): void => {
     setMaticVault(currentMaticVault);
   }, []);

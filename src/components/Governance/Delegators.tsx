@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import Row from "react-bootstrap/esm/Row";
 import { useQuery, gql } from "@apollo/client";
+import { useTranslation } from "react-i18next";
 import ProfileCard from "./ProfileCard";
 import KeeperForm from "./KeeperForm";
 import Delegate from "./Delegate";
@@ -25,6 +26,7 @@ type props = {
 }; */
 
 const Delegators = ({ currentSignerAddress }: props) => {
+  const { t } = useTranslation();
   const [keepers, setKeepers] = useState<any[]>([]);
   const [keepersInfo, setKeepersInfo] = useState<any[]>([]);
   const [keeperIndex, setKeeperIndex] = useState(-1);
@@ -170,7 +172,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           {FEATURES.KEEPERS_API && (
             <div className="create">
               <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => showCreateKeeper()}>
-                New Crypt Keeper
+                {t("governance.new")}
               </Button>
             </div>
           )}
@@ -180,6 +182,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
               updateData={updateData}
               withdrawTimes={withdrawTimes}
               updateTimes={updateTimes}
+              t={t}
             />
           </Row>
         </>
@@ -198,6 +201,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
                 openWithdraw={openWithdraw}
                 addWithdrawTime={addWithdrawTime}
                 isSigner={keeper.delegatee.toLowerCase() !== currentSignerAddress.toLowerCase()}
+                t={t}
               />
             );
           }
@@ -213,6 +217,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         keeperInfo={keeperIndex !== -1 ? keepersInfo[keeperIndex] : null}
         onHide={() => hideKeeperForm()}
         refresh={() => refresh()}
+        t={t}
       />
       <Delegate
         show={showDelegate}
@@ -224,6 +229,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           setShowDelegate(false);
         }}
         refresh={() => refresh()}
+        t={t}
       />
       <Withdraw
         show={showWithdraw}
@@ -236,6 +242,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           setShowWithdraw(false);
         }}
         refresh={() => refresh()}
+        t={t}
       />
     </div>
   );

@@ -1,0 +1,348 @@
+@import "./colors";
+@import "./fonts";
+
+.vault-monitoring {
+  padding: 1rem 3rem;
+  
+  .row {
+    display: block;
+    margin-top: 2rem;
+  }
+
+  .card {
+    padding: 1.5rem 2.8125rem;
+    width: 100%;
+    @media (max-width: 1400px) {
+      padding: 1.5rem 2rem;
+    }
+    .actions {
+      display: flex;
+      .dropdown {
+        padding-left: 0.5rem;
+        .dropdown-toggle {
+          display: flex;
+          height: 2.1rem;
+          width: 150px;
+          background-color: #281e31;
+          border: 1px solid #dfd1ea;
+          
+          div {
+            display: flex;
+            align-items: center;
+            flex: 1;
+          }
+          span {
+            font-size: 0.8rem;    
+          }
+          svg {
+            height: 20px;  
+            margin-right: 5px;
+          }
+        }
+        .dropdown-toggle::after {
+          position: absolute;
+          margin-left: 0.255em;
+          vertical-align: 0.255em;
+          content: "";
+          border-top: 0.4em solid;
+          border-right: 0.4em solid transparent;
+          border-bottom: 0;
+          border-left: 0.4em solid transparent;
+          margin-top: 7px;
+          margin-left: 65%;          
+        }
+        .dropdown-menu {
+          width: 85%;
+          margin-top: 3px !important;
+          margin-right: 1rem;
+          background-color: #211828;
+
+          .dropdown-item {
+            color: $white;
+          }
+          .dropdown-item.active {
+            background-color: rgba(121, 64, 242, 0.4);
+          }
+          .dropdown-item:hover {
+            background-color: rgba(121, 64, 242, 0.3);
+          }
+        }
+      }
+      .dd {
+        &-container {
+          display: flex;
+          align-items: center;
+          margin-left: 1rem;
+        }
+        @media (max-width: 1450px) {
+          &-collateral, &-mode {
+            .dropdown-toggle {
+              width: 6.7rem;
+            }
+            .dropdown-toggle::after {
+              margin-left: 62%;
+            }
+            .dropdown-menu {
+              width: 7rem;
+              min-width: 7rem;
+            }
+          }
+        }
+      }
+      
+      .btn-group {
+        border: 1px solid #dfd1ea;
+        border-radius: 5px;
+        margin-bottom: 0rem !important;
+        .btn-secondary {
+          margin-bottom: 0rem;
+          font-size: 0.8rem;
+          background-color: #281e31;
+        }
+        .btn-secondary.active {
+          background-color: $neon-highlight;
+        }
+      }
+      .filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        padding: 0px;
+        width: 100%;
+        input[type="radio"] {
+          display: none;
+        }
+      }
+      .items-view {
+        .dd-container {
+          margin-left: 0rem; 
+        }
+        .dropdown {
+          .dropdown-toggle {
+            height: 2.1rem;
+            width: 80px;
+          }
+          .dropdown-toggle::after {
+            margin-left: 50%;
+          }
+          .dropdown-menu {
+            width: 120px;
+            min-width: 120px;
+          }
+        }
+      }
+      div[class*="col-"] {
+        padding: 0px;
+      }
+      .titles {
+        color: $white;
+        margin-bottom: 0px;
+      }
+    }
+    .vaults {
+      margin-top: 1.8rem !important;  
+      margin-bottom: 0.2rem;
+        
+      .number {
+        flex: 1;
+        text-align: right;
+        font-size: 0.8rem;
+      }
+      .btn {
+        margin-top: 0px;
+        padding: 0.3rem 0.6rem;
+      }
+      thead {
+        th {
+          text-align: center;
+        }  
+        .status {
+          text-align: left; 
+        }
+        .collateral, .collateral-usd, .debt-usd, .ratio {
+          text-align: right;
+        }
+        .collateral {
+          padding-right: 40px;    
+        }
+        .debt {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-end; 
+          .tcap {
+            width: 30px;
+            margin-right: 10px;
+          }
+        }
+        .sort {
+          background-color: transparent;
+          border: 0 solid transparent;
+          padding-right: 0px;
+          svg {
+            color: $white;
+          }
+          .asc {
+            margin-top: 5px;
+          }
+          .desc {
+            margin-top: -8px;
+          }
+        }
+      }
+      tbody {
+        div {
+          display: flex;    
+        }
+        tr.hide {
+          display: none;
+        }
+        td {
+          border-top: 0.5px solid #a440f2;
+        }
+        .collateral{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          span {
+            flex: 2;
+            margin-right: -15px;
+          }
+          svg {
+            flex: 1;
+            height: 25px;
+          }
+        }
+        .ratio {
+          width: 100%;  
+          justify-content: flex-end;
+
+          span {
+            font-family: "Erbos Draco 1st Open NBP";
+            font-weight: 100;
+            font-size: 0.9rem;
+          }
+        }
+        .status {
+          display: flex;
+          flex-direction: column;
+          //align-items: center;
+          font-family: "Nineteen Ninety Seven";
+          font-size: 15px;
+          -webkit-animation: fire 2s infinite alternate;
+          animation: fire 2s infinite alternate;
+          color: #fff !important;
+          .mode {
+            font-size: 0.6rem;
+            text-shadow: none;
+            color: $off-white;
+          }
+          svg {
+            margin-left: 7px;
+            &.empty {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #f28040);
+            }
+            &.ready {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #167226);
+            }
+            &.active {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #e440f2);
+            }
+            &.liquidation {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #c33);  
+            }
+          }
+          button {
+            background: transparent;
+            border: 0.8px solid #f28040;
+          }
+          a {
+            color: $white;
+          }
+        }
+        .empty {
+          text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+        }
+        .ready {
+          text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
+        }
+        .active {
+          text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
+        }
+        .liquidation {
+          text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
+        }
+        .liquidated {
+          text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+        }
+      }
+    }
+    .pag-container{
+      display: flex;
+      justify-content: center;
+      padding-top: 2rem;
+      border-top: 2px solid $highlight;
+      .page-link {
+        color: $off-white;
+        background-color: $darker;
+        border: 1px solid $highlight;
+      }
+      .page-link:hover {
+        background-color: $primary;  
+      }
+      .page-item.active {
+        .page-link {
+          background-color: $neon-highlight;
+        }
+      }
+    }
+  }
+  .card.totals {
+    .totals-container {
+      display: flex;
+      flex-direction: row;
+    }
+    div[class*="col-"] {
+      padding: 0px;
+    }
+    .total-box {
+      display: flex;
+      flex-direction: column-reverse;
+
+      .debt {
+        display: flex;
+        flex-direction: row;    
+      }
+    }
+    h6 {
+      color: $light;
+      margin-top: 5px;
+    }
+    .number {
+      color: $white;
+      text-shadow: 0 0 4px #f195f9,0 0 10px #fff,0 0 20px #e440f2,0 -10px 40px #b626c4;
+    }
+    .tcap-icon {
+      width: 25px;
+      margin-left: 7px;
+    }
+  }
+  .card-header {
+    padding: 0rem;
+    border: 0px;
+  }
+  .card-body {
+    padding: 1.25rem 0rem;
+  }
+  @media (max-width: 800px) {
+    .row {
+      display: flex;
+      margin-top: 1rem;
+    }
+    .card {
+      .items-view {
+        display: flex;
+      }
+    }
+  }
+}

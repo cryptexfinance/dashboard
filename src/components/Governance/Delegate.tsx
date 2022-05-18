@@ -14,6 +14,7 @@ type props = {
   addTodayWithdrawTime: () => void;
   onHide: () => void;
   refresh: () => void;
+  t: any;
 };
 
 const Delegate = ({
@@ -23,6 +24,7 @@ const Delegate = ({
   addTodayWithdrawTime,
   onHide,
   refresh,
+  t,
 }: props) => {
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
@@ -82,13 +84,13 @@ const Delegate = ({
             onHide();
             addTodayWithdrawTime();
           } catch (error) {
-            errorNotification("Not enough CTX balance.");
+            errorNotification(t("errors.not-ctx"));
           }
         } else {
-          errorNotification("Not enough CTX balance");
+          errorNotification(t("errors.not-ctx"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
       setCanDelegate(true);
     }
@@ -104,9 +106,9 @@ const Delegate = ({
         setIsApproved(true);
       } catch (error) {
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         }
       }
     }
@@ -124,7 +126,9 @@ const Delegate = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Stake & Delegate</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {t("governance.stake-delegate")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
@@ -132,14 +136,11 @@ const Delegate = ({
           <Form.Group className="" controlId="">
             {isApproved ? (
               <>
-                <p>
-                  Stake and Delegate CTX to this Crypt Keeper. Each time you Stake and Delegate, you
-                  must wait a minimum of 7 days before you can withdraw.
-                </p>
-                <Form.Label>Amount to Stake</Form.Label>
+                <p>{t("governance.stake-info")}</p>
+                <Form.Label>{t("governance.amount-stake")}</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
-                    MAX
+                    {t("max")}
                   </a>
                 </Form.Label>
                 <Form.Control
@@ -151,7 +152,7 @@ const Delegate = ({
                 />
               </>
             ) : (
-              <p>Approve delegating CTX tokens. You only have to do this once.</p>
+              <p>{t("governance.stake-info2")}</p>
             )}
           </Form.Group>
         </Form>
@@ -164,11 +165,11 @@ const Delegate = ({
             onClick={stake}
             disabled={!canDelegate}
           >
-            {canDelegate ? "Delegate to Keeper" : "Delegating"}
+            {canDelegate ? t("governance.delegate-to") : t("governance.delegating")}
           </Button>
         ) : (
           <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
-            Infinite Approve
+            {t("infinite-approve")}
           </Button>
         )}
       </Modal.Footer>

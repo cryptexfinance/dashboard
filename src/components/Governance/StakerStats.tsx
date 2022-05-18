@@ -14,9 +14,10 @@ type props = {
   updateData: boolean;
   withdrawTimes: number[];
   updateTimes: boolean;
+  t: any;
 };
 
-const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props) => {
+const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: props) => {
   const signer = useContext(SignerContext);
   const governance = useContext(GovernanceContext);
   const [totalStaked, setTotalStaked] = useState("0.0");
@@ -75,9 +76,9 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
         notifyUser(tx, refresh);
       } catch (error) {
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Insufficient funds to stake");
+          errorNotification(t("errors.no-funds"));
         }
       }
     }
@@ -97,14 +98,16 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
 
   return (
     <div className="mb-2 staker">
-      <h2>Stake Reward </h2>
+      <h2>{t("governance.stake-reward")}</h2>
       <Table hover className="mt-2">
         <thead>
           <tr>
-            <th>Staked</th>
-            <th>Last Staked</th>
-            <th>Staked Reward</th>
-            <th>APY</th>
+            <th>{t("staked")}</th>
+            <th>
+              {t("last")} {t("staked")}
+            </th>
+            <th>{t("governance.staked-reward")}</th>
+            <th>APR</th>
             <th />
           </tr>
         </thead>
@@ -144,7 +147,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes }: props)
                   claimRewards();
                 }}
               >
-                Claim
+                {t("claim")}
               </Button>
             </td>
           </tr>

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import NetworkContext from "../../state/NetworkContext";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "../../utils/constants";
-import Welcome from "./Welcome";
+import Summary from "./Summary";
 
 const clientOracle = (graphqlEndpoint: string) =>
   new ApolloClient({
@@ -12,9 +12,10 @@ const clientOracle = (graphqlEndpoint: string) =>
 
 type props = {
   signerAddress: string;
+  loadingContracts: boolean;
 };
 
-const Wrapper = ({ signerAddress }: props) => {
+const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
   const currentNetwork = useContext(NetworkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
@@ -30,11 +31,17 @@ const Wrapper = ({ signerAddress }: props) => {
       case NETWORKS.rinkeby.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
         break;
+      case NETWORKS.optimism.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
+        break;
       case NETWORKS.okovan.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
         break;
       case NETWORKS.polygon.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
+        break;
+      case NETWORKS.mumbai.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mumbai));
         break;
       default:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
@@ -44,9 +51,9 @@ const Wrapper = ({ signerAddress }: props) => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Welcome signerAddress={signerAddress} />
+      <Summary signerAddress={signerAddress} loadingContracts={loadingContracts} />
     </ApolloProvider>
   );
 };
 
-export default Wrapper;
+export default WelcomeWrapper;

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "../styles/graph.scss";
 import Card from "react-bootstrap/esm/Card";
 import { BigNumber, ethers } from "ethers";
+import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import NetworkContext from "../state/NetworkContext";
@@ -18,6 +19,7 @@ import { ReactComponent as AAVEIcon } from "../assets/images/graph/aave.svg";
 import { ReactComponent as LINKIcon } from "../assets/images/graph/chainlink.svg";
 import { ReactComponent as UNIIcon } from "../assets/images/graph/uni.svg";
 import { ReactComponent as SNXIcon } from "../assets/images/graph/snx.svg";
+import { ReactComponent as WBTCIcon } from "../assets/images/graph/usdc.svg";
 import { ReactComponent as CtxIcon } from "../assets/images/ctx-coin.svg";
 import cryptexJson from "../contracts/cryptex.json";
 import {
@@ -27,11 +29,13 @@ import {
   isPolygon,
   isUndefined,
   toUSD,
+  validOracles,
 } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { NETWORKS, FEATURES } from "../utils/constants";
 import Loading from "./Loading";
 
 const Graph = () => {
+  const { t } = useTranslation();
   const currentNetwork = useContext(NetworkContext);
   const tokens = useContext(TokensContext);
   const signer = useContext(SignerContext);
@@ -45,6 +49,7 @@ const Graph = () => {
   const [linkStake, setLinkStake] = useState("0");
   const [snxStake, setSNXStake] = useState("0");
   const [uniStake, setUNIStake] = useState("0");
+  const [wbtcStake, setWBTCStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
   const [totalSupply, setTotalSupply] = useState("0.0");
   const [loading, setLoading] = useState(true);
@@ -64,34 +69,6 @@ const Graph = () => {
     fetchPolicy: "no-cache",
   });
 
-  const validOracles = (): boolean => {
-    let valid =
-      !isUndefined(oracles.wethOracleRead) &&
-      !isUndefined(oracles.daiOracleRead) &&
-      !isUndefined(oracles.tcapOracleRead) &&
-      !isUndefined(tokens.tcapTokenRead);
-
-    if (isInLayer1(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.aaveOracle) &&
-        !isUndefined(oracles.linkOracle) &&
-        !isUndefined(tokens.ctxPoolTokenRead);
-    }
-    if (isOptimism(currentNetwork.chainId)) {
-      valid =
-        valid &&
-        !isUndefined(oracles.linkOracleRead) &&
-        !isUndefined(oracles.snxOracleRead) &&
-        !isUndefined(oracles.uniOracleRead);
-    }
-
-    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
-      valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
-    }
-    return valid;
-  };
-
   const getMaticUSD = async () => {
     const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
     // @ts-ignore
@@ -102,70 +79,82 @@ const Graph = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (oracles && tokens && data && signer && validOracles()) {
+      if (
+        oracles &&
+        tokens &&
+        data &&
+        signer &&
+        !isUndefined(tokens.tcapTokenRead) &&
+        validOracles(currentNetwork.chainId || 1, oracles)
+      ) {
         const currentTotalPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
         const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
-        const ethcalls = [
-          currentTotalPriceCall,
-          wethOraclePriceCall,
-          daiOraclePriceCall,
-          currentTotalSupplyCall,
-        ];
+        const ethcalls = [currentTotalPriceCall, daiOraclePriceCall, currentTotalSupplyCall];
 
         if (isInLayer1(currentNetwork.chainId)) {
+          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
           const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
+          const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+          ethcalls.push(wethOraclePriceCall);
           ethcalls.push(aaveOraclePriceCall);
           ethcalls.push(linkOraclePriceCall);
+          ethcalls.push(wbtcOraclePriceCall);
           ethcalls.push(reservesCtxPoolCall);
         }
         if (isOptimism(currentNetwork.chainId)) {
+          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
           const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
           const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
+          ethcalls.push(wethOraclePriceCall);
           ethcalls.push(linkOraclePriceCall);
           ethcalls.push(snxOraclePriceCall);
           ethcalls.push(uniOraclePriceCall);
         }
+        if (isPolygon(currentNetwork.chainId)) {
+          const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+          ethcalls.push(wbtcOraclePriceCall);
+        }
         let currentTotalPrice;
-        let wethOraclePrice;
         let daiOraclePrice;
         let currentTotalSupply;
+        let wethOraclePrice;
         let aaveOraclePrice;
         let linkOraclePrice;
         let snxOraclePrice;
         let uniOraclePrice;
+        let wbtcOraclePrice;
         let reservesCtxPool;
 
         if (isInLayer1(currentNetwork.chainId)) {
           // @ts-ignore
           [
             currentTotalPrice,
-            wethOraclePrice,
             daiOraclePrice,
             currentTotalSupply,
+            wethOraclePrice,
             aaveOraclePrice,
             linkOraclePrice,
+            wbtcOraclePrice,
             reservesCtxPool,
           ] = await signer.ethcallProvider?.all(ethcalls);
         } else if (isOptimism(currentNetwork.chainId)) {
           // @ts-ignore
           [
             currentTotalPrice,
-            wethOraclePrice,
             daiOraclePrice,
             currentTotalSupply,
+            wethOraclePrice,
             linkOraclePrice,
             snxOraclePrice,
             uniOraclePrice,
-            reservesCtxPool,
           ] = await signer.ethcallProvider?.all(ethcalls);
         } else {
           // @ts-ignore
-          [currentTotalPrice, wethOraclePrice, daiOraclePrice, currentTotalSupply] =
+          [currentTotalPrice, daiOraclePrice, currentTotalSupply, wbtcOraclePrice] =
             await signer.ethcallProvider?.all(ethcalls);
         }
 
@@ -178,6 +167,7 @@ const Graph = () => {
         let currentSNXStake = BigNumber.from(0);
         let currentUNIStake = BigNumber.from(0);
         let currentMATICStake = BigNumber.from(0);
+        let currentWBTCStake = BigNumber.from(0);
 
         const networkId = currentNetwork.chainId;
         // @ts-ignore
@@ -198,6 +188,9 @@ const Graph = () => {
           case NETWORKS.polygon.chainId:
             contracts = cryptexJson[137].polygon.contracts;
             break;
+          case NETWORKS.mumbai.chainId:
+            contracts = cryptexJson[80001].mumbai.contracts;
+            break;
           default:
             contracts = cryptexJson[4].rinkeby.contracts;
             break;
@@ -208,19 +201,26 @@ const Graph = () => {
           if (cAddress === contracts.DAIVaultHandler.address.toLowerCase()) {
             currentDAIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
           }
-          // @ts-ignore
-          if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
-            currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
-          }
 
           if (isPolygon(currentNetwork.chainId)) {
             // @ts-ignore
             if (cAddress === contracts.MATICVaultHandler.address.toLowerCase()) {
               currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
             }
+          } else if (isInLayer1(currentNetwork.chainId) || isPolygon(currentNetwork.chainId)) {
             // @ts-ignore
-          } else if (cAddress === contracts.LinkVaultHandler.address.toLowerCase()) {
-            currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            if (cAddress === contracts.WBTCVaultHandler.address.toLowerCase()) {
+              currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            }
+          } else {
+            // @ts-ignore
+            if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
+              currentWETHStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            }
+            // @ts-ignore
+            if (cAddress === contracts.LinkVaultHandler.address.toLowerCase()) {
+              currentLINKStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
+            }
           }
 
           if (
@@ -256,25 +256,32 @@ const Graph = () => {
         setUNIStake(formatUNI);
         const formatMATIC = ethers.utils.formatEther(currentMATICStake);
         setMATICStake(formatMATIC);
+        const formatWBTC = ethers.utils.formatUnits(currentWBTCStake, 8);
+        setWBTCStake(formatWBTC);
 
-        const ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
+        let ethUSD = "0";
         let aaveUSD = "0";
         let linkUSD = "0";
         let snxUSD = "0";
         let uniUSD = "0";
         let maticUSD = "0";
+        let wbtcUSD = "0";
         if (isInLayer1(currentNetwork.chainId)) {
+          ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
           aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
+          wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
         }
         if (isOptimism(currentNetwork.chainId)) {
+          ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
           snxUSD = ethers.utils.formatEther(snxOraclePrice.mul(10000000000));
           uniUSD = ethers.utils.formatEther(uniOraclePrice.mul(10000000000));
         }
-        if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+        if (isPolygon(currentNetwork.chainId)) {
           maticUSD = await getMaticUSD();
+          wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
         }
 
         const totalUSD =
@@ -284,19 +291,18 @@ const Graph = () => {
           toUSD(linkUSD, formatLINK) +
           toUSD(snxUSD, formatSNX) +
           toUSD(uniUSD, formatUNI) +
-          toUSD(maticUSD, formatMATIC);
+          toUSD(maticUSD, formatMATIC) +
+          toUSD(wbtcUSD, formatWBTC);
         setTotalStake(totalUSD.toString());
         setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
-        if (signer) {
+        if (signer && isInLayer1(currentNetwork.chainId)) {
           const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          if (isInLayer1(currentNetwork.chainId)) {
-            const currentPriceCTX = getPriceInUSDFromPair(
-              reservesCtxPool[0],
-              reservesCtxPool[1],
-              parseFloat(currentPriceETH)
-            );
-            setCtxPrice(currentPriceCTX.toString());
-          }
+          const currentPriceCTX = getPriceInUSDFromPair(
+            reservesCtxPool[0],
+            reservesCtxPool[1],
+            parseFloat(currentPriceETH)
+          );
+          setCtxPrice(currentPriceCTX.toString());
         }
       }
       setLoading(false);
@@ -314,7 +320,7 @@ const Graph = () => {
       <div className="grid">
         <Card>
           <StakeIcon className="stake" />
-          <h4>Total Staked in USD</h4>
+          <h4>{t("graph.staked-usd")}</h4>
           <h5 className="number neon-green">
             <NumberFormat
               value={TotalStake}
@@ -327,7 +333,7 @@ const Graph = () => {
         </Card>
         <Card>
           <H24Icon className="h24" />
-          <h4>Total Supply</h4>
+          <h4>{t("graph.total-supply")}</h4>
           <h5 className="number neon-blue">
             <NumberFormat
               value={totalSupply}
@@ -340,7 +346,7 @@ const Graph = () => {
         </Card>
         <Card>
           <TcapIcon className="tcap" />
-          <h4>TCAP Price</h4>
+          <h4>{t("graph.tcap-price")}</h4>
           <h5 className="number neon-highlight">
             <NumberFormat
               value={tcapPrice}
@@ -351,17 +357,24 @@ const Graph = () => {
             />
           </h5>
         </Card>
-        <Card>
-          <WETHIcon className="weth" />
-          <h4>Total Staked in ETH</h4>
-          <h5 className="number neon-highlight">
-            <NumberFormat value={ETHStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
-            ETH
-          </h5>
-        </Card>
+        {!isPolygon(currentNetwork.chainId) && (
+          <Card>
+            <WETHIcon className="weth" />
+            <h4>{t("graph.staked-eth")}</h4>
+            <h5 className="number neon-highlight">
+              <NumberFormat
+                value={ETHStake}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              ETH
+            </h5>
+          </Card>
+        )}
         <Card>
           <DAIIcon className="dai" />
-          <h4>Total Staked in DAI</h4>
+          <h4>{t("graph.staked-dai")}</h4>
           <h5 className="number neon-orange">
             <NumberFormat value={DAIStake} displayType="text" thousandSeparator decimalScale={2} />{" "}
             DAI
@@ -371,7 +384,7 @@ const Graph = () => {
           <>
             <Card>
               <CtxIcon className="ctx" />
-              <h4>CTX Price</h4>
+              <h4>{t("graph.ctx-price")}</h4>
               <h5 className="number neon-blue">
                 <NumberFormat
                   value={ctxPrice}
@@ -382,22 +395,24 @@ const Graph = () => {
                 />{" "}
               </h5>
             </Card>
-            <Card>
-              <AAVEIcon className="ctx" />
-              <h4>Total Staked in AAVE</h4>
-              <h5 className="number neon-highlight">
-                <NumberFormat
-                  value={aaveStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />{" "}
-                AAVE
-              </h5>
-            </Card>
+            {FEATURES.NEW_VAULTS && (
+              <Card>
+                <AAVEIcon className="ctx" />
+                <h4>Total Staked in AAVE</h4>
+                <h5 className="number neon-highlight">
+                  <NumberFormat
+                    value={aaveStake}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                  />{" "}
+                  AAVE
+                </h5>
+              </Card>
+            )}
           </>
         )}
-        {!isPolygon(currentNetwork.chainId) && (
+        {!isPolygon(currentNetwork.chainId) && FEATURES.NEW_VAULTS && (
           <>
             <Card>
               <LINKIcon className="ctx" />
@@ -414,7 +429,7 @@ const Graph = () => {
             </Card>
           </>
         )}
-        {isOptimism(currentNetwork.chainId) && (
+        {isOptimism(currentNetwork.chainId) && FEATURES.NEW_VAULTS && (
           <>
             <Card>
               <UNIIcon className="ctx" />
@@ -444,10 +459,10 @@ const Graph = () => {
             </Card>
           </>
         )}
-        {currentNetwork.chainId === NETWORKS.polygon.chainId && (
+        {isPolygon(currentNetwork.chainId) && (
           <Card>
             <POLYGONIcon className="eth" />
-            <h4>Total Staked in MATIC</h4>
+            <h4>{t("graph.staked-matic")}</h4>
             <h5 className="number neon-blue">
               <NumberFormat
                 value={MATICStake}
@@ -456,6 +471,21 @@ const Graph = () => {
                 decimalScale={2}
               />{" "}
               MATIC
+            </h5>
+          </Card>
+        )}
+        {!isOptimism(currentNetwork.chainId) && (
+          <Card>
+            <WBTCIcon className="eth" />
+            <h4>Total Staked in WBTC</h4>
+            <h5 className="number neon-blue">
+              <NumberFormat
+                value={wbtcStake}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />{" "}
+              WBTC
             </h5>
           </Card>
         )}
