@@ -15,7 +15,7 @@ import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
 import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
@@ -269,6 +269,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
       <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Polygon" : "Mumbai"}</h6>
     </>
   );
+
   const PolygonOpt = () => (
     <Dropdown.Item
       key={
@@ -308,7 +309,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 <Dropdown.Menu>
                   {EthereumOpt()}
                   {OptimismOpt()}
-                  {PolygonOpt()}
+                  {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>
             </div>
