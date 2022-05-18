@@ -304,8 +304,8 @@ const Mint = ({ address, t }: props) => {
     (!isPolygon(currentNetwork.chainId) && selectedVault === "ETH") ||
     (isPolygon(currentNetwork.chainId) && selectedVault === "MATIC");
 
-  async function loadVault(vaultType: string, vaultData: any) {
-    if (signer.signer && validVaults() && vaultData) {
+  async function loadVault(vaultType: string) {
+    if (signer.signer && validVaults()) {
       let currentVault: any;
       let currentVaultRead: any;
       let currentToken;
@@ -405,33 +405,6 @@ const Mint = ({ address, t }: props) => {
       setSelectedOracleRead(currentOracleRead);
 
       let currentVaultData: any;
-      // Removed GRAPH
-      // if data is empty load vault data from contract
-      /* const graphBlock = vaultData._meta.block.number;
-      let currentBlock = await provider.getBlockNumber();
-      currentBlock -= 10;
-      if (
-        isInLayer1(currentNetwork.chainId) &&
-        vaultData.vaults.length > 0 &&
-        !vaultData._meta.hasIndexingErrors &&
-        graphBlock >= currentBlock
-      ) {
-        await vaultData.vaults.forEach((v: any) => {
-          if (v.address.toLowerCase() === currentVault.address.toLowerCase()) {
-            currentVaultData = v;
-          }
-        });
-      } else {
-        const vaultID = await currentVault.userToVault(address);
-        if (!vaultID.eq(0)) {
-          const vault = await currentVault.vaults(vaultID);
-          currentVaultData = {
-            vaultId: vaultID,
-            collateral: vault.Collateral,
-            debt: vault.Debt,
-          };
-        }
-      } */
       const vaultID = await currentVault.userToVault(address);
       if (!vaultID.eq(0)) {
         const vault = await currentVault.vaults(vaultID);
@@ -572,8 +545,9 @@ const Mint = ({ address, t }: props) => {
       if (isPolygon(currentNetwork.chainId) && vaultType === "ETH") {
         vaultType = "MATIC";
         setSelectedVault("MATIC");
+        console.log(data);
       }
-      loadVault(vaultType, data);
+      loadVault(vaultType);
     },
   });
 
@@ -582,7 +556,7 @@ const Mint = ({ address, t }: props) => {
       if (!isOptimism(currentNetwork.chainId)) {
         await refetch();
       } else {
-        loadVault(selectedVault, data);
+        loadVault(selectedVault);
       }
     } catch (error) {
       console.log(error);
