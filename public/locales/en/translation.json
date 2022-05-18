@@ -105,7 +105,7 @@
     "locked": "Locked Reward",
     "current-info": "Early adopters rewards are issued over 14 days for a total of 500,000 CTX. Assuming approximately 6500 Ethereum blocks per day over 14 days (91,000 Ethereum blocks), the per block reward would be 5.4945 CTX split across the debtors at that point in time. 100% of the reward is immediately available.",
     "unlocked-info": "Available to claim immediately.",
-    "locked-info": "Rewards are unlocked 6 months after the start of the pool.",
+    "locked-info": "Available to claim immediately.",
     "token-vault": "{{token}} Vault",
     "eth-tcap-pool": "ETH/TCAP Pool",
     "eth-ctx-pool": "ETH/CTX Pool"
