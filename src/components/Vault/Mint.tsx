@@ -92,7 +92,7 @@ const Mint = ({ address, t }: props) => {
       break;
     case "wbtc":
       currency = "WBTC";
-      if (isOptimism(currentNetwork.chainId) || isHardMode()) {
+      if (isOptimism(currentNetwork.chainId) || !isHardMode()) {
         history?.push(`/vault/ETH`);
         currency = "ETH";
       }
@@ -1072,7 +1072,7 @@ const Mint = ({ address, t }: props) => {
 
   useEffect(() => {
     async function load() {
-      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK", "WBTC"];
+      let vOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
       if (isHardMode()) {
         vOptions = ["ETH", "WETH", "DAI", "USDC", "WBTC"];
       }
