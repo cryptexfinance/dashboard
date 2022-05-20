@@ -46,7 +46,22 @@
     "title3": "连接您的账户",
     "subtitle3": "铸造TCAP，或检查你的余额连接你的账户",
     "tcap-balance": "TCAP余额",
-    "ctx-balance": "CTX余额"
+    "tcap-price": "TCAP Price",
+    "ctx-balance": "CTX余额",
+    "summary": {
+      "title": "Protocol Summary",
+      "staked-usd": "Total Staked USD",
+      "staked-eth": "Staked in ETH",
+      "staked-dai": "Staked in DAI",
+      "staked-aave": "Staked in AAVE",
+      "staked-link": "Staked in LINK",
+      "staked-matic": "Staked in MATIC",
+      "staked-wbtc": "Staked in WBTC",
+      "staked-usdc": "Staked in USDC",
+      "staked-uni": "Staked in UNI",
+      "staked-snx": "Staked in SNX",
+      "total-supply": "TCAP Supply" 
+    }
   },
   "vault": {
     "warning": "警告",
@@ -89,26 +104,51 @@
       "min-tcap2": "Afte burning the minimum amount of debt should be 20 TCAP."
     }
   },
-  "pools": {
-    "pools": "池",
-    "enabled": "启用的池子",
-    "available": "可用的池子",
-    "liquidity": "流动性"
-  },
   "farming": {
-    "farming": "挖矿",
-    "minting": "铸币奖励",
+    "current-info": "早期采用者的奖励在14天内发放，共计500,000 CTX。假设14天内每天大约6500个以太坊区块（91,000个以太坊区块），每个区块的奖励将是5.4945 CTX，分给当时的债务人。100%的奖励是立即可用的。",
     "current-mint": "当前铸造",
     "current-reward": "当前奖励",
-    "liquidity": "流动性奖励",
-    "unlocked": "解锁的奖励",
-    "locked": "锁定的奖赏",
-    "current-info": "早期采用者的奖励在14天内发放，共计500,000 CTX。假设14天内每天大约6500个以太坊区块（91,000个以太坊区块），每个区块的奖励将是5.4945 CTX，分给当时的债务人。100%的奖励是立即可用的。",
-    "unlocked-info": "可立即领取。",
-    "locked-info": "奖励在池子开始6个月后解锁。",
-    "token-vault": "{{token}} Vault",
     "eth-tcap-pool": "ETH/TCAP Pool",
-    "eth-ctx-pool": "ETH/CTX Pool"
+    "eth-ctx-pool": "ETH/CTX Pool",
+    "farming": "挖矿",
+    "liquidity": "流动性奖励",
+    "locked": "锁定的奖赏",
+    "locked-info": "奖励在池子开始6个月后解锁。",
+    "minting": "铸币奖励",
+    "unlocked": "解锁的奖励",
+    "unlocked-info": "可立即领取。",
+    "token-vault": "{{token}} Vault",
+    "univ3": {
+      "amount-claim": "Amount to claim",
+      "available-claim": "Available to claim",
+      "claim-info": "In order to claim rewards, you need to unstake your token.",
+      "claim-reward": "Claim Reward",
+      "current-reward": "Current Reward",
+      "current-reward-info": "Amount of CTX that it's been earn while the LP token is staked. You must unstake the LP token in order to claim the reward.",
+      "deposited-info": "LP token needs to be stake to earn rewards. ",
+      "pending-info": "LP token needs to be approved in order to be staked.",
+      "position": "Position",
+      "position-info1": "Position Min and Max price represents TCAP per WETH.",
+      "position-info2": "Current price is",
+      "staked-info": "LP token is staked and earning rewards.",
+      "unstaked-info": "LP token hasn't been staked or deposited.",
+      "out-of-range-info": "You aren't earning rewards because the price is out of your position range."
+    }
+  },
+  "monitoring": {
+    "active-info": "Vault is minting TCAP.",
+    "empty-info": "There is not collateral on the vault.",
+    "liquidation-info": "Ratio is less than min required.",
+    "liquidate-vault": "Liquidate Vault",
+    "liquidating": "Liquidating",
+    "ratio": "Ratio",
+    "ready-info": "Vault has collateral and it is ready to mint TCAP.",
+    "reward": "Reward",
+    "reward-info": "Collateral amount in USD you are getting for liquidating the vault.",
+    "tcap-amount-info": "Amount of TCAP in USD you need to provide to liquidate vault.",
+    "net-reward": "Net Reward",
+    "net-reward-info1": "Actual profit in USD you earn after liquidation",
+    "net-reward-info2": "Net Reward = Reward - TCAP Amount - Burn Fee."
   },
   "governance": {
     "amount-stake": "质押金额",
@@ -148,26 +188,17 @@
       "too-long": "字段太长。最长 ({{max}} 字符。)"
     } 
   },
-  "graph": {
-    "staked-usd": "总质押（美元）",
-    "staked-eth": "总质押（以太坊）",
-    "staked-dai": "总质押（DAI）",
-    "staked-aave": "总质押（AAVE）",
-    "staked-link": "总质押（LINK）",
-    "staked-matic": "总质押（MATIC）",
-    "total-supply": "供应总量",
-    "tcap-price": "TCAP 价格",
-    "ctx-price": "CTX 价格"
-  },
   "errors": {
     "empty": "字段不能为空",
     "invalid-address": "请输入一个有效的地址",
     "invalid-ens": "请输入一个有效的ENS名称",
     "invalid-file-type": "无效的文件类型。",
     "invalid-image-size": "图像的最大尺寸是 {{size}} KB",
+    "less-tcap": "Tcap amount is less than required.",
+    "not-approve": "未批准的代币",
     "no-ctx":  "没有足够的CTX余额。",
     "no-funds": "没有足够的资金质押",
-    "not-approve": "未批准的代币",
+    "no-tcap":  "Not enough TCAP balance.",
     "tran-rejected": "交易被拒绝",
     "unexpected": "意外的错误"
   }

@@ -5,6 +5,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
+import { useTranslation } from "react-i18next";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
@@ -57,6 +58,7 @@ const Rewards = ({
   nfpmContractRead,
   poolContractRead,
 }: props) => {
+  const { t } = useTranslation();
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
@@ -231,13 +233,13 @@ const Rewards = ({
         className=" ml-4 claim"
         disabled={btnDisabled}
       >
-        Claim
+        {t("claim")}
       </Button>
     );
   };
 
   const WithdrawButton = ({ position }: btnProps) => {
-    const title = "Exit";
+    const title = t("exit");
     let btnDisabled = true;
 
     // eslint-disable-next-line
@@ -282,15 +284,11 @@ const Rewards = ({
         </div>
         <div className="rewards-total">
           <h6>
-            Available to Claim
+            {t("farming.univ3.available-claim")}
             <OverlayTrigger
               key="bottom"
               placement="bottom"
-              overlay={
-                <Tooltip id="tooltip-bottom">
-                  In order to claim rewards, you need to unstake your token.
-                </Tooltip>
-              }
+              overlay={<Tooltip id="tooltip-bottom">{t("farming.univ3.claim-info")}</Tooltip>}
             >
               <Button variant="dark" className="question-small">
                 ?
@@ -318,15 +316,15 @@ const Rewards = ({
         <thead>
           <th />
           <th>
-            Position
+            {t("farming.univ3.position")}
             <OverlayTrigger
               key="top"
               placement="right"
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-position" className="univ3-status-tooltip">
-                  Position Min and Max price represents TCAP per WETH. <br />
-                  Current price is{" "}
+                  {t("farming.univ3.position-info1")} <br />
+                  {t("farming.univ3.position-info2")}{" "}
                   <span className={StakeStatus.staked}>
                     {numberFormatStr(cumulativePrice.toString(), 4, 4)}
                   </span>{" "}
@@ -338,23 +336,23 @@ const Rewards = ({
             </OverlayTrigger>
           </th>
           <th className="status">
-            Status
+            {t("status")}
             <OverlayTrigger
               key="top"
               placement="right"
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                  <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
-                  approved in order to be staked. <br />
-                  <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked
-                  or deposited. <br />
-                  <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be
-                  stake to earn rewards. <br />
-                  <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
-                  rewards. <br />
-                  <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
-                  rewards because the price is out of your position range.
+                  <span className={StakeStatus.not_approved}>Pending</span>:{" "}
+                  {t("farming.univ3.pending-info")} <br />
+                  <span className={StakeStatus.empty}>Unstaked</span>:{" "}
+                  {t("farming.univ3.unstaked-info")} <br />
+                  <span className={StakeStatus.deposited}>Deposited</span>:{" "}
+                  {t("farming.univ3.deposited-info")} <br />
+                  <span className={StakeStatus.staked}>Staked</span>:{" "}
+                  {t("farming.univ3.staked-info")} <br />
+                  <span className={StakeStatus.out_range}>Out of range</span>:{" "}
+                  {t("farming.univ3.out-of-range-info")}
                 </Tooltip>
               }
             >
@@ -362,15 +360,14 @@ const Rewards = ({
             </OverlayTrigger>
           </th>
           <th>
-            Current Reward
+            {t("farming.univ3.current-reward")}
             <OverlayTrigger
               key="top"
               placement="auto"
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                  Amount of CTX that it's been earn while the LP token is staked. You must unstake
-                  the LP token in order to claim the reward.
+                  {t("farming.univ3.current-reward-info")}
                 </Tooltip>
               }
             >
@@ -474,7 +471,7 @@ const Rewards = ({
   return (
     <Card className="diamond mb-2 univ3">
       <Card.Header>
-        <h2>Uniswap V3 Liquidity Rewards</h2>
+        <h2>Uniswap V3 {t("farming.liquidity")}</h2>
       </Card.Header>
       <Card.Body>
         {ownerAddress !== "" ? (

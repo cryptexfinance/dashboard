@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { ethers } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
+import { useTranslation } from "react-i18next";
 import "../../../styles/modal.scss";
 import { errorNotification, notifyUser } from "../../../utils/utils";
 import { IncentiveType } from "./types";
@@ -25,6 +26,7 @@ const ClaimReward = ({
   onHide,
   refresh,
 }: props) => {
+  const { t } = useTranslation();
   const [rewardText, setRewardText] = useState("");
   const [canClaim, setCanClaim] = useState(true);
 
@@ -53,13 +55,13 @@ const ClaimReward = ({
             setRewardText("");
             onHide();
           } catch (error) {
-            errorNotification("Transaction Rejected");
+            errorNotification(t("errors.tran-rejected"));
           }
         } else {
           errorNotification("Not enough CTX reward");
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
       setCanClaim(true);
     }
@@ -77,13 +79,15 @@ const ClaimReward = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Claim Reward</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {t("farming.univ3.claim-reward")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            <Form.Label>Amount to Claim</Form.Label>
+            <Form.Label>{t("farming.univ3.amount-claim")}</Form.Label>
             <Form.Label className="max">
               <a href="/" className="number" onClick={maxReward}>
                 MAX
@@ -101,7 +105,7 @@ const ClaimReward = ({
       </Modal.Body>
       <Modal.Footer>
         <Button variant="pink" className="mt-3 mb-4 w-100" onClick={claim} disabled={!canClaim}>
-          {canClaim ? "Claim Reward" : "Claiming"}
+          {canClaim ? t("farming.univ3.claim-reward") : t("claiming")}
         </Button>
       </Modal.Footer>
     </Modal>

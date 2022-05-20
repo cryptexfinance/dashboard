@@ -7,6 +7,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Row from "react-bootstrap/esm/Row";
 import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import Spinner from "react-bootstrap/Spinner";
+import { useTranslation } from "react-i18next";
 import "../../../styles/vault-monitoring.scss";
 import { useQuery, gql } from "@apollo/client";
 import { useLocation } from "react-router-dom";
@@ -26,6 +27,7 @@ import {
   toUSD,
   validOracles,
   validVaults,
+  validHardVaults,
 } from "../../../utils/utils";
 import { Vaults } from "./Vaults";
 import { VaultPagination } from "./Pagination";
@@ -68,6 +70,7 @@ type liqVaultsTempType = {
 const showAllVaults = true;
 
 export const Monitoring = () => {
+  const { t } = useTranslation();
   const currentNetwork = useContext(NetworkContext);
   const oracles = useContext(OraclesContext);
   const vaults = useContext(vaultsContext);
@@ -92,8 +95,8 @@ export const Monitoring = () => {
   const [vaultMode, setVaultMode] = useState("all");
   const [renderTable, setRenderTable] = useState(false);
   const radios = [
-    { name: "All Vaults", value: "1" },
-    { name: "My Vaults", value: "2" },
+    { name: t("all-vaults"), value: "1" },
+    { name: t("my-vaults"), value: "2" },
   ];
   const viewsList = [
     { key: "5", name: "5" },
@@ -279,7 +282,13 @@ export const Monitoring = () => {
   };
 
   const loadRatios = async () => {
-    if (signer && vaults && validVaults(currentNetwork.chainId || 1, vaults)) {
+    if (
+      signer &&
+      vaults &&
+      hardVaults &&
+      validVaults(currentNetwork.chainId || 1, vaults) &&
+      validHardVaults(currentNetwork.chainId || 1, hardVaults)
+    ) {
       const daiRatioCall = await vaults.daiVaultRead?.ratio();
       const ethcalls = [daiRatioCall];
 
@@ -324,7 +333,6 @@ export const Monitoring = () => {
       let hardEthRatio = 0;
       let hardDaiRatio = 0;
       let hardUsdcRatio = 0;
-
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
         [daiRatio, ethRatio, aaveRatio, linkRatio, hardEthRatio, hardDaiRatio, hardUsdcRatio] =
@@ -850,29 +858,29 @@ export const Monitoring = () => {
         <Row>
           <Card className="diamond mb-2 totals">
             <Card.Header>
-              <h5>Totals</h5>
+              <h5>{t("totals")}</h5>
             </Card.Header>
             <Card.Body>
               <Col md={12} className="totals-container">
                 <Col md={3} className="total-box">
-                  <h6>Vaults</h6>
+                  <h6>{t("vaults")}</h6>
                   <span className="number">{vaultsTotals.vaults}</span>
                 </Col>
                 <Col md={3} className="total-box">
-                  <h6>Collateral (USD)</h6>
+                  <h6>{t("collateral")} (USD)</h6>
                   <span className="number">
                     ${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}
                   </span>
                 </Col>
                 <Col md={3} className="total-box">
                   <div className="debt">
-                    <h6>Debt</h6>
+                    <h6>{t("debt")}</h6>
                     <TcapIcon className="tcap-icon" />
                   </div>
                   <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
                 </Col>
                 <Col md={3} className="total-box">
-                  <h6>Debt (USD)</h6>
+                  <h6>{t("debt")} (USD)</h6>
                   <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
                 </Col>
               </Col>
@@ -883,7 +891,7 @@ export const Monitoring = () => {
               <Col md={12} className="actions">
                 <div className="items-view">
                   <div className="dd-container">
-                    <h6 className="titles">View:</h6>
+                    <h6 className="titles">{t("view")}:</h6>
                     <Dropdown onSelect={(eventKey) => handleItemsViewChange(eventKey || "15")}>
                       <Dropdown.Toggle
                         variant="secondary"
@@ -906,7 +914,7 @@ export const Monitoring = () => {
                 </div>
                 <div className="filters">
                   <div className="dd-container">
-                    <h6 className="titles">Collateral:</h6>
+                    <h6 className="titles">{t("collateral")}:</h6>
                     <Dropdown
                       className="dd-collateral"
                       onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
@@ -931,7 +939,7 @@ export const Monitoring = () => {
                     </Dropdown>
                   </div>
                   <div className="dd-container">
-                    <h6 className="titles">Status:</h6>
+                    <h6 className="titles">{t("status")}:</h6>
                     <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
                       <Dropdown.Toggle
                         variant="secondary"
@@ -953,7 +961,7 @@ export const Monitoring = () => {
                   </div>
                   {isInLayer1(currentNetwork.chainId) && (
                     <div className="dd-container">
-                      <h6 className="titles">Mode:</h6>
+                      <h6 className="titles">{t("mode")}:</h6>
                       <Dropdown
                         className="dd-mode"
                         onSelect={(eventKey) => handleModeChange(eventKey || "ALL")}

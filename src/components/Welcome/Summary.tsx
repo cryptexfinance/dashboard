@@ -170,7 +170,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
               decimalScale={2}
             />
           </h4>
-          <h4>TCAP Price:</h4>
+          <h4>{t("welcome.tcap-price")}:</h4>
         </div>
         {isInLayer1(currentNetwork.chainId) && (
           <div className="token-price">
@@ -184,7 +184,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                 decimalScale={2}
               />
             </h4>
-            <h4>CTX Price:</h4>
+            <h4>{t("welcome.ctx-price")}:</h4>
           </div>
         )}
       </div>
@@ -325,7 +325,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    My Vaults
+                    {t("my-vaults")}
                   </Button>
                   <Button
                     variant="warning"
