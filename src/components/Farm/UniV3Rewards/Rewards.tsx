@@ -374,6 +374,7 @@ const Rewards = ({
               <Button variant="dark">?</Button>
             </OverlayTrigger>
           </th>
+          <th>APR</th>
           <th />
         </thead>
         <tbody>
@@ -423,6 +424,16 @@ const Rewards = ({
                     decimalScale={2}
                   />{" "}
                   CTX
+                </td>
+                <td>
+                  <NumberFormat
+                    className="number"
+                    value={90}
+                    displayType="text"
+                    thousandSeparator
+                    suffix="%"
+                    decimalScale={0}
+                  />
                 </td>
                 <td align="right">
                   <>

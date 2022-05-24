@@ -408,7 +408,7 @@ export const Monitoring = () => {
     switch (symbol) {
       case "ETH":
         if (isHardVault) {
-          minRatio = vaultsRatio?.hardEthRatio || 1100;
+          minRatio = vaultsRatio?.hardEthRatio || 100;
         } else {
           minRatio = vaultsRatio?.ethRatio || 200;
         }
