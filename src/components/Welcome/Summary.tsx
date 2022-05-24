@@ -109,8 +109,11 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
           const tcapString = ethers.utils.formatEther(currentTcapBalance);
           setTcapBalance(tcapString);
           const tcapUSD = parseFloat(tcapString) * parseFloat(tPrice);
-          setTcapUSDBalance(tcapUSD.toString());
-
+          if (tcapUSD < 0.0001) {
+            setTcapUSDBalance("0.0");
+          } else {
+            setTcapUSDBalance(tcapUSD.toString());
+          }
           if (isInLayer1(currentNetwork.chainId)) {
             const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
             // @ts-ignore
