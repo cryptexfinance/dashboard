@@ -66,6 +66,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
       const tvlUsd =
         parseFloat(tcapPrice) * aprData.totalAmount0 +
         parseFloat(currentPriceETH) * aprData.totalAmount1;
+      console.log(tvlUsd);
       const remainingSeconds = incentive.endTime - Date.now() / 1000;
       const remainingDays = remainingSeconds / (3600 * 24);
       const rewardRate = parseFloat(rewardUnclaimed) / remainingDays;
@@ -78,7 +79,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
 
   const { loading, data, error } = useQuery(TVL, {
     fetchPolicy: "no-cache",
-    pollInterval: 80000,
+    pollInterval: 400000,
     notifyOnNetworkStatusChange: true,
     onError: () => {
       console.log(error);

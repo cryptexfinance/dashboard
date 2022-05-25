@@ -175,7 +175,7 @@ const Rewards = ({
 
   const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
-    pollInterval: 60000,
+    pollInterval: 90000,
     notifyOnNetworkStatusChange: true,
     variables: { owner: ownerAddress.toLowerCase() },
     onError: () => {
@@ -271,16 +271,22 @@ const Rewards = ({
     <>
       <div className="rewards">
         <div className="rewards-tier">
-          <h6>Fee tier:</h6>
-          <NumberFormat
-            className="number"
-            value="0.3"
-            displayType="text"
-            thousandSeparator
-            prefix=""
-            suffix="%"
-            decimalScale={4}
-          />
+          <div className="rewards-item">
+            <h6>Fee tier:</h6>
+            <NumberFormat
+              className="number"
+              value="0.3"
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              suffix="%"
+              decimalScale={4}
+            />
+          </div>
+          <div className="rewards-item">
+            <h6>APR:</h6>
+            <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+          </div>
         </div>
         <div className="rewards-total">
           <h6>
@@ -383,7 +389,6 @@ const Rewards = ({
               </div>
             </div>
           </th>
-          <th>APR</th>
           <th />
         </thead>
         <tbody>
@@ -432,11 +437,6 @@ const Rewards = ({
                 />{" "}
                 CTX
               </td>
-              <td>
-                <b className="fire">
-                  <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
-                </b>
-              </td>
               <td align="right">
                 <>
                   <Stake
@@ -461,16 +461,22 @@ const Rewards = ({
     <div className="empty-lp">
       <div className="lp-box">
         <div className="lp-info">
-          <div className="icons">
-            <WETHIcon className="weth" />
-            <TcapIcon className="tcap" />
+          <div className="row1">
+            <div className="icons">
+              <WETHIcon className="weth" />
+              <TcapIcon className="tcap" />
+            </div>
+            <div className="description">
+              <a target="_blank" rel="noreferrer" href={lpUrl()}>
+                WETH/TCAP Pool <br />
+                <UNIIconSmall className="uni" />
+                <small> Fee tier: 0.3%</small>
+              </a>
+            </div>
           </div>
-          <div className="description">
-            <a target="_blank" rel="noreferrer" href={lpUrl()}>
-              WETH/TCAP Pool <br />
-              <UNIIconSmall className="uni" />
-              <small> Fee tier: 0.3%</small>
-            </a>
+          <div className="row2">
+            <h6>Current APR:</h6>
+            <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
           </div>
         </div>
         <a className="btn" target="_blank" rel="noreferrer" href={lpUrl()}>
