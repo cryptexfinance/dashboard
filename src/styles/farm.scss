@@ -298,6 +298,12 @@
           }
         }
         &.univ3 {
+          .card-header {
+            padding-left: 0rem;
+          }
+          .card-body {
+            padding: 1rem 0rem;
+          }
           thead {
             .btn {
               margin-top: 0rem;
@@ -334,9 +340,16 @@
             width: 6rem;
             margin-right: 1rem;
             padding: 0.1rem 1rem;
+          }          
+          .current-rewards {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
           }
-          .card-body {
-            padding: 1rem 0rem;
+          .fire {
+            .number {
+              font-family: "Nineteen Ninety Seven";
+            }
           }
           .rewards {
             display: flex;
