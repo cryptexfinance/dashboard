@@ -83,17 +83,19 @@ const UniV3Rewards = ({ signer }: props) => {
   }, [currentNetwork.chainId]);
 
   return (
-    <ApolloProvider client={apolloClient}>
-      <Rewards
-        ownerAddress={ownerAddress}
-        signer={signer}
-        stakerContract={stakerContract}
-        stakerContractRead={stakerContractRead}
-        nfpmContract={nfpmContract}
-        nfpmContractRead={nfpmContractRead}
-        poolContractRead={poolContractRead}
-      />
-    </ApolloProvider>
+    <div>
+      <ApolloProvider client={apolloClient}>
+        <Rewards
+          ownerAddress={ownerAddress}
+          signer={signer}
+          stakerContract={stakerContract}
+          stakerContractRead={stakerContractRead}
+          nfpmContract={nfpmContract}
+          nfpmContractRead={nfpmContractRead}
+          poolContractRead={poolContractRead}
+        />
+      </ApolloProvider>
+    </div>
   );
 };
 
