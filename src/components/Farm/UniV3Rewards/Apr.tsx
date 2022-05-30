@@ -33,12 +33,13 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
 
   const calculateApr = async (aprData: any) => {
     if (
-      signer.signer &&
+      signer &&
       oracles.wethOracleRead &&
       oracles.tcapOracleRead &&
       tokens.ctxPoolTokenRead &&
       stakerContractRead &&
-      aprData
+      aprData &&
+      incentive
     ) {
       const incentiveId = computeIncentiveId(incentive);
       const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
@@ -84,7 +85,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
       console.log(error);
     },
     onCompleted: () => {
-      if (signer.signer) {
+      if (signer) {
         calculateApr(data.apr);
       }
     },

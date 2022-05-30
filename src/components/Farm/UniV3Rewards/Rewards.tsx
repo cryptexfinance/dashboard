@@ -45,10 +45,6 @@ type btnProps = {
   position: PositionType;
 };
 
-type infoMsgProps = {
-  message: string;
-};
-
 const Rewards = ({
   ownerAddress,
   signer,
@@ -87,7 +83,7 @@ const Rewards = ({
     }
   `;
 
-  const loadData = async (positionsData: any) => {
+  const confIncetive = (): any => {
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
       case NETWORKS.rinkeby.chainId:
@@ -99,6 +95,12 @@ const Rewards = ({
     }
     // console.log(computeIncentiveId(ethTcapPool.incentives[0]));
     setEthTcapIncentive(ethTcapPool.incentives);
+
+    return ethTcapPool;
+  };
+
+  const loadData = async (positionsData: any) => {
+    const ethTcapPool = confIncetive();
     const ethPositions = new Array<PositionType>();
 
     // Read pool price
@@ -185,6 +187,8 @@ const Rewards = ({
       if (signer.signer && ownerAddress !== "") {
         loadData(data);
         setFirstLoad(false);
+      } else {
+        confIncetive();
       }
     },
   });
@@ -258,12 +262,6 @@ const Rewards = ({
       </Button>
     );
   };
-
-  const InfoMessage = ({ message }: infoMsgProps) => (
-    <div className="info-message">
-      <h6>{message}</h6>
-    </div>
-  );
 
   const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
 
@@ -501,7 +499,7 @@ const Rewards = ({
             )}
           </>
         ) : (
-          <InfoMessage message="Connect your Wallet" />
+          <RenderEmptyLP />
         )}
       </Card.Body>
       <ClaimReward
