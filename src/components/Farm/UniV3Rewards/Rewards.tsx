@@ -282,6 +282,17 @@ const Rewards = ({
             />
           </div>
           <div className="rewards-item">
+            <h6>TCAP/WETH Price: </h6>
+            <NumberFormat
+              className="number"
+              value={cumulativePrice}
+              displayType="text"
+              thousandSeparator
+              suffix=""
+              decimalScale={4}
+            />
+          </div>
+          <div className="rewards-item">
             <h6>APR:</h6>
             <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
           </div>
@@ -332,11 +343,6 @@ const Rewards = ({
               overlay={
                 <Tooltip id="ttip-position" className="univ3-status-tooltip">
                   Position Min and Max price represents TCAP per WETH. <br />
-                  Current price is{" "}
-                  <span className={StakeStatus.staked}>
-                    {numberFormatStr(cumulativePrice.toString(), 4, 4)}
-                  </span>{" "}
-                  TCAP per WETH
                 </Tooltip>
               }
             >
@@ -437,6 +443,14 @@ const Rewards = ({
               </td>
               <td align="right">
                 <>
+                  <a
+                    className="btn position-url"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://app.uniswap.org/#/pool/${position.lpTokenId}?chain=${currentNetwork.name}`}
+                  >
+                    Position
+                  </a>
                   <Stake
                     ownerAddress={ownerAddress}
                     position={position}
