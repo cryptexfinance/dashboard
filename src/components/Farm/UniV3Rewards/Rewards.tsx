@@ -45,10 +45,6 @@ type btnProps = {
   position: PositionType;
 };
 
-type infoMsgProps = {
-  message: string;
-};
-
 const Rewards = ({
   ownerAddress,
   signer,
@@ -87,7 +83,7 @@ const Rewards = ({
     }
   `;
 
-  const loadData = async (positionsData: any) => {
+  const confIncetive = (): any => {
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
       case NETWORKS.rinkeby.chainId:
@@ -99,6 +95,12 @@ const Rewards = ({
     }
     // console.log(computeIncentiveId(ethTcapPool.incentives[0]));
     setEthTcapIncentive(ethTcapPool.incentives);
+
+    return ethTcapPool;
+  };
+
+  const loadData = async (positionsData: any) => {
+    const ethTcapPool = confIncetive();
     const ethPositions = new Array<PositionType>();
 
     // Read pool price
@@ -185,6 +187,8 @@ const Rewards = ({
       if (signer.signer && ownerAddress !== "") {
         loadData(data);
         setFirstLoad(false);
+      } else {
+        confIncetive();
       }
     },
   });
@@ -259,12 +263,6 @@ const Rewards = ({
     );
   };
 
-  const InfoMessage = ({ message }: infoMsgProps) => (
-    <div className="info-message">
-      <h6>{message}</h6>
-    </div>
-  );
-
   const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
 
   const RenderRewards = () => (
@@ -280,6 +278,17 @@ const Rewards = ({
               thousandSeparator
               prefix=""
               suffix="%"
+              decimalScale={4}
+            />
+          </div>
+          <div className="rewards-item">
+            <h6>TCAP/WETH Price: </h6>
+            <NumberFormat
+              className="number"
+              value={cumulativePrice}
+              displayType="text"
+              thousandSeparator
+              suffix=""
               decimalScale={4}
             />
           </div>
@@ -334,11 +343,6 @@ const Rewards = ({
               overlay={
                 <Tooltip id="ttip-position" className="univ3-status-tooltip">
                   Position Min and Max price represents TCAP per WETH. <br />
-                  Current price is{" "}
-                  <span className={StakeStatus.staked}>
-                    {numberFormatStr(cumulativePrice.toString(), 4, 4)}
-                  </span>{" "}
-                  TCAP per WETH
                 </Tooltip>
               }
             >
@@ -439,6 +443,14 @@ const Rewards = ({
               </td>
               <td align="right">
                 <>
+                  <a
+                    className="btn position-url"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://app.uniswap.org/#/pool/${position.lpTokenId}?chain=${currentNetwork.name}`}
+                  >
+                    Position
+                  </a>
                   <Stake
                     ownerAddress={ownerAddress}
                     position={position}
@@ -501,7 +513,7 @@ const Rewards = ({
             )}
           </>
         ) : (
-          <InfoMessage message="Connect your Wallet" />
+          <RenderEmptyLP />
         )}
       </Card.Body>
       <ClaimReward

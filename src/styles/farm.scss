@@ -329,9 +329,13 @@
           }
           .btn {
             width: 7rem;
+            margin-left: 1.5rem;
           }
           .btn.small {
             width: 5rem;
+            @media (max-width: 1550px) { 
+              width: 7rem !important;
+            }
           }
           .btn.claim {
             background-color: #281e31;
@@ -340,6 +344,11 @@
             width: 6rem;
             margin-right: 1rem;
             padding: 0.1rem 1rem;
+          }
+          .btn.position-url {
+            border-width: 1px;
+            border-color: $green;
+            word-wrap: wrap;
           }
           .number {
             font-size: 1rem;

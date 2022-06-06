@@ -18,7 +18,6 @@
     .actions {
       display: flex;
       .dropdown {
-        padding-left: 0.5rem;
         .dropdown-toggle {
           display: flex;
           height: 2.1rem;
@@ -49,7 +48,7 @@
           border-bottom: 0;
           border-left: 0.4em solid transparent;
           margin-top: 7px;
-          margin-left: 65%;          
+          margin-left: 70%;          
         }
         .dropdown-menu {
           width: 85%;
@@ -67,12 +66,60 @@
             background-color: rgba(121, 64, 242, 0.3);
           }
         }
+        .ratio-range-toggle {
+          width: 180px;
+        }
+        .ratio-range-toggle::after {
+          margin-left: 80%; 
+        }
+        .ratio-range-menu {
+          display: flex;
+          flex-direction: column;
+          width: 17rem;
+          .btn {
+            background-color: $darker;
+            font-size: 0.8rem;
+            margin: 0rem 0.5rem;
+          }
+          .range-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+          }
+          svg {
+            color: $white;
+          }
+        }
+      }
+      .filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        padding: 0px;
+        width: 100%;
+        input[type="radio"] {
+          display: none;
+        }
       }
       .dd {
         &-container {
           display: flex;
+          flex-direction: row;
           align-items: center;
           margin-left: 1rem;
+          h6 {
+            margin-right: 5px;
+          }
+        }
+        @media (max-width: 1670px) {
+          &-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-end;
+            margin-left: 1rem;
+          }
         }
         @media (max-width: 1450px) {
           &-collateral, &-mode {
@@ -89,7 +136,18 @@
           }
         }
       }
-      
+      input[type="number"] {
+        background-color: #281e31;
+        border: 1px solid #dfd1ea;
+        border-radius: 5px;
+        text-align: right;
+        height: 2.1rem;
+        width: 6rem;
+      }
+      .neon-orange {
+        border: 1px solid $orange !important;        
+        box-shadow: 0px 0px 39px -6px rgba(242, 128, 64, 0.4);
+      }
       .btn-group {
         border: 1px solid #dfd1ea;
         border-radius: 5px;
@@ -101,16 +159,6 @@
         }
         .btn-secondary.active {
           background-color: $neon-highlight;
-        }
-      }
-      .filters {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-        padding: 0px;
-        width: 100%;
-        input[type="radio"] {
-          display: none;
         }
       }
       .items-view {
@@ -136,7 +184,7 @@
       }
       .titles {
         color: $white;
-        margin-bottom: 0px;
+        margin-bottom: 5px;
       }
     }
     .vaults {
@@ -155,7 +203,10 @@
       thead {
         th {
           text-align: center;
-        }  
+        }
+        .vault-id {
+          text-align: left;
+        } 
         .status {
           text-align: left; 
         }

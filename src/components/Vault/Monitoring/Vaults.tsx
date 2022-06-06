@@ -52,14 +52,6 @@ export const Vaults = ({
   const [rewardSort, setRewardSort] = useState(0);
   // const [renderReward, setRenderReward] = useState(false);
 
-  /* useEffect(() => {
-    if (loadingLiq) {
-      console.log("ntra aqui");
-      setRenderReward(!renderReward);
-    }
-    // eslint-disable-next-line
-  }, [loadingLiq]); */
-
   const liquidateVault = (index: number, lVault: VaultsType) => {
     setVaultIndex(index);
     setLiqVault(lVault);
@@ -175,6 +167,7 @@ export const Vaults = ({
       <Table hover className="mt-2 vaults">
         <thead>
           <tr>
+            <th className="vault-id">Vault Id</th>
             <th className="status">
               Status
               <OverlayTrigger
@@ -238,6 +231,7 @@ export const Vaults = ({
             const itemPage = Math.ceil((index + 1) / pagination.itemsPerPage);
             return (
               <tr key={index} className={pagination.current === itemPage ? "show" : "hide"}>
+                <td>{numberFormatStr(v.id, 0, 0)}</td>
                 <td>
                   <div className="status">
                     {statusTag(index, v)}
