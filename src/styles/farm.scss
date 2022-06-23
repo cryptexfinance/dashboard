@@ -299,7 +299,10 @@
         }
         &.univ3 {
           .card-header {
-            padding-left: 0rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-left: 0rem;            
           }
           .card-body {
             padding: 1rem 0rem;
@@ -344,6 +347,11 @@
             width: 6rem;
             margin-right: 1rem;
             padding: 0.1rem 1rem;
+          }
+          .claim-button2 {
+            .btn.claim {
+              margin-right: 0rem;
+            }
           }
           .btn.position-url {
             border-width: 1px;
