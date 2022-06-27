@@ -514,7 +514,7 @@ const Rewards = ({
     <Card className="diamond mb-2 univ3">
       <Card.Header>
         <h2>Uniswap V3 Liquidity Rewards</h2>
-        {availableReward > 0.001 && (
+        {availableReward > 0.001 && ethTcapPositions.length === 0 && (
           <div className="rewards-total">
             <h6>Unclaimed Reward:</h6>
             <div className="amount">
