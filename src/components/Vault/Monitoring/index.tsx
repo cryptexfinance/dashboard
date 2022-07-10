@@ -1,13 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ethers, BigNumber } from "ethers";
+import Button from "react-bootstrap/esm/Button";
 import ButtonGroup from "react-bootstrap/esm/ButtonGroup";
 import Card from "react-bootstrap/esm/Card";
 import Col from "react-bootstrap/Col";
 import Dropdown from "react-bootstrap/Dropdown";
+import { FaArrowsAltH } from "react-icons/fa";
+import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/esm/Row";
-import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import Spinner from "react-bootstrap/Spinner";
 import { useTranslation } from "react-i18next";
+import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import "../../../styles/vault-monitoring.scss";
 import { useQuery, gql } from "@apollo/client";
 import { useLocation } from "react-router-dom";
@@ -83,9 +86,11 @@ export const Monitoring = () => {
   const [vaultsRatio, setVaultsRatio] = useState<VaultsRatioType>();
   const [vaultsTotals, setVaultsTotals] = useState<VaultsTotalsType>(totalsDefault);
   const [vaultList, setVaultList] = useState<Array<VaultsType>>([]);
+  const [vaultGraphList, setVaultGraphList] = useState<Array<any>>([]);
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
   const [loadMore, setLoadMore] = useState(false);
   const [pricesUpdated, setPricesUpdated] = useState(false);
+  const [filteringRatios, setFilteringRatios] = useState(false);
   // @ts-ignore
   const [ownerAddress, setOwnerAddress] = useState(state && state.address ? state.address : "");
   // @ts-ignore
@@ -93,7 +98,14 @@ export const Monitoring = () => {
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
+  const [currentMinRatio, setCurrentMinRatio] = useState("0%");
+  const [currentMaxRatio, setCurrentMaxRatio] = useState("2500%");
+  // const [minFilterRatio, setMinFilterRatio] = useState("0");
+  // const [maxFilterRatio, setMaxFilterRatio] = useState("1500");
   const [renderTable, setRenderTable] = useState(false);
+  const ratioRangeDropdown = useRef(null);
+  const minRatioInput = useRef(null);
+  const maxRatioInput = useRef(null);
   const radios = [
     { name: t("all-vaults"), value: "1" },
     { name: t("my-vaults"), value: "2" },
@@ -605,13 +617,46 @@ export const Monitoring = () => {
     return { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status };
   };
 
+  const isValidRatio = (value: string) => {
+    let valid = false;
+    if (!Number.isNaN(value)) {
+      valid = Number.parseFloat(value) >= 0;
+    }
+    return valid;
+  };
+
+  const getMinRangeRatio = (): number => {
+    if (minRatioInput && minRatioInput.current) {
+      // @ts-ignore
+      const minRatio = minRatioInput.current.value;
+      if (isValidRatio(minRatio)) {
+        return parseFloat(minRatio);
+      }
+    }
+    return 0;
+  };
+
+  const getMaxRangeRatio = (): number => {
+    if (maxRatioInput && maxRatioInput.current) {
+      // @ts-ignore
+      const maxRatio = maxRatioInput.current.value;
+      if (isValidRatio(maxRatio)) {
+        return parseFloat(maxRatio);
+      }
+    }
+    return 3000;
+  };
+
   const loadVaults = async (vaultsData: any) => {
     const vData = new Array<VaultsType>();
     const vLiquidables = new Array<liqVaultsTempType>();
     const totals = { ...totalsDefault };
+    const minFilterRatio = getMinRangeRatio();
+    const maxFilterRatio = getMaxRangeRatio();
 
     setSkipQuery(true);
     setLoadMore(false);
+    setFilteringRatios(true);
     // setLiqLoaded(currentStatus !== VAULT_STATUS.liquidation);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
@@ -623,6 +668,11 @@ export const Monitoring = () => {
       if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
         addVault = currentStatus === status;
       }
+      // filter ratio
+      if (currentStatus !== VAULT_STATUS.empty && currentStatus !== VAULT_STATUS.ready) {
+        addVault = addVault && ratio >= minFilterRatio && ratio <= maxFilterRatio;
+      }
+
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
@@ -685,6 +735,7 @@ export const Monitoring = () => {
     }
     // Set pagination data
     confPagination(vData, pagination.itemsPerPage);
+    setFilteringRatios(false);
   };
 
   const { loading, data, error } = useQuery(vaultsQuery, {
@@ -696,6 +747,7 @@ export const Monitoring = () => {
     },
     onCompleted: () => {
       if (pricesUpdated) {
+        setVaultGraphList(data);
         loadVaults(data);
       }
     },
@@ -769,6 +821,33 @@ export const Monitoring = () => {
   const handleModeChange = (newMode: string) => {
     setSkipQuery(false);
     setVaultMode(newMode);
+  };
+
+  /* const onChangeMinFilterRatio = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMinFilterRatio(event.target.value);
+  };
+
+  const onChangeMaxFilterRatio = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxFilterRatio(event.target.value);
+  }; */
+
+  const onFilterRatioClick = () => {
+    if (minRatioInput && maxRatioInput) {
+      // @ts-ignore
+      const minRatio = minRatioInput.current.value;
+      // @ts-ignore
+      const maxRatio = maxRatioInput.current.value;
+      if (isValidRatio(minRatio) && isValidRatio(maxRatio)) {
+        setCurrentMinRatio(minRatio.concat("%"));
+        setCurrentMaxRatio(maxRatio.concat("%"));
+        // @ts-ignore
+        loadVaults(vaultGraphList);
+        if (ratioRangeDropdown !== null) {
+          // @ts-ignore
+          ratioRangeDropdown.current.click();
+        }
+      }
+    }
   };
 
   const onPageSelected = (pageNumber: number) => {
@@ -939,7 +1018,7 @@ export const Monitoring = () => {
                     </Dropdown>
                   </div>
                   <div className="dd-container">
-                    <h6 className="titles">{t("status")}:</h6>
+                    <h6 className="titles">Status</h6>
                     <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
                       <Dropdown.Toggle
                         variant="secondary"
@@ -985,6 +1064,45 @@ export const Monitoring = () => {
                       </Dropdown>
                     </div>
                   )}
+                  {currentStatus !== VAULT_STATUS.empty && currentStatus !== VAULT_STATUS.ready && (
+                    <div className="dd-container">
+                      <h6 className="titles">Ratio Range</h6>
+                      <Dropdown>
+                        <Dropdown.Toggle
+                          variant="secondary"
+                          id="dropdown-flags"
+                          className="text-left ratio-range-toggle"
+                          ref={ratioRangeDropdown}
+                        >
+                          <div className="status-toggle">
+                            <span>
+                              {currentMinRatio} <FaArrowsAltH /> {currentMaxRatio}
+                            </span>
+                          </div>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu className="ratio-range-menu">
+                          <div className="range-container">
+                            <Form.Control
+                              type="number"
+                              placeholder=""
+                              className="neon-green"
+                              defaultValue="0"
+                              ref={minRatioInput}
+                            />
+                            <FaArrowsAltH />
+                            <Form.Control
+                              type="number"
+                              placeholder=""
+                              className="neon-green"
+                              defaultValue="2500"
+                              ref={maxRatioInput}
+                            />
+                          </div>
+                          <Button onClick={() => onFilterRatioClick()}>Apply</Button>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+                  )}
                   {currentAddress !== "" && (
                     <div className="dd-container">
                       <ButtonGroup className="mb-2">
@@ -1007,7 +1125,7 @@ export const Monitoring = () => {
                   )}
                 </div>
               </Col>
-              {loading || !pricesUpdated ? (
+              {loading || filteringRatios || !pricesUpdated ? (
                 <Spinner variant="danger" className="spinner" animation="border" />
               ) : (
                 <Vaults

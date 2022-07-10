@@ -30,6 +30,7 @@ import {
 import { IncentiveType, PositionType, positionDefaultValues, StakeStatus } from "./types";
 import ClaimReward from "./ClaimReward";
 import Stake from "./Stake";
+import Apr from "./Apr";
 
 type props = {
   ownerAddress: string;
@@ -43,10 +44,6 @@ type props = {
 
 type btnProps = {
   position: PositionType;
-};
-
-type infoMsgProps = {
-  message: string;
 };
 
 const Rewards = ({
@@ -88,7 +85,7 @@ const Rewards = ({
     }
   `;
 
-  const loadData = async (positionsData: any) => {
+  const confIncetive = (): any => {
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
       case NETWORKS.rinkeby.chainId:
@@ -98,19 +95,35 @@ const Rewards = ({
         ethTcapPool = UNIV3.mainnet.tcapPool;
         break;
     }
+    // console.log(computeIncentiveId(ethTcapPool.incentives[0]));
     setEthTcapIncentive(ethTcapPool.incentives);
+
+    return ethTcapPool;
+  };
+
+  const loadData = async (positionsData: any) => {
+    const ethTcapPool = confIncetive();
     const ethPositions = new Array<PositionType>();
 
     // Read pool price
     const poolObserveCall = await poolContractRead?.observe([0, 10]);
+    // Read available to claim reward
+    const availableRewardCall = await stakerContractRead?.rewards(
+      ethTcapPool.incentives[0].rewardToken,
+      ownerAddress
+    );
+
     // @ts-ignore
-    const [observations] = await signer.ethcallProvider?.all([poolObserveCall]);
+    const [observations, availableRewardWei] = await signer.ethcallProvider?.all([
+      poolObserveCall,
+      availableRewardCall,
+    ]);
     const tickCumulative0 = observations.tickCumulatives[0];
     const tickCumulative1 = observations.tickCumulatives[1];
 
     const currentCumPrice = calculateCumulativePrice(tickCumulative0, tickCumulative1, 10);
     setCumulativePrice(currentCumPrice);
-
+    setAvailableReward(parseFloat(ethers.utils.formatEther(availableRewardWei)));
     positionsData.positions.forEach(async (p: any) => {
       if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
         const position = { ...positionDefaultValues };
@@ -129,19 +142,12 @@ const Rewards = ({
         const nfpCall = await nfpmContractRead?.getApproved(p.id);
         const lpDepositsCall = await stakerContractRead?.deposits(p.id);
         const lpStakesCall = await stakerContractRead?.stakes(p.id, incentiveId);
-        const availableRewardCall = await stakerContractRead?.rewards(
-          ethTcapPool.incentives[0].rewardToken,
-          ownerAddress
-        );
         // @ts-ignore
-        const [nfpAddress, depositsEth, stakesEth, availableRewardWei] =
-          await signer.ethcallProvider?.all([
-            nfpCall,
-            lpDepositsCall,
-            lpStakesCall,
-            availableRewardCall,
-          ]);
-        setAvailableReward(parseFloat(ethers.utils.formatEther(availableRewardWei)));
+        const [nfpAddress, depositsEth, stakesEth] = await signer.ethcallProvider?.all([
+          nfpCall,
+          lpDepositsCall,
+          lpStakesCall,
+        ]);
         if (
           depositsEth.owner === ownerAddress &&
           depositsEth.tickLower === position.tickLower &&
@@ -175,7 +181,7 @@ const Rewards = ({
 
   const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
-    pollInterval: 60000,
+    pollInterval: 90000,
     notifyOnNetworkStatusChange: true,
     variables: { owner: ownerAddress.toLowerCase() },
     onError: () => {
@@ -185,6 +191,8 @@ const Rewards = ({
       if (signer.signer && ownerAddress !== "") {
         loadData(data);
         setFirstLoad(false);
+      } else {
+        confIncetive();
       }
     },
   });
@@ -259,18 +267,12 @@ const Rewards = ({
     );
   };
 
-  const InfoMessage = ({ message }: infoMsgProps) => (
-    <div className="info-message">
-      <h6>{message}</h6>
-    </div>
-  );
-
   const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
 
-  const RenderRewards = () => (
-    <>
-      <div className="rewards">
-        <div className="rewards-tier">
+  const RenderHeader = (): React.ReactElement => (
+    <div className="rewards">
+      <div className="rewards-tier">
+        <div className="rewards-item">
           <h6>Fee tier:</h6>
           <NumberFormat
             className="number"
@@ -282,175 +284,200 @@ const Rewards = ({
             decimalScale={4}
           />
         </div>
-        <div className="rewards-total">
-          <h6>
-            {t("farming.univ3.available-claim")}
-            <OverlayTrigger
-              key="bottom"
-              placement="bottom"
-              overlay={<Tooltip id="tooltip-bottom">{t("farming.univ3.claim-info")}</Tooltip>}
-            >
-              <Button variant="dark" className="question-small">
-                ?
-              </Button>
-            </OverlayTrigger>
-            :
-          </h6>
-          <div className="amount">
-            <NumberFormat
-              className="number"
-              value={availableReward}
-              displayType="text"
-              thousandSeparator
-              prefix=""
-              decimalScale={4}
-            />
-            <CtxIcon />
-          </div>
-          <div className="claim-button">
-            <ClaimButton />
-          </div>
+        <div className="rewards-item">
+          <h6>TCAP/WETH Price: </h6>
+          <NumberFormat
+            className="number"
+            value={cumulativePrice}
+            displayType="text"
+            thousandSeparator
+            suffix=""
+            decimalScale={4}
+          />
+        </div>
+        <div className="rewards-item">
+          <h6>APR:</h6>
+          <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
         </div>
       </div>
+      <div className="rewards-total">
+        <h6>
+          Available to Claim
+          <OverlayTrigger
+            key="bottom"
+            placement="bottom"
+            overlay={
+              <Tooltip id="tooltip-bottom">
+                In order to claim rewards, you need to unstake your token.
+              </Tooltip>
+            }
+          >
+            <Button variant="dark" className="question-small">
+              ?
+            </Button>
+          </OverlayTrigger>
+          :
+        </h6>
+        <div className="amount">
+          <NumberFormat
+            className="number"
+            value={availableReward}
+            displayType="text"
+            thousandSeparator
+            prefix=""
+            decimalScale={4}
+          />
+          <CtxIcon />
+        </div>
+        <div className="claim-button">
+          <ClaimButton />
+        </div>
+      </div>
+    </div>
+  );
+
+  const RenderTableHeader = () => (
+    <thead>
+      <tr>
+        <th />
+        <th>
+          Position
+          <OverlayTrigger
+            key="top"
+            placement="right"
+            trigger={["hover", "click"]}
+            overlay={
+              <Tooltip id="ttip-position" className="univ3-status-tooltip">
+                Position Min and Max price represents TCAP per WETH. <br />
+              </Tooltip>
+            }
+          >
+            <Button variant="dark">?</Button>
+          </OverlayTrigger>
+        </th>
+        <th className="status">
+          Status
+          <OverlayTrigger
+            key="top"
+            placement="right"
+            trigger={["hover", "click"]}
+            overlay={
+              <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
+                approved in order to be staked. <br />
+                <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked or
+                deposited. <br />
+                <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be stake
+                to earn rewards. <br />
+                <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
+                rewards. <br />
+                <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
+                rewards because the price is out of your position range.
+              </Tooltip>
+            }
+          >
+            <Button variant="dark">?</Button>
+          </OverlayTrigger>
+        </th>
+        <th>
+          <div className="current-rewards">
+            <div className="title">Current Reward</div>
+            <div className="button">
+              <OverlayTrigger
+                key="top"
+                placement="auto"
+                trigger={["hover", "click"]}
+                overlay={
+                  <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                    Amount of CTX that it's been earn while the LP token is staked. You must unstake
+                    the LP token in order to claim the reward.
+                  </Tooltip>
+                }
+              >
+                <Button variant="dark">?</Button>
+              </OverlayTrigger>
+            </div>
+          </div>
+        </th>
+        <th />
+      </tr>
+    </thead>
+  );
+
+  const RenderRewards = () => (
+    <>
+      <RenderHeader />
       <Table hover className="mt-2">
-        <thead>
-          <th />
-          <th>
-            {t("farming.univ3.position")}
-            <OverlayTrigger
-              key="top"
-              placement="right"
-              trigger={["hover", "click"]}
-              overlay={
-                <Tooltip id="ttip-position" className="univ3-status-tooltip">
-                  {t("farming.univ3.position-info1")} <br />
-                  {t("farming.univ3.position-info2")}{" "}
-                  <span className={StakeStatus.staked}>
-                    {numberFormatStr(cumulativePrice.toString(), 4, 4)}
-                  </span>{" "}
-                  TCAP per WETH
-                </Tooltip>
-              }
-            >
-              <Button variant="dark">?</Button>
-            </OverlayTrigger>
-          </th>
-          <th className="status">
-            {t("status")}
-            <OverlayTrigger
-              key="top"
-              placement="right"
-              trigger={["hover", "click"]}
-              overlay={
-                <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                  <span className={StakeStatus.not_approved}>Pending</span>:{" "}
-                  {t("farming.univ3.pending-info")} <br />
-                  <span className={StakeStatus.empty}>Unstaked</span>:{" "}
-                  {t("farming.univ3.unstaked-info")} <br />
-                  <span className={StakeStatus.deposited}>Deposited</span>:{" "}
-                  {t("farming.univ3.deposited-info")} <br />
-                  <span className={StakeStatus.staked}>Staked</span>:{" "}
-                  {t("farming.univ3.staked-info")} <br />
-                  <span className={StakeStatus.out_range}>Out of range</span>:{" "}
-                  {t("farming.univ3.out-of-range-info")}
-                </Tooltip>
-              }
-            >
-              <Button variant="dark">?</Button>
-            </OverlayTrigger>
-          </th>
-          <th>
-            {t("farming.univ3.current-reward")}
-            <OverlayTrigger
-              key="top"
-              placement="auto"
-              trigger={["hover", "click"]}
-              overlay={
-                <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                  {t("farming.univ3.current-reward-info")}
-                </Tooltip>
-              }
-            >
-              <Button variant="dark">?</Button>
-            </OverlayTrigger>
-          </th>
-          <th>APR</th>
-          <th />
-        </thead>
+        <RenderTableHeader />
         <tbody>
-          {ethTcapPositions.sort(sortPositions).map((position, index) => {
-            console.log("");
-            return (
-              <tr key={index}>
-                <td>
-                  <WETHIcon className="weth" />
-                  <TcapIcon className="tcap" />
-                </td>
-                <td className="position">
-                  <div className="ranges">
-                    <div className="min-range">
-                      <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
-                    </div>
-                    <FaArrowsAltH />
-                    <div className="max-range">
-                      <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
-                    </div>
+          {ethTcapPositions.sort(sortPositions).map((position, index) => (
+            <tr key={index}>
+              <td>
+                <WETHIcon className="weth" />
+                <TcapIcon className="tcap" />
+              </td>
+              <td className="position">
+                <div className="ranges">
+                  <div className="min-range">
+                    <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
                   </div>
-                  <div className="description">
-                    <span className="tokens">TCAP/WETH Pool</span>
-                    <small>Uniswap</small>
+                  <FaArrowsAltH />
+                  <div className="max-range">
+                    <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
                   </div>
-                </td>
-                <td>
-                  <div className="status">
-                    {position.priceInRange ? (
-                      <span className={position.status}>
-                        {position.status === StakeStatus.not_approved
-                          ? "Pending"
-                          : capitalize(position.status)}
-                      </span>
-                    ) : (
-                      <span className={StakeStatus.out_range}>Out of range</span>
-                    )}
-                  </div>
-                </td>
-                <td className="number">
-                  <NumberFormat
-                    className="number"
-                    value={position.reward}
-                    displayType="text"
-                    thousandSeparator
-                    prefix=""
-                    decimalScale={2}
-                  />{" "}
-                  CTX
-                </td>
-                <td>
-                  <NumberFormat
-                    className="number"
-                    value={90}
-                    displayType="text"
-                    thousandSeparator
-                    suffix="%"
-                    decimalScale={0}
+                </div>
+                <div className="description">
+                  <span className="tokens">TCAP/WETH Pool</span>
+                  <small>Uniswap</small>
+                </div>
+              </td>
+              <td>
+                <div className="status">
+                  {position.priceInRange ? (
+                    <span className={position.status}>
+                      {position.status === StakeStatus.not_approved
+                        ? "Pending"
+                        : capitalize(position.status)}
+                    </span>
+                  ) : (
+                    <span className={StakeStatus.out_range}>Out of range</span>
+                  )}
+                </div>
+              </td>
+              <td className="number">
+                <NumberFormat
+                  className="number"
+                  value={position.reward}
+                  displayType="text"
+                  thousandSeparator
+                  prefix=""
+                  decimalScale={2}
+                />{" "}
+                CTX
+              </td>
+              <td align="right">
+                <>
+                  <a
+                    className="btn position-url"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://app.uniswap.org/#/pool/${position.lpTokenId}?chain=${currentNetwork.name}`}
+                  >
+                    Position
+                  </a>
+                  <Stake
+                    ownerAddress={ownerAddress}
+                    position={position}
+                    incentive={ethTcapIncentive[0]}
+                    nfpmContract={nfpmContract}
+                    stakerContract={stakerContract}
+                    refresh={() => refresh()}
                   />
-                </td>
-                <td align="right">
-                  <>
-                    <Stake
-                      ownerAddress={ownerAddress}
-                      position={position}
-                      incentive={ethTcapIncentive[0]}
-                      nfpmContract={nfpmContract}
-                      stakerContract={stakerContract}
-                      refresh={() => refresh()}
-                    />
-                    <WithdrawButton position={position} />
-                  </>
-                </td>
-              </tr>
-            );
-          })}
+                  <WithdrawButton position={position} />
+                </>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </>
@@ -460,16 +487,22 @@ const Rewards = ({
     <div className="empty-lp">
       <div className="lp-box">
         <div className="lp-info">
-          <div className="icons">
-            <WETHIcon className="weth" />
-            <TcapIcon className="tcap" />
+          <div className="row1">
+            <div className="icons">
+              <WETHIcon className="weth" />
+              <TcapIcon className="tcap" />
+            </div>
+            <div className="description">
+              <a target="_blank" rel="noreferrer" href={lpUrl()}>
+                WETH/TCAP Pool <br />
+                <UNIIconSmall className="uni" />
+                <small> Fee tier: 0.3%</small>
+              </a>
+            </div>
           </div>
-          <div className="description">
-            <a target="_blank" rel="noreferrer" href={lpUrl()}>
-              WETH/TCAP Pool <br />
-              <UNIIconSmall className="uni" />
-              <small> Fee tier: 0.3%</small>
-            </a>
+          <div className="row2">
+            <h6>Current APR:</h6>
+            <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
           </div>
         </div>
         <a className="btn" target="_blank" rel="noreferrer" href={lpUrl()}>
@@ -482,7 +515,26 @@ const Rewards = ({
   return (
     <Card className="diamond mb-2 univ3">
       <Card.Header>
-        <h2>Uniswap V3 {t("farming.liquidity")}</h2>
+        <h2>Uniswap V3 Liquidity Rewards</h2>
+        {availableReward > 0.001 && ethTcapPositions.length === 0 && (
+          <div className="rewards-total">
+            <h6>Unclaimed Reward:</h6>
+            <div className="amount">
+              <NumberFormat
+                className="number"
+                value={availableReward}
+                displayType="text"
+                thousandSeparator
+                prefix=""
+                decimalScale={4}
+              />
+              <CtxIcon />
+            </div>
+            <div className="claim-button2">
+              <ClaimButton />
+            </div>
+          </div>
+        )}
       </Card.Header>
       <Card.Body>
         {ownerAddress !== "" ? (
@@ -494,7 +546,7 @@ const Rewards = ({
             )}
           </>
         ) : (
-          <InfoMessage message="Connect your Wallet" />
+          <RenderEmptyLP />
         )}
       </Card.Body>
       <ClaimReward

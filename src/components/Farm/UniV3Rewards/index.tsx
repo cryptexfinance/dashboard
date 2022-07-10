@@ -52,7 +52,7 @@ const UniV3Rewards = ({ signer }: props) => {
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
           break;
       }
-      if (signer.signer) {
+      if (signer) {
         const stakerRead = new Contract(UNIV3.stakerAddress, UniswapV3Staker);
         const staker = new ethers.Contract(UNIV3.stakerAddress, UniswapV3Staker, signer.signer);
         const nfpmRead = new Contract(
@@ -74,8 +74,10 @@ const UniV3Rewards = ({ signer }: props) => {
         setNfpmContract(nfpm);
         setNfpmContractRead(nfpmRead);
         setPoolContractRead(poolRead);
-        const oAddress = await signer.signer.getAddress();
-        setOwnerAddress(oAddress);
+        if (signer.signer) {
+          const oAddress = await signer.signer.getAddress();
+          setOwnerAddress(oAddress);
+        }
       }
     };
     load();
