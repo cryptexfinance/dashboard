@@ -310,9 +310,9 @@ const KeeperForm = ({
     event.preventDefault();
     setSaving(true);
     if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      if (delegatee) {
+      if (address && delegatee) {
         try {
-          const tx = await delegatorFactory.createDelegator(delegatee);
+          const tx = await delegatorFactory.createDelegator(address);
           notifyUser(tx, refresh);
           setDelegatee("");
           await saveKeeper();
