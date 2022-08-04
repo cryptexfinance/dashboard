@@ -11,19 +11,19 @@ import StakerStats from "./StakerStats";
 import SignerContext from "../../state/SignerContext";
 import GovernanceContext from "../../state/GovernanceContext";
 import { API_ENDPOINT, FEATURES } from "../../utils/constants";
-import { delegatorsInfo, infoType } from "./data";
+import { delegatorsInfo } from "./data";
 
 type props = {
   currentSignerAddress: string;
 };
-/* type delegatorType = {
+type delegatorType = {
   id: string;
   delegatee: string;
   delegatedVotes: string;
   delegatedVotesRaw: string;
   tokenOwners: { stake: string; stakeRaw: string }[];
   totalHoldersRepresented: Number;
-}; */
+};
 
 const Delegators = ({ currentSignerAddress }: props) => {
   const { t } = useTranslation();
@@ -131,7 +131,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
     setShowKeeperForm(false);
   };
 
-  /* const getDelegatorData = (address: string): delegatorType | null => {
+  const getDelegatorData = (address: string): delegatorType | null => {
     const index = keepers.findIndex(
       (item) => item.delegatee.toLowerCase() === address.toLowerCase()
     );
@@ -139,9 +139,9 @@ const Delegators = ({ currentSignerAddress }: props) => {
       return keepers[index];
     }
     return null;
-  }; */
+  };
 
-  const getKeepersData = (address: string): infoType | null => {
+  /* const getKeepersData = (address: string): infoType | null => {
     const index = keepersInfo.findIndex(
       (item) => item.address.toLowerCase() === address.toLowerCase()
     );
@@ -149,7 +149,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
       return keepersInfo[index];
     }
     return null;
-  };
+  }; */
 
   const addWithdrawTime = (wTime: number) => {
     const wtimes = withdrawTimes;
@@ -188,12 +188,12 @@ const Delegators = ({ currentSignerAddress }: props) => {
         </>
       )}
       <div className="grid profiles">
-        {keepers.map((keeper, index) => {
-          const keeperInfo = getKeepersData(keeper.delegatee);
-          if (keeperInfo) {
+        {keepersInfo.map((keeperInfo, index) => {
+          const keeper = getDelegatorData(keeperInfo.address);
+          if (keeper) {
             return (
               <ProfileCard
-                key={keeper.id}
+                key={keeperInfo.id}
                 delegator={keeper}
                 info={keeperInfo}
                 showUpdateKeeper={() => showUpdateKeeper(index)}
