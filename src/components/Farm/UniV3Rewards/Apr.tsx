@@ -100,7 +100,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
         const aprValue = aprNumerator / tvlUsd;
         setApr(aprValue);
       } else {
-        setApr(0);
+        setApr(-1);
       }
     }
   };
@@ -120,14 +120,20 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
   });
 
   return (
-    <NumberFormat
-      className="number"
-      value={loading ? "0" : apr}
-      displayType="text"
-      thousandSeparator
-      suffix="%"
-      decimalScale={0}
-    />
+    <>
+      {apr >= 0 ? (
+        <NumberFormat
+          className="number"
+          value={loading ? "0" : apr}
+          displayType="text"
+          thousandSeparator
+          suffix="%"
+          decimalScale={0}
+        />
+      ) : (
+        <span className="number">Expired</span>
+      )}
+    </>
   );
 };
 

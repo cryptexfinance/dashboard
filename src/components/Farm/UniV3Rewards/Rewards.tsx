@@ -126,6 +126,10 @@ const Rewards = ({
       if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
         const position = { ...positionDefaultValues };
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
+        /* let incentiveIdBefore = "";
+        if (ethTcapPool.incentives.length > 1) {
+          incentiveIdBefore = computeIncentiveId(ethTcapPool.incentives[1]);
+        } */
         position.lpTokenId = p.id;
         position.poolId = p.poolAddress;
         position.tickLower = parseInt(p.tickLower.tickIdx);
@@ -140,6 +144,7 @@ const Rewards = ({
         const nfpCall = await nfpmContractRead?.getApproved(p.id);
         const lpDepositsCall = await stakerContractRead?.deposits(p.id);
         const lpStakesCall = await stakerContractRead?.stakes(p.id, incentiveId);
+
         // @ts-ignore
         const [nfpAddress, depositsEth, stakesEth] = await signer.ethcallProvider?.all([
           nfpCall,
