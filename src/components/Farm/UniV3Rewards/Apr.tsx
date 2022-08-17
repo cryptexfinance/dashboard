@@ -87,13 +87,12 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
       const incentiveReward = ethers.BigNumber.from(incentivesInfo[0]);
       const claimableReward = await calculateClaimableRewards(lpData.positions);
       const unclaimedReward = ethers.utils.formatEther(incentiveReward.sub(claimableReward));
-      console.log(unclaimedReward);
 
       const tvlUsd =
         parseFloat(tcapPrice) * lpData.apr.totalAmount0 +
         parseFloat(currentPriceETH) * lpData.apr.totalAmount1;
       const remainingSeconds = incentive.endTime - Date.now() / 1000;
-      if (remainingSeconds >= 0) {
+      if (remainingSeconds > 0) {
         const remainingDays = remainingSeconds / (3600 * 24);
         const rewardRate = parseFloat(unclaimedReward) / remainingDays;
         const ONE_YEAR = 365;

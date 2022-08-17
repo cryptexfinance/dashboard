@@ -41,7 +41,8 @@ const Stake = ({
       btnTitle = "Deposit";
     } else if (currentTime >= incentive.startTime && currentTime <= incentive.endTime) {
       // eslint-disable-next-line
-      bDisabled = !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
+      bDisabled = !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
+      btnTitle = "Ended";
       // eslint-disable-next-line
     } else {
       bDisabled = false;
