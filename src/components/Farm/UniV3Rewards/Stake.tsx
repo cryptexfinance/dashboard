@@ -41,11 +41,11 @@ const Stake = ({
       btnTitle = "Deposit";
     } else if (currentTime >= incentive.startTime && currentTime <= incentive.endTime) {
       // eslint-disable-next-line
-      bDisabled = !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
-      btnTitle = "Ended";
+      bDisabled =  !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
       // eslint-disable-next-line
     } else {
       bDisabled = false;
+      btnTitle = "Expired";
     }
     setTitle(btnTitle);
     setBtnDisabled(bDisabled);
