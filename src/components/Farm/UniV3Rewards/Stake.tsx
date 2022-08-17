@@ -44,7 +44,7 @@ const Stake = ({
       bDisabled =  !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
       // eslint-disable-next-line
     } else {
-      bDisabled = false;
+      bDisabled = true;
       btnTitle = "Expired";
     }
     setTitle(btnTitle);
