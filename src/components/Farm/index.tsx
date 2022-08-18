@@ -26,7 +26,7 @@ import {
   getPriceInUSDFromPair,
   isInLayer1,
 } from "../../utils/utils";
-import { Stake } from "../modals/Stake";
+// import { Stake } from "../modals/Stake";
 
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
@@ -53,16 +53,16 @@ const Farm = () => {
   const oracles = useContext(OraclesContext);
   const governance = useContext(GovernanceContext);
   const rewards = useContext(RewardsContext);
-  const [stakeShow, setStakeShow] = useState(false);
-  const [stakeBalance, setStakeBalance] = useState("0");
-  const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
-  const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
-  const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
+  // const [stakeShow, setStakeShow] = useState(false);
+  // const [stakeBalance, setStakeBalance] = useState("0");
+  // const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
+  // const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
+  // const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
   // APY
   const [, setEthVaultAPY] = useState("0");
   const [, setDaiVaultAPY] = useState("0");
   // const [ethPoolAPY, setEthPoolAPY] = useState("0");
-  const [ctxPoolAPY, setCtxPoolAPY] = useState("0");
+  // const [ctxPoolAPY, setCtxPoolAPY] = useState("0");
 
   const oneYear = 60 * 60 * 24 * 365;
 
@@ -79,7 +79,7 @@ const Farm = () => {
     return apy.toString();
   }
 
-  async function getAPYFromLPRewards(
+  /* async function getAPYFromLPRewards(
     rate: number,
     LPsStaked: number,
     reserves: any,
@@ -96,7 +96,7 @@ const Farm = () => {
     }
 
     return apy.toString();
-  }
+  } */
 
   const refresh = async () => {
     try {
@@ -128,9 +128,9 @@ const Farm = () => {
         const totalTcapDebtDaihCall = await rewards.daiRewardRead?.totalSupply();
         const rateDaiCall = await rewards.daiRewardRead?.rewardRate();
         const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-        const totalSupplyCtxPoolCall = await tokens.ctxPoolTokenRead?.totalSupply();
-        const rateCtxPoolCall = await rewards.ctxPoolRewardRead?.rewardRate();
-        const ctxLPsStakedCall = await rewards.ctxPoolRewardRead?.totalSupply();
+        // const totalSupplyCtxPoolCall = await tokens.ctxPoolTokenRead?.totalSupply();
+        // const rateCtxPoolCall = await rewards.ctxPoolRewardRead?.rewardRate();
+        // const ctxLPsStakedCall = await rewards.ctxPoolRewardRead?.totalSupply();
         const wethPoolVestingRatioCall = await rewards.wethPoolRewardRead?.vestingRatio();
         const ctxVestingRatioCall = await rewards.ctxPoolRewardRead?.vestingRatio();
 
@@ -143,9 +143,6 @@ const Farm = () => {
           totalTcapDebtDai,
           rateDai,
           reservesCtxPool,
-          totalSupplyCtxPool,
-          rateCtxPool,
-          ctxLPsStaked,
           wethPoolVestingRatio,
           ctxVestingRatio,
         ] = await signer.ethcallProvider?.all([
@@ -156,9 +153,6 @@ const Farm = () => {
           totalTcapDebtDaihCall,
           rateDaiCall,
           reservesCtxPoolCall,
-          totalSupplyCtxPoolCall,
-          rateCtxPoolCall,
-          ctxLPsStakedCall,
           wethPoolVestingRatioCall,
           ctxVestingRatioCall,
         ]);
@@ -193,7 +187,7 @@ const Farm = () => {
         );
 
         // CTX Pool APY
-        setCtxPoolAPY(
+        /* setCtxPoolAPY(
           await getAPYFromLPRewards(
             rateCtxPool,
             ctxLPsStaked,
@@ -202,7 +196,7 @@ const Farm = () => {
             currentPriceCTX,
             parseFloat(currentPriceETH)
           )
-        );
+        ); */
 
         if (signer.signer) {
           const currentAddress = await signer.signer.getAddress();
@@ -633,15 +627,7 @@ const Farm = () => {
                     </td>
                     <td>
                       <b className="fire">
-                        <NumberFormat
-                          className=""
-                          value={ctxPoolAPY}
-                          displayType="text"
-                          thousandSeparator
-                          prefix=""
-                          decimalScale={0}
-                        />
-                        %
+                        <b className="fire">Expired</b>
                       </b>
                     </td>
                     <td align="right">
@@ -659,7 +645,7 @@ const Farm = () => {
                         </>
                       ) : (
                         <>
-                          <Button
+                          {/* <Button
                             variant="primary"
                             className=""
                             onClick={() => {
@@ -673,7 +659,7 @@ const Farm = () => {
                             }}
                           >
                             {t("stake")}
-                          </Button>
+                          </Button> */}
                           {ctxVestAmount.gt(0) && showCtxClaimVest() ? (
                             <Button
                               variant="success"
@@ -714,7 +700,7 @@ const Farm = () => {
           </Row>
         </Row>
       </div>
-      <Stake
+      {/* <Stake
         pool={selectedPool}
         poolTitle={selectedPoolTitle}
         poolToken={selectedPoolToken}
@@ -722,7 +708,7 @@ const Farm = () => {
         show={stakeShow}
         onHide={() => setStakeShow(false)}
         refresh={() => refresh()}
-      />
+                          /> */}
     </div>
   );
 };
