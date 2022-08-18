@@ -4,6 +4,7 @@ export const StakeStatus = {
   deposited: "deposited",
   staked: "staked",
   out_range: "out_range",
+  expired: "Expired",
 };
 
 export type IncentiveType = {
@@ -26,6 +27,7 @@ export type PositionType = {
   tickUpperPrice1: number;
   priceInRange: boolean;
   incetiveId: string;
+  incentiveIndex: number;
   reward: number;
   status: string;
 };
@@ -42,6 +44,7 @@ export const positionDefaultValues = {
   tickUpperPrice1: 1,
   priceInRange: true,
   incetiveId: "",
+  incentiveIndex: 0,
   reward: 0,
   status: StakeStatus.empty,
 };

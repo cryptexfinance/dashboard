@@ -122,14 +122,15 @@ const Rewards = ({
     const currentCumPrice = calculateCumulativePrice(tickCumulative0, tickCumulative1, 10);
     setCumulativePrice(currentCumPrice);
     setAvailableReward(parseFloat(ethers.utils.formatEther(availableRewardWei)));
+
     positionsData.positions.forEach(async (p: any) => {
       if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
         const position = { ...positionDefaultValues };
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
-        /* let incentiveIdBefore = "";
+        let incentiveIdBefore = "";
         if (ethTcapPool.incentives.length > 1) {
           incentiveIdBefore = computeIncentiveId(ethTcapPool.incentives[1]);
-        } */
+        }
         position.lpTokenId = p.id;
         position.poolId = p.poolAddress;
         position.tickLower = parseInt(p.tickLower.tickIdx);
@@ -139,25 +140,41 @@ const Rewards = ({
         position.tickUpperPrice0 = p.tickUpper.price0;
         position.tickUpperPrice1 = p.tickUpper.price1;
         position.incetiveId = incentiveId;
+        position.incentiveIndex = 0;
         position.liquidity = ethers.utils.formatEther(p.liquidity);
 
         const nfpCall = await nfpmContractRead?.getApproved(p.id);
         const lpDepositsCall = await stakerContractRead?.deposits(p.id);
         const lpStakesCall = await stakerContractRead?.stakes(p.id, incentiveId);
+        const lpStakesCallBefore = await stakerContractRead?.stakes(p.id, incentiveIdBefore);
 
         // @ts-ignore
-        const [nfpAddress, depositsEth, stakesEth] = await signer.ethcallProvider?.all([
-          nfpCall,
-          lpDepositsCall,
-          lpStakesCall,
-        ]);
+        const [nfpAddress, depositsEth, stakesEth, stakesEthBefore] =
+          await signer.ethcallProvider?.all([
+            nfpCall,
+            lpDepositsCall,
+            lpStakesCall,
+            lpStakesCallBefore,
+          ]);
         if (
           depositsEth.owner === ownerAddress &&
           depositsEth.tickLower === position.tickLower &&
           depositsEth.tickUpper === position.tickUpper
         ) {
           position.status = StakeStatus.deposited;
-          if (stakesEth.liquidity > BigNumber.from("0")) {
+          // Check if it is staked on the previous Incentive
+          if (stakesEthBefore.liquidity > BigNumber.from("0")) {
+            position.status = StakeStatus.staked;
+            position.incetiveId = incentiveIdBefore;
+            position.incentiveIndex = 1;
+            const rewardInfoCall = await stakerContractRead?.getRewardInfo(
+              ethTcapPool.incentives[1],
+              p.id
+            );
+            // @ts-ignore
+            const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
+            position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
+          } else if (stakesEth.liquidity > BigNumber.from("0")) {
             position.status = StakeStatus.staked;
             const rewardInfoCall = await stakerContractRead?.getRewardInfo(
               ethTcapPool.incentives[0],
@@ -375,7 +392,9 @@ const Rewards = ({
                 <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
                 rewards. <br />
                 <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
-                rewards because the price is out of your position range.
+                rewards because the price is out of your position range. <br />
+                <span className={StakeStatus.out_range}>Expired</span>: LP token is staked on an
+                incentive that already ended.
               </Tooltip>
             }
           >
@@ -407,6 +426,28 @@ const Rewards = ({
     </thead>
   );
 
+  const RenderStatusLabel = (p: PositionType) => {
+    let lbl = capitalize(p.status);
+    let classN = p.status;
+    if (p.status === StakeStatus.not_approved) {
+      lbl = "Pending";
+    }
+    if (!p.priceInRange) {
+      lbl = "Out of range";
+      classN = StakeStatus.out_range;
+    }
+    if (p.incentiveIndex === 1) {
+      lbl = "Expired";
+      classN = StakeStatus.out_range;
+    }
+
+    return (
+      <div className="status">
+        <span className={classN}>{lbl}</span>
+      </div>
+    );
+  };
+
   const RenderRewards = () => (
     <>
       <RenderHeader />
@@ -434,19 +475,7 @@ const Rewards = ({
                   <small>Uniswap</small>
                 </div>
               </td>
-              <td>
-                <div className="status">
-                  {position.priceInRange ? (
-                    <span className={position.status}>
-                      {position.status === StakeStatus.not_approved
-                        ? "Pending"
-                        : capitalize(position.status)}
-                    </span>
-                  ) : (
-                    <span className={StakeStatus.out_range}>Out of range</span>
-                  )}
-                </div>
-              </td>
+              <td>{RenderStatusLabel(position)}</td>
               <td className="number">
                 <NumberFormat
                   className="number"
@@ -471,7 +500,7 @@ const Rewards = ({
                   <Stake
                     ownerAddress={ownerAddress}
                     position={position}
-                    incentive={ethTcapIncentive[0]}
+                    incentive={ethTcapIncentive[position.incentiveIndex]}
                     nfpmContract={nfpmContract}
                     stakerContract={stakerContract}
                     refresh={() => refresh()}

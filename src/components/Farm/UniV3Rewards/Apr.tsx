@@ -28,7 +28,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
         totalAmount0
         totalAmount1
       }
-      positions(where: { staked: true }) {
+      positions(where: { staked: true, stakedBlockNumber_gt: 15361736 }) {
         id
       }
     }
@@ -88,17 +88,24 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
       const claimableReward = await calculateClaimableRewards(lpData.positions);
       const unclaimedReward = ethers.utils.formatEther(incentiveReward.sub(claimableReward));
 
-      const tvlUsd =
-        parseFloat(tcapPrice) * lpData.apr.totalAmount0 +
-        parseFloat(currentPriceETH) * lpData.apr.totalAmount1;
+      let tvlUsd = 0;
+      if (lpData.apr) {
+        tvlUsd =
+          parseFloat(tcapPrice) * lpData.apr.totalAmount0 +
+          parseFloat(currentPriceETH) * lpData.apr.totalAmount1;
+      }
       const remainingSeconds = incentive.endTime - Date.now() / 1000;
       if (remainingSeconds > 0) {
         const remainingDays = remainingSeconds / (3600 * 24);
         const rewardRate = parseFloat(unclaimedReward) / remainingDays;
         const ONE_YEAR = 365;
         const aprNumerator = rewardRate * currentPriceCTX * ONE_YEAR * 100;
-        const aprValue = aprNumerator / tvlUsd;
-        setApr(aprValue);
+        if (tvlUsd === 0) {
+          setApr(10);
+        } else {
+          const aprValue = aprNumerator / tvlUsd;
+          setApr(aprValue);
+        }
       } else {
         setApr(-1);
       }

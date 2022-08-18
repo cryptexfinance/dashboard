@@ -45,7 +45,6 @@ const Stake = ({
       // eslint-disable-next-line
     } else {
       bDisabled = true;
-      btnTitle = "Expired";
     }
     setTitle(btnTitle);
     setBtnDisabled(bDisabled);
