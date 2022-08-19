@@ -293,6 +293,13 @@ html,
   text-align: left;
 }
 
+.univ3-expired-tooltip > .tooltip-inner {
+  min-width: 300px;
+  width: 300px;
+  text-align: left;
+  padding: 0.9rem;
+}
+
 .univ3-status-tooltip > .tooltip-inner {
   min-width: 400px;
   width: 400px;

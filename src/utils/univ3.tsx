@@ -11,8 +11,8 @@ export const UNIV3 = {
         {
           rewardToken: "0x321C2fE4446C7c963dc41Dd58879AF648838f98D",
           pool: "0x11456b3750E991383bB8943118ed79C1afdEE192",
-          startTime: 1652823662,
-          endTime: 1660772462,
+          startTime: 1660854590,
+          endTime: 1668630590,
           refundee: "0xa70b638B70154EdfCbb8DbbBd04900F328F32c35",
         },
         {
@@ -43,7 +43,7 @@ export const UNIV3 = {
 };
 
 export const GRAPHQL_UNIV3_ENDPOINT = {
-  mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-univ3",
+  mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-univ3",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
 };
 
