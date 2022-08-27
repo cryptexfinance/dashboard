@@ -192,7 +192,7 @@ const Protocol = ({ data }: props) => {
           }
           if (isInLayer1(currentNetwork.chainId) || isPolygon(currentNetwork.chainId)) {
             // @ts-ignore
-            if (cAddress === contracts.WBTCVaultHandler.address.toLowerCase()) {
+            if (cAddress === contracts.HardWBTCVaultHandler.address.toLowerCase()) {
               currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
             }
           }
