@@ -284,7 +284,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     <Button
                       variant="primary"
                       id="connect"
-                      className="neon-pink"
+                      className="neon-pink btn-connect"
                       onClick={() => {
                         web3Modal.toggleModal();
                       }}

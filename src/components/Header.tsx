@@ -350,7 +350,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
         <>
           <Button
             variant="pink"
-            className="neon-pink"
+            className="neon-pink btn-connect"
             onClick={() => {
               web3Modal.toggleModal();
             }}
