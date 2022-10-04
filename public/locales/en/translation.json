@@ -100,7 +100,7 @@
     "balance-title": "{{vault}} Balance",
     "ratio-title": "Vault Ratio",
     "ratio-warning": "Ratio must be > {{minRatio}}% or you will be liquidated.",
-    "hard-mode-info": "Hard mode vaults have a minimum required ratio of 110%.",
+    "hard-mode-info": "Hard mode vaults have a minimum required ratio of 125%.",
     "hard-mode-info2": "You're required to mint a minimum of 20 TCAP on hard mode.",
     "collateral": {
       "title": "Staked Collateral",

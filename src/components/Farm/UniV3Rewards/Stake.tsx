@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/esm/Button";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 import { BigNumber, ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import { UNIV3, encodeIncentive } from "../../../utils/univ3";
@@ -26,6 +28,7 @@ const Stake = ({
   const { t } = useTranslation();
   const [title, setTitle] = useState("Stake");
   const [btnDisabled, setBtnDisabled] = useState(true);
+  const [showToolTip, setShowToolTip] = useState(true);
 
   useEffect(() => {
     const cDate = new Date();
@@ -43,10 +46,10 @@ const Stake = ({
       btnTitle = t("deposit");
     } else if (currentTime >= incentive.startTime && currentTime <= incentive.endTime) {
       // eslint-disable-next-line
-      bDisabled = !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
+      bDisabled =  !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
       // eslint-disable-next-line
     } else {
-      bDisabled = false;
+      bDisabled = true;
     }
     setTitle(btnTitle);
     setBtnDisabled(bDisabled);
@@ -119,9 +122,36 @@ const Stake = ({
   };
 
   return (
-    <Button variant="primary" onClick={() => handleOnClick()} disabled={btnDisabled}>
-      {title}
-    </Button>
+    <>
+      {position.incentiveIndex === 0 ? (
+        <Button variant="primary" onClick={() => handleOnClick()} disabled={btnDisabled}>
+          {title}
+        </Button>
+      ) : (
+        <OverlayTrigger
+          key="top"
+          placement="top"
+          show={showToolTip}
+          overlay={
+            <Tooltip id="tooltip-bottom" className="univ3-expired-tooltip">
+              You aren't earning rewards because your LP token is staked on an incentive that
+              already ended.
+            </Tooltip>
+          }
+        >
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowToolTip(!showToolTip);
+              handleOnClick();
+            }}
+            disabled={btnDisabled}
+          >
+            {title}
+          </Button>
+        </OverlayTrigger>
+      )}
+    </>
   );
 };
 

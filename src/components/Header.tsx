@@ -9,7 +9,6 @@ import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
-import { ChangeNetwork } from "./modals/ChangeNetwork";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
@@ -35,7 +34,6 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
-  const [showChangeNetwork, setShowChangeNetwork] = useState(false);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
@@ -105,27 +103,6 @@ const Header = ({ signerAddress, isMobile }: props) => {
       });
     } catch (addError) {
       // handle "add" error
-    }
-  }
-
-  async function changeNetwork(newChainId: string) {
-    if (currentNetwork.isBrowserWallet) {
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: newChainId }],
-        });
-      } catch (error) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (
-          error.code === 4902 &&
-          (newChainId === NETWORKS.optimism.hexChainId ||
-            newChainId === NETWORKS.okovan.hexChainId ||
-            newChainId === NETWORKS.polygon.hexChainId)
-        ) {
-          addNetwork(newChainId);
-        }
-      }
     }
   }
 
@@ -218,26 +195,32 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const EthereumToggle = () => (
     <>
       <ETHIcon className="eth" />
-      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
+      {process.env.REACT_APP_NETWORK_ID === "5" ? (
+        <h6>Goerli</h6>
+      ) : (
+        <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
+      )}
     </>
   );
 
-  const EthereumOpt = () => (
-    <Dropdown.Item
-      key={
-        process.env.REACT_APP_NETWORK_ID === "1"
-          ? NETWORKS.mainnet.chainId
-          : NETWORKS.rinkeby.chainId
-      }
-      eventKey={
-        process.env.REACT_APP_NETWORK_ID === "1"
-          ? NETWORKS.mainnet.hexChainId
-          : NETWORKS.rinkeby.hexChainId
-      }
-    >
-      {EthereumToggle()}
-    </Dropdown.Item>
-  );
+  const EthereumOpt = () => {
+    let { chainId } = NETWORKS.mainnet;
+    let { hexChainId } = NETWORKS.mainnet;
+    if (process.env.REACT_APP_NETWORK_ID === "4") {
+      chainId = NETWORKS.rinkeby.chainId;
+      hexChainId = NETWORKS.rinkeby.hexChainId;
+    }
+    if (process.env.REACT_APP_NETWORK_ID === "5") {
+      chainId = NETWORKS.goerli.chainId;
+      hexChainId = NETWORKS.goerli.hexChainId;
+    }
+
+    return (
+      <Dropdown.Item key={chainId} eventKey={hexChainId}>
+        {EthereumToggle()}
+      </Dropdown.Item>
+    );
+  };
 
   const OptimismToggle = () => (
     <>
@@ -340,17 +323,12 @@ const Header = ({ signerAddress, isMobile }: props) => {
             </h5>
             {/* <LangDropDown className="btn-language small" /> */}
           </div>
-          <ChangeNetwork
-            show={showChangeNetwork}
-            onHide={() => setShowChangeNetwork(false)}
-            changeNetwork={changeNetwork}
-          />
         </>
       ) : (
         <>
           <Button
             variant="pink"
-            className="neon-pink"
+            className="neon-pink btn-connect"
             onClick={() => {
               web3Modal.toggleModal();
             }}

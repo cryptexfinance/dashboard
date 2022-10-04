@@ -1492,6 +1492,7 @@ const Mint = ({ address, t }: props) => {
                           />
                           <InputGroup.Append>
                             <Button
+                              id="btn-mint-tcap"
                               className="neon-green"
                               onClick={mintTCAP}
                               disabled={btnDisabled}

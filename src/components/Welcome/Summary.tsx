@@ -190,6 +190,13 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
             <h4>{t("welcome.ctx-price")}:</h4>
           </div>
         )}
+        <div
+          id="crypto-widget-CoinList"
+          data-transparent="true"
+          data-theme="dark"
+          data-design="modern"
+          data-coin-ids="4434,4784"
+        />
       </div>
       <div className="summary2">
         <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
@@ -277,7 +284,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     <Button
                       variant="primary"
                       id="connect"
-                      className="neon-pink"
+                      className="neon-pink btn-connect"
                       onClick={() => {
                         web3Modal.toggleModal();
                       }}
