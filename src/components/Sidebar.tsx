@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
-import { GiSpottedMushroom } from "react-icons/gi";
+// import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
@@ -134,7 +134,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </Link>
           </Nav.Item>
         )}
-        <Nav.Item>
+        {/* <Nav.Item>
           <Link
             to="/sewagefruit"
             className={active === "sewagefruit" ? "active" : ""}
@@ -145,7 +145,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <GiSpottedMushroom size={28} className="sewagefruit" />
             <span className={active === "sewagefruit" ? "title active" : "title"}>Sewagefruit</span>
           </Link>
-        </Nav.Item>
+          </Nav.Item> */}
         <Nav.Item>
           <Link
             to=""
