@@ -16,8 +16,8 @@ $theme-colors: (
 
 @import "~bootstrap/scss/bootstrap";
 
-p {
-  color: $light;
+p, li {
+  color: $lighter;
 }
 
 h1,
@@ -57,6 +57,10 @@ body {
   color: $white;
   font-family: "Nineteen Ninety Seven";
   border-width: 1px;
+}
+
+.btn:disabled {
+  color: $dark;
 }
 
 .btn.neon-highlight {
@@ -207,6 +211,21 @@ input[type="number"].neon-hightlight:focus {
   box-shadow: -1px 0px 15px -6px $highlight;
   color: $white;
   background: no-repeat;
+}
+
+span {
+  &.neon-green {
+    text-shadow: 0 0 4px #167226, 0 0 10px #61c4b3, 0 0 20px #167226, 0 -10px 40px #167226;
+  }
+  &.neon-orange {
+    text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
+  }
+  &.neon-pink {
+    text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+  }
+  &.neon-purple {
+    text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #7940f2, 0 -10px 40px #c33;
+  }  
 }
 
 textarea.neon-green:focus {

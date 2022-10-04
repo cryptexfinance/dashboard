@@ -97,8 +97,6 @@ export const Monitoring = () => {
   const [vaultMode, setVaultMode] = useState("all");
   const [currentMinRatio, setCurrentMinRatio] = useState("0%");
   const [currentMaxRatio, setCurrentMaxRatio] = useState("2500%");
-  // const [minFilterRatio, setMinFilterRatio] = useState("0");
-  // const [maxFilterRatio, setMaxFilterRatio] = useState("1500");
   const [renderTable, setRenderTable] = useState(false);
   const ratioRangeDropdown = useRef(null);
   const minRatioInput = useRef(null);

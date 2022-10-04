@@ -287,7 +287,11 @@ export const isValidNetwork = (chainId: number) => {
 
 export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
-    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+    return (
+      chainId === NETWORKS.mainnet.chainId ||
+      chainId === NETWORKS.rinkeby.chainId ||
+      chainId === NETWORKS.goerli.chainId
+    );
   }
   return false;
 };
@@ -302,6 +306,13 @@ export const isOptimism = (chainId: number | undefined) => {
 export const isPolygon = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
     return chainId === NETWORKS.polygon.chainId || chainId === NETWORKS.mumbai.chainId;
+  }
+  return false;
+};
+
+export const isGoerli = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.goerli.chainId;
   }
   return false;
 };
