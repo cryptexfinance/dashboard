@@ -19,7 +19,7 @@ import WelcomeWrapper from "./components/Welcome/index";
 import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
 import Delegators from "./components/Governance/Delegators";
-import MushroomNfts from "./components/MushroomNft";
+// import MushroomNfts from "./components/MushroomNft";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import Warnings from "./components/Warnings";
@@ -935,9 +935,9 @@ const App = () => {
                               <Route path={`${match.url}governance`}>
                                 <Delegators currentSignerAddress={currentSignerAddress} />
                               </Route>
-                              <Route path={`${match.url}sewagefruit`}>
+                              {/* <Route path={`${match.url}sewagefruit`}>
                                 <MushroomNfts currentSignerAddress={currentSignerAddress} />
-                              </Route>
+                                </Route> */}
                             </ApolloProvider>
                           </Switch>
                         </Container>
