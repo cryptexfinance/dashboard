@@ -218,9 +218,11 @@ span {
     text-shadow: 0 0 4px #167226, 0 0 10px #61c4b3, 0 0 20px #167226, 0 -10px 40px #167226;
   }
   &.neon-orange {
+    color: $white;
     text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
   }
   &.neon-pink {
+    color: $white;
     text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
   }
   &.neon-purple {

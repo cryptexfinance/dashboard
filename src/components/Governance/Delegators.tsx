@@ -82,12 +82,12 @@ const Delegators = ({ currentSignerAddress }: props) => {
           setKeepersInfo(responseJson);
         })
         .catch((error) => {
-          console.error("Error getting all");
           console.error(error);
           setKeepersInfo([]);
         });
     };
     loadKeepers();
+
     if (FEATURES.KEEPERS_API) {
       loadKeepersFromDB();
     } else {

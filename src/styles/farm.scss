@@ -383,14 +383,18 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 1rem;
+
+            h6 {
+              margin: 0rem;
+              margin-right: 0.4rem;
+            }
+            .btn {
+              margin-left: 0.5rem;
+            }
             &-item {
               display: flex;
               padding-right: 2.2rem;
-              align-items: center;
-              h6 {
-                margin: 0rem;
-                margin-right: 0.4rem;
-              }
+              align-items: center;              
             }
             &-tier {
               display: flex;
@@ -401,14 +405,18 @@
               display: flex;
               flex-direction: row;
               align-items: center;
+              .btn {
+                margin-left: 0rem;
+              }
               .amount {
                 display: flex;
+                
                 svg {
                   margin-top: -3px;
                   margin-left: 4px;
                 }
               }
-            }
+            }            
           }
           .position {
             padding-right: 4rem;
@@ -492,13 +500,19 @@
                 flex-direction: row;
                 justify-content: center;
                 align-items: center;
+                margin-top: 0.6rem;
                 h6 {
                   font-size: 0.9rem;
                   margin: 0rem;
                 }
                 .number {
                   font-size: 0.85rem;
-                  margin-left: 0.2rem;
+                  margin-left: 0.3rem;                  
+                }
+                .neon-pink {
+                  margin-left: 0.3rem;
+                  font-size: 0.9rem;                  
+                  text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
                 }
               }
             }
