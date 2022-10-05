@@ -7,6 +7,7 @@ import Modal from "react-bootstrap/esm/Modal";
 import NumberFormat from "react-number-format";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import "../../../styles/modal.scss";
 import NetworkContext from "../../../state/NetworkContext";
 import SignerContext from "../../../state/SignerContext";
@@ -32,6 +33,7 @@ type props = {
 };
 
 const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) => {
+  const { t } = useTranslation();
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const oracles = useContext(OracleContext);
@@ -209,13 +211,13 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               errorNotification("Burn fee less than required.");
             }
           } else {
-            errorNotification("Not enough TCAP balance.");
+            errorNotification(t("errors.no-tcap"));
           }
         } else {
-          errorNotification("Tcap amount is less than required.");
+          errorNotification(t("errors.less-tcap"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
       setCanLiquidate(true);
     }
@@ -235,20 +237,20 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
 
   const rewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      Collateral amount in USD you are getting for liquidating the vault.
+      {t("monitoring.reward-info")}
     </Tooltip>
   );
 
   const tcapAmountHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      Amount of TCAP in USD you need to provide to liquidate vault.
+      {t("monitoring.tcap-amount-info")}
     </Tooltip>
   );
 
   const netRewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      Actual profit in USD you earn after liquidation: <br />
-      Net Reward = Reward - TCAP Amount - Burn Fee.
+      {t("monitoring.net-reward-info1")}: <br />
+      {t("monitoring.net-reward-info2")}
     </Tooltip>
   );
 
@@ -279,14 +281,16 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Liquidate Vault</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {t("monitoring.liquidate-vault")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
             <>
-              <Form.Label>Amount of TCAP</Form.Label>
+              <Form.Label>{t("amount-tcap")}</Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
                   MIN REQUIRED
@@ -314,7 +318,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               <div className="liquidation-data">
                 <Form.Text className="text-muted liquidation-reward">
                   <div>
-                    Reward:{" "}
+                    {t("monitoring.reward")}:{" "}
                     <NumberFormat
                       className="number neon-pink"
                       value={reward}
@@ -345,16 +349,16 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Table hover className="mt-2 liq-info">
           <thead>
             <th>
-              Reward
+              {t("monitoring.reward")}
               {helpToolTip(0)}
             </th>
             <th>
-              Required TCAP
+              {t("required-tcap")}
               {helpToolTip(1)}
             </th>
             <th>Burn Fee</th>
             <th>
-              Net Reward
+              {t("monitoring.net-reward")}
               {helpToolTip(3)}
             </th>
           </thead>
@@ -373,7 +377,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
           onClick={liquidate}
           disabled={!canLiquidate}
         >
-          {canLiquidate ? "Liquidate Vault" : "Liquidating"}
+          {canLiquidate ? t("monitoring.liquidate-vault") : t("monitoring.liquidating")}
         </Button>
       </Modal.Footer>
     </Modal>

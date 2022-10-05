@@ -68,7 +68,7 @@ const KeeperForm = ({
   };
 
   useEffect(() => {
-    if (keeperInfo !== null) {
+    if (keeperInfo !== null && typeof keeperInfo !== "undefined") {
       setDelegatee(keeperInfo.eth_name);
       setAddress(keeperInfo.address);
       setName(keeperInfo.name);
@@ -310,16 +310,17 @@ const KeeperForm = ({
     event.preventDefault();
     setSaving(true);
     if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      if (delegatee) {
+      if (address && delegatee) {
         try {
-          const tx = await delegatorFactory.createDelegator(delegatee);
+          const tx = await delegatorFactory.createDelegator(address);
           notifyUser(tx, refresh);
           setDelegatee("");
           await saveKeeper();
           refresh();
           onHide();
         } catch (error) {
-          errorNotification(t("governance.errors.empty"));
+          console.log(error);
+          errorNotification(t("governance.errors.creating-keeper"));
         }
       } else {
         errorNotification(t("errors.empty"));

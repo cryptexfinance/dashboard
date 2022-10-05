@@ -5,6 +5,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
+import { useTranslation } from "react-i18next";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
@@ -54,6 +55,7 @@ const Rewards = ({
   nfpmContractRead,
   poolContractRead,
 }: props) => {
+  const { t } = useTranslation();
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
@@ -237,6 +239,14 @@ const Rewards = ({
     return `https://app.uniswap.org/#/add/${wethAddress}/${tcapAddress}/${feeTier}?chain=${currentNetwork.name}`;
   };
 
+  const incentiveEndDate = () => {
+    if (ethTcapIncentive.length > 0) {
+      const d = new Date(ethTcapIncentive[0].endTime * 1000);
+      return d.toLocaleDateString();
+    }
+    return "-";
+  };
+
   const withdraw = async (lpTokenId: number) => {
     if (stakerContract) {
       try {
@@ -261,13 +271,13 @@ const Rewards = ({
         className=" ml-4 claim"
         disabled={btnDisabled}
       >
-        Claim
+        {t("claim")}
       </Button>
     );
   };
 
   const WithdrawButton = ({ position }: btnProps) => {
-    const title = "Exit";
+    const title = t("exit");
     let btnDisabled = true;
 
     // eslint-disable-next-line
@@ -318,17 +328,12 @@ const Rewards = ({
         <div className="rewards-item">
           <h6>APR:</h6>
           <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
-        </div>
-      </div>
-      <div className="rewards-total">
-        <h6>
-          Available to Claim
           <OverlayTrigger
             key="bottom"
             placement="bottom"
             overlay={
               <Tooltip id="tooltip-bottom">
-                In order to claim rewards, you need to unstake your token.
+                Incentive ends on <span className="neon-pink">{incentiveEndDate()}</span>
               </Tooltip>
             }
           >
@@ -336,8 +341,24 @@ const Rewards = ({
               ?
             </Button>
           </OverlayTrigger>
-          :
-        </h6>
+        </div>
+      </div>
+      <div className="rewards-total">
+        <h6>Available to Claim</h6>
+        <OverlayTrigger
+          key="bottom"
+          placement="bottom"
+          overlay={
+            <Tooltip id="tooltip-bottom">
+              In order to claim rewards, you need to unstake your token.
+            </Tooltip>
+          }
+        >
+          <Button variant="dark" className="question-small">
+            ?
+          </Button>
+        </OverlayTrigger>
+        <h6>:</h6>
         <div className="amount">
           <NumberFormat
             className="number"
@@ -535,6 +556,10 @@ const Rewards = ({
           <div className="row2">
             <h6>Current APR:</h6>
             <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+          </div>
+          <div className="row2">
+            <h6>End Date:</h6>
+            <span className="neon-pink">{incentiveEndDate()}</span>
           </div>
         </div>
         <a className="btn" target="_blank" rel="noreferrer" href={lpUrl()}>

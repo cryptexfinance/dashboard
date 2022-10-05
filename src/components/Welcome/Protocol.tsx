@@ -311,7 +311,7 @@ const Protocol = ({ data }: props) => {
   return (
     <Card className="protocol">
       <Card.Header>
-        <h2>Protocol Summary</h2>
+        <h2>{t("welcome.summary.title")}</h2>
       </Card.Header>
       <Card.Body>
         {loading ? (
@@ -323,7 +323,7 @@ const Protocol = ({ data }: props) => {
             <div className="totals">
               <StakeIcon className="stake" />
               <div className="staked">
-                <h6>{t("graph.staked-usd")}</h6>
+                <h6>{t("welcome.summary.staked-usd")}</h6>
                 <h5 className="number neon-green">
                   <NumberFormat
                     value={TotalStake}
@@ -338,7 +338,7 @@ const Protocol = ({ data }: props) => {
             <div className="totals">
               <TcapIcon className="h24" />
               <div className="staked">
-                <h6>{t("graph.total-supply")}</h6>
+                <h6>{t("welcome.summary.total-supply")}</h6>
                 <h5 className="number neon-blue">
                   <NumberFormat
                     value={totalSupply}
@@ -353,7 +353,7 @@ const Protocol = ({ data }: props) => {
               <div className="asset">
                 <WETHIcon className="weth" />
                 <div className="staked">
-                  <h6>{t("graph.staked-eth")}</h6>
+                  <h6>{t("welcome.summary.staked-eth")}</h6>
                   <h5 className="number neon-highlight">
                     <NumberFormat
                       value={ethStake}
@@ -368,7 +368,7 @@ const Protocol = ({ data }: props) => {
             <div className="asset">
               <DAIIcon className="dai" />
               <div className="staked">
-                <h6>{t("graph.staked-dai")}</h6>
+                <h6>{t("welcome.summary.staked-dai")}</h6>
                 <h5 className="number neon-orange">
                   <NumberFormat
                     value={daiStake}
@@ -383,7 +383,7 @@ const Protocol = ({ data }: props) => {
               <div className="asset">
                 <AAVEIcon className="ctx" />
                 <div className="staked">
-                  <h6>{t("graph.staked-aave")}</h6>
+                  <h6>{t("welcome.summary.staked-aave")}</h6>
                   <h5 className="number neon-highlight">
                     <NumberFormat
                       value={aaveStake}
@@ -399,7 +399,7 @@ const Protocol = ({ data }: props) => {
               <div className="asset">
                 <LINKIcon className="ctx" />
                 <div className="staked">
-                  <h6>{t("graph.staked-link")}</h6>
+                  <h6>{t("welcome.summary.staked-link")}</h6>
                   <h5 className="number neon-highlight">
                     <NumberFormat
                       value={linkStake}
@@ -416,7 +416,7 @@ const Protocol = ({ data }: props) => {
                 <div className="asset">
                   <UNIIcon className="ctx" />
                   <div className="staked">
-                    <h4>{t("graph.staked-uni")}</h4>
+                    <h4>{t("welcome.summary.staked-uni")}</h4>
                     <h5 className="number neon-highlight">
                       <NumberFormat
                         value={uniStake}
@@ -430,7 +430,7 @@ const Protocol = ({ data }: props) => {
                 <div className="asset">
                   <SNXIcon className="ctx" />
                   <div className="staked">
-                    <h4>{t("graph.staked-snx")}</h4>
+                    <h4>{t("welcome.summary.staked-snx")}</h4>
                     <h5 className="number neon-highlight">
                       <NumberFormat
                         value={snxStake}
@@ -447,7 +447,7 @@ const Protocol = ({ data }: props) => {
               <div className="asset">
                 <POLYGONIcon className="eth" />
                 <div className="staked">
-                  <h6>{t("graph.staked-matic")}</h6>
+                  <h6>{t("welcome.summary.staked-matic")}</h6>
                   <h5 className="number neon-blue">
                     <NumberFormat
                       value={maticStake}
@@ -463,7 +463,7 @@ const Protocol = ({ data }: props) => {
               <div className="asset">
                 <WBTCIcon className="eth" />
                 <div className="staked">
-                  <h6>{t("graph.staked-wbtc")}</h6>
+                  <h6>{t("welcome.summary.staked-wbtc")}</h6>
                   <h5 className="number neon-blue">
                     <NumberFormat
                       value={wbtcStake}
@@ -478,7 +478,7 @@ const Protocol = ({ data }: props) => {
             <div className="asset">
               <USDCIcon className="eth" />
               <div className="staked">
-                <h6>{t("graph.staked-usdc")}</h6>
+                <h6>{t("welcome.summary.staked-usdc")}</h6>
                 <h5 className="number neon-blue">
                   <NumberFormat
                     value={usdcStake}

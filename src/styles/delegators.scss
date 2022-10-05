@@ -16,7 +16,7 @@
   &.off { 
     margin-top: 0rem;
   }
-  
+
   .create {
     position: relative;
     width: 15rem;
@@ -361,6 +361,10 @@
               align-items: center;
             }
           }
+        }
+
+        .end-date {
+          text-align: right;
         }
       }
       @media (max-width: 450px) {

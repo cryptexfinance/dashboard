@@ -3,6 +3,7 @@ import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
@@ -42,6 +43,7 @@ export const Vaults = ({
   pagination,
   refresh,
 }: dataType) => {
+  const { t } = useTranslation();
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
   const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
@@ -169,20 +171,18 @@ export const Vaults = ({
           <tr>
             <th className="vault-id">Vault Id</th>
             <th className="status">
-              Status
+              {t("status")}
               <OverlayTrigger
                 key="top"
                 placement="right"
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="vaults-status-tooltip">
-                    <span className="empty">Empty</span>: There is not collateral on the vault.{" "}
-                    <br />
-                    <span className="ready">Ready</span>: Vault has collateral and it is ready to
-                    mint TCAP. <br />
-                    <span className="active">Active</span>: Vault is minting TCAP. <br />
-                    <span className="liquidation">Liquidation</span>: Ratio is less than min
-                    required. <br />
+                    <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
+                    <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
+                    <span className="active">Active</span>: {t("monitoring.active-info")} <br />
+                    <span className="liquidation">Liquidation</span>:{" "}
+                    {t("monitoring.liquidation-info")} <br />
                   </Tooltip>
                 }
               >
@@ -190,35 +190,35 @@ export const Vaults = ({
               </OverlayTrigger>
             </th>
             <th className="collateral">
-              Collateral
+              {t("collateral")}
               <button type="button" className="sort" onClick={() => onSortCollateralClick()}>
                 {sortingIncon(collateralSort)}
               </button>
             </th>
             <th className="collateral-usd">
-              Collateral (USD)
+              {t("collateral")} (USD)
               <button type="button" className="sort" onClick={() => onSortCollateralUsdClick()}>
                 {sortingIncon(collateralUsdSort)}
               </button>
             </th>
             <th>
               <div className="debt">
-                <TcapIcon className="tcap" /> <span>Debt</span>
+                <TcapIcon className="tcap" /> <span>{t("debt")}</span>
                 <button type="button" className="sort" onClick={() => onSortDebtClick()}>
                   {sortingIncon(debtSort)}
                 </button>
               </div>
             </th>
-            <th className="debt-usd">Debt (USD)</th>
+            <th className="debt-usd">{t("debt")} (USD)</th>
             <th className="ratio">
-              Ratio
+              {t("monitoring.ratio")}
               <button type="button" className="sort" onClick={() => onSortRatioClick()}>
                 {sortingIncon(ratioSort)}
               </button>
             </th>
             {currentStatus === "liquidation" && (
               <th className="ratio">
-                Net Reward
+                {t("monitoring.net-reward")}
                 <button type="button" className="sort" onClick={() => onSortRewardClick()}>
                   {sortingIncon(rewardSort)}
                 </button>

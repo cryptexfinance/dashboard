@@ -25,6 +25,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
   const [rewards, setRewards] = useState("0.0");
   const [waitTime, setWaitTime] = useState(604800);
   const [lastStakeDate, setLastStakeDate] = useState<Date | null>();
+  const [periodEnds, setPeriodEnds] = useState(new Date());
 
   useEffect(() => {
     async function load() {
@@ -39,19 +40,23 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
           currentSignerAddress
         );
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
+        const currentPeriodEndsCall = await governance.delegatorFactoryRead?.periodFinish();
+
         // @ts-ignore
-        const [totalSupply, currentStake, currentReward, currentWaitTime] =
+        const [totalSupply, currentStake, currentReward, currentWaitTime, currentPeriodEnds] =
           await signer.ethcallProvider?.all([
             totalSupplyCall,
             currentStakeCall,
             currentRewardCall,
             currentWaitTimeCall,
+            currentPeriodEndsCall,
           ]);
         setTotalStaked(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
         setWaitTime(currentWT);
+        setPeriodEnds(new Date(currentPeriodEnds.toNumber() * 1000));
       }
     }
     load();
@@ -108,6 +113,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
             </th>
             <th>{t("governance.staked-reward")}</th>
             <th>APR</th>
+            <th className="end-date">End Date</th>
             <th />
           </tr>
         </thead>
@@ -139,6 +145,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
             <td>
               <b className="fire">{apy()}</b>
             </td>
+            <td className="end-date">{periodEnds.toLocaleDateString()}</td>
             <td align="right">
               <Button
                 variant="success"
