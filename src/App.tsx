@@ -936,7 +936,7 @@ const App = () => {
                                 <Delegators currentSignerAddress={currentSignerAddress} />
                               </Route>
                               <Route path={`${match.url}sewagefruit`}>
-                                <MushroomNfts currentSignerAddress={currentSignerAddress} />
+                                <MushroomNfts />
                               </Route>
                             </ApolloProvider>
                           </Switch>

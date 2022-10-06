@@ -97,8 +97,9 @@ export const GRAPHQL_ENDPOINT = {
 };
 
 export const OS_API_URL = {
-  mainnet: "https://testnets-api.opensea.io/api/v1/assets",
-  goerli: "https://testnets-api.opensea.io/api/v1/assets",
+  // mainnet: "https://testnets-api.opensea.io/api/v1/assets",
+  mainnet: "https://deep-index.moralis.io/api/v2",
+  goerli: "https://deep-index.moralis.io/api/v2",
 };
 
 export const FEATURES = {
