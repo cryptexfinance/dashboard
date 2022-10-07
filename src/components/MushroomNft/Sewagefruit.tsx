@@ -148,10 +148,6 @@ const SewageFruit = () => {
 
   useEffect(() => {
     const load = async () => {
-      /* if (isInitialized) {
-        console.log("--- Entra aqui");
-        Moralis.initPlugins();
-      } */
       if (signer && signer.signer) {
         const currentAddress = await signer.signer.getAddress();
         if (currentAddress !== "") {
@@ -160,6 +156,8 @@ const SewageFruit = () => {
         } else {
           setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
     load();
@@ -201,7 +199,7 @@ const SewageFruit = () => {
       if (userStatus.claimed && fruitInfo) {
         return (
           <p>
-            Swagefruit will be revealed on{" "}
+            Sewage Fruit MINTED. It will be revealed on DATE/TIME{" "}
             <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>.
           </p>
         );
@@ -250,19 +248,18 @@ const SewageFruit = () => {
         <Card className="diamond info">
           <Card.Body>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris.
+              Sewage Fruit is an NFT collection of 2,500 fungi’s. Not only can you use your NFT as
+              your PFP but it will serve as access to exclusive rewards through quests set out by
+              the DAO. Whether its minting TCAP or staking CTX we want people to explore our
+              protocol and learn along the way.
             </p>
-            <ul>
-              <li>Duis aute irure dolor in reprehenderit in voluptate velit.</li>
-              <li>Excepteur sint occaecat cupidatat non proident.</li>
-              <li>Sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-              <li>
-                Sunt in culpa qui officia deserunt mollit anim id est laborum in voluptate velit.
-              </li>
-            </ul>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+            <br />
+            {signerAddress === "" && (
+              <p>
+                Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
+                eligible, public mint will be available on XX/XX/XXXX.
+              </p>
+            )}
           </Card.Body>
         </Card>
       </div>
