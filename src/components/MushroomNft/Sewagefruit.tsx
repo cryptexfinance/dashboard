@@ -39,6 +39,8 @@ const SewageFruit = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [merkleProof, setMerkleProof] = useState<any>();
   const [mintPeriodEnd, setMintPeriodEnd] = useState(new Date());
+  const [publicMint, setPublicMint] = useState(false);
+  const [maxSupplyReached, setMaxSupplyReached] = useState(false);
   const [userStatus, setUserStatus] = useState<UserStatusType>({
     verified: false,
     claimed: false,
@@ -104,58 +106,75 @@ const SewageFruit = () => {
       });
   };
 
-  const loadData = async (currentAddress: string) => {
-    if (mushroom.mushroomNftRead) {
-      setLoading(true);
-      const currentUserStatus = userStatus;
-      currentUserStatus.verified = merkleTree.verify(currentAddress);
+  const loadUserStatus = async (currentAddress: string, isPublic: boolean) => {
+    const currentUserStatus = userStatus;
 
+    if (!isPublic) {
+      currentUserStatus.verified = merkleTree.verify(currentAddress);
       if (currentUserStatus.verified) {
         setMerkleProof(merkleTree.getProof(currentAddress));
-
-        const userToClaimsCall = await mushroom.mushroomNftRead?.userToClaims(currentAddress);
-        const mintPeriodCall = await mushroom.mushroomNftRead?.mintPeriod();
-
-        // @ts-ignore
-        const [userClaims, mintPeriod] = await signer.ethcallProvider?.all([
-          userToClaimsCall,
-          mintPeriodCall,
-        ]);
-        const endDate = new Date(mintPeriod.toNumber() * 1000);
-        setMintPeriodEnd(endDate);
-
-        currentUserStatus.claimed = userClaims;
-        if (currentUserStatus.claimed) {
-          let tokenId = 0;
-          try {
-            tokenId = await getTokenId(currentAddress);
-          } catch (error) {
-            console.log(error);
-          }
-          if (tokenId > 0) {
-            const tokenURICall = await mushroom.mushroomNftRead?.tokenURI(tokenId);
-            // @ts-ignore
-            const [tokenURI] = await signer.ethcallProvider?.all([tokenURICall]);
-            currentUserStatus.tokenURI = tokenURI;
-            await loadFruitData(tokenURI);
-          }
-        }
       }
-      setUserStatus(currentUserStatus);
-      setLoading(false);
+    } else {
+      currentUserStatus.verified = true;
+    }
+
+    const userToClaimsCall = await mushroom.mushroomNftRead?.userToClaims(currentAddress);
+    // @ts-ignore
+    const [userClaims] = await signer.ethcallProvider?.all([userToClaimsCall]);
+
+    currentUserStatus.claimed = userClaims;
+    if (currentUserStatus.claimed) {
+      let tokenId = 0;
+      try {
+        tokenId = await getTokenId(currentAddress);
+      } catch (error) {
+        console.log(error);
+      }
+      if (tokenId > 0) {
+        const tokenURICall = await mushroom.mushroomNftRead?.tokenURI(tokenId);
+        // @ts-ignore
+        const [tokenURI] = await signer.ethcallProvider?.all([tokenURICall]);
+        currentUserStatus.tokenURI = tokenURI;
+        await loadFruitData(tokenURI);
+      }
+    }
+
+    setUserStatus(currentUserStatus);
+  };
+
+  const loadData = async () => {
+    const currentTokenIdCall = await mushroom.mushroomNftRead?.currentTokenId();
+    const maxSupplyCall = await mushroom.mushroomNftRead?.maxSupply();
+    const mintPeriodCall = await mushroom.mushroomNftRead?.mintPeriod();
+
+    // @ts-ignore
+    const [currentTokenId, maxSupply, mintPeriod] = await signer.ethcallProvider?.all([
+      currentTokenIdCall,
+      maxSupplyCall,
+      mintPeriodCall,
+    ]);
+
+    const today = new Date();
+    const endDateMS = mintPeriod.toNumber() * 1000;
+    setMintPeriodEnd(new Date(endDateMS));
+    setPublicMint(today.getTime() > endDateMS);
+    setMaxSupplyReached(currentTokenId.toNumber() + 1 > maxSupply.toNumber());
+
+    if (signer.signer) {
+      const currentAddress = await signer.signer.getAddress();
+      if (currentAddress !== "") {
+        setSignerAddress(currentAddress);
+        await loadUserStatus(currentAddress, today.getTime() > endDateMS);
+      }
     }
   };
 
   useEffect(() => {
     const load = async () => {
-      if (signer && signer.signer) {
-        const currentAddress = await signer.signer.getAddress();
-        if (currentAddress !== "") {
-          setSignerAddress(currentAddress);
-          loadData(currentAddress);
-        } else {
-          setLoading(false);
-        }
+      if (signer && mushroom.mushroomNftRead) {
+        setLoading(true);
+        await loadData();
+        setLoading(false);
       } else {
         setLoading(false);
       }
@@ -170,13 +189,23 @@ const SewageFruit = () => {
 
   const refresh = async () => {
     setRefreshing(true);
-    await loadData(signerAddress);
+    await loadUserStatus(signerAddress, publicMint);
     setRefreshing(false);
   };
 
   const handleMint = async () => {
     try {
       const tx = await mushroom.mushroomNft?.mint(signerAddress, merkleProof);
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error.message);
+      errorNotification(t("errors.tran-rejected"));
+    }
+  };
+
+  const handlePublicMint = async () => {
+    try {
+      const tx = await mushroom.mushroomNft?.publicMint();
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error.message);
@@ -197,16 +226,27 @@ const SewageFruit = () => {
   const renderMintInfo = () => {
     if (userStatus.verified) {
       if (userStatus.claimed && fruitInfo) {
+        if (!publicMint) {
+          return (
+            <p>
+              Sewage Fruit MINTED. It will be revealed on{" "}
+              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>.
+            </p>
+          );
+        }
+        return <p>Sewage Fruit MINTED.</p>;
+      }
+
+      if (!maxSupplyReached) {
         return (
           <p>
-            Sewage Fruit MINTED. It will be revealed on DATE/TIME{" "}
-            <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>.
+            <span className="neon-pink">Congrats!</span> You're eligible to mint a sewagefruit.
           </p>
         );
       }
       return (
         <p>
-          <span className="neon-pink">Congrats!</span> You're eligible to mint a sewagefruit.
+          <span className="neon-pink">Sorry!</span> all sewagefruits have been minted.
         </p>
       );
     }
@@ -231,12 +271,12 @@ const SewageFruit = () => {
                 renderImage()
               )}
             </Card.Body>
-            {userStatus.verified && !userStatus.claimed && (
+            {userStatus.verified && !userStatus.claimed && !maxSupplyReached && (
               <Card.Footer>
                 <Button
                   variant="success"
                   className="neon-green"
-                  onClick={handleMint}
+                  onClick={publicMint ? handlePublicMint : handleMint}
                   disabled={refreshing}
                 >
                   Mint
@@ -257,7 +297,7 @@ const SewageFruit = () => {
             {signerAddress === "" && (
               <p>
                 Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
-                eligible, public mint will be available on XX/XX/XXXX.
+                eligible, public mint will be available on {mintPeriodEnd.toLocaleDateString()}.
               </p>
             )}
           </Card.Body>
