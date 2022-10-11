@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
+// import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
@@ -11,7 +12,6 @@ import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashbo
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
 import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
-// import { ReactComponent as GraphIcon } from "../assets/images/welcome/graph.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
@@ -46,6 +46,9 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
       break;
     case "/governance":
       activeVal = "governance";
+      break;
+    case "/sewagefruit":
+      activeVal = "sewagefruit";
       break;
     default:
       activeVal = "dashboard";
@@ -131,6 +134,18 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </Link>
           </Nav.Item>
         )}
+        {/* <Nav.Item>
+          <Link
+            to="/sewagefruit"
+            className={active === "sewagefruit" ? "active" : ""}
+            onClick={() => {
+              setActive("sewagefruit");
+            }}
+          >
+            <GiSpottedMushroom size={28} className="sewagefruit" />
+            <span className={active === "sewagefruit" ? "title active" : "title"}>Sewagefruit</span>
+          </Link>
+          </Nav.Item> */}
         <Nav.Item>
           <Link
             to=""
@@ -140,7 +155,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
               window.location.reload();
             }}
           >
-            <LogoutIcon />
+            <LogoutIcon className="logout-icon" />
             <span className="title">Disconnect</span>
           </Link>
         </Nav.Item>

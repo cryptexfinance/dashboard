@@ -3,6 +3,7 @@ import Button from "react-bootstrap/esm/Button";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { BigNumber, ethers } from "ethers";
+import { useTranslation } from "react-i18next";
 import { UNIV3, encodeIncentive } from "../../../utils/univ3";
 import { IncentiveType, PositionType, StakeStatus } from "./types";
 import { notifyUser, errorNotification } from "../../../utils/utils";
@@ -24,6 +25,7 @@ const Stake = ({
   stakerContract,
   refresh,
 }: props) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("Stake");
   const [btnDisabled, setBtnDisabled] = useState(true);
   const [showToolTip, setShowToolTip] = useState(true);
@@ -34,14 +36,14 @@ const Stake = ({
     let btnTitle = "Stake";
     let bDisabled = true;
     if (position.status === StakeStatus.not_approved) {
-      btnTitle = "Approve";
+      btnTitle = t("approve");
       bDisabled = false;
     } else if (position.status === StakeStatus.staked) {
       bDisabled = false;
-      btnTitle = "Unstake";
+      btnTitle = t("unstake");
     } else if (currentTime < incentive.startTime) {
       bDisabled = false;
-      btnTitle = "Deposit";
+      btnTitle = t("deposit");
     } else if (currentTime >= incentive.startTime && currentTime <= incentive.endTime) {
       // eslint-disable-next-line
       bDisabled =  !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
@@ -61,7 +63,7 @@ const Stake = ({
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
-      errorNotification("Transaction rejected");
+      errorNotification(t("errors.tran-rejected"));
     }
     setBtnDisabled(false);
   };
@@ -78,7 +80,7 @@ const Stake = ({
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
-      errorNotification("Transaction rejected");
+      errorNotification(t("errors.tran-rejected"));
     }
     setBtnDisabled(false);
   };
@@ -90,7 +92,7 @@ const Stake = ({
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
-      errorNotification("Transaction rejected");
+      errorNotification(t("errors.tran-rejected"));
     }
     setBtnDisabled(false);
   };
@@ -102,7 +104,7 @@ const Stake = ({
       notifyUser(tx, refresh);
     } catch (error) {
       console.log(error);
-      errorNotification("Transaction rejected");
+      errorNotification(t("errors.tran-rejected"));
     }
     setBtnDisabled(false);
   };

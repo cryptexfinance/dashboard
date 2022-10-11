@@ -19,6 +19,7 @@ import WelcomeWrapper from "./components/Welcome/index";
 import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
 import Delegators from "./components/Governance/Delegators";
+// import MushroomNfts from "./components/MushroomNft";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import Warnings from "./components/Warnings";
@@ -30,6 +31,7 @@ import { useTokens } from "./hooks/useTokens";
 import { useOracles } from "./hooks/useOracles";
 import { useGovernance } from "./hooks/useGovernance";
 import { useRewards } from "./hooks/useRewards";
+import { useMushroomNft } from "./hooks/useMushroomNft";
 import signerContext from "./state/SignerContext";
 import NetworkContext from "./state/NetworkContext";
 import vaultsContext from "./state/VaultsContext";
@@ -38,11 +40,13 @@ import tokensContext from "./state/TokensContext";
 import oraclesContext from "./state/OraclesContext";
 import governanceContext from "./state/GovernanceContext";
 import rewardsContext from "./state/RewardsContext";
+import mushroomNftContext from "./state/MushroomNftContext";
 import { Web3ModalContext } from "./state/Web3ModalContext";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
 import UniV2Pair from "./contracts/UniswapV2Pair.json";
+import Mushroom from "./contracts/Mushroom.json";
 import {
   isInLayer1,
   isPolygon,
@@ -50,6 +54,7 @@ import {
   getDefaultProvider,
   toFragment,
   isOptimism,
+  isGoerli,
 } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
 
@@ -79,6 +84,7 @@ const App = () => {
   const oracles = useOracles();
   const governance = useGovernance();
   const rewards = useRewards();
+  const mushroomNft = useMushroomNft();
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
@@ -597,6 +603,22 @@ const App = () => {
     oracles.setCurrentWBTCOracleRead(currentWBTCOracleRead);
   };
 
+  const setGoerliContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
+
+    // Set Mushroom contracts
+    const currentMushroomNft = new ethers.Contract(
+      NETWORKS.goerli.mushroomNft,
+      Mushroom.abi,
+      currentSigner
+    );
+    mushroomNft.setCurrentMushroomNft(currentMushroomNft);
+
+    const currentMushroomNftRead = new Contract(NETWORKS.goerli.mushroomNft, Mushroom.abi);
+    mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
+  };
+
   const setContracts = async (
     currentSigner: ethers.Signer,
     ethcallProvider: Provider,
@@ -756,7 +778,10 @@ const App = () => {
     setLoadingContracts(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
-    if (!isValidNetwork(network.chainId)) {
+    const isNftFruit =
+      window.location.toString().includes("sewagefruit") && isGoerli(network.chainId);
+
+    if (!isValidNetwork(network.chainId) && !isNftFruit) {
       setInvalidNetwork(true);
     }
     const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
@@ -766,6 +791,8 @@ const App = () => {
 
     if (isPolygon(network.chainId)) {
       await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
+    } else if (isGoerli(network.chainId)) {
+      await setGoerliContracts(currentSigner, ethcallProvider);
     } else {
       await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
     }
@@ -869,48 +896,53 @@ const App = () => {
               <hardVaultsContext.Provider value={hardVaults}>
                 <governanceContext.Provider value={governance}>
                   <rewardsContext.Provider value={rewards}>
-                    <Sidebar
-                      showSidebar={showSidebar}
-                      setShowSidebar={setShowSidebar}
-                      isMobile={isMobile}
-                    />
-                    <Topbar
-                      showSidebar={showSidebar}
-                      setShowSidebar={setShowSidebar}
-                      isMobile={isMobile}
-                    />
-                    <Suspense fallback={<Loading position="total" />}>
-                      <Container fluid className="wrapper" {...handlers}>
-                        <Warnings />
-                        <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
-                        <ToastContainer />
-                        <Switch>
-                          <Route path={`${match.url}/`}>
-                            <WelcomeWrapper
-                              signerAddress={currentSignerAddress}
-                              loadingContracts={isLoadingContracts}
-                            />
-                          </Route>
-                          <Route path={`${match.url}farm`}>
-                            <Farm />
-                          </Route>
-                          <ApolloProvider client={apolloClient}>
-                            <Route path={`${match.url}graph`}>
-                              <Graph />
+                    <mushroomNftContext.Provider value={mushroomNft}>
+                      <Sidebar
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        isMobile={isMobile}
+                      />
+                      <Topbar
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        isMobile={isMobile}
+                      />
+                      <Suspense fallback={<Loading position="total" />}>
+                        <Container fluid className="wrapper" {...handlers}>
+                          <Warnings />
+                          <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
+                          <ToastContainer />
+                          <Switch>
+                            <Route path={`${match.url}/`}>
+                              <WelcomeWrapper
+                                signerAddress={currentSignerAddress}
+                                loadingContracts={isLoadingContracts}
+                              />
                             </Route>
-                            <Route path={`${match.url}vault`}>
-                              <Vault />
+                            <Route path={`${match.url}farm`}>
+                              <Farm />
                             </Route>
-                            <Route path={`${match.url}vault-monitoring`}>
-                              <Monitoring />
-                            </Route>
-                            <Route path={`${match.url}governance`}>
-                              <Delegators currentSignerAddress={currentSignerAddress} />
-                            </Route>
-                          </ApolloProvider>
-                        </Switch>
-                      </Container>
-                    </Suspense>
+                            <ApolloProvider client={apolloClient}>
+                              <Route path={`${match.url}graph`}>
+                                <Graph />
+                              </Route>
+                              <Route path={`${match.url}vault`}>
+                                <Vault />
+                              </Route>
+                              <Route path={`${match.url}vault-monitoring`}>
+                                <Monitoring />
+                              </Route>
+                              <Route path={`${match.url}governance`}>
+                                <Delegators currentSignerAddress={currentSignerAddress} />
+                              </Route>
+                              {/* <Route path={`${match.url}sewagefruit`}>
+                                <MushroomNfts currentSignerAddress={currentSignerAddress} />
+                                </Route> */}
+                            </ApolloProvider>
+                          </Switch>
+                        </Container>
+                      </Suspense>
+                    </mushroomNftContext.Provider>
                   </rewardsContext.Provider>
                 </governanceContext.Provider>
               </hardVaultsContext.Provider>

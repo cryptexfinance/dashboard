@@ -1361,7 +1361,9 @@ const Mint = ({ address, t }: props) => {
                     </div>
                     <Form>
                       <Form.Group>
-                        <Form.Label>Add {selectedVault}</Form.Label>
+                        <Form.Label>
+                          {t("vault.collateral.add", { collateral: selectedVault })}
+                        </Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number" onClick={maxAddCollateral}>
                             {t("max")}
@@ -1383,7 +1385,7 @@ const Mint = ({ address, t }: props) => {
                               onClick={addCollateral}
                               disabled={btnDisabled}
                             >
-                              Add
+                              {t("add")}
                             </Button>
                           </InputGroup.Append>
                         </InputGroup>
@@ -1399,7 +1401,9 @@ const Mint = ({ address, t }: props) => {
                         </Form.Text>
                       </Form.Group>
                       <Form.Group className="remove">
-                        <Form.Label>Remove {selectedVault}</Form.Label>
+                        <Form.Label>
+                          {t("vault.collateral.remove", { collateral: selectedVault })}
+                        </Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number orange" onClick={safeRemoveCollateral}>
                             {t("max-safe")}
@@ -1421,7 +1425,7 @@ const Mint = ({ address, t }: props) => {
                               onClick={removeCollateral}
                               disabled={btnDisabled}
                             >
-                              Remove
+                              {t("remove")}
                             </Button>
                           </InputGroup.Append>
                         </InputGroup>
@@ -1493,7 +1497,7 @@ const Mint = ({ address, t }: props) => {
                               onClick={mintTCAP}
                               disabled={btnDisabled}
                             >
-                              Mint
+                              {t("mint")}
                             </Button>
                           </InputGroup.Append>
                         </InputGroup>
@@ -1531,7 +1535,7 @@ const Mint = ({ address, t }: props) => {
                               onClick={burnTCAP}
                               disabled={btnDisabled}
                             >
-                              Burn
+                              {t("burn")}
                             </Button>
                           </InputGroup.Append>
                         </InputGroup>

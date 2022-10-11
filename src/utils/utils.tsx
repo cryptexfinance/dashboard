@@ -7,6 +7,7 @@ import errorImg from "../assets/images/noti-error.png";
 import { FEATURES, NETWORKS } from "./constants";
 import { OraclesContext } from "../state/OraclesContext";
 import { VaultsContext } from "../state/VaultsContext";
+import { HardVaultsContext } from "../state/HardVaultsContext";
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -287,7 +288,11 @@ export const isValidNetwork = (chainId: number) => {
 
 export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
-    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+    return (
+      chainId === NETWORKS.mainnet.chainId ||
+      chainId === NETWORKS.rinkeby.chainId ||
+      chainId === NETWORKS.goerli.chainId
+    );
   }
   return false;
 };
@@ -302,6 +307,13 @@ export const isOptimism = (chainId: number | undefined) => {
 export const isPolygon = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
     return chainId === NETWORKS.polygon.chainId || chainId === NETWORKS.mumbai.chainId;
+  }
+  return false;
+};
+
+export const isGoerli = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.goerli.chainId;
   }
   return false;
 };
@@ -348,7 +360,9 @@ export const validOracles = (chainId: number, oracles: OraclesContext): boolean 
       valid &&
       !isUndefined(oracles.wethOracleRead) &&
       !isUndefined(oracles.aaveOracleRead) &&
-      !isUndefined(oracles.linkOracleRead);
+      !isUndefined(oracles.linkOracleRead) &&
+      !isUndefined(oracles.usdcOracleRead) &&
+      !isUndefined(oracles.wbtcOracleRead);
   }
   if (isOptimism(chainId)) {
     valid =
@@ -387,6 +401,19 @@ export const validVaults = (chainId: number, vaults: VaultsContext): boolean => 
 
   if (isPolygon(chainId)) {
     valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
+  }
+  return valid;
+};
+
+export const validHardVaults = (chainId: number, hardVaults: HardVaultsContext): boolean => {
+  let valid = true;
+  if (isInLayer1(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(hardVaults.wethVaultRead) &&
+      !isUndefined(hardVaults.daiVaultRead) &&
+      !isUndefined(hardVaults.wbtcVaultRead) &&
+      !isUndefined(hardVaults.usdcVaultRead);
   }
   return valid;
 };

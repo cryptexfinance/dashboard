@@ -130,7 +130,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
     <>
       {apr >= 0 ? (
         <NumberFormat
-          className="number"
+          className="number neon-pink"
           value={loading ? "0" : apr}
           displayType="text"
           thousandSeparator
