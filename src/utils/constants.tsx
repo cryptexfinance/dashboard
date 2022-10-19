@@ -6,6 +6,7 @@ export const NETWORKS = {
     eth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     weth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     dai: "0x6b175474e89094c44da98b954eedeac495271d0f",
+    mushroomNft: "0x209c23db16298504354112fa4210d368e1d564da",
     ethPool: "0xa87e2c5d5964955242989b954474ff2eb08dd2f5",
     ethUniPool: "0x11456b3750E991383bB8943118ed79C1afdEE192",
     daiPool: "",
@@ -22,7 +23,7 @@ export const NETWORKS = {
     name: "goerli",
     eth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
     weth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
-    mushroomNft: "0x91877f3928379e972ac28ea9076ded52c9738b7c",
+    mushroomNft: "0x209c23db16298504354112fa4210d368e1d564da",
     infuraRpcUrl: "https://goerli.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://goerli.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""

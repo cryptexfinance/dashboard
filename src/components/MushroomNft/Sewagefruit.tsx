@@ -37,6 +37,8 @@ const SewageFruit = () => {
   const [signerAddress, setSignerAddress] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [minting, setMinting] = useState(false);
+  const [loadingFruit, setLoadingFruit] = useState(false);
   const [merkleProof, setMerkleProof] = useState<any>();
   const [mintPeriodEnd, setMintPeriodEnd] = useState(new Date());
   const [publicMint, setPublicMint] = useState(false);
@@ -82,6 +84,7 @@ const SewageFruit = () => {
   };
 
   const loadFruitData = async (tokenURI: string) => {
+    setLoadingFruit(true);
     fetch(tokenURI, {
       method: "GET",
     })
@@ -100,9 +103,11 @@ const SewageFruit = () => {
             status,
           });
         }
+        setLoadingFruit(false);
       })
       .catch((error) => {
         console.error(error);
+        setLoadingFruit(false);
       });
   };
 
@@ -156,6 +161,7 @@ const SewageFruit = () => {
 
     const today = new Date();
     const endDateMS = mintPeriod.toNumber() * 1000;
+
     setMintPeriodEnd(new Date(endDateMS));
     setPublicMint(today.getTime() > endDateMS);
     setMaxSupplyReached(currentTokenId.toNumber() + 1 > maxSupply.toNumber());
@@ -189,14 +195,17 @@ const SewageFruit = () => {
 
   const refresh = async () => {
     setRefreshing(true);
-    await loadUserStatus(signerAddress, publicMint);
+    await loadData();
     setRefreshing(false);
   };
 
   const handleMint = async () => {
     try {
+      // console.log(merkleProof);
+      setMinting(true);
       const tx = await mushroom.mushroomNft?.mint(signerAddress, merkleProof);
       notifyUser(tx, refresh);
+      setMinting(false);
     } catch (error) {
       console.log(error.message);
       errorNotification(t("errors.tran-rejected"));
@@ -263,9 +272,9 @@ const SewageFruit = () => {
       <div className="content">
         {signerAddress !== "" && (
           <Card className="diamond mint">
-            <Card.Header>{renderMintInfo()}</Card.Header>
+            <Card.Header>{!refreshing && !loadingFruit && renderMintInfo()}</Card.Header>
             <Card.Body>
-              {refreshing ? (
+              {refreshing || loadingFruit ? (
                 <Spinner variant="danger" className="spinner" animation="border" />
               ) : (
                 renderImage()
@@ -277,7 +286,7 @@ const SewageFruit = () => {
                   variant="success"
                   className="neon-green"
                   onClick={publicMint ? handlePublicMint : handleMint}
-                  disabled={refreshing}
+                  disabled={refreshing || minting}
                 >
                   Mint
                 </Button>

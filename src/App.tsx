@@ -832,14 +832,20 @@ const App = () => {
       } else {
         setLoadingContracts(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        const provider = getDefaultProvider(
-          parseInt(chainId),
-          chainId === "1" ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
-        );
+        let networkName = NETWORKS.mainnet.name;
+        if (isGoerli(parseInt(chainId))) {
+          networkName = NETWORKS.goerli.name;
+        }
+        if (chainId === "4") {
+          networkName = NETWORKS.rinkeby.name;
+        }
+        const provider = getDefaultProvider(parseInt(chainId), networkName);
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         if (isPolygon(parseInt(chainId))) {
           setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
+        } else if (isGoerli(parseInt(chainId))) {
+          setGoerliContracts(randomSigner, ethcallProvider);
         } else {
           setContracts(randomSigner, ethcallProvider, parseInt(chainId));
         }
