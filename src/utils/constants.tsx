@@ -22,7 +22,7 @@ export const NETWORKS = {
     name: "goerli",
     eth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
     weth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
-    mushroomNft: "0x91877f3928379e972ac28ea9076ded52c9738b7c",
+    mushroomNft: "0x13eB47b8d3c0E1fB1770757bbdD52d5dA0653518",
     infuraRpcUrl: "https://goerli.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://goerli.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
