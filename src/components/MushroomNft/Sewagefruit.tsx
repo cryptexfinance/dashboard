@@ -18,7 +18,7 @@ import { whitelist, whitelistGoerli } from "./whitelist";
 type SewageFruitType = {
   description: string;
   image: string;
-  status: string;
+  revealed: boolean;
 };
 
 type UserStatusType = {
@@ -91,16 +91,16 @@ const SewageFruit = () => {
       .then((response) => response.json())
       .then((resp) => {
         if (resp) {
-          let status = "";
+          let isRevealed = true;
           if (resp.attributes.length > 0) {
             if (resp.attributes[0].trait_type === "Status") {
-              status = resp.attributes[0].value;
+              isRevealed = true;
             }
           }
           setFruitInfo({
             description: resp.description,
             image: resp.image,
-            status,
+            revealed: isRevealed,
           });
         }
         setLoadingFruit(false);
@@ -235,7 +235,7 @@ const SewageFruit = () => {
   const renderMintInfo = () => {
     if (userStatus.verified) {
       if (userStatus.claimed && fruitInfo) {
-        if (!publicMint) {
+        if (!fruitInfo.revealed) {
           return (
             <p>
               Sewage Fruit MINTED. It will be revealed on{" "}
