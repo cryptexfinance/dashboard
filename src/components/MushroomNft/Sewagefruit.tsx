@@ -16,6 +16,7 @@ import sewageFruit from "../../assets/images/sewage-fruit.png";
 import { whitelist, whitelistGoerli } from "./whitelist";
 
 type SewageFruitType = {
+  name: string;
   description: string;
   image: string;
   revealed: boolean;
@@ -98,6 +99,7 @@ const SewageFruit = () => {
             }
           }
           setFruitInfo({
+            name: resp.name.replace("#", ""),
             description: resp.description,
             image: resp.image,
             revealed: isRevealed,
@@ -201,7 +203,6 @@ const SewageFruit = () => {
 
   const handleMint = async () => {
     try {
-      // console.log(merkleProof);
       setMinting(true);
       const tx = await mushroom.mushroomNft?.mint(signerAddress, merkleProof);
       notifyUser(tx, refresh);
@@ -220,6 +221,18 @@ const SewageFruit = () => {
       console.log(error.message);
       errorNotification(t("errors.tran-rejected"));
     }
+  };
+
+  const openseaUrl = (): string => {
+    let nftUrl = "https://opensea.io/assets/ethereum/".concat(NETWORKS.mainnet.mushroomNft);
+    if (isGoerli(currentNetwork.chainId)) {
+      nftUrl = "https://testnets.opensea.io/assets/goerli/".concat(NETWORKS.goerli.mushroomNft);
+    }
+    if (fruitInfo) {
+      nftUrl = nftUrl.concat("/").concat(fruitInfo.name);
+    }
+
+    return nftUrl;
   };
 
   const renderImage = () => {
@@ -243,7 +256,14 @@ const SewageFruit = () => {
             </p>
           );
         }
-        return <p>Sewage Fruit MINTED.</p>;
+        return (
+          <p>
+            Sewage Fruit MINTED. You can also check it out on{" "}
+            <a href={openseaUrl()} target="_blank" rel="noreferrer">
+              here.
+            </a>
+          </p>
+        );
       }
 
       if (!maxSupplyReached) {
