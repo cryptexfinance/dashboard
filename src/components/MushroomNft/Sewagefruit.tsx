@@ -258,7 +258,7 @@ const SewageFruit = () => {
         }
         return (
           <p>
-            Sewage Fruit MINTED. You can also check it out on{" "}
+            Sewage Fruit MINTED. You can also check it out{" "}
             <a href={openseaUrl()} target="_blank" rel="noreferrer">
               here.
             </a>
