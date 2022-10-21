@@ -317,10 +317,27 @@ const SewageFruit = () => {
         <Card className="diamond info">
           <Card.Body>
             <p>
-              Sewage Fruit is an NFT collection of 2,500 fungi’s. Not only can you use your NFT as
-              your PFP but it will serve as access to exclusive rewards through quests set out by
-              the DAO. Whether its minting TCAP or staking CTX we want people to explore our
-              protocol and learn along the way.
+              Sewage Fruitz are a collection of 2,500 upgradable NFTs created from the depths of the
+              Ethereum Blockchain and are a reward to all members of the Cryptex Finance community.
+              A fungus, grown out of dark substances in the yard of Mushroom Man as he spreads his
+              spores worldwide.
+            </p>
+            <p>
+              Holding a Sewage Fruitz PFP unlocks user ability to go on quests within the Cryptex
+              Finance ecosystem, completing tasks that will be unlocked inside the DAO. Sewage
+              Fruitz holders can earn upgrades, badges and burn them in the future based on their
+              achievements to earn CTX, Cryptex Finance protocol governance token available
+              worldwide on Coinbase, Gemini, Huobi and many others.
+            </p>
+            <p>
+              Read more in our most recent blog post:{" "}
+              <a
+                href="https://cryptex.finance/blog/2022-10-13-cryptex-extends-single-side-staking-rewards-updates/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Blog post name
+              </a>
             </p>
             <br />
             {signerAddress === "" && (
