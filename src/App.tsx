@@ -19,7 +19,7 @@ import WelcomeWrapper from "./components/Welcome/index";
 import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
 import Delegators from "./components/Governance/Delegators";
-// import MushroomNfts from "./components/MushroomNft";
+import MushroomNft from "./components/MushroomNft";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import Warnings from "./components/Warnings";
@@ -126,6 +126,19 @@ const App = () => {
     networks.setCurrentDAIAddress(cNetwork.dai);
     networks.setCurrentIsBrowserWallet(isBrowserWallet);
     if (walletName !== "") networks.setCurrentWallet(walletName);
+  };
+
+  const setMushroomContracts = async (currentSigner: ethers.Signer) => {
+    // Set Mushroom contracts
+    const currentMushroomNft = new ethers.Contract(
+      NETWORKS.mainnet.mushroomNft,
+      Mushroom.abi,
+      currentSigner
+    );
+    mushroomNft.setCurrentMushroomNft(currentMushroomNft);
+
+    const currentMushroomNftRead = new Contract(NETWORKS.mainnet.mushroomNft, Mushroom.abi);
+    mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
   };
 
   const setEthereumContracts = async (chainId: number, currentSigner: ethers.Signer) => {
@@ -416,6 +429,9 @@ const App = () => {
       toFragment(contracts.Timelock.abi)
     );
     governance.setCurrentTimelockRead(currentTimelockRead);
+    if (chainId === 1) {
+      await setMushroomContracts(currentSigner);
+    }
   };
 
   const setOptimismContracts = async (currentSigner: ethers.Signer) => {
@@ -832,14 +848,20 @@ const App = () => {
       } else {
         setLoadingContracts(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        const provider = getDefaultProvider(
-          parseInt(chainId),
-          chainId === "1" ? NETWORKS.mainnet.name : NETWORKS.rinkeby.name
-        );
+        let networkName = NETWORKS.mainnet.name;
+        if (isGoerli(parseInt(chainId))) {
+          networkName = NETWORKS.goerli.name;
+        }
+        if (chainId === "4") {
+          networkName = NETWORKS.rinkeby.name;
+        }
+        const provider = getDefaultProvider(parseInt(chainId), networkName);
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         if (isPolygon(parseInt(chainId))) {
           setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
+        } else if (isGoerli(parseInt(chainId))) {
+          setGoerliContracts(randomSigner, ethcallProvider);
         } else {
           setContracts(randomSigner, ethcallProvider, parseInt(chainId));
         }
@@ -935,9 +957,9 @@ const App = () => {
                               <Route path={`${match.url}governance`}>
                                 <Delegators currentSignerAddress={currentSignerAddress} />
                               </Route>
-                              {/* <Route path={`${match.url}sewagefruit`}>
-                                <MushroomNfts currentSignerAddress={currentSignerAddress} />
-                                </Route> */}
+                              <Route path={`${match.url}sewagefruitz`}>
+                                <MushroomNft />
+                              </Route>
                             </ApolloProvider>
                           </Switch>
                         </Container>
