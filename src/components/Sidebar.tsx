@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
-// import { GiSpottedMushroom } from "react-icons/gi";
+import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
@@ -121,31 +121,35 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
           </Link>
         </Nav.Item>
         {isInLayer1(currentNetwork.chainId) && (
-          <Nav.Item>
-            <Link
-              to="/governance"
-              className={active === "governance" ? "active" : ""}
-              onClick={() => {
-                setActive("governance");
-              }}
-            >
-              <StakeIcon className="governance" />
-              <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
-            </Link>
-          </Nav.Item>
+          <>
+            <Nav.Item>
+              <Link
+                to="/governance"
+                className={active === "governance" ? "active" : ""}
+                onClick={() => {
+                  setActive("governance");
+                }}
+              >
+                <StakeIcon className="governance" />
+                <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
+              </Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Link
+                to="/sewagefruitz"
+                className={active === "sewagefruit" ? "active" : ""}
+                onClick={() => {
+                  setActive("sewagefruitz");
+                }}
+              >
+                <GiSpottedMushroom size={28} className="sewagefruit" />
+                <span className={active === "sewagefruitz" ? "title active" : "title"}>
+                  Sewagefruitz
+                </span>
+              </Link>
+            </Nav.Item>
+          </>
         )}
-        {/* <Nav.Item>
-          <Link
-            to="/sewagefruit"
-            className={active === "sewagefruit" ? "active" : ""}
-            onClick={() => {
-              setActive("sewagefruit");
-            }}
-          >
-            <GiSpottedMushroom size={28} className="sewagefruit" />
-            <span className={active === "sewagefruit" ? "title active" : "title"}>Sewagefruit</span>
-          </Link>
-          </Nav.Item> */}
         <Nav.Item>
           <Link
             to=""
