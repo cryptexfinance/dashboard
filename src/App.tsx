@@ -128,6 +128,19 @@ const App = () => {
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
+  const setMushroomContracts = async (currentSigner: ethers.Signer) => {
+    // Set Mushroom contracts
+    const currentMushroomNft = new ethers.Contract(
+      NETWORKS.mainnet.mushroomNft,
+      Mushroom.abi,
+      currentSigner
+    );
+    mushroomNft.setCurrentMushroomNft(currentMushroomNft);
+
+    const currentMushroomNftRead = new Contract(NETWORKS.mainnet.mushroomNft, Mushroom.abi);
+    mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
+  };
+
   const setEthereumContracts = async (chainId: number, currentSigner: ethers.Signer) => {
     let contracts;
     let ethPoolAddress = NETWORKS.rinkeby.ethPool;
@@ -416,6 +429,10 @@ const App = () => {
       toFragment(contracts.Timelock.abi)
     );
     governance.setCurrentTimelockRead(currentTimelockRead);
+
+    if (chainId === 1) {
+      await setMushroomContracts(currentSigner);
+    }
   };
 
   const setOptimismContracts = async (currentSigner: ethers.Signer) => {

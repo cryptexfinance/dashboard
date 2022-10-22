@@ -57,7 +57,7 @@ const SewageFruit = () => {
     apiUrl.search = new URLSearchParams({
       chain: isGoerli(currentNetwork.chainId) ? "goerli" : "eth",
       format: "decimal",
-      token_addresses: NETWORKS.goerli.mushroomNft,
+      token_addresses: isGoerli(currentNetwork.chainId) ? NETWORKS.goerli.mushroomNft : NETWORKS.mainnet.mushroomNft,
     }).toString();
 
     const response = await fetch(apiUrl.toString(), {
@@ -288,7 +288,7 @@ const SewageFruit = () => {
 
   return (
     <div className="sewage-fruit">
-      <h2>Sewage Fruit</h2>
+      <h2>Sewage Fruitz</h2>
       <div className="content">
         {signerAddress !== "" && (
           <Card className="diamond mint">
