@@ -97,7 +97,7 @@ const SewageFruit = () => {
           let isRevealed = true;
           if (resp.attributes.length > 0) {
             if (resp.attributes[0].trait_type === "Status") {
-              isRevealed = true;
+              isRevealed = resp.attributes[0].value !== "Unrevealed";
             }
           }
           setFruitInfo({
