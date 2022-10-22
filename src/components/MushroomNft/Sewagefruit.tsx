@@ -257,7 +257,15 @@ const SewageFruit = () => {
           return (
             <p>
               Sewage Fruit MINTED. It will be revealed on{" "}
-              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>.
+              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>. You can check out
+              the collection{" "}
+              <a
+                href="https://opensea.io/collection/sewage-fruitz"
+                target="_blank"
+                rel="noreferrer"
+              >
+                here.
+              </a>
             </p>
           );
         }
