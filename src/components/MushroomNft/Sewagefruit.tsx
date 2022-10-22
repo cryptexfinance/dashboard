@@ -337,11 +337,11 @@ const SewageFruit = () => {
             <p>
               Read more in our most recent blog post:{" "}
               <a
-                href="https://cryptex.finance/blog/2022-10-13-cryptex-extends-single-side-staking-rewards-updates/"
+                href="https://cryptex.finance/blog/2022-10-22-introducing-sewage-fruitz/"
                 target="_blank"
                 rel="noreferrer"
               >
-                Blog post name
+                Introducing Sewage Fruitz
               </a>
             </p>
             <br />
