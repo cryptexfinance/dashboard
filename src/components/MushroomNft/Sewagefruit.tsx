@@ -57,7 +57,9 @@ const SewageFruit = () => {
     apiUrl.search = new URLSearchParams({
       chain: isGoerli(currentNetwork.chainId) ? "goerli" : "eth",
       format: "decimal",
-      token_addresses: isGoerli(currentNetwork.chainId) ? NETWORKS.goerli.mushroomNft : NETWORKS.mainnet.mushroomNft,
+      token_addresses: isGoerli(currentNetwork.chainId)
+        ? NETWORKS.goerli.mushroomNft
+        : NETWORKS.mainnet.mushroomNft,
     }).toString();
 
     const response = await fetch(apiUrl.toString(), {
