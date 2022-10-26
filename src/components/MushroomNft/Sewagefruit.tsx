@@ -256,14 +256,22 @@ const SewageFruit = () => {
         if (!fruitInfo.revealed) {
           return (
             <p>
-              Sewage Fruit MINTED. It will be revealed on{" "}
-              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>.
+              Sewage Fruitz MINTED. It will be revealed on{" "}
+              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>. You can check out
+              the collection{" "}
+              <a
+                href="https://opensea.io/collection/sewage-fruitz"
+                target="_blank"
+                rel="noreferrer"
+              >
+                here.
+              </a>
             </p>
           );
         }
         return (
           <p>
-            Sewage Fruit MINTED. You can also check it out{" "}
+            Sewage Fruitz MINTED. You can also check it out{" "}
             <a href={openseaUrl()} target="_blank" rel="noreferrer">
               here.
             </a>
@@ -274,13 +282,13 @@ const SewageFruit = () => {
       if (!maxSupplyReached) {
         return (
           <p>
-            <span className="neon-pink">Congrats!</span> You're eligible to mint a sewagefruit.
+            <span className="neon-pink">Congrats!</span> You're eligible to mint a Sewage Fruitz.
           </p>
         );
       }
       return (
         <p>
-          <span className="neon-pink">Sorry!</span> all sewagefruits have been minted.
+          <span className="neon-pink">Sorry!</span> all Sewage Fruitz have been minted.
         </p>
       );
     }
