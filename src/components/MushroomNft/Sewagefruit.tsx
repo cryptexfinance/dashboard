@@ -31,6 +31,7 @@ type UserStatusType = {
 const SewageFruit = () => {
   const { t } = useTranslation();
   // const { isInitialized, Moralis } = useMoralis();
+  const revealedDate = new Date(1667245715000);
   const currentNetwork = useContext(NetworkContext);
   const signer = useContext(SignerContext);
   const mushroom = useContext(MushroomNftContext);
@@ -257,8 +258,8 @@ const SewageFruit = () => {
           return (
             <p>
               Sewage Fruitz MINTED. It will be revealed on{" "}
-              <span className="neon-pink">{mintPeriodEnd.toLocaleString()}</span>. You can check out
-              the collection{" "}
+              <span className="neon-pink">{revealedDate.toLocaleDateString()}</span>. You can check
+              out the collection{" "}
               <a
                 href="https://opensea.io/collection/sewage-fruitz"
                 target="_blank"
