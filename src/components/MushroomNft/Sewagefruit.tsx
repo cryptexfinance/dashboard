@@ -3,6 +3,7 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/esm/Card";
 import Spinner from "react-bootstrap/Spinner";
 import { useTranslation } from "react-i18next";
+// import { Widget } from "@typeform/embed-react";
 import "../../styles/sewagefruit.scss";
 import Loading from "../Loading";
 import SignerContext from "../../state/SignerContext";
@@ -359,7 +360,7 @@ const SewageFruit = () => {
                 Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
                 eligible, public mint will be available on {mintPeriodEnd.toLocaleDateString()}.
               </p>
-            )}
+            )}            
           </Card.Body>
         </Card>
       </div>
