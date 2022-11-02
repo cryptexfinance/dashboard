@@ -153,14 +153,20 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
             <OverlayTrigger
               key="bottom"
               placement="bottom"
-              overlay={<Tooltip id="tooltip-bottom">{t("welcome.tcap-info")}</Tooltip>}
+              overlay={
+                <Tooltip id="tooltip-bottom">
+                  <>{t("welcome.tcap-info")}</>
+                </Tooltip>
+              }
             >
               <Button variant="dark" className="question">
                 ?
               </Button>
             </OverlayTrigger>
           </h4>
-          <h4 className="title">{t("welcome.tcap")}:</h4>
+          <h4 className="title">
+            <>{t("welcome.tcap")}:</>
+          </h4>
         </div>
         <div className="token-price">
           <h4 className="number neon-dark-blue">
@@ -173,7 +179,9 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
               decimalScale={2}
             />
           </h4>
-          <h4>{t("welcome.tcap-price")}:</h4>
+          <h4>
+            <>{t("welcome.tcap-price")}:</>
+          </h4>
         </div>
         {isInLayer1(currentNetwork.chainId) && (
           <div className="token-price">
@@ -187,7 +195,9 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                 decimalScale={2}
               />
             </h4>
-            <h4>{t("welcome.ctx-price")}:</h4>
+            <h4>
+              <>{t("welcome.ctx-price")}:</>
+            </h4>
           </div>
         )}
         <div
@@ -204,14 +214,18 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
             <Card className="balance">
               <Card.Header>
                 <div className="">
-                  <h2>{t("welcome.title1")}</h2>
+                  <h2>
+                    <>{t("welcome.title1")}</>
+                  </h2>
                 </div>
               </Card.Header>
               <Card.Body>
                 <div className="balance-section">
                   <div className="balance-box">
                     <div className="title">
-                      <h5 className="tcap">{t("welcome.tcap-balance")}</h5>
+                      <h5 className="tcap">
+                        <>{t("welcome.tcap-balance")}</>
+                      </h5>
                     </div>
                     <div className="values">
                       <div className="asset-value">
@@ -241,7 +255,9 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                   {isInLayer1(currentNetwork.chainId) && (
                     <div className="balance-box">
                       <div className="title">
-                        <h5 className="tcap">{t("welcome.ctx-balance")}</h5>
+                        <h5 className="tcap">
+                          <>{t("welcome.ctx-balance")}</>
+                        </h5>
                       </div>
                       <div className="values">
                         <div className="asset-value">
@@ -275,11 +291,15 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
           ) : (
             <Card className="balance">
               <Card.Header>
-                <h2>{t("welcome.title3")}</h2>
+                <h2>
+                  <>{t("welcome.title3")}</>
+                </h2>
               </Card.Header>
               <Card.Body>
                 <Row className="">
-                  <p>{t("welcome.subtitle3")}</p>
+                  <p>
+                    <>{t("welcome.subtitle3")}</>
+                  </p>
                   <div>
                     <Button
                       variant="primary"
@@ -289,7 +309,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                         web3Modal.toggleModal();
                       }}
                     >
-                      {t("connect")}
+                      <>{t("connect")}</>
                     </Button>
                   </div>
                 </Row>
@@ -298,10 +318,14 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
           )}
           <Card className="diamond">
             <Card.Header>
-              <h2>{t("welcome.title2")}</h2>
+              <h2>
+                <>{t("welcome.title2")}</>
+              </h2>
             </Card.Header>
             <Card.Body>
-              <p>{t("welcome.subtitle2")}</p>
+              <p>
+                <>{t("welcome.subtitle2")}</>
+              </p>
               <Row className="">
                 <Col>
                   <Button
@@ -311,7 +335,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                       window.open("https://app.uniswap.org/#/swap", "_blank");
                     }}
                   >
-                    {t("trade")}
+                    <>{t("trade")}</>
                   </Button>
                   <Button
                     variant="success"
@@ -321,7 +345,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("mint")}
+                    <>{t("mint")}</>
                   </Button>
                 </Col>
               </Row>
@@ -335,7 +359,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("my-vaults")}
+                    <>{t("my-vaults")}</>
                   </Button>
                   <Button
                     variant="warning"
@@ -345,7 +369,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("farm")}
+                    <>{t("farm")}</>
                   </Button>
                 </Col>
               </Row>

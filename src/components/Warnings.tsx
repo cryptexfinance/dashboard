@@ -18,7 +18,9 @@ const Warnings = () => {
           }}
           dismissible
         >
-          <b>{t("vault-warning")}</b>
+          <b>
+            <>{t("vault-warning")}</>
+          </b>
         </Alert>
       )}
     </>

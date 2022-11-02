@@ -333,7 +333,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
               web3Modal.toggleModal();
             }}
           >
-            {t("connect")}
+            <>{t("connect")}</>
           </Button>
           {/* <LangDropDown className="btn-language" /> */}
         </>

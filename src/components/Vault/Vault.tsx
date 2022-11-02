@@ -38,18 +38,24 @@ export const Vault = () => {
   return (
     <div className="vault">
       <div>
-        <h3>{t("vault.title1")}</h3>
+        <h3>
+          <>{t("vault.title1")}</>
+        </h3>
         {!signer.signer ? (
           <div className="pre-actions">
-            <h5 className="action-title mt-4 pt-2">{t("connect")}</h5>
-            <p>{t("vault.no-connected")}</p>
+            <h5 className="action-title mt-4 pt-2">
+              <>{t("connect")}</>
+            </h5>
+            <p>
+              <>{t("vault.no-connected")}</>
+            </p>
             <Button
               variant="pink neon-pink btn-connect"
               onClick={() => {
                 web3Modal.toggleModal();
               }}
             >
-              {t("connect")}
+              <>{t("connect")}</>
             </Button>
           </div>
         ) : (

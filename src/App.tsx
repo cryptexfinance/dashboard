@@ -16,7 +16,6 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import WelcomeWrapper from "./components/Welcome/index";
-import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
 import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
@@ -945,9 +944,6 @@ const App = () => {
                               <Farm />
                             </Route>
                             <ApolloProvider client={apolloClient}>
-                              <Route path={`${match.url}graph`}>
-                                <Graph />
-                              </Route>
                               <Route path={`${match.url}vault`}>
                                 <Vault />
                               </Route>

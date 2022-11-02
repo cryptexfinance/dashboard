@@ -404,22 +404,34 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>{t("farming.farming")}</h3>{" "}
+        <h3>
+          <>{t("farming.farming")}</>
+        </h3>{" "}
         <Row className="card-wrapper">
           <Row>
             {isInLayer1(currentNetwork.chainId) && <UniV3Rewards signer={signer} />}
             <Card className="diamond mt-4">
-              <h2>{t("farming.liquidity")}</h2>
+              <h2>
+                <>{t("farming.liquidity")}</>
+              </h2>
               <Table hover className="mt-2">
                 <thead>
                   <tr>
                     <th />
-                    <th>{t("description")}</th>
-                    <th>{t("balance")}</th>
-                    <th>{t("stake")}</th>
+                    <th>
+                      <>{t("description")}</>
+                    </th>
+                    <th>
+                      <>{t("balance")}</>
+                    </th>
+                    <th>
+                      <>{t("stake")}</>
+                    </th>
                     <th>
                       <div className="rewards">
-                        <div className="title">{t("farming.unlocked")}</div>
+                        <div className="title">
+                          <>{t("farming.unlocked")}</>
+                        </div>
                         <div className="button">
                           <OverlayTrigger
                             key="top"
@@ -427,7 +439,7 @@ const Farm = () => {
                             trigger={["hover", "click"]}
                             overlay={
                               <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                {t("farming.unlocked-info")}
+                                <>{t("farming.unlocked-info")}</>
                               </Tooltip>
                             }
                           >
@@ -438,7 +450,9 @@ const Farm = () => {
                     </th>
                     <th>
                       <div className="rewards">
-                        <div className="title">{t("farming.locked")}</div>
+                        <div className="title">
+                          <>{t("farming.locked")}</>
+                        </div>
                         <div className="button">
                           <OverlayTrigger
                             key="top"
@@ -446,7 +460,7 @@ const Farm = () => {
                             trigger={["hover", "click"]}
                             overlay={
                               <Tooltip id="tooltip-top" className="farm-tooltip">
-                                {t("farming.locked-info")}
+                                <>{t("farming.locked-info")}</>
                               </Tooltip>
                             }
                           >
@@ -471,7 +485,9 @@ const Farm = () => {
                         rel="noreferrer"
                         href={`${lpURL}/#/add/${tokens.tcapToken?.address}/ETH`}
                       >
-                        {t("farming.eth-tcap-pool")} <br /> <small> SushiSwap </small>
+                        <>
+                          {t("farming.eth-tcap-pool")} <br /> <small> SushiSwap </small>
+                        </>
                       </a>
                     </td>
                     <td className="number">
@@ -525,10 +541,10 @@ const Farm = () => {
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
+                            <>{t("claim")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       ) : (
@@ -541,7 +557,7 @@ const Farm = () => {
                                 claimRewards("ETHPOOL");
                               }}
                             >
-                              {t("claim")}
+                              <>{t("claim")}</>
                             </Button>
                           ) : (
                             <Button
@@ -551,7 +567,7 @@ const Farm = () => {
                                 claimVest("ETHPOOL");
                               }}
                             >
-                              {t("claim-vest")}
+                              <>{t("claim-vest")}</>
                             </Button>
                           )}
                           <Button
@@ -561,7 +577,7 @@ const Farm = () => {
                               exitRewards("ETHPOOL");
                             }}
                           >
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       )}
@@ -578,7 +594,9 @@ const Farm = () => {
                         rel="noreferrer"
                         href={`${lpURL}/#/add/${tokens.ctxToken?.address}/ETH`}
                       >
-                        {t("farming.eth-ctx-pool")} <br /> <small> SushiSwap </small>
+                        <>
+                          {t("farming.eth-ctx-pool")} <br /> <small> SushiSwap </small>
+                        </>
                       </a>
                     </td>
                     <td className="number">
@@ -634,13 +652,13 @@ const Farm = () => {
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="" disabled>
-                            {t("mint")}
+                            <>{t("mint")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
+                            <>{t("claim")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       ) : (
@@ -668,7 +686,7 @@ const Farm = () => {
                                 claimVest("CTXPOOL");
                               }}
                             >
-                              {t("claim-vest")}
+                              <>{t("claim-vest")}</>
                             </Button>
                           ) : (
                             <Button
@@ -678,7 +696,7 @@ const Farm = () => {
                                 claimRewards("CTXPOOL");
                               }}
                             >
-                              {t("claim")}
+                              <>{t("claim")}</>
                             </Button>
                           )}
                           <Button
@@ -688,7 +706,7 @@ const Farm = () => {
                               exitRewards("CTXPOOL");
                             }}
                           >
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       )}

@@ -736,15 +736,17 @@ export const Monitoring = () => {
     setFilteringRatios(false);
   };
 
-  const { loading, data, error } = useQuery(vaultsQuery, {
+  const { loading } = useQuery(vaultsQuery, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     skip: skipQuery,
-    onError: () => {
+    onError: (error) => {
       console.log(error);
     },
-    onCompleted: () => {
-      if (pricesUpdated) {
+    onCompleted: (data: any) => {
+      console.log("--- graph --");
+      console.log(data);
+      if (pricesUpdated && !isUndefined(data)) {
         setVaultGraphList(data);
         loadVaults(data);
       }
@@ -756,9 +758,10 @@ export const Monitoring = () => {
       if (!pricesUpdated) {
         loadPrices();
         loadRatios();
-      } else if (!isUndefined(data)) {
-        loadVaults(data);
       }
+      // else if (!isUndefined(data)) {
+      // loadVaults(data);
+      // }
     },
     // eslint-disable-next-line
     [signer, currentNetwork.chainId, pricesUpdated]
@@ -935,29 +938,39 @@ export const Monitoring = () => {
         <Row>
           <Card className="diamond mb-2 totals">
             <Card.Header>
-              <h5>{t("totals")}</h5>
+              <h5>
+                <>{t("totals")}</>
+              </h5>
             </Card.Header>
             <Card.Body>
               <Col md={12} className="totals-container">
                 <Col md={3} className="total-box">
-                  <h6>{t("vaults")}</h6>
+                  <h6>
+                    <>{t("vaults")}</>
+                  </h6>
                   <span className="number">{vaultsTotals.vaults}</span>
                 </Col>
                 <Col md={3} className="total-box">
-                  <h6>{t("collateral")} (USD)</h6>
+                  <h6>
+                    <>{t("collateral")} (USD)</>
+                  </h6>
                   <span className="number">
                     ${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}
                   </span>
                 </Col>
                 <Col md={3} className="total-box">
                   <div className="debt">
-                    <h6>{t("debt")}</h6>
+                    <h6>
+                      <>{t("debt")}</>
+                    </h6>
                     <TcapIcon className="tcap-icon" />
                   </div>
                   <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
                 </Col>
                 <Col md={3} className="total-box">
-                  <h6>{t("debt")} (USD)</h6>
+                  <h6>
+                    <>{t("debt")} (USD)</>
+                  </h6>
                   <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
                 </Col>
               </Col>
@@ -968,7 +981,9 @@ export const Monitoring = () => {
               <Col md={12} className="actions">
                 <div className="items-view">
                   <div className="dd-container">
-                    <h6 className="titles">{t("view")}:</h6>
+                    <h6 className="titles">
+                      <>{t("view")}:</>
+                    </h6>
                     <Dropdown onSelect={(eventKey) => handleItemsViewChange(eventKey || "15")}>
                       <Dropdown.Toggle
                         variant="secondary"
@@ -991,7 +1006,9 @@ export const Monitoring = () => {
                 </div>
                 <div className="filters">
                   <div className="dd-container">
-                    <h6 className="titles">{t("collateral")}:</h6>
+                    <h6 className="titles">
+                      <>{t("collateral")}:</>
+                    </h6>
                     <Dropdown
                       className="dd-collateral"
                       onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
@@ -1038,7 +1055,9 @@ export const Monitoring = () => {
                   </div>
                   {isInLayer1(currentNetwork.chainId) && (
                     <div className="dd-container">
-                      <h6 className="titles">{t("mode")}:</h6>
+                      <h6 className="titles">
+                        <>{t("mode")}:</>
+                      </h6>
                       <Dropdown
                         className="dd-mode"
                         onSelect={(eventKey) => handleModeChange(eventKey || "ALL")}

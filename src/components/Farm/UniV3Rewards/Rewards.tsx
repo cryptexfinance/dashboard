@@ -201,15 +201,15 @@ const Rewards = ({
     });
   };
 
-  const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
+  const { loading, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
     pollInterval: 90000,
     notifyOnNetworkStatusChange: true,
     variables: { owner: ownerAddress.toLowerCase() },
-    onError: () => {
+    onError: (error) => {
       console.log(error);
     },
-    onCompleted: () => {
+    onCompleted: (data: any) => {
       if (signer.signer && ownerAddress !== "") {
         loadData(data);
         setFirstLoad(false);
@@ -271,7 +271,7 @@ const Rewards = ({
         className=" ml-4 claim"
         disabled={btnDisabled}
       >
-        {t("claim")}
+        <>{t("claim")}</>
       </Button>
     );
   };

@@ -398,13 +398,11 @@ const KeeperForm = ({
                   size={120}
                 />
               )}
-              <Form.File
+              <Form.Control
                 type="file"
                 id="custom-file"
                 onChange={onChangeImage}
                 className={imageError === "" ? "neon-green" : "neon-orange"}
-                label="Select your image"
-                custom
               />
               <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>

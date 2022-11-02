@@ -237,20 +237,22 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
 
   const rewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.reward-info")}
+      <>{t("monitoring.reward-info")}</>
     </Tooltip>
   );
 
   const tcapAmountHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.tcap-amount-info")}
+      <>{t("monitoring.tcap-amount-info")}</>
     </Tooltip>
   );
 
   const netRewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.net-reward-info1")}: <br />
-      {t("monitoring.net-reward-info2")}
+      <>
+        {t("monitoring.net-reward-info1")}: <br />
+        {t("monitoring.net-reward-info2")}
+      </>
     </Tooltip>
   );
 
@@ -282,7 +284,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t("monitoring.liquidate-vault")}
+          <>{t("monitoring.liquidate-vault")}</>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -290,7 +292,9 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Form>
           <Form.Group className="" controlId="">
             <>
-              <Form.Label>{t("amount-tcap")}</Form.Label>
+              <Form.Label>
+                <>{t("amount-tcap")}</>
+              </Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
                   MIN REQUIRED
@@ -318,7 +322,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               <div className="liquidation-data">
                 <Form.Text className="text-muted liquidation-reward">
                   <div>
-                    {t("monitoring.reward")}:{" "}
+                    <>{t("monitoring.reward")}: </>
                     <NumberFormat
                       className="number neon-pink"
                       value={reward}
@@ -349,16 +353,16 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Table hover className="mt-2 liq-info">
           <thead>
             <th>
-              {t("monitoring.reward")}
+              <>{t("monitoring.reward")}</>
               {helpToolTip(0)}
             </th>
             <th>
-              {t("required-tcap")}
+              <>{t("required-tcap")}</>
               {helpToolTip(1)}
             </th>
             <th>Burn Fee</th>
             <th>
-              {t("monitoring.net-reward")}
+              <>{t("monitoring.net-reward")}</>
               {helpToolTip(3)}
             </th>
           </thead>
@@ -377,7 +381,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
           onClick={liquidate}
           disabled={!canLiquidate}
         >
-          {canLiquidate ? t("monitoring.liquidate-vault") : t("monitoring.liquidating")}
+          <>{canLiquidate ? t("monitoring.liquidate-vault") : t("monitoring.liquidating")}</>
         </Button>
       </Modal.Footer>
     </Modal>

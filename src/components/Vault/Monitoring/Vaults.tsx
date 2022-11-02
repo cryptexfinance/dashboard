@@ -171,18 +171,20 @@ export const Vaults = ({
           <tr>
             <th className="vault-id">Vault Id</th>
             <th className="status">
-              {t("status")}
+              <>{t("status")}</>
               <OverlayTrigger
                 key="top"
                 placement="right"
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="vaults-status-tooltip">
-                    <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
-                    <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
-                    <span className="active">Active</span>: {t("monitoring.active-info")} <br />
-                    <span className="liquidation">Liquidation</span>:{" "}
-                    {t("monitoring.liquidation-info")} <br />
+                    <>
+                      <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
+                      <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
+                      <span className="active">Active</span>: {t("monitoring.active-info")} <br />
+                      <span className="liquidation">Liquidation</span>:{" "}
+                      {t("monitoring.liquidation-info")} <br />
+                    </>
                   </Tooltip>
                 }
               >
@@ -190,35 +192,40 @@ export const Vaults = ({
               </OverlayTrigger>
             </th>
             <th className="collateral">
-              {t("collateral")}
+              <>{t("collateral")}</>
               <button type="button" className="sort" onClick={() => onSortCollateralClick()}>
                 {sortingIncon(collateralSort)}
               </button>
             </th>
             <th className="collateral-usd">
-              {t("collateral")} (USD)
+              <>{t("collateral")} (USD)</>
               <button type="button" className="sort" onClick={() => onSortCollateralUsdClick()}>
                 {sortingIncon(collateralUsdSort)}
               </button>
             </th>
             <th>
               <div className="debt">
-                <TcapIcon className="tcap" /> <span>{t("debt")}</span>
+                <TcapIcon className="tcap" />
+                <span>
+                  <>{t("debt")}</>
+                </span>
                 <button type="button" className="sort" onClick={() => onSortDebtClick()}>
                   {sortingIncon(debtSort)}
                 </button>
               </div>
             </th>
-            <th className="debt-usd">{t("debt")} (USD)</th>
+            <th className="debt-usd">
+              <>{t("debt")} (USD)</>
+            </th>
             <th className="ratio">
-              {t("monitoring.ratio")}
+              <>{t("monitoring.ratio")}</>
               <button type="button" className="sort" onClick={() => onSortRatioClick()}>
                 {sortingIncon(ratioSort)}
               </button>
             </th>
             {currentStatus === "liquidation" && (
               <th className="ratio">
-                {t("monitoring.net-reward")}
+                <>{t("monitoring.net-reward")}</>
                 <button type="button" className="sort" onClick={() => onSortRewardClick()}>
                   {sortingIncon(rewardSort)}
                 </button>

@@ -1362,11 +1362,11 @@ const Mint = ({ address, t }: props) => {
                     <Form>
                       <Form.Group>
                         <Form.Label>
-                          {t("vault.collateral.add", { collateral: selectedVault })}
+                          <>{t("vault.collateral.add", { collateral: selectedVault })}</>
                         </Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number" onClick={maxAddCollateral}>
-                            {t("max")}
+                            <>{t("max")}</>
                           </a>
                         </Form.Label>
                         <InputGroup>
@@ -1379,15 +1379,13 @@ const Mint = ({ address, t }: props) => {
                             onFocus={onFocusAddCollateral}
                             onBlur={onBlurAddCollateral}
                           />
-                          <InputGroup.Append>
-                            <Button
-                              className="neon-green"
-                              onClick={addCollateral}
-                              disabled={btnDisabled}
-                            >
-                              {t("add")}
-                            </Button>
-                          </InputGroup.Append>
+                          <Button
+                            className="neon-green"
+                            onClick={addCollateral}
+                            disabled={btnDisabled}
+                          >
+                            <>{t("add")}</>
+                          </Button>
                         </InputGroup>
                         <Form.Text className="text-muted">
                           <NumberFormat
@@ -1402,11 +1400,11 @@ const Mint = ({ address, t }: props) => {
                       </Form.Group>
                       <Form.Group className="remove">
                         <Form.Label>
-                          {t("vault.collateral.remove", { collateral: selectedVault })}
+                          <>{t("vault.collateral.remove", { collateral: selectedVault })}</>
                         </Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number orange" onClick={safeRemoveCollateral}>
-                            {t("max-safe")}
+                            <>{t("max-safe")}</>
                           </a>
                         </Form.Label>
                         <InputGroup>
@@ -1419,15 +1417,13 @@ const Mint = ({ address, t }: props) => {
                             onFocus={onFocusRemoveCollateral}
                             onBlur={onBlurRemoveCollateral}
                           />
-                          <InputGroup.Append>
-                            <Button
-                              className="neon-orange"
-                              onClick={removeCollateral}
-                              disabled={btnDisabled}
-                            >
-                              {t("remove")}
-                            </Button>
-                          </InputGroup.Append>
+                          <Button
+                            className="neon-orange"
+                            onClick={removeCollateral}
+                            disabled={btnDisabled}
+                          >
+                            <>{t("remove")}</>
+                          </Button>
                         </InputGroup>
                         <Form.Text className="text-muted">
                           <NumberFormat
@@ -1446,7 +1442,9 @@ const Mint = ({ address, t }: props) => {
                 <div className="form-card">
                   <Card>
                     <div className="info">
-                      <h4>{t("vault.debt.title")}</h4>
+                      <h4>
+                        <>{t("vault.debt.title")}</>
+                      </h4>
                       <div>
                         <div className="amount">
                           <TcapIcon className="tcap-neon" />
@@ -1477,7 +1475,7 @@ const Mint = ({ address, t }: props) => {
                         <Form.Label>{t("vault.debt.mint")}</Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number" onClick={safeMintTCAP}>
-                            {t("max-safe")}
+                            <>{t("max-safe")}</>
                           </a>
                         </Form.Label>
                         <InputGroup>
@@ -1490,16 +1488,14 @@ const Mint = ({ address, t }: props) => {
                             onFocus={onFocusMint}
                             onBlur={onBlurMint}
                           />
-                          <InputGroup.Append>
-                            <Button
-                              id="btn-mint-tcap"
-                              className="neon-green"
-                              onClick={mintTCAP}
-                              disabled={btnDisabled}
-                            >
-                              {t("mint")}
-                            </Button>
-                          </InputGroup.Append>
+                          <Button
+                            id="btn-mint-tcap"
+                            className="neon-green"
+                            onClick={mintTCAP}
+                            disabled={btnDisabled}
+                          >
+                            <>{t("mint")}</>
+                          </Button>
                         </InputGroup>
                         <Form.Text className="text-muted">
                           <NumberFormat
@@ -1516,7 +1512,7 @@ const Mint = ({ address, t }: props) => {
                         <Form.Label>{t("vault.debt.burn")}</Form.Label>
                         <Form.Label className="max">
                           <a href="/" className="number orange" onClick={maxBurnTCAP}>
-                            {t("max")}
+                            <>{t("max")}</>
                           </a>
                         </Form.Label>
                         <InputGroup>
@@ -1529,15 +1525,9 @@ const Mint = ({ address, t }: props) => {
                             onFocus={onFocusBurn}
                             onBlur={onBlurBurn}
                           />
-                          <InputGroup.Append>
-                            <Button
-                              className="neon-orange"
-                              onClick={burnTCAP}
-                              disabled={btnDisabled}
-                            >
-                              {t("burn")}
-                            </Button>
-                          </InputGroup.Append>
+                          <Button className="neon-orange" onClick={burnTCAP} disabled={btnDisabled}>
+                            <>{t("burn")}</>
+                          </Button>
                         </InputGroup>
                         <Form.Text className="text-muted">
                           <NumberFormat
@@ -1550,7 +1540,7 @@ const Mint = ({ address, t }: props) => {
                           />
                         </Form.Text>
                         <Form.Text className="text-muted burn-fee">
-                          {t("vault.debt.fee")}:{" "}
+                          <>{t("vault.debt.fee")}: </>
                           <NumberFormat
                             className="number neon-pink"
                             value={burnFee}
