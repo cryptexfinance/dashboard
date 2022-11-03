@@ -13,12 +13,14 @@ import { ethers, BigNumber } from "ethers";
 import NumberFormat from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
-import NetworkContext from "../../state/NetworkContext";
-import OraclesContext from "../../state/OraclesContext";
-import TokensContext from "../../state/TokensContext";
-import VaultsContext from "../../state/VaultsContext";
-import HardVaultsContext from "../../state/HardVaultsContext";
-import SignerContext from "../../state/SignerContext";
+import {
+  hardVaultsContext,
+  networkContext,
+  oraclesContext,
+  signerContext,
+  tokensContext,
+  vaultsContext,
+} from "../../state";
 import "../../styles/mint.scss";
 import { ReactComponent as ETHIconSmall } from "../../assets/images/vault/eth.svg";
 import { ReactComponent as DAIIconSmall } from "../../assets/images/vault/dai.svg";
@@ -55,12 +57,12 @@ type props = {
 // TODO: Vault doesn't show if approve is 0 even if there is data in the vault
 
 const Mint = ({ address, t }: props) => {
-  const currentNetwork = useContext(NetworkContext);
-  const oracles = useContext(OraclesContext);
-  const tokens = useContext(TokensContext);
-  const vaults = useContext(VaultsContext);
-  const hardVaults = useContext(HardVaultsContext);
-  const signer = useContext(SignerContext);
+  const currentNetwork = useContext(networkContext);
+  const oracles = useContext(oraclesContext);
+  const tokens = useContext(tokensContext);
+  const vaults = useContext(vaultsContext);
+  const hardVaults = useContext(hardVaultsContext);
+  const signer = useContext(signerContext);
   const [vaultMode, setVaultMode] = useState(
     isInLayer1(currentNetwork.chainId) ? "hard" : "normal"
   );

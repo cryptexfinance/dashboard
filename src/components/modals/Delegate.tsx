@@ -3,9 +3,8 @@ import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
 import "../../styles/modal.scss";
-import governanceContext from "../../state/GovernanceContext";
+import { governanceContext, tokensContext } from "../../state";
 import { isValidAddress, errorNotification, notifyUser } from "../../utils/utils";
-import tokensContext from "../../state/TokensContext";
 
 type props = {
   show: boolean;

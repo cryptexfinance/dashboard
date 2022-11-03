@@ -5,9 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { useTranslation } from "react-i18next";
 import "../../styles/sewagefruit.scss";
 import Loading from "../Loading";
-import SignerContext from "../../state/SignerContext";
-import MushroomNftContext from "../../state/MushroomNftContext";
-import NetworkContext from "../../state/NetworkContext";
+import { mushroomNftContext, networkContext, signerContext } from "../../state";
 import { useMerkleTree } from "../../hooks/useMerkleTree";
 import { NETWORKS } from "../../utils/constants";
 import { errorNotification, isGoerli, notifyUser } from "../../utils/utils";
@@ -31,9 +29,9 @@ type UserStatusType = {
 const SewageFruit = () => {
   const { t } = useTranslation();
   // const { isInitialized, Moralis } = useMoralis();
-  const currentNetwork = useContext(NetworkContext);
-  const signer = useContext(SignerContext);
-  const mushroom = useContext(MushroomNftContext);
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
+  const mushroom = useContext(mushroomNftContext);
   const merkleTree = useMerkleTree(isGoerli(currentNetwork.chainId) ? whitelistGoerli : whitelist);
   const [signerAddress, setSignerAddress] = useState("");
   const [loading, setLoading] = useState(true);

@@ -12,8 +12,7 @@ import ethereumImg from "../../assets/images/Ethereum-ETH-icon.png";
 import discordImg from "../../assets/images/discord-icon.jpg";
 import twitterImg from "../../assets/images/twitter.svg";
 import tallyImg from "../../assets/images/tally.png";
-import SignerContext from "../../state/SignerContext";
-import GovernanceContext from "../../state/GovernanceContext";
+import { governanceContext, signerContext } from "../../state";
 import { VoteBadge, ProfileImage } from "./common";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { infoType } from "./data";
@@ -52,8 +51,8 @@ const ProfileCard = ({
   const [briefLength, setBriefLength] = useState(239);
   const [tokenOwnerStake, setTokenOwnerStake] = useState<{ stake: string; stakeRaw: string }>();
   const [withdrawTime, setWithdrawTime] = useState(0);
-  const signer = useContext(SignerContext);
-  const governance = useContext(GovernanceContext);
+  const signer = useContext(signerContext);
+  const governance = useContext(governanceContext);
   const mediaQuery = useMediaQuery("only screen and (max-height: 850px)");
 
   const etherscanUrl = () => {

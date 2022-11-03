@@ -7,7 +7,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useQuery, gql } from "@apollo/client";
-import VaultsContext from "../../../state/VaultsContext";
+import { vaultsContext } from "../../../state";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../../assets/images/graph/DAI.svg";
 
@@ -19,7 +19,7 @@ type props = {
 };
 
 const Rewards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
-  const vaults = useContext(VaultsContext);
+  const vaults = useContext(vaultsContext);
   const [ethDebt, setEthDebt] = useState("0.0");
   const [daiDebt, setDaiDebt] = useState("0.0");
 

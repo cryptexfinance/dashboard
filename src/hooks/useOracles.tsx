@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { OraclesContext } from "../state/OraclesContext";
+import { IOraclesContext } from "../state";
 
-export const useOracles = (): OraclesContext => {
+export const useOracles = (): IOraclesContext => {
   const [wethOracle, setETHOracle] = useState<ethers.Contract>();
   const [daiOracle, setDAIOracle] = useState<ethers.Contract>();
   const [wbtcOracle, setWBTCOracle] = useState<ethers.Contract>();

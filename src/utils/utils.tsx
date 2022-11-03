@@ -5,9 +5,7 @@ import { toast } from "react-toastify";
 import successImg from "../assets/images/noti-success.png";
 import errorImg from "../assets/images/noti-error.png";
 import { FEATURES, NETWORKS } from "./constants";
-import { OraclesContext } from "../state/OraclesContext";
-import { VaultsContext } from "../state/VaultsContext";
-import { HardVaultsContext } from "../state/HardVaultsContext";
+import { IHardVaultsContext, IOraclesContext, IVaultsContext } from "../state";
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -352,7 +350,7 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
   return provider;
 };
 
-export const validOracles = (chainId: number, oracles: OraclesContext): boolean => {
+export const validOracles = (chainId: number, oracles: IOraclesContext): boolean => {
   let valid = !isUndefined(oracles.daiOracleRead) && !isUndefined(oracles.tcapOracleRead);
 
   if (isInLayer1(chainId)) {
@@ -379,7 +377,7 @@ export const validOracles = (chainId: number, oracles: OraclesContext): boolean 
   return valid;
 };
 
-export const validVaults = (chainId: number, vaults: VaultsContext): boolean => {
+export const validVaults = (chainId: number, vaults: IVaultsContext): boolean => {
   let valid = !isUndefined(vaults.daiVaultRead);
 
   if (isInLayer1(chainId)) {
@@ -405,7 +403,7 @@ export const validVaults = (chainId: number, vaults: VaultsContext): boolean => 
   return valid;
 };
 
-export const validHardVaults = (chainId: number, hardVaults: HardVaultsContext): boolean => {
+export const validHardVaults = (chainId: number, hardVaults: IHardVaultsContext): boolean => {
   let valid = true;
   if (isInLayer1(chainId)) {
     valid =

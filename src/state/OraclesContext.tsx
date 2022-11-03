@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface OraclesContext {
+export interface IOraclesContext {
   wethOracle?: ethers.Contract;
   setCurrentWETHOracle: (currentOracle: ethers.Contract) => void;
   daiOracle?: ethers.Contract;
@@ -68,6 +68,4 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentUSDCOracleRead: () => {},
 };
 
-const oraclesContext = React.createContext<OraclesContext>(ORACLES_DEFAULT_VALUE);
-
-export default oraclesContext;
+export const oraclesContext = React.createContext<IOraclesContext>(ORACLES_DEFAULT_VALUE);

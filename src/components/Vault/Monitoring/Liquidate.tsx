@@ -9,12 +9,14 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
 import "../../../styles/modal.scss";
-import NetworkContext from "../../../state/NetworkContext";
-import SignerContext from "../../../state/SignerContext";
-import OracleContext from "../../../state/OraclesContext";
-import TokensContext from "../../../state/TokensContext";
-import VaultContext from "../../../state/VaultsContext";
-import HardVaultsContext from "../../../state/HardVaultsContext";
+import {
+  hardVaultsContext,
+  networkContext,
+  oraclesContext,
+  signerContext,
+  tokensContext,
+  vaultsContext,
+} from "../../../state";
 import { VaultsType } from "./types";
 import {
   errorNotification,
@@ -34,12 +36,12 @@ type props = {
 
 const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) => {
   const { t } = useTranslation();
-  const currentNetwork = useContext(NetworkContext);
-  const signer = useContext(SignerContext);
-  const oracles = useContext(OracleContext);
-  const vaults = useContext(VaultContext);
-  const hardVaults = useContext(HardVaultsContext);
-  const tokens = useContext(TokensContext);
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
+  const oracles = useContext(oraclesContext);
+  const vaults = useContext(vaultsContext);
+  const hardVaults = useContext(hardVaultsContext);
+  const tokens = useContext(tokensContext);
   const [currentVault, setCurrentVault] = useState<ethers.Contract>();
   const [tcapBalance, setTcapBalance] = useState("0");
   const [tcapPrice, setTcapPrice] = useState("0");

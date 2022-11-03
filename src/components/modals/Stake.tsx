@@ -4,7 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
 import { ethers, BigNumber } from "ethers";
 import { useTranslation } from "react-i18next";
-import SignerContext from "../../state/SignerContext";
+import { signerContext } from "../../state";
 import "../../styles/modal.scss";
 
 import { errorNotification, notifyUser } from "../../utils/utils";
@@ -23,7 +23,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
   const { t } = useTranslation();
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
-  const signer = useContext(SignerContext);
+  const signer = useContext(signerContext);
 
   // Infinite Approval
   const infiniteApproveValue = BigNumber.from("1157920892373161954235709850086879078532699");

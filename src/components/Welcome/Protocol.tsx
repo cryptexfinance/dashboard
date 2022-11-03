@@ -4,10 +4,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { BigNumber, ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
-import NetworkContext from "../../state/NetworkContext";
-import TokensContext from "../../state/TokensContext";
-import SignerContext from "../../state/SignerContext";
-import OraclesContext from "../../state/OraclesContext";
+import { networkContext, oraclesContext, signerContext, tokensContext } from "../../state";
 import { ReactComponent as StakeIcon } from "../../assets/images/graph/stake.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
@@ -36,10 +33,10 @@ type props = {
 
 const Protocol = ({ data }: props) => {
   const { t } = useTranslation();
-  const currentNetwork = useContext(NetworkContext);
-  const tokens = useContext(TokensContext);
-  const signer = useContext(SignerContext);
-  const oracles = useContext(OraclesContext);
+  const currentNetwork = useContext(networkContext);
+  const tokens = useContext(tokensContext);
+  const signer = useContext(signerContext);
+  const oracles = useContext(oraclesContext);
   const [ethStake, setETHStake] = useState("0");
   const [daiStake, setDAIStake] = useState("0");
   const [maticStake, setMATICStake] = useState("0");

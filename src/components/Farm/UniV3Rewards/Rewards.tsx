@@ -15,9 +15,7 @@ import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg
 import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
 import { ReactComponent as UNIIconSmall } from "../../../assets/images/vault/uni.svg";
-import NetworkContext from "../../../state/NetworkContext";
-import { SignerContext } from "../../../state/SignerContext";
-import TokensContext from "../../../state/TokensContext";
+import { ISignerContext, networkContext, tokensContext } from "../../../state";
 import { NETWORKS } from "../../../utils/constants";
 import { UNIV3, computeIncentiveId } from "../../../utils/univ3";
 import {
@@ -34,7 +32,7 @@ import Apr from "./Apr";
 
 type props = {
   ownerAddress: string;
-  signer: SignerContext;
+  signer: ISignerContext;
   stakerContract: ethers.Contract | undefined;
   stakerContractRead: Contract | undefined;
   nfpmContract: ethers.Contract | undefined;
@@ -56,8 +54,8 @@ const Rewards = ({
   poolContractRead,
 }: props) => {
   const { t } = useTranslation();
-  const tokens = useContext(TokensContext);
-  const currentNetwork = useContext(NetworkContext);
+  const tokens = useContext(tokensContext);
+  const currentNetwork = useContext(networkContext);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
   const [cumulativePrice, setCumulativePrice] = useState(0);

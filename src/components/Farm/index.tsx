@@ -8,12 +8,14 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
-import SignerContext from "../../state/SignerContext";
-import TokensContext from "../../state/TokensContext";
-import NetworkContext from "../../state/NetworkContext";
-import OraclesContext from "../../state/OraclesContext";
-import GovernanceContext from "../../state/GovernanceContext";
-import RewardsContext from "../../state/RewardsContext";
+import {
+  governanceContext,
+  networkContext,
+  oraclesContext,
+  rewardsContext,
+  signerContext,
+  tokensContext,
+} from "../../state";
 import UniV3Rewards from "./UniV3Rewards/index";
 import "../../styles/farm.scss";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
@@ -47,12 +49,12 @@ const Farm = () => {
   const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [updateData, setUpdateData] = useState(false);
-  const currentNetwork = useContext(NetworkContext);
-  const signer = useContext(SignerContext);
-  const tokens = useContext(TokensContext);
-  const oracles = useContext(OraclesContext);
-  const governance = useContext(GovernanceContext);
-  const rewards = useContext(RewardsContext);
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
+  const tokens = useContext(tokensContext);
+  const oracles = useContext(oraclesContext);
+  const governance = useContext(governanceContext);
+  const rewards = useContext(rewardsContext);
   // const [stakeShow, setStakeShow] = useState(false);
   // const [stakeBalance, setStakeBalance] = useState("0");
   // const [selectedPoolTitle, setSelectedPoolTitle] = useState("");

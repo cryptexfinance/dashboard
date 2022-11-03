@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { TokensContext } from "../state/TokensContext";
+import { ITokensContext } from "../state";
 
-export const useTokens = (): TokensContext => {
+export const useTokens = (): ITokensContext => {
   const [wethToken, setETHToken] = useState<ethers.Contract>();
   const [daiToken, setDAIToken] = useState<ethers.Contract>();
   const [wbtcToken, setWBTCToken] = useState<ethers.Contract>();

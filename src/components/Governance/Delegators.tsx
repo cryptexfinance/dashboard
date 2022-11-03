@@ -8,8 +8,7 @@ import KeeperForm from "./KeeperForm";
 import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
-import SignerContext from "../../state/SignerContext";
-import GovernanceContext from "../../state/GovernanceContext";
+import { governanceContext, signerContext } from "../../state";
 import { API_ENDPOINT, FEATURES } from "../../utils/constants";
 import { delegatorsInfo } from "./data";
 
@@ -39,8 +38,8 @@ const Delegators = ({ currentSignerAddress }: props) => {
   const [withdrawTimes, setWithdrawTimes] = useState<number[]>([]);
   const [updateData, setUpdateData] = useState(false);
   const [updateTimes, setUpdateTimes] = useState(false);
-  const signer = useContext(SignerContext);
-  const governance = useContext(GovernanceContext);
+  const signer = useContext(signerContext);
+  const governance = useContext(governanceContext);
 
   const DELEGATORS = gql`
     query DELEGATORS($currentSignerAddress: String!) {

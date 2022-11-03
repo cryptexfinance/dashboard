@@ -3,9 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 import NumberFormat from "react-number-format";
-import SignerContext from "../../../state/SignerContext";
-import OraclesContext from "../../../state/OraclesContext";
-import TokensContext from "../../../state/TokensContext";
+import { oraclesContext, signerContext, tokensContext } from "../../../state";
 import { getPriceInUSDFromPair } from "../../../utils/utils";
 import { computeIncentiveId } from "../../../utils/univ3";
 import { IncentiveType } from "./types";
@@ -16,9 +14,9 @@ type props = {
 };
 
 const Apr = ({ incentive, stakerContractRead }: props) => {
-  const signer = useContext(SignerContext);
-  const oracles = useContext(OraclesContext);
-  const tokens = useContext(TokensContext);
+  const signer = useContext(signerContext);
+  const oracles = useContext(oraclesContext);
+  const tokens = useContext(tokensContext);
   const [apr, setApr] = useState(0);
 
   const TVL = gql`

@@ -17,30 +17,25 @@ import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import WelcomeWrapper from "./components/Welcome/index";
 import { Vault, Monitoring } from "./components/Vault";
+import Vaults from "./components/Vaults";
 import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import Warnings from "./components/Warnings";
-import { useSigner } from "./hooks/useSigner";
-import { useNetworks } from "./hooks/useNetworks";
-import { useVaults } from "./hooks/useVaults";
-import { useHardVaults } from "./hooks/useHardVaults";
-import { useTokens } from "./hooks/useTokens";
-import { useOracles } from "./hooks/useOracles";
-import { useGovernance } from "./hooks/useGovernance";
-import { useRewards } from "./hooks/useRewards";
-import { useMushroomNft } from "./hooks/useMushroomNft";
-import signerContext from "./state/SignerContext";
-import NetworkContext from "./state/NetworkContext";
-import vaultsContext from "./state/VaultsContext";
-import hardVaultsContext from "./state/HardVaultsContext";
-import tokensContext from "./state/TokensContext";
-import oraclesContext from "./state/OraclesContext";
-import governanceContext from "./state/GovernanceContext";
-import rewardsContext from "./state/RewardsContext";
-import mushroomNftContext from "./state/MushroomNftContext";
-import { Web3ModalContext } from "./state/Web3ModalContext";
+import * as hooks from "./hooks";
+import {
+  governanceContext,
+  hardVaultsContext,
+  mushroomNftContext,
+  networkContext,
+  oraclesContext,
+  rewardsContext,
+  signerContext,
+  tokensContext,
+  vaultsContext,
+  Web3ModalContext,
+} from "./state";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
@@ -64,7 +59,7 @@ const clientOracle = (graphqlEndpoint: string) =>
   });
 
 const App = () => {
-  const signer = useSigner();
+  const signer = hooks.useSigner();
   const web3Modal = useContext(Web3ModalContext);
   const [isLoadingContracts, setLoadingContracts] = useState(false);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
@@ -75,15 +70,15 @@ const App = () => {
       process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
     )
   );
-  const networks = useNetworks();
+  const networks = hooks.useNetworks();
   const [currentSignerAddress, setCurrentSignerAddress] = useState("");
-  const vaults = useVaults();
-  const hardVaults = useHardVaults();
-  const tokens = useTokens();
-  const oracles = useOracles();
-  const governance = useGovernance();
-  const rewards = useRewards();
-  const mushroomNft = useMushroomNft();
+  const vaults = hooks.useVaults();
+  const hardVaults = hooks.useHardVaults();
+  const tokens = hooks.useTokens();
+  const oracles = hooks.useOracles();
+  const governance = hooks.useGovernance();
+  const rewards = hooks.useRewards();
+  const mushroomNft = hooks.useMushroomNft();
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
@@ -910,7 +905,7 @@ const App = () => {
 
   return (
     <signerContext.Provider value={signer}>
-      <NetworkContext.Provider value={networks}>
+      <networkContext.Provider value={networks}>
         <tokensContext.Provider value={tokens}>
           <oraclesContext.Provider value={oracles}>
             <vaultsContext.Provider value={vaults}>
@@ -947,6 +942,9 @@ const App = () => {
                               <Route path={`${match.url}vault`}>
                                 <Vault />
                               </Route>
+                              <Route path={`${match.url}vaults`}>
+                                <Vaults />
+                              </Route>
                               <Route path={`${match.url}vault-monitoring`}>
                                 <Monitoring />
                               </Route>
@@ -967,7 +965,7 @@ const App = () => {
             </vaultsContext.Provider>
           </oraclesContext.Provider>
         </tokensContext.Provider>
-      </NetworkContext.Provider>
+      </networkContext.Provider>
     </signerContext.Provider>
   );
 };

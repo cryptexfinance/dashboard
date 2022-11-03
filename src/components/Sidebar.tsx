@@ -4,7 +4,7 @@ import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import NetworkContext from "../state/NetworkContext";
+import { networkContext } from "../state";
 import { isInLayer1 } from "../utils/utils";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
@@ -22,7 +22,7 @@ type props = {
 };
 
 const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
-  const currentNetwork = useContext(NetworkContext);
+  const currentNetwork = useContext(networkContext);
   const location = useLocation();
   let activeVal = "dashboard";
   switch (location.pathname) {

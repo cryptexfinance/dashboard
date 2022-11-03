@@ -9,10 +9,7 @@ import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
-import SignerContext from "../state/SignerContext";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import TokensContext from "../state/TokensContext";
-import NetworkContext from "../state/NetworkContext";
+import { networkContext, signerContext, tokensContext, Web3ModalContext } from "../state";
 import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
 import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
@@ -31,9 +28,9 @@ type props = {
 const Header = ({ signerAddress, isMobile }: props) => {
   const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
-  const signer = useContext(SignerContext);
-  const tokens = useContext(TokensContext);
-  const currentNetwork = useContext(NetworkContext);
+  const signer = useContext(signerContext);
+  const tokens = useContext(tokensContext);
+  const currentNetwork = useContext(networkContext);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");

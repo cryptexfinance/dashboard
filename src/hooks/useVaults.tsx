@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { VaultsContext } from "../state/VaultsContext";
+import { IVaultsContext } from "../state";
 
-export const useVaults = (): VaultsContext => {
+export const useVaults = (): IVaultsContext => {
   const [wethVault, setWETHVault] = useState<ethers.Contract>();
   const [daiVault, setDAIVault] = useState<ethers.Contract>();
   const [wbtcVault, setWBTCVault] = useState<ethers.Contract>();

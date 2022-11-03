@@ -3,8 +3,7 @@ import { Button } from "react-bootstrap";
 import { ethers } from "ethers";
 import Table from "react-bootstrap/esm/Table";
 import NumberFormat from "react-number-format";
-import GovernanceContext from "../../state/GovernanceContext";
-import SignerContext from "../../state/SignerContext";
+import { governanceContext, signerContext } from "../../state";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
 const sixMonthCtxRewardAmount = 12654;
@@ -18,8 +17,8 @@ type props = {
 };
 
 const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: props) => {
-  const signer = useContext(SignerContext);
-  const governance = useContext(GovernanceContext);
+  const signer = useContext(signerContext);
+  const governance = useContext(governanceContext);
   const [totalStaked, setTotalStaked] = useState("0.0");
   const [stake, setStake] = useState("0.0");
   const [rewards, setRewards] = useState("0.0");

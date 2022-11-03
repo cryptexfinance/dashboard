@@ -2,7 +2,7 @@ import React from "react";
 import { Contract } from "ethers-multicall";
 import { ethers } from "ethers";
 
-export interface TokensContext {
+export interface ITokensContext {
   wethToken?: ethers.Contract;
   setCurrentWETHToken: (currentToken: ethers.Contract) => void;
   daiToken?: ethers.Contract;
@@ -98,6 +98,4 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentCTXPoolTokenRead: () => {},
 };
 
-const tokensContext = React.createContext<TokensContext>(TOKENS_DEFAULT_VALUE);
-
-export default tokensContext;
+export const tokensContext = React.createContext<ITokensContext>(TOKENS_DEFAULT_VALUE);

@@ -14,11 +14,13 @@ import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import "../../../styles/vault-monitoring.scss";
 import { useQuery, gql } from "@apollo/client";
 import { useLocation } from "react-router-dom";
-import NetworkContext from "../../../state/NetworkContext";
-import OraclesContext from "../../../state/OraclesContext";
-import SignerContext from "../../../state/SignerContext";
-import vaultsContext from "../../../state/VaultsContext";
-import hardVaultsContext from "../../../state/HardVaultsContext";
+import {
+  hardVaultsContext,
+  networkContext,
+  oraclesContext,
+  signerContext,
+  vaultsContext,
+} from "../../../state";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import {
   getRatio2,
@@ -74,11 +76,11 @@ const showAllVaults = true;
 
 export const Monitoring = () => {
   const { t } = useTranslation();
-  const currentNetwork = useContext(NetworkContext);
-  const oracles = useContext(OraclesContext);
+  const currentNetwork = useContext(networkContext);
+  const oracles = useContext(oraclesContext);
   const vaults = useContext(vaultsContext);
   const hardVaults = useContext(hardVaultsContext);
-  const signer = useContext(SignerContext);
+  const signer = useContext(signerContext);
   const { state } = useLocation();
   const [skipQuery, setSkipQuery] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");

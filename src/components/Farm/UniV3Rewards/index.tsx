@@ -5,8 +5,7 @@ import { Contract } from "ethers-multicall";
 import UniswapV3Staker from "../../../contracts/UniswapV3Staker.json";
 import NonfungiblePositionManager from "../../../contracts/NonfungiblePositionManager.json";
 import UniV3Pool from "../../../contracts/UniV3Pool.json";
-import NetworkContext from "../../../state/NetworkContext";
-import { SignerContext } from "../../../state/SignerContext";
+import { networkContext, ISignerContext } from "../../../state";
 import { NETWORKS } from "../../../utils/constants";
 import { GRAPHQL_UNIV3_ENDPOINT, UNIV3 } from "../../../utils/univ3";
 import { toFragment } from "../../../utils/utils";
@@ -20,11 +19,11 @@ const clientOracle = (graphqlEndpoint: string) =>
   });
 
 type props = {
-  signer: SignerContext;
+  signer: ISignerContext;
 };
 
 const UniV3Rewards = ({ signer }: props) => {
-  const currentNetwork = useContext(NetworkContext);
+  const currentNetwork = useContext(networkContext);
   const [ownerAddress, setOwnerAddress] = useState("");
   const [stakerContract, setStakerContract] = useState<ethers.Contract | undefined>();
   const [stakerContractRead, setStakerContractRead] = useState<Contract | undefined>();

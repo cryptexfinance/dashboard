@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-import NetworkContext from "../../../state/NetworkContext";
+import { networkContext } from "../../../state";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "../../../utils/constants";
 import Rewards from "./Rewards";
 
@@ -18,7 +18,7 @@ type props = {
 };
 
 const MintingRerwards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
-  const currentNetwork = useContext(NetworkContext);
+  const currentNetwork = useContext(networkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
       process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby

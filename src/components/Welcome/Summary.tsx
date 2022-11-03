@@ -10,11 +10,13 @@ import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
-import NetworkContext from "../../state/NetworkContext";
-import SignerContext from "../../state/SignerContext";
-import TokensContext from "../../state/TokensContext";
-import OraclesContext from "../../state/OraclesContext";
-import { Web3ModalContext } from "../../state/Web3ModalContext";
+import {
+  networkContext,
+  oraclesContext,
+  signerContext,
+  tokensContext,
+  Web3ModalContext,
+} from "../../state";
 import { makeShortAddress, getPriceInUSDFromPair, getENS, isInLayer1 } from "../../utils/utils";
 import "../../styles/summary.scss";
 import Protocol from "./Protocol";
@@ -40,11 +42,11 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
   const [ctxUSDBalance, setCtxUSDBalance] = useState("0.0");
   const [ctxBalance, setCtxBalance] = useState("0.0");
   const [isLoading, setIsLoading] = useState(true);
-  const currentNetwork = useContext(NetworkContext);
-  const signer = useContext(SignerContext);
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
   const web3Modal = useContext(Web3ModalContext);
-  const tokens = useContext(TokensContext);
-  const oracles = useContext(OraclesContext);
+  const tokens = useContext(tokensContext);
+  const oracles = useContext(oraclesContext);
 
   const VAULTS_STATE = gql`
     {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { IMushroomNftContext } from "../state/MushroomNftContext";
+import { IMushroomNftContext } from "../state";
 
 export const useMushroomNft = (): IMushroomNftContext => {
   const [mushroomNft, setMushroomNft] = useState<ethers.Contract>();

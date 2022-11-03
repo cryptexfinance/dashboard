@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import Button from "react-bootstrap/esm/Button";
 import { useTranslation } from "react-i18next";
-import { Web3ModalContext } from "../../state/Web3ModalContext";
-import SignerContext from "../../state/SignerContext";
+import { signerContext, Web3ModalContext } from "../../state";
 import "../../styles/mint.scss";
 
 import Loading from "../Loading";
@@ -11,7 +10,7 @@ import Mint from "./Mint";
 export const Vault = () => {
   const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
-  const signer = useContext(SignerContext);
+  const signer = useContext(signerContext);
 
   // State
   const [isLoading, setIsLoading] = useState(true);
