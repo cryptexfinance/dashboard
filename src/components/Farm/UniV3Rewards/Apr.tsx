@@ -23,7 +23,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
 
   const TVL = gql`
     query aprs {
-      apr(id: "1") {
+      apr(id: "2") {
         id
         totalAmount0
         totalAmount1
