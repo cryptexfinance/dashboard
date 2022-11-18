@@ -28,7 +28,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
         totalAmount0
         totalAmount1
       }
-      positions(where: { staked: true, stakedBlockNumber_gt: 15361736 }) {
+      positions(where: { staked: true, stakedBlockNumber_gt: 15998870 }) {
         id
       }
     }
