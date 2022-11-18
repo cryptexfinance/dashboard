@@ -108,9 +108,13 @@ export const usePrices = (): OraclePricesType => {
     }
   };
 
-  useEffect(() => {
-    loadPrices();
-  });
+  useEffect(
+    () => {
+      loadPrices();
+    },
+    // eslint-disable-next-line
+    []
+  );
 
   return oraclePrices;
 };

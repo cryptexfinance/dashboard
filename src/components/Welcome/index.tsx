@@ -31,6 +31,12 @@ const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
       case NETWORKS.rinkeby.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
         break;
+      case NETWORKS.arbitrum.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum_goerli));
+        break;
       case NETWORKS.optimism.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
         break;

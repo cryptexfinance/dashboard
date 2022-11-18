@@ -45,6 +45,22 @@ export const NETWORKS = {
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
     ),
   },
+  arbitrum: {
+    chainId: 42161,
+    hexChainId: "0xA4B1",
+    name: "Arbitrum One",
+    eth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    weth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    dai: "0x17aC26AB292660126d2baF16e5304DcbEc54340C",
+  },
+  arbitrum_goerli: {
+    chainId: 421613,
+    hexChainId: "0x66EED",
+    name: "Arbitrum Goerli",
+    eth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    weth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    dai: "0x17aC26AB292660126d2baF16e5304DcbEc54340C",
+  },
   optimism: {
     chainId: 10,
     hexChainId: "0xA",
@@ -91,6 +107,8 @@ export const API_ENDPOINT = "https://api.cryptex.finance";
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
   rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
+  arbitrum_goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",

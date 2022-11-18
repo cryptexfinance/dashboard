@@ -13,7 +13,7 @@ import { PaginationType, VaultsType } from "./types";
 import { numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
-  CollateralIcon,
+  TokenIcon,
   sortCollateralDesc,
   sortCollateralAsc,
   sortCollateralUsdDesc,
@@ -258,7 +258,7 @@ export const Vaults = ({
                   >
                     <div className="collateral">
                       <span className="number">{numberFormatStr(v.collateralValue, 4, 4)}</span>
-                      <CollateralIcon name={v.collateralSymbol.toLowerCase()} />
+                      <TokenIcon name={v.collateralSymbol.toLowerCase()} />
                     </div>
                   </OverlayTrigger>
                 </td>

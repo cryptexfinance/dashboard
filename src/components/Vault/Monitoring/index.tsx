@@ -44,7 +44,7 @@ import {
   VaultsType,
   VaultsTotalsType,
 } from "./types";
-import { capitalize, CollateralIcon, VAULT_STATUS } from "./common";
+import { capitalize, TokenIcon, VAULT_STATUS } from "./common";
 
 const pagDefault = {
   previous: 0,
@@ -1021,7 +1021,7 @@ export const Monitoring = () => {
                         className="text-left"
                       >
                         <div className="collateral-toggle">
-                          <CollateralIcon name={tokenSymbol} />
+                          <TokenIcon name={tokenSymbol} />
                           <span>{tokenSymbol.toUpperCase()}</span>
                         </div>
                       </Dropdown.Toggle>

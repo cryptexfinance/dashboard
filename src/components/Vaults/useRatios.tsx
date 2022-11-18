@@ -107,9 +107,13 @@ export const useRatios = (): VaultsRatioType => {
     }
   };
 
-  useEffect(() => {
-    loadRatios();
-  });
+  useEffect(
+    () => {
+      loadRatios();
+    },
+    // eslint-disable-next-line
+    []
+  );
 
   return vaultsRatio;
 };

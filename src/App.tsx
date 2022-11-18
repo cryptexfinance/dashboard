@@ -47,6 +47,7 @@ import {
   isValidNetwork,
   getDefaultProvider,
   toFragment,
+  isArbitrum,
   isOptimism,
   isGoerli,
 } from "./utils/utils";
@@ -82,6 +83,10 @@ const App = () => {
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
+  setMulticallAddress(
+    NETWORKS.arbitrum_goerli.chainId,
+    "0x108B25170319f38DbED14cA9716C54E5D1FF4623"
+  );
 
   const setCurrentNetwork = (networkId: number, walletName: string, isBrowserWallet: boolean) => {
     let cNetwork;
@@ -94,11 +99,19 @@ const App = () => {
         cNetwork = NETWORKS.rinkeby;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
         break;
-      case 10:
+      case NETWORKS.arbitrum.chainId:
+        cNetwork = NETWORKS.arbitrum;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        cNetwork = NETWORKS.arbitrum_goerli;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum_goerli));
+        break;
+      case NETWORKS.optimism.chainId:
         cNetwork = NETWORKS.optimism;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
         break;
-      case 69:
+      case NETWORKS.okovan.chainId:
         cNetwork = NETWORKS.okovan;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
         break;
@@ -428,6 +441,113 @@ const App = () => {
     }
   };
 
+  const setArbitrumContracts = async (
+    chainId: number,
+    currentSigner: ethers.Signer,
+    ethcallProvider: Provider
+  ) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
+    let contracts;
+    let wethAddress;
+    let daiAddress;
+
+    switch (chainId) {
+      case NETWORKS.arbitrum.chainId:
+        contracts = cryptexJson[42161].mainnet.contracts;
+        wethAddress = NETWORKS.arbitrum.weth;
+        daiAddress = NETWORKS.arbitrum.dai;
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        contracts = cryptexJson[421613].arbitrum_goerli.contracts;
+        wethAddress = NETWORKS.arbitrum_goerli.weth;
+        daiAddress = NETWORKS.arbitrum_goerli.dai;
+        break;
+      default:
+        contracts = cryptexJson[42161].arbitrum.contracts;
+        wethAddress = NETWORKS.arbitrum.weth;
+        daiAddress = NETWORKS.arbitrum.dai;
+        break;
+    }
+
+    // Set Vaults
+    const currentWETHVault = new ethers.Contract(
+      contracts.WETHVaultHandler.address,
+      contracts.WETHVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentWETHVault(currentWETHVault);
+    const currentDAIVault = new ethers.Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentDAIVault(currentDAIVault);
+
+    const currentWETHVaultRead = new Contract(
+      contracts.WETHVaultHandler.address,
+      toFragment(contracts.WETHVaultHandler.abi)
+    );
+    vaults.setCurrentWETHVaultRead(currentWETHVaultRead);
+    const currentDAIVaultRead = new Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi
+    );
+    vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
+
+    // Set Tokens
+    const currentWETHToken = new ethers.Contract(wethAddress, ERC20.abi, currentSigner);
+    tokens.setCurrentWETHToken(currentWETHToken);
+    const currentDAIToken = new ethers.Contract(daiAddress, WETH.abi, currentSigner);
+    tokens.setCurrentDAIToken(currentDAIToken);
+    const currentTCAPToken = new ethers.Contract(
+      contracts.TCAP.address,
+      contracts.TCAP.abi,
+      currentSigner
+    );
+    tokens.setCurrentTCAPToken(currentTCAPToken);
+
+    const currentWETHTokenRead = new Contract(wethAddress, ERC20.abi);
+    tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
+    const currentDAITokenRead = new Contract(daiAddress, WETH.abi);
+    tokens.setCurrentDAITokenRead(currentDAITokenRead);
+    const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
+    tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
+
+    // Set Oracles
+    const currentWETHOracle = new ethers.Contract(
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentWETHOracle(currentWETHOracle);
+    const currentDAIOracle = new ethers.Contract(
+      contracts.DAIOracle.address,
+      contracts.DAIOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentDAIOracle(currentDAIOracle);
+    const currentTCAPOracle = new ethers.Contract(
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentTCAPOracle(currentTCAPOracle);
+
+    const currentWETHOracleRead = new Contract(
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi
+    );
+    oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
+    const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
+    oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
+    const currentTCAPOracleRead = new Contract(
+      contracts.TCAPOracle.address,
+      contracts.TCAPOracle.abi
+    );
+    oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
+  };
+
   const setOptimismContracts = async (currentSigner: ethers.Signer) => {
     const contracts = cryptexJson[10].optimism.contracts;
 
@@ -653,7 +773,7 @@ const App = () => {
         daiAddress = NETWORKS.rinkeby.dai;
         linkAddress = contracts.LINK.address;
         break;
-      case 10:
+      case NETWORKS.optimism.chainId:
         contracts = cryptexJson[10].optimism.contracts;
         wethAddress = NETWORKS.optimism.weth;
         daiAddress = NETWORKS.optimism.dai;
@@ -799,7 +919,9 @@ const App = () => {
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
 
-    if (isPolygon(network.chainId)) {
+    if (isArbitrum(network.chainId)) {
+      await setArbitrumContracts(network.chainId, currentSigner, ethcallProvider);
+    } else if (isPolygon(network.chainId)) {
       await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
     } else if (isGoerli(network.chainId)) {
       await setGoerliContracts(currentSigner, ethcallProvider);
@@ -852,7 +974,9 @@ const App = () => {
         const provider = getDefaultProvider(parseInt(chainId), networkName);
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
-        if (isPolygon(parseInt(chainId))) {
+        if (isArbitrum(parseInt(chainId))) {
+          setArbitrumContracts(parseInt(chainId), randomSigner, ethcallProvider);
+        } else if (isPolygon(parseInt(chainId))) {
           setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
         } else if (isGoerli(parseInt(chainId))) {
           setGoerliContracts(randomSigner, ethcallProvider);

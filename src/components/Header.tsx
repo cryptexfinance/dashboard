@@ -10,7 +10,14 @@ import { ethers } from "ethers";
 import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
 import { networkContext, signerContext, tokensContext, Web3ModalContext } from "../state";
-import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
+import {
+  makeShortAddress,
+  getENS,
+  isInLayer1,
+  isOptimism,
+  isPolygon,
+  isArbitrum,
+} from "../utils/utils";
 import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
@@ -162,32 +169,31 @@ const Header = ({ signerAddress, isMobile }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
-  /* const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setLanguage(lng.toUpperCase());
-    localStorage.setItem("language", lng);
-  }; */
-
-  /* const handleOnSelect = (eventKey: any, event: Object) => {
-    console.log(event);
-    changeLanguage(eventKey);
-  }; */
-
-  /* const LangDropDown = ({ className }: propsDD) => (
-    <Dropdown onSelect={handleOnSelect} className={className}>
-      <Dropdown.Toggle variant="success" id="dropdown-basic">
-        {language}
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Item eventKey="en">English</Dropdown.Item>
-        <Dropdown.Item eventKey="fr">French</Dropdown.Item>
-        <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  ); */
-
   const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
+
+  const ArbitrumToggle = () => {
+    <>
+      <OPTIMISMIcon className="optimism" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "Goerli"}</h6>
+    </>;
+  };
+
+  const ArbitrumOpt = () => (
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.arbitrum.chainId
+          : NETWORKS.arbitrum_goerli.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.arbitrum.hexChainId
+          : NETWORKS.arbitrum_goerli.hexChainId
+      }
+    >
+      <>{ArbitrumToggle()}</>
+    </Dropdown.Item>
+  );
 
   const EthereumToggle = () => (
     <>
@@ -281,14 +287,18 @@ const Header = ({ signerAddress, isMobile }: props) => {
                   style={{ width: 200 }}
                 >
                   <div className="network-toggle">
-                    {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
-                    {isOptimism(currentNetwork.chainId) && OptimismToggle()}
-                    {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                    <>
+                      {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
+                      {isOptimism(currentNetwork.chainId) && OptimismToggle()}
+                      {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                      {isArbitrum(currentNetwork.chainId) && ArbitrumToggle()}
+                    </>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {EthereumOpt()}
                   {OptimismOpt()}
+                  {ArbitrumOpt()}
                   {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>

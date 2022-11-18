@@ -18,6 +18,7 @@ import { ReactComponent as WBTCIcon } from "../../assets/images/graph/wbtc.svg";
 import { ReactComponent as USDCIcon } from "../../assets/images/graph/usdc.svg";
 import cryptexJson from "../../contracts/cryptex.json";
 import {
+  isArbitrum,
   isInLayer1,
   isOptimism,
   isPolygon,
@@ -98,6 +99,11 @@ const Protocol = ({ data }: props) => {
           const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
           ethcalls.push(wbtcOraclePriceCall);
         }
+        if (isArbitrum(currentNetwork.chainId)) {
+          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+          ethcalls.push(wethOraclePriceCall);
+        }
+
         let daiOraclePrice;
         let currentTotalSupply;
         let wethOraclePrice;
@@ -119,6 +125,12 @@ const Protocol = ({ data }: props) => {
             wbtcOraclePrice,
             usdcOraclePrice,
           ] = await signer.ethcallProvider?.all(ethcalls);
+        } else if (isArbitrum(currentNetwork.chainId)) {
+          console.log("Entra aqui");
+          // @ts-ignore
+          [daiOraclePrice, currentTotalSupply, wethOraclePrice] = await signer.ethcallProvider?.all(
+            ethcalls
+          );
         } else if (isOptimism(currentNetwork.chainId)) {
           // @ts-ignore
           [
@@ -135,6 +147,10 @@ const Protocol = ({ data }: props) => {
             ethcalls
           );
         }
+
+        console.log("DAI: ", daiOraclePrice.toString());
+        console.log("wethOraclePrice: ", wethOraclePrice.toString());
+        console.log("currentTotalSupply: ", currentTotalSupply.toString());
 
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
@@ -165,6 +181,12 @@ const Protocol = ({ data }: props) => {
           case NETWORKS.polygon.chainId:
             contracts = cryptexJson[137].polygon.contracts;
             break;
+          case NETWORKS.arbitrum.chainId:
+            contracts = cryptexJson[42161].arbitrum.contracts;
+            break;
+          case NETWORKS.arbitrum_goerli.chainId:
+            contracts = cryptexJson[421613].arbitrum_goerli.contracts;
+            break;
           case NETWORKS.mumbai.chainId:
             contracts = cryptexJson[80001].mumbai.contracts;
             break;
@@ -172,6 +194,7 @@ const Protocol = ({ data }: props) => {
             contracts = cryptexJson[4].rinkeby.contracts;
             break;
         }
+
         await data.states.forEach((s: any) => {
           const cAddress = s.id.toLowerCase();
           // @ts-ignore
@@ -238,6 +261,15 @@ const Protocol = ({ data }: props) => {
               currentUNIStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
             }
           }
+
+          if (isArbitrum(currentNetwork.chainId)) {
+            // @ts-ignore
+            if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
+              currentWETHStake = currentWETHStake.add(
+                s.amountStaked ? s.amountStaked : BigNumber.from(0)
+              );
+            }
+          }
         });
 
         const formatDAI = ethers.utils.formatEther(currentDAIStake);
@@ -274,6 +306,9 @@ const Protocol = ({ data }: props) => {
           linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
           wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
           usdcUSD = ethers.utils.formatEther(usdcOraclePrice.mul(10000000000));
+        }
+        if (isArbitrum(currentNetwork.chainId)) {
+          ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
         }
         if (isOptimism(currentNetwork.chainId)) {
           ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));

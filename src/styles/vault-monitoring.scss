@@ -151,13 +151,16 @@
       .btn-group {
         border: 1px solid #dfd1ea;
         border-radius: 5px;
+        padding-left: 1px;
         margin-bottom: 0rem !important;
         .btn-secondary {
           margin-bottom: 0rem;
           font-size: 0.8rem;
           background-color: #281e31;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
         }
-        .btn-secondary.active {
+        .btn-check:checked + .btn {
           background-color: $neon-highlight;
         }
       }
@@ -337,6 +340,9 @@
         color: $off-white;
         background-color: $darker;
         border: 1px solid $highlight;
+        .visually-hidden {
+          display: none;
+        }
       }
       .page-link:hover {
         background-color: $primary;  
@@ -385,6 +391,17 @@
   .card-body {
     padding: 1.25rem 0rem;
   }
+
+  .btn-update-vault {
+    background-color: transparent;
+    border: none;
+    span {
+      font-size: 1rem;
+      font-family: "Space Mono";
+      text-decoration: underline;
+    }
+  }
+
   @media (max-width: 800px) {
     .row {
       display: flex;

@@ -273,12 +273,14 @@ export const isValidNetwork = (chainId: number) => {
   if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
+      chainId === NETWORKS.arbitrum.chainId ||
       (FEATURES.OPTIMISM && chainId === NETWORKS.optimism.chainId) ||
       (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
     );
   }
   return (
     chainId === NETWORKS.rinkeby.chainId ||
+    chainId === NETWORKS.arbitrum_goerli.chainId ||
     (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
     (FEATURES.POLYGON && chainId === NETWORKS.mumbai.chainId)
   );
@@ -291,6 +293,13 @@ export const isInLayer1 = (chainId: number | undefined) => {
       chainId === NETWORKS.rinkeby.chainId ||
       chainId === NETWORKS.goerli.chainId
     );
+  }
+  return false;
+};
+
+export const isArbitrum = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.arbitrum.chainId || chainId === NETWORKS.arbitrum_goerli.chainId;
   }
   return false;
 };

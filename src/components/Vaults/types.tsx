@@ -63,6 +63,13 @@ export type VaultsTotalsType = {
   debtUSD: string;
 };
 
+export type VaultToUpdateType = {
+  vaultId: string;
+  assetSymbol: string;
+  collateralSymbol: string;
+  isHardVault: boolean;
+}
+
 export type DropdownItemType = {
   key: string;
   name: string;
