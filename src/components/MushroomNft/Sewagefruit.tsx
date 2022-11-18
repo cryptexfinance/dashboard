@@ -360,7 +360,7 @@ const SewageFruit = () => {
                 Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
                 eligible, public mint will be available on {mintPeriodEnd.toLocaleDateString()}.
               </p>
-            )}            
+            )}
           </Card.Body>
         </Card>
       </div>
