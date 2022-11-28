@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Monitoring from "./monitoring";
+import Vault from "./vault";
 import Vault2 from "./vault/Vault2";
 import { signerContext } from "../../state";
 import { VaultToUpdateType } from "./types";
@@ -43,15 +44,17 @@ const Vaults = () => {
     return (
       <Vault2
         currentAddress={currentAddress}
-        vaultId={currrentVault.vaultId}
-        assetSymbol={currrentVault.assetSymbol}
-        collateralSymbol={currrentVault.collateralSymbol}
-        isHardVault={currrentVault.isHardVault}
+        vaultInitData={currrentVault}
+        goBack={() => setMinting(false)}
       />
     );
   }
 
-  return <Monitoring setVaultToUpdate={setVaultToUpdate} />;
+  return (
+    <>
+      <Monitoring setVaultToUpdate={setVaultToUpdate} />
+    </>
+  );
 };
 
 export default Vaults;

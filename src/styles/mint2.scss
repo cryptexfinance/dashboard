@@ -1,0 +1,543 @@
+@import "./colors";
+@import "./fonts";
+
+.vault2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 0px;
+
+  .alert-warning {
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 1rem;
+    height: 2rem;
+    width: 70%;
+  }
+
+  .btn:active {
+    background-color: transparent;
+  }
+
+  .vault-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4rem;
+    width: 30%;
+    background-color: $darker;
+  }
+
+  .vault {
+
+    &-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      height: 4rem;
+      padding: 1.5rem 0.8rem;
+      background-color: $darker;
+      border-bottom: 0.5px solid $dark;
+      .header-col1 {
+        display: flex;
+        align-items: center;
+      }
+      .go-back {
+        // background-color: transparent;
+        border: none;
+      }
+      svg {
+        color: white;
+      }
+    }
+
+    &-select {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    &-controls {
+      background-color: $darker;
+      margin-bottom: 1rem;
+      padding: 0rem;
+
+      label {
+        font-family: "Nineteen Ninety Seven";
+        color: $white;
+      }
+
+      .text-muted {
+        position: absolute;
+        text-align: left;
+        font-size: .85rem;
+        margin-top: -1.7rem;
+        padding-left: 1rem;
+      }
+
+      .input-group {
+        background-color: #281e31;
+        border: 1px solid $dark;
+        border-radius: 5px;
+
+        input[type="number"] {
+          font-size: 1rem;
+          padding-bottom: 1.8rem;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          border-color: transparent;
+          color: $white;
+          height: 3.7rem;
+        }
+
+        .btn {
+          background-color: $darker;
+          width: 7.5rem;
+          height: 3.7rem;
+          border-top-right-radius: 5px;
+          border-bottom-right-radius: 5px;
+        }
+      }
+
+      .burn-fee.text-muted {
+        position: relative;
+        text-align: right;
+        font-size: 1rem;
+        margin-top: .5rem;
+        margin-right: .2rem;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        font-size: .8rem;
+        color: #f5f5f5 !important;
+      }      
+    }
+
+    &-actios-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1rem;
+      padding: 2rem;
+      background-color: $darker;
+    }
+  }
+
+  .dd-collateral {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+
+    h6 {
+      color: $white;
+      margin: 0px;
+      font-size: 0.9rem;
+    }
+
+    .balance-container {
+      display: flex;
+      align-items: center;
+      margin: 0rem 1rem;
+      color: $light;
+
+      .number {
+        margin-bottom: 0rem;
+        color: $light;
+      }
+    }
+
+    .dropdown {
+      margin-top: 0.5rem;
+
+      .btn {
+        margin-top: 0rem;
+      }
+
+      .dropdown-toggle {
+        svg {
+          height: 23px;
+          margin-right: 5px;
+        }
+        .tcap {
+          width: 30px;
+        }
+      }
+
+      .dropdown-toggle:active {
+        background-color: $darkest;
+      }
+
+      .dropdown-menu {
+        width: 85%;
+        margin-top: 3px !important;
+        margin-right: 1rem;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.3rem 1.2rem;
+        svg {
+          margin-right: 10px;
+          width: 25px;
+        }
+        .eth {
+          width: 15px;
+          margin-left: 5px;
+          margin-right: 15px;
+        }
+        .dai {
+          width: 25px;
+        }
+        .usdc {
+          width: 25px;
+        }
+        .wbtc {
+          width: 25px;
+        }
+      }
+    }
+  }
+
+  .vault-actions {
+    margin-top: 2rem;
+    background-color: $darker;
+
+    .btn-max {
+      display: flex;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid $green;
+      border-radius: 20px;
+      background-color: $darkest;
+      font-size: 0.7rem;
+      color: $green;
+
+      &.orange {
+        border: 1px solid $orange;
+        color: $orange; 
+      }
+    }
+
+    .actions-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+
+      .choices {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .burn-fee {
+        display: flex;
+        align-self: end;
+        margin-right: 0.4rem;
+
+        span {
+          color: $off-white;
+          font-size: 0.85rem;
+        }
+
+        .number {
+          color: $white;
+          padding: 0rem 0.3rem;
+        }
+      }
+    }
+
+    .dropdown {
+      height: 100%;
+      width: 110px;
+      margin-right: 0.5rem;
+
+      .dropdown-toggle {
+        padding-right: 1rem;
+        border-radius: 20px;
+        width: 100%;
+        height: 100%;
+
+        span {
+          font-family: "space mono";
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+
+  .actions-goback {
+    background-color: transparent;
+    border: 0px;
+    padding: 0rem;
+    padding-left: 0.2rem;
+  }
+
+  .loading-container {
+    padding-top: 12.5%;
+  }
+
+  .icon-container {
+    display: flex;
+    flex-direction: row;
+    // width: 30%;
+
+    .btn-group {
+      width: fit-content;
+      border: 1px solid #dfd1ea;
+      border-radius: 5px;
+      margin-bottom: 0rem !important;
+      margin-right: 0.5rem;
+
+      input[type="radio"] {
+        display: none;
+      }
+
+      .btn-secondary {
+        margin-bottom: 0rem;
+        font-size: 0.7rem;
+        background-color: #281e31;
+      }
+
+      .btn-secondary.active {
+        background-color: $neon-highlight;
+      }
+
+      .radio-1 {
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+      }
+    }
+
+    .btn-dark {
+      margin-top: 0.3rem;
+    }
+  }
+
+  .create-vault {
+
+    .btn {
+      width: 13.4375rem;
+      height: 3.875rem;
+      border-radius: 1px;
+      margin-top: 1rem;
+    }
+  }
+
+  .btn-group {
+    margin: 0.35rem;
+    background-color: #1d1d3c82;
+    border: 1px solid #dfd1ea;
+    border-radius: 5px;
+    padding-left: 1px;
+
+    .btn-check {
+      display: none;
+    }
+
+    .btn-secondary {
+      margin-bottom: 0rem;
+      background-color: #281e31;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+    }
+
+    .btn-check:checked+.btn {
+      background-color: $neon-highlight;
+    }
+  }
+
+  .vault-assets {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: transparent;
+
+    svg.tcap {
+      width: 23px;
+      height: 23px;
+    }
+
+    svg.small {
+      vertical-align: top;
+      width: 0.6rem;
+      filter: brightness(1118%) drop-shadow(0px 0px 5px $highlight);
+
+      @supports (-webkit-touch-callout: none) {
+        height: intrinsic;
+      }
+
+      &.btc.small {
+        margin-top: 0px;
+        width: 1.5rem;
+      }
+
+      &.dai.small {
+        margin-top: 0px;
+        width: 1rem;
+        filter: drop-shadow(0px 0px 5px $highlight);
+      }
+
+      &.aave.small {
+        margin-top: 2px;
+        width: 1.5rem;
+        filter: drop-shadow(0px 0px 5px $highlight);
+      }
+
+      &.link.small {
+        margin-top: 7px;
+        width: 1.4rem;
+        filter: drop-shadow(0px 0px 5px $highlight);
+      }
+
+      &.uni.small {
+        margin-top: -5px;
+        width: 1.5rem;
+        filter: drop-shadow(0px 0px 5px $highlight);
+      }
+
+      &.snx.small {
+        margin-top: -3px;
+        width: 1.3rem;
+        filter: drop-shadow(0px 0px 5px $highlight);
+      }
+
+      &.usdc.small {
+        margin-top: -5px;
+        width: 1.3rem;
+      }
+    }
+
+    h5 {
+      font-size: 1rem;
+    }
+
+    .assets-box-options {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 0rem 1rem;
+    }
+    .vault-form {
+      padding: 0rem 1rem;
+    }
+    .assets-balance {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 1rem 0.5rem;
+      border: 0.6px solid $light;
+      border-radius: 5px;
+      margin: 1.3rem 0rem;
+
+      .balance {
+        display: flex;
+        flex-direction: column;
+
+        &.collateral {
+          align-items: flex-end;
+        }
+      }
+
+      .number {
+        font-size: 0.9rem;
+        margin-bottom: 0rem;
+        margin-left: 0rem;
+
+        &-usd {
+          font-size: 0.8rem;
+        }
+      }
+
+      .amount {
+        display: flex;
+        margin-bottom: 0.4rem;
+      }
+    }
+        
+    .asset-box-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding-bottom: 2rem;
+      // border-bottom: 0.5px solid #a540f254;
+    }
+
+    &-box {
+      display: flex;
+      flex-direction: column;
+      background-color: $darker;
+      padding: 2rem 1.5rem;
+      margin-bottom: 1rem;
+
+      h6 {
+        color: $white;
+        margin: 0px;
+        font-size: 0.9rem;
+      }
+
+      .asset-box {
+        display: flex;
+        flex-direction: column;
+        background-color: $darker;
+        // border: 0.7px solid $light;
+        border-radius: 10px;
+      }
+
+      .asset-box-balance {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.2rem 0.2rem;
+
+        &-title {
+          color: $lighter;
+          font-size: 0.8rem;
+        }
+
+        &-value {
+          font-size: 0.75rem;
+          color: $white;
+          text-shadow: 0px 4px 13px rgba(223, 33, 254, 0.8);
+        }
+      }
+    }
+
+    .vault-ratio {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-top: 0.2rem;
+      border: 0.7px solid $white;
+      border-radius: 5px;
+
+      h6 {
+        font-size: 0.9rem;
+        color: $white;
+        align-self: center;
+        margin-bottom: 0rem;
+      }
+      .title {
+        display: flex;
+        padding: 0.5rem 0.8rem;
+        width: 40%;
+        background-color: $darkest;
+      }
+      .values {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0.5rem 0.8rem;
+        width: 60%;
+        .number {
+          font-size: 0.95rem;
+          margin-bottom: 0rem;
+        }
+        .ratio-status {
+          font-size: 0.95rem;
+        }
+      }      
+    }
+  }
+
+}

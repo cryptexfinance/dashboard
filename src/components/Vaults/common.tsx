@@ -113,7 +113,7 @@ export const VAULT_STATUS = {
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const TokenIcon = ({ name }: iconProps) => {
-  switch (name) {
+  switch (name.toLowerCase()) {
     case "eth":
       return <WETHIcon className="eth" />;
     case "weth":
@@ -135,7 +135,7 @@ export const TokenIcon = ({ name }: iconProps) => {
     case "tcap":
       return <TCAPIcon className="tcap" />;
     case "usdc":
-      return <USDCIcon className="eth" />;
+      return <USDCIcon className="usdc" />;
     default:
       return <></>;
   }

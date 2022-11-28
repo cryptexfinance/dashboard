@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { ethers, BigNumber } from "ethers";
-import { oraclesContext, networkContext, signerContext } from "../../state/index";
-import { isInLayer1, isOptimism, isPolygon, validOracles } from "../../utils/utils";
-import { OraclePricesType } from "./types";
+import { oraclesContext, networkContext, signerContext } from "../state/index";
+import { isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
+import { OraclePricesType } from "../components/Vaults/types";
 
 export const usePrices = (): OraclePricesType => {
   const currentNetwork = useContext(networkContext);
@@ -23,6 +23,7 @@ export const usePrices = (): OraclePricesType => {
 
   const loadPrices = async () => {
     if (signer && oracles && validOracles(currentNetwork.chainId || 1, oracles)) {
+      console.log("4. usePrices");
       const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
       const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
 

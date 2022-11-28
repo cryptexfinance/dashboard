@@ -3,7 +3,11 @@
 
 .vault-monitoring {
   padding: 1rem 3rem;
-  
+
+  .btn:active {
+    background-color: transparent;
+  }
+
   .row {
     display: block;
     margin-top: 2rem;
@@ -202,6 +206,9 @@
       .btn {
         margin-top: 0px;
         padding: 0.3rem 0.6rem;
+      }
+      .btn:active {
+        background-color: transparent;
       }
       thead {
         th {

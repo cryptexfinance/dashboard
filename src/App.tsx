@@ -990,7 +990,7 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal]);
+  }, []);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setShowSidebar(true),

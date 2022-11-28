@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { hardVaultsContext, networkContext, signerContext, vaultsContext } from "../../state/index";
-import { isInLayer1, isOptimism, isPolygon, validVaults, validHardVaults } from "../../utils/utils";
-import { VaultsRatioType } from "./types";
+import { hardVaultsContext, networkContext, signerContext, vaultsContext } from "../state/index";
+import { isInLayer1, isOptimism, isPolygon, validVaults, validHardVaults } from "../utils/utils";
+import { VaultsRatioType } from "../components/Vaults/types";
 
 export const useRatios = (): VaultsRatioType => {
   const currentNetwork = useContext(networkContext);
