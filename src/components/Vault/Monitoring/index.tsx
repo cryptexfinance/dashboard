@@ -674,7 +674,7 @@ export const Monitoring = () => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
-      if (addVault && v.tokenSymbol !== "WBTC") {
+      if (addVault) {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -773,6 +773,7 @@ export const Monitoring = () => {
         symbols.push({ key: "aave", name: "AAVE" });
         symbols.push({ key: "link", name: "LINK" });
         symbols.push({ key: "usdc", name: "USDC" });
+        symbols.push({ key: "wbtc", name: "WBTC" });
       }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });
