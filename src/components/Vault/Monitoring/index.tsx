@@ -309,12 +309,14 @@ export const Monitoring = () => {
         const hardWethRatioCall = await hardVaults.wethVaultRead?.ratio();
         const hardDaiRatioCall = await hardVaults.daiVaultRead?.ratio();
         const hardUsdcRatioCall = await hardVaults.usdcVaultRead?.ratio();
+        const hardWbtcRatioCall = await hardVaults.wbtcVaultRead?.ratio();
         ethcalls.push(wethRatioCall);
         ethcalls.push(aaveRatioCall);
         ethcalls.push(linkRatioCall);
         ethcalls.push(hardWethRatioCall);
         ethcalls.push(hardDaiRatioCall);
         ethcalls.push(hardUsdcRatioCall);
+        ethcalls.push(hardWbtcRatioCall);
       }
       if (isOptimism(currentNetwork.chainId)) {
         const wethRatioCall = await vaults.wethVaultRead?.ratio();
@@ -343,10 +345,19 @@ export const Monitoring = () => {
       let hardEthRatio = 0;
       let hardDaiRatio = 0;
       let hardUsdcRatio = 0;
+      let hardWbtcRatio = 0;
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
-        [daiRatio, ethRatio, aaveRatio, linkRatio, hardEthRatio, hardDaiRatio, hardUsdcRatio] =
-          await signer.ethcallProvider?.all(ethcalls);
+        [
+          daiRatio,
+          ethRatio,
+          aaveRatio,
+          linkRatio,
+          hardEthRatio,
+          hardDaiRatio,
+          hardUsdcRatio,
+          hardWbtcRatio,
+        ] = await signer.ethcallProvider?.all(ethcalls);
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
         [daiRatio, ethRatio, linkRatio, snxRatio, uniRatio] = await signer.ethcallProvider?.all(
@@ -370,6 +381,7 @@ export const Monitoring = () => {
         hardWethRatio: hardEthRatio,
         hardDaiRatio,
         hardUsdcRatio,
+        hardWbtcRatio,
       });
     }
   };
@@ -425,14 +437,14 @@ export const Monitoring = () => {
         break;
       case "WETH":
         if (isHardVault) {
-          minRatio = vaultsRatio?.hardWethRatio || 110;
+          minRatio = vaultsRatio?.hardWethRatio || 125;
         } else {
           minRatio = vaultsRatio?.ethRatio || 200;
         }
         break;
       case "DAI":
         if (isHardVault) {
-          minRatio = vaultsRatio?.hardDaiRatio || 110;
+          minRatio = vaultsRatio?.hardDaiRatio || 125;
         } else {
           minRatio = vaultsRatio?.daiRatio || 200;
         }
@@ -453,10 +465,14 @@ export const Monitoring = () => {
         minRatio = vaultsRatio?.maticRatio || 200;
         break;
       case "WBTC":
-        minRatio = vaultsRatio?.wbtcRatio || 200;
+        if (isHardVault) {
+          minRatio = vaultsRatio?.hardWbtcRatio || 125;
+        } else {
+          minRatio = vaultsRatio?.wbtcRatio || 200;
+        }
         break;
       case "USDC":
-        minRatio = vaultsRatio?.hardUsdcRatio || 110;
+        minRatio = vaultsRatio?.hardUsdcRatio || 125;
         break;
       default:
         break;
@@ -674,7 +690,7 @@ export const Monitoring = () => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
       }
-      if (addVault && v.tokenSymbol !== "WBTC") {
+      if (addVault) {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -773,6 +789,7 @@ export const Monitoring = () => {
         symbols.push({ key: "aave", name: "AAVE" });
         symbols.push({ key: "link", name: "LINK" });
         symbols.push({ key: "usdc", name: "USDC" });
+        symbols.push({ key: "wbtc", name: "WBTC" });
       }
     } else if (isOptimism(currentNetwork.chainId)) {
       symbols.push({ key: "eth", name: "ETH" });

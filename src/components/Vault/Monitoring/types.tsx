@@ -36,6 +36,7 @@ export type VaultsRatioType = {
   hardWethRatio: number;
   hardDaiRatio: number;
   hardUsdcRatio: number;
+  hardWbtcRatio: number;
 };
 
 export type VaultsType = {
