@@ -888,6 +888,7 @@ const App = () => {
   };
 
   web3Modal.on("connect", async (networkProvider) => {
+    console.log("2. web3Modal");
     setLoadingContracts(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
@@ -937,6 +938,7 @@ const App = () => {
 
   useEffect(() => {
     async function loadProvider() {
+      console.log("1. entra");
       if (web3Modal.cachedProvider && !signer.signer) {
         if (!isLoadingContracts) {
           await web3Modal.connect();
