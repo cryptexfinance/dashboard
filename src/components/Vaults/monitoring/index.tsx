@@ -1,14 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Dropdown,
-  Form,
-  Row,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "react-bootstrap/esm";
+import { Button, Card, Col, Dropdown, Form, Row } from "react-bootstrap/esm";
 import Spinner from "react-bootstrap/Spinner";
 import { FaArrowsAltH } from "react-icons/fa";
 import { ethers, BigNumber } from "ethers";
@@ -87,6 +78,10 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const hardVaults = useContext(hardVaultsContext);
   const prices = usePrices();
   const ratios = useRatios();
+  const vaultsOwnerFilter = [
+    { name: t("all-vaults"), value: "0" },
+    { name: t("my-vaults"), value: "1" },
+  ];
   const [vaultsUpdated, setVaultsUpdated] = useState(false);
   const [vaultsTotals, setVaultsTotals] = useState<VaultsTotalsType>(totalsDefault);
   const [vaultList, setVaultList] = useState<Array<VaultsType>>([]);
@@ -96,7 +91,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const [filteringRatios, setFilteringRatios] = useState(false);
   const [currentAddress, setCurrentAddress] = useState("");
   const [ownerAddress, setOwnerAddress] = useState("");
-  const [radioValue, setRadioValue] = useState("2");
+  const [currentOwnerFilter, setCurrentOwnerFilter] = useState(vaultsOwnerFilter[1]);
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
@@ -106,10 +101,6 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const ratioRangeDropdown = useRef(null);
   const minRatioInput = useRef(null);
   const maxRatioInput = useRef(null);
-  const radios = [
-    { name: t("all-vaults"), value: "1" },
-    { name: t("my-vaults"), value: "2" },
-  ];
   const viewsList = [
     { key: "5", name: "5" },
     { key: "10", name: "10" },
@@ -139,7 +130,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     let statusFilter = "";
     let modeFilter = "";
 
-    if (radioValue === "2" && ownerAddress !== "") {
+    if (currentOwnerFilter.value === "1" && ownerAddress !== "") {
       ownerFilter = `, owner: "${ownerAddress}"`;
     }
     if (tokenSymbol !== "all") {
@@ -490,11 +481,12 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
           if (!vaultsUpdated) {
             const address = await signer.signer.getAddress();
             setCurrentAddress(address);
-            setOwnerAddress(radioValue === "2" ? address : "");
+            setOwnerAddress(currentOwnerFilter.value === "1" ? address : "");
 
             loadVaultData();
           }
         } else {
+          setCurrentOwnerFilter(vaultsOwnerFilter[0]);
           loadVaultData();
         }
       };
@@ -538,9 +530,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     confPagination(vaultList, parseInt(number));
   };
 
-  const handleRadioBtnChange = (value: string) => {
-    setRadioValue(value);
-    if (value === "1") {
+  const handleVaultOwnerFilterChange = (value: string) => {
+    setCurrentOwnerFilter(vaultsOwnerFilter[parseInt(value)]);
+    if (value === "0") {
       setOwnerAddress("");
     } else {
       setOwnerAddress(currentAddress);
@@ -816,74 +808,83 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                       </Dropdown>
                     </div>
                   )}
-                  {currentStatus !== VAULT_STATUS.empty && currentStatus !== VAULT_STATUS.ready && (
-                    <div className="dd-container">
-                      <h6 className="titles">Ratio Range</h6>
-                      <Dropdown>
-                        <Dropdown.Toggle
-                          variant="secondary"
-                          id="dropdown-flags"
-                          className="text-left ratio-range-toggle"
-                          ref={ratioRangeDropdown}
+                  <div className="dd-container">
+                    <h6 className="titles">Ratio Range</h6>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-flags"
+                        className="text-left ratio-range-toggle"
+                        ref={ratioRangeDropdown}
+                      >
+                        <div className="status-toggle">
+                          <span>
+                            {currentMinRatio} <FaArrowsAltH /> {currentMaxRatio}
+                          </span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className="ratio-range-menu">
+                        <div className="range-container">
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-green"
+                            defaultValue="0"
+                            ref={minRatioInput}
+                          />
+                          <FaArrowsAltH />
+                          <Form.Control
+                            type="number"
+                            placeholder=""
+                            className="neon-green"
+                            defaultValue="2500"
+                            ref={maxRatioInput}
+                          />
+                        </div>
+                        <Button onClick={() => onFilterRatioClick()}>Apply</Button>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  <div className="dd-container">
+                    <h6 className="titles">Vaults</h6>
+                    <Dropdown
+                      onSelect={(eventKey) => handleVaultOwnerFilterChange(eventKey || "1")}
+                    >
+                      <Dropdown.Toggle
+                        variant="secondary"
+                        id="dropdown-flags"
+                        className="text-left"
+                      >
+                        <div className="status-toggle">
+                          <span>{capitalize(currentOwnerFilter.name)}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          key={vaultsOwnerFilter[0].value}
+                          eventKey={vaultsOwnerFilter[0].value}
                         >
-                          <div className="status-toggle">
-                            <span>
-                              {currentMinRatio} <FaArrowsAltH /> {currentMaxRatio}
-                            </span>
-                          </div>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="ratio-range-menu">
-                          <div className="range-container">
-                            <Form.Control
-                              type="number"
-                              placeholder=""
-                              className="neon-green"
-                              defaultValue="0"
-                              ref={minRatioInput}
-                            />
-                            <FaArrowsAltH />
-                            <Form.Control
-                              type="number"
-                              placeholder=""
-                              className="neon-green"
-                              defaultValue="2500"
-                              ref={maxRatioInput}
-                            />
-                          </div>
-                          <Button onClick={() => onFilterRatioClick()}>Apply</Button>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </div>
-                  )}
-                  {currentAddress !== "" && (
-                    <>
-                      <div className="dd-container">
-                        <ToggleButtonGroup
-                          type="radio"
-                          value={radioValue}
-                          onChange={(val) => handleRadioBtnChange(val)}
-                          name="vaults-options"
+                          {vaultsOwnerFilter[0].name}
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          key={vaultsOwnerFilter[1].value}
+                          eventKey={vaultsOwnerFilter[1].value}
+                          disabled={currentAddress === ""}
                         >
-                          {radios.map((radio, idx) => (
-                            <ToggleButton
-                              id={`radio-${idx}`}
-                              key={`radio-${idx}`}
-                              variant="secondary"
-                              name="radio"
-                              value={radio.value}
-                            >
-                              {radio.name}
-                            </ToggleButton>
-                          ))}
-                        </ToggleButtonGroup>
-                      </div>
-                      <div className="dd-container">
-                        <Button className="btn-create-vault" onClick={() => newVault()}>
-                          New Vault
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                          {vaultsOwnerFilter[1].name}
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  <div className="dd-container">
+                    <Button
+                      className="btn-create-vault"
+                      onClick={() => newVault()}
+                      disabled={currentAddress === ""}
+                    >
+                      New Vault
+                    </Button>
+                  </div>
                 </div>
               </Col>
               {loading || filteringRatios ? (
@@ -897,7 +898,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                   pagination={pagination}
                   refresh={updateLiquidatedVault}
                   setVaultToUpdate={setVaultToUpdate}
-                  myVaults={radioValue === "2"}
+                  myVaults={currentOwnerFilter.value === "1"}
                 />
               )}
               <Col md={12} className="pag-container">

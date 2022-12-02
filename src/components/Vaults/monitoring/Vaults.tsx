@@ -186,7 +186,7 @@ export const Vaults = ({
     };
     return (
       <Button className="btn-update-vault" onClick={() => setVaultToUpdate(vtu)}>
-        <span className={v.status}>Update</span>
+        <span className={v.status}>Go to Vault</span>
       </Button>
     );
   };
