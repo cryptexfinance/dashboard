@@ -19,7 +19,7 @@ const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
   const currentNetwork = useContext(networkContext);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.goerli
     )
   );
 
@@ -28,8 +28,8 @@ const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => {
       case NETWORKS.mainnet.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
-      case NETWORKS.rinkeby.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+      case NETWORKS.goerli.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.goerli));
         break;
       case NETWORKS.arbitrum.chainId:
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));

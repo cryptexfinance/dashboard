@@ -17,9 +17,6 @@ switch (process.env.REACT_APP_NETWORK_ID) {
   case "3":
     network = "ropsten";
     break;
-  case "4":
-    network = "rinkeby";
-    break;
   case "5":
     network = "goerli";
     break;
@@ -56,7 +53,7 @@ const providerOptions = {
         rpcUrl:
           process.env.REACT_APP_NETWORK_ID === "1"
             ? NETWORKS.mainnet.infuraFortmaticRpcUrl
-            : NETWORKS.rinkeby.infuraFortmaticRpcUrl,
+            : NETWORKS.goerli.infuraFortmaticRpcUrl,
       }, // if we don't pass it, it will default to localhost:8454
     },
   },

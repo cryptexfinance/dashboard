@@ -2,7 +2,8 @@
 @import "./fonts";
 
 .vault-monitoring {
-  padding: 1rem 3rem;
+  margin-left: 1.5rem;
+  padding: 1rem 2rem;
 
   .btn:active {
     background-color: transparent;
@@ -21,6 +22,8 @@
     }
     .actions {
       display: flex;
+      align-items: flex-end;
+
       .dropdown {
         .dropdown-toggle {
           display: flex;
@@ -51,7 +54,7 @@
           border-right: 0.4em solid transparent;
           border-bottom: 0;
           border-left: 0.4em solid transparent;
-          margin-top: 7px;
+          margin-top: 2px;
           margin-left: 70%;          
         }
         .dropdown-menu {
@@ -109,19 +112,24 @@
       .dd {
         &-container {
           display: flex;
-          flex-direction: row;
-          align-items: center;
-          margin-left: 1rem;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-end;
+          margin-left: 1.2rem;
           h6 {
             margin-right: 5px;
+          }
+
+          &.view {
+            flex-direction: row;
+            align-items: center;
+          }
+          .btn-create-vault {
+            font-size: 0.9rem;
           }
         }
         @media (max-width: 1670px) {
           &-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-end;
             margin-left: 1rem;
           }
         }
@@ -161,8 +169,8 @@
           margin-bottom: 0rem;
           font-size: 0.8rem;
           background-color: #281e31;
-          border-top-left-radius: 5px;
-          border-bottom-left-radius: 5px;
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
         }
         .btn-check:checked + .btn {
           background-color: $neon-highlight;
@@ -336,7 +344,7 @@
         .liquidated {
           text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
         }
-      }
+      }      
     }
     .pag-container{
       display: flex;
@@ -358,6 +366,23 @@
         .page-link {
           background-color: $neon-highlight;
         }
+      }
+    }
+    .no-vaults-box {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding-top: 2rem;
+      padding-bottom: 1rem;
+
+      p {
+        font-size: 1.2rem;
+      }
+      .btn-create-vault {
+        border: none;
+        padding-top: 0rem;
+        padding-bottom: 0.25rem;
+        color: $highlight;
       }
     }
   }

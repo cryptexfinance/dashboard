@@ -28,7 +28,17 @@ import {
   numberFormatStr,
   toUSD,
 } from "../../../utils/utils";
-import { capitalize, TokenIcon, getMinRatio, getCollateralPrice, VAULT_STATUS } from "../common";
+import { TOKENS_SYMBOLS } from "../../../utils/constants";
+import {
+  capitalize,
+  TokenIcon,
+  getMinRatio,
+  getCollateralPrice,
+  findNewArbitrumVaultCollateral,
+  findNewMainnetVaultCollateral,
+  findNewOptimismVaultCollateral,
+  VAULT_STATUS,
+} from "../common";
 import {
   DropdownItemType,
   PaginationType,
@@ -128,6 +138,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     let vaultFilter = "";
     let statusFilter = "";
     let modeFilter = "";
+
     if (radioValue === "2" && ownerAddress !== "") {
       ownerFilter = `, owner: "${ownerAddress}"`;
     }
@@ -164,6 +175,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         filter = `, where: { blockTS_gt: "0" ${filter} }`;
       }
     }
+
+    console.log("Filter: ", filter);
+
     return filter;
   };
 
@@ -372,7 +386,6 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
     setLoadMore(false);
     setFilteringRatios(true);
-    console.log("Current:  ", currentStatus);
     // setLiqLoaded(currentStatus !== VAULT_STATUS.liquidation);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
@@ -464,7 +477,6 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       console.log(error);
     },
     onCompleted: (data: any) => {
-      console.log("aqui --");
       if (!isUndefined(data)) {
         setVaultGraphList(data);
         loadVaults(data, currentStatus);
@@ -478,12 +490,14 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       const load = async () => {
         if (signer && signer.signer) {
           if (!vaultsUpdated) {
-            console.log("Monitoring");
             const address = await signer.signer.getAddress();
             setCurrentAddress(address);
             setOwnerAddress(radioValue === "2" ? address : "");
+
             loadVaultData();
           }
+        } else {
+          loadVaultData();
         }
       };
       load();
@@ -495,28 +509,28 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const tokensSymbols = (): Array<DropdownItemType> => {
     const symbols = [{ key: "all", name: "All" }];
     if (isInLayer1(currentNetwork.chainId)) {
-      symbols.push({ key: "weth", name: "ETH" });
-      symbols.push({ key: "dai", name: "DAI" });
+      symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
       if (showAllVaults) {
-        symbols.push({ key: "aave", name: "AAVE" });
-        symbols.push({ key: "link", name: "LINK" });
-        symbols.push({ key: "usdc", name: "USDC" });
+        symbols.push({ key: "aave", name: TOKENS_SYMBOLS.AAVE });
+        symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
+        symbols.push({ key: "usdc", name: TOKENS_SYMBOLS.USDC });
       }
     } else if (isArbitrum(currentNetwork.chainId)) {
-      symbols.push({ key: "weth", name: "ETH" });
-      symbols.push({ key: "dai", name: "DAI" });
+      symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
     } else if (isOptimism(currentNetwork.chainId)) {
-      symbols.push({ key: "eth", name: "ETH" });
-      symbols.push({ key: "dai", name: "DAI" });
+      symbols.push({ key: "eth", name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
       if (showAllVaults) {
-        symbols.push({ key: "link", name: "LINK" });
-        symbols.push({ key: "uni", name: "UNI" });
-        symbols.push({ key: "snx", name: "SNX" });
+        symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
+        symbols.push({ key: "uni", name: TOKENS_SYMBOLS.UNI });
+        symbols.push({ key: "snx", name: TOKENS_SYMBOLS.SNX });
       }
     } else {
-      symbols.push({ key: "matic", name: "MATIC" });
-      symbols.push({ key: "dai", name: "DAI" });
-      symbols.push({ key: "wbtc", name: "WBTC" });
+      symbols.push({ key: "matic", name: TOKENS_SYMBOLS.MATIC });
+      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
+      symbols.push({ key: "wbtc", name: TOKENS_SYMBOLS.WBTC });
     }
 
     return symbols;
@@ -623,6 +637,38 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     setRenderTable(!renderTable);
   };
 
+  const newVault = () => {
+    let newAssetSymbol = TOKENS_SYMBOLS.TCAP;
+    let newCollateralSymbol = "ETH";
+    let isHardVault = false;
+    const createdCollaterals = [];
+    for (let i = 0; i < vaultList.length; i += 1) {
+      createdCollaterals.push(vaultList[i].collateralSymbol);
+    }
+
+    if (createdCollaterals.includes(TOKENS_SYMBOLS.WETH)) {
+      createdCollaterals.push(TOKENS_SYMBOLS.ETH);
+    }
+
+    if (isInLayer1(currentNetwork.chainId)) {
+      [newCollateralSymbol, isHardVault] = findNewMainnetVaultCollateral(createdCollaterals);
+    }
+    if (isOptimism(currentNetwork.chainId)) {
+      newCollateralSymbol = findNewOptimismVaultCollateral(createdCollaterals);
+    }
+    if (isArbitrum(currentNetwork.chainId)) {
+      newAssetSymbol = TOKENS_SYMBOLS.JPEGz;
+      newCollateralSymbol = findNewArbitrumVaultCollateral(createdCollaterals);
+    }
+
+    setVaultToUpdate({
+      vaultId: "0",
+      assetSymbol: newAssetSymbol,
+      collateralSymbol: newCollateralSymbol,
+      isHardVault,
+    });
+  };
+
   return (
     <div className="vault-monitoring">
       <Row className="card-wrapper">
@@ -671,7 +717,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
             <Card.Body>
               <Col md={12} className="actions">
                 <div className="items-view">
-                  <div className="dd-container">
+                  <div className="dd-container view">
                     <h6 className="titles">
                       <>{t("view")}:</>
                     </h6>
@@ -698,7 +744,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                 <div className="filters">
                   <div className="dd-container">
                     <h6 className="titles">
-                      <>{t("collateral")}:</>
+                      <>{t("collateral")}</>
                     </h6>
                     <Dropdown
                       className="dd-collateral"
@@ -747,7 +793,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                   {isInLayer1(currentNetwork.chainId) && (
                     <div className="dd-container">
                       <h6 className="titles">
-                        <>{t("mode")}:</>
+                        <>{t("mode")}</>
                       </h6>
                       <Dropdown
                         className="dd-mode"
@@ -812,26 +858,33 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                     </div>
                   )}
                   {currentAddress !== "" && (
-                    <div className="dd-container">
-                      <ToggleButtonGroup
-                        type="radio"
-                        value={radioValue}
-                        onChange={(val) => handleRadioBtnChange(val)}
-                        name="vaults-options"
-                      >
-                        {radios.map((radio, idx) => (
-                          <ToggleButton
-                            id={`radio-${idx}`}
-                            key={`radio-${idx}`}
-                            variant="secondary"
-                            name="radio"
-                            value={radio.value}
-                          >
-                            {radio.name}
-                          </ToggleButton>
-                        ))}
-                      </ToggleButtonGroup>
-                    </div>
+                    <>
+                      <div className="dd-container">
+                        <ToggleButtonGroup
+                          type="radio"
+                          value={radioValue}
+                          onChange={(val) => handleRadioBtnChange(val)}
+                          name="vaults-options"
+                        >
+                          {radios.map((radio, idx) => (
+                            <ToggleButton
+                              id={`radio-${idx}`}
+                              key={`radio-${idx}`}
+                              variant="secondary"
+                              name="radio"
+                              value={radio.value}
+                            >
+                              {radio.name}
+                            </ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
+                      </div>
+                      <div className="dd-container">
+                        <Button className="btn-create-vault" onClick={() => newVault()}>
+                          New Vault
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </div>
               </Col>

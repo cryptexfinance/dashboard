@@ -68,7 +68,7 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.goerli
     )
   );
   const networks = hooks.useNetworks();
@@ -95,9 +95,9 @@ const App = () => {
         cNetwork = NETWORKS.mainnet;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
-      case NETWORKS.rinkeby.chainId:
-        cNetwork = NETWORKS.rinkeby;
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+      case NETWORKS.goerli.chainId:
+        cNetwork = NETWORKS.goerli;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.goerli));
         break;
       case NETWORKS.arbitrum.chainId:
         cNetwork = NETWORKS.arbitrum;
@@ -135,24 +135,25 @@ const App = () => {
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
-  const setMushroomContracts = async (currentSigner: ethers.Signer) => {
+  const setMushroomContracts = async (chainId: number, currentSigner: ethers.Signer) => {
+    let mushroomNftAddress = NETWORKS.mainnet.mushroomNft;
+    if (isGoerli(chainId)) {
+      mushroomNftAddress = NETWORKS.goerli.mushroomNft;
+    }
+
     // Set Mushroom contracts
-    const currentMushroomNft = new ethers.Contract(
-      NETWORKS.mainnet.mushroomNft,
-      Mushroom.abi,
-      currentSigner
-    );
+    const currentMushroomNft = new ethers.Contract(mushroomNftAddress, Mushroom.abi, currentSigner);
     mushroomNft.setCurrentMushroomNft(currentMushroomNft);
 
-    const currentMushroomNftRead = new Contract(NETWORKS.mainnet.mushroomNft, Mushroom.abi);
+    const currentMushroomNftRead = new Contract(mushroomNftAddress, Mushroom.abi);
     mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
   };
 
   const setEthereumContracts = async (chainId: number, currentSigner: ethers.Signer) => {
     let contracts;
-    let ethPoolAddress = NETWORKS.rinkeby.ethPool;
-    let daiPoolAddress = NETWORKS.rinkeby.daiPool;
-    let ctxPoolAddress = NETWORKS.rinkeby.ctxPool;
+    let ethPoolAddress;
+    let daiPoolAddress;
+    let ctxPoolAddress;
     switch (chainId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
@@ -160,11 +161,11 @@ const App = () => {
         daiPoolAddress = NETWORKS.mainnet.daiPool;
         ctxPoolAddress = NETWORKS.mainnet.ctxPool;
         break;
-      case 4:
-        contracts = cryptexJson[4].rinkeby.contracts;
+      case 5:
+        contracts = cryptexJson[5].goerli.contracts;
         break;
       default:
-        contracts = cryptexJson[4].rinkeby.contracts;
+        contracts = cryptexJson[5].goerli.contracts;
         break;
     }
 
@@ -436,9 +437,7 @@ const App = () => {
       toFragment(contracts.Timelock.abi)
     );
     governance.setCurrentTimelockRead(currentTimelockRead);
-    if (chainId === 1) {
-      await setMushroomContracts(currentSigner);
-    }
+    await setMushroomContracts(chainId, currentSigner);
   };
 
   const setArbitrumContracts = async (
@@ -733,22 +732,6 @@ const App = () => {
     oracles.setCurrentWBTCOracleRead(currentWBTCOracleRead);
   };
 
-  const setGoerliContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
-    await ethcallProvider.init();
-    signer.setCurrentEthcallProvider(ethcallProvider);
-
-    // Set Mushroom contracts
-    const currentMushroomNft = new ethers.Contract(
-      NETWORKS.goerli.mushroomNft,
-      Mushroom.abi,
-      currentSigner
-    );
-    mushroomNft.setCurrentMushroomNft(currentMushroomNft);
-
-    const currentMushroomNftRead = new Contract(NETWORKS.goerli.mushroomNft, Mushroom.abi);
-    mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
-  };
-
   const setContracts = async (
     currentSigner: ethers.Signer,
     ethcallProvider: Provider,
@@ -767,10 +750,10 @@ const App = () => {
         daiAddress = NETWORKS.mainnet.dai;
         linkAddress = contracts.LINK.address;
         break;
-      case NETWORKS.rinkeby.chainId:
-        contracts = cryptexJson[4].rinkeby.contracts;
-        wethAddress = NETWORKS.rinkeby.weth;
-        daiAddress = NETWORKS.rinkeby.dai;
+      case NETWORKS.goerli.chainId:
+        contracts = cryptexJson[5].goerli.contracts;
+        wethAddress = NETWORKS.goerli.weth;
+        daiAddress = NETWORKS.goerli.dai;
         linkAddress = contracts.LINK.address;
         break;
       case NETWORKS.optimism.chainId:
@@ -786,9 +769,9 @@ const App = () => {
         linkAddress = "";
         break;
       default:
-        contracts = cryptexJson[4].rinkeby.contracts;
-        wethAddress = NETWORKS.rinkeby.weth;
-        daiAddress = NETWORKS.rinkeby.dai;
+        contracts = cryptexJson[5].goerli.contracts;
+        wethAddress = NETWORKS.goerli.weth;
+        daiAddress = NETWORKS.goerli.dai;
         linkAddress = contracts.LINK.address;
         break;
     }
@@ -923,10 +906,8 @@ const App = () => {
       await setArbitrumContracts(network.chainId, currentSigner, ethcallProvider);
     } else if (isPolygon(network.chainId)) {
       await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
-    } else if (isGoerli(network.chainId)) {
-      await setGoerliContracts(currentSigner, ethcallProvider);
     } else {
-      await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+      await setContracts(currentSigner, ethcallProvider, network.chainId || 5);
     }
 
     const isBrowserWallet =
@@ -963,13 +944,10 @@ const App = () => {
         }
       } else {
         setLoadingContracts(true);
-        const chainId = process.env.REACT_APP_NETWORK_ID || "4";
+        const chainId = process.env.REACT_APP_NETWORK_ID || "5";
         let networkName = NETWORKS.mainnet.name;
         if (isGoerli(parseInt(chainId))) {
           networkName = NETWORKS.goerli.name;
-        }
-        if (chainId === "4") {
-          networkName = NETWORKS.rinkeby.name;
         }
         const provider = getDefaultProvider(parseInt(chainId), networkName);
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
@@ -978,8 +956,6 @@ const App = () => {
           setArbitrumContracts(parseInt(chainId), randomSigner, ethcallProvider);
         } else if (isPolygon(parseInt(chainId))) {
           setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
-        } else if (isGoerli(parseInt(chainId))) {
-          setGoerliContracts(randomSigner, ethcallProvider);
         } else {
           setContracts(randomSigner, ethcallProvider, parseInt(chainId));
         }

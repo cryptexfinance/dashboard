@@ -1,4 +1,5 @@
 import React from "react";
+import { TOKENS_SYMBOLS } from "../../utils/constants";
 import { OraclePricesType, VaultsRatioType, VaultsType } from "./types";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
@@ -23,6 +24,32 @@ import { ReactComponent as TCAPIcon } from "../../assets/images/tcap-coin.svg";
 type iconProps = {
   name: string;
 };
+
+export const MAINNET_COLLATERALS = [
+  TOKENS_SYMBOLS.ETH,
+  TOKENS_SYMBOLS.WETH,
+  TOKENS_SYMBOLS.DAI,
+  TOKENS_SYMBOLS.AAVE,
+  TOKENS_SYMBOLS.LINK,
+];
+
+export const MAINNET_HARD_COLLATERALS = [
+  TOKENS_SYMBOLS.ETH,
+  TOKENS_SYMBOLS.WETH,
+  TOKENS_SYMBOLS.DAI,
+  TOKENS_SYMBOLS.USDC,
+  TOKENS_SYMBOLS.WBTC,
+];
+
+export const ARBITRUM_COLLATERALS = [TOKENS_SYMBOLS.ETH, TOKENS_SYMBOLS.WETH, TOKENS_SYMBOLS.DAI];
+
+export const OPTIMISM_COLLATERALS = [
+  TOKENS_SYMBOLS.ETH,
+  TOKENS_SYMBOLS.DAI,
+  TOKENS_SYMBOLS.LINK,
+  TOKENS_SYMBOLS.UNI,
+  TOKENS_SYMBOLS.SNX,
+];
 
 export const getMinRatio = (ratios: VaultsRatioType, symbol: string, isHardVault: boolean) => {
   let minRatio = 200;
@@ -142,7 +169,7 @@ export const TokenIcon = ({ name }: iconProps) => {
 };
 
 export const TokenIconSmall = ({ name }: iconProps) => {
-  switch (name) {
+  switch (name.toLowerCase()) {
     case "eth":
       return <WETHIconSmall className="eth small" />;
     case "weth":
@@ -168,6 +195,36 @@ export const TokenIconSmall = ({ name }: iconProps) => {
     default:
       return <></>;
   }
+};
+
+export const findNewMainnetVaultCollateral = (collaterals: Array<string>): [string, boolean] => {
+  let diff = MAINNET_HARD_COLLATERALS.filter((x) => !collaterals.includes(x));
+  let isHardVault = true;
+  if (diff.length === 0) {
+    diff = MAINNET_COLLATERALS.filter((x) => !collaterals.includes(x));
+    if (diff.length === 0) {
+      return ["ETH", isHardVault];
+    }
+    isHardVault = false;
+  }
+  return [diff[0], isHardVault];
+};
+
+export const findNewOptimismVaultCollateral = (collaterals: Array<string>): string => {
+  const diff = OPTIMISM_COLLATERALS.filter((x) => !collaterals.includes(x));
+  if (diff.length === 0) {
+    return "ETH";
+  }
+  return diff[0];
+};
+
+export const findNewArbitrumVaultCollateral = (collaterals: Array<string>): string => {
+  const diff = ARBITRUM_COLLATERALS.filter((x) => !collaterals.includes(x));
+  if (diff.length === 0) {
+    return "ETH";
+  }
+
+  return diff[0];
 };
 
 export const sortCollateralAsc = (a: VaultsType, b: VaultsType) =>

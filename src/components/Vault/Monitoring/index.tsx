@@ -1009,7 +1009,7 @@ export const Monitoring = () => {
                 <div className="filters">
                   <div className="dd-container">
                     <h6 className="titles">
-                      <>{t("collateral")}:</>
+                      <>{t("collateral")}</>
                     </h6>
                     <Dropdown
                       className="dd-collateral"
@@ -1058,7 +1058,7 @@ export const Monitoring = () => {
                   {isInLayer1(currentNetwork.chainId) && (
                     <div className="dd-container">
                       <h6 className="titles">
-                        <>{t("mode")}:</>
+                        <>{t("mode")}</>
                       </h6>
                       <Dropdown
                         className="dd-mode"

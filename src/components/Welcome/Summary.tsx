@@ -17,7 +17,13 @@ import {
   tokensContext,
   Web3ModalContext,
 } from "../../state";
-import { makeShortAddress, getPriceInUSDFromPair, getENS, isInLayer1 } from "../../utils/utils";
+import {
+  makeShortAddress,
+  getPriceInUSDFromPair,
+  getENS,
+  isInLayer1,
+  isGoerli,
+} from "../../utils/utils";
 import "../../styles/summary.scss";
 import Protocol from "./Protocol";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
@@ -75,7 +81,10 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
         setTcapPrice(tPrice);
 
         let currentPriceCTX = 0;
-        if (signerAddress === "" || isInLayer1(currentNetwork.chainId)) {
+        if (
+          !isGoerli(currentNetwork.chainId) &&
+          (signerAddress === "" || isInLayer1(currentNetwork.chainId))
+        ) {
           const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
           const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
           // @ts-ignore

@@ -174,7 +174,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const ArbitrumToggle = () => {
     <>
       <OPTIMISMIcon className="optimism" />
-      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "Goerli"}</h6>
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "Arbitrum Goerli"}</h6>
     </>;
   };
 
@@ -198,21 +198,13 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const EthereumToggle = () => (
     <>
       <ETHIcon className="eth" />
-      {process.env.REACT_APP_NETWORK_ID === "5" ? (
-        <h6>Goerli</h6>
-      ) : (
-        <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
-      )}
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Goerli"}</h6>
     </>
   );
 
   const EthereumOpt = () => {
     let { chainId } = NETWORKS.mainnet;
     let { hexChainId } = NETWORKS.mainnet;
-    if (process.env.REACT_APP_NETWORK_ID === "4") {
-      chainId = NETWORKS.rinkeby.chainId;
-      hexChainId = NETWORKS.rinkeby.hexChainId;
-    }
     if (process.env.REACT_APP_NETWORK_ID === "5") {
       chainId = NETWORKS.goerli.chainId;
       hexChainId = NETWORKS.goerli.hexChainId;

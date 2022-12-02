@@ -23,7 +23,6 @@ export const usePrices = (): OraclePricesType => {
 
   const loadPrices = async () => {
     if (signer && oracles && validOracles(currentNetwork.chainId || 1, oracles)) {
-      console.log("4. usePrices");
       const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
       const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
 
@@ -78,6 +77,7 @@ export const usePrices = (): OraclePricesType => {
           usdcOraclePrice,
           wbtcOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
+        console.log("4. usePrices");
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
         [

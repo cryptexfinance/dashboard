@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
@@ -10,8 +10,9 @@ import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
 import Liquidate from "./Liquidate";
+import { networkContext } from "../../../state";
 import { PaginationType, VaultsType, VaultToUpdateType } from "../types";
-import { numberFormatStr } from "../../../utils/utils";
+import { isArbitrum, numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
   TokenIcon,
@@ -26,6 +27,7 @@ import {
   sortRewardDesc,
   sortRewardAsc,
 } from "../common";
+import { TOKENS_SYMBOLS } from "../../../utils/constants";
 
 type dataType = {
   currentAddress: string;
@@ -55,6 +57,7 @@ export const Vaults = ({
   myVaults,
 }: dataType) => {
   const { t } = useTranslation();
+  const currentNetwork = useContext(networkContext);
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
   const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
@@ -174,11 +177,11 @@ export const Vaults = ({
     return <span className={v.status}>{capitalize(v.status)}</span>;
   };
 
-  const vaultButtonLink = (index: number, v: VaultsType) => {
+  const vaultButtonLink = (v: VaultsType) => {
     const vtu = {
       vaultId: v.id,
-      assetSymbol: "tcap",
-      collateralSymbol: v.collateralSymbol,
+      assetSymbol: isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP,
+      collateralSymbol: v.collateralSymbol !== "WETH" ? v.collateralSymbol : "ETH",
       isHardVault: v.isHardVault,
     };
     return (
@@ -186,6 +189,16 @@ export const Vaults = ({
         <span className={v.status}>Update</span>
       </Button>
     );
+  };
+
+  const newVault = () => {
+    const initData = {
+      vaultId: "0",
+      assetSymbol: "TCAP",
+      collateralSymbol: "ETH",
+      isHardVault: true,
+    };
+    setVaultToUpdate(initData);
   };
 
   return (
@@ -339,12 +352,28 @@ export const Vaults = ({
                     </div>
                   </td>
                 )}
-                {myVaults && v.url !== "" && <td>{vaultButtonLink(index, v)}</td>}
+                {myVaults && v.url !== "" && <td>{vaultButtonLink(v)}</td>}
               </tr>
             );
           })}
         </tbody>
       </Table>
+      {vaults.length === 0 && currentAddress !== "" && myVaults && (
+        <div className="no-vaults-box">
+          <p>
+            No Vaults yet. Please
+            <Button className="btn-create-vault" onClick={() => newVault()}>
+              CREATE
+            </Button>
+            your first vault.
+          </p>
+        </div>
+      )}
+      {vaults.length === 0 && currentAddress === "" && (
+        <div className="no-vaults-box">
+          <p>No vaults found.</p>
+        </div>
+      )}
       <Liquidate
         show={showLiquidate}
         currentAddress={currentAddress}

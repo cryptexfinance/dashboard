@@ -126,7 +126,6 @@ const Protocol = ({ data }: props) => {
             usdcOraclePrice,
           ] = await signer.ethcallProvider?.all(ethcalls);
         } else if (isArbitrum(currentNetwork.chainId)) {
-          console.log("Entra aqui");
           // @ts-ignore
           [daiOraclePrice, currentTotalSupply, wethOraclePrice] = await signer.ethcallProvider?.all(
             ethcalls
@@ -148,10 +147,6 @@ const Protocol = ({ data }: props) => {
           );
         }
 
-        console.log("DAI: ", daiOraclePrice.toString());
-        console.log("wethOraclePrice: ", wethOraclePrice.toString());
-        console.log("currentTotalSupply: ", currentTotalSupply.toString());
-
         let currentDAIStake = BigNumber.from(0);
         let currentWETHStake = BigNumber.from(0);
         let currentAAVEStake = BigNumber.from(0);
@@ -169,8 +164,8 @@ const Protocol = ({ data }: props) => {
           case NETWORKS.mainnet.chainId:
             contracts = cryptexJson[1].mainnet.contracts;
             break;
-          case NETWORKS.rinkeby.chainId:
-            contracts = cryptexJson[4].rinkeby.contracts;
+          case NETWORKS.goerli.chainId:
+            contracts = cryptexJson[5].goerli.contracts;
             break;
           case NETWORKS.optimism.chainId:
             contracts = cryptexJson[10].optimism.contracts;
@@ -191,7 +186,7 @@ const Protocol = ({ data }: props) => {
             contracts = cryptexJson[80001].mumbai.contracts;
             break;
           default:
-            contracts = cryptexJson[4].rinkeby.contracts;
+            contracts = cryptexJson[5].goerli.contracts;
             break;
         }
 

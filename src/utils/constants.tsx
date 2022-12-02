@@ -12,6 +12,9 @@ export const NETWORKS = {
     daiPool: "",
     ctxPool: "0x2a93167ed63a31f35ca4788e2eb9fbd9fa6089d0",
     lpUrl: "https://app.sushi.com",
+    alchemyUrl: "https://eth-mainnet.g.alchemy.com/v2/".concat(
+      process.env.REACT_APP_ALCHEMY_KEY || ""
+    ),
     infuraRpcUrl: "https://mainnet.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://mainnet.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
@@ -21,27 +24,15 @@ export const NETWORKS = {
     chainId: 5,
     hexChainId: "0x5",
     name: "goerli",
-    eth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
-    weth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
+    dai: "0xD2a7627C992Dc37554c7c79bBCcC9875550D9259",
+    eth: "0xFfb99f4A02712C909d8F7cC44e67C87Ea1E71E83",
+    weth: "0x9a87De45A1bA9973fb457623Dc86ED992C0BDEe3",
     mushroomNft: "0x209c23db16298504354112fa4210d368e1d564da",
+    alchemyUrl: "https://eth-goerli.g.alchemy.com/v2/".concat(
+      process.env.REACT_APP_ALCHEMY_KEY_GOERLI || ""
+    ),
     infuraRpcUrl: "https://goerli.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://goerli.infura.io/v3/".concat(
-      process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
-    ),
-  },
-  rinkeby: {
-    chainId: 4,
-    hexChainId: "0x4",
-    name: "rinkeby",
-    eth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
-    weth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
-    dai: "0x118a4238E4086FAE2621D0336C0E6cdC1257BE82",
-    ethPool: "0x7d7db1ba4bc85f7d4ea43bad63acece407364aff",
-    ethUniPool: "0x3436d87664964df8a1825f826f127dec13117b0b",
-    daiPool: "0xb9625c0ec3dd89b00d20d1e3ea03d5b4072f03b4",
-    ctxPool: "0x9c4438470b1593cf4efe0f85108e7416c3b582f8",
-    infuraRpcUrl: "https://rinkeby.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
-    infuraFortmaticRpcUrl: "https://rinkeby.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
     ),
   },
@@ -106,7 +97,7 @@ export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
-  rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-goerli-demo",
   arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   arbitrum_goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
@@ -116,7 +107,6 @@ export const GRAPHQL_ENDPOINT = {
 };
 
 export const OS_API_URL = {
-  // mainnet: "https://testnets-api.opensea.io/api/v1/assets",
   mainnet: "https://deep-index.moralis.io/api/v2",
   goerli: "https://deep-index.moralis.io/api/v2",
 };
@@ -126,4 +116,19 @@ export const FEATURES = {
   NEW_VAULTS: true,
   OPTIMISM: true,
   POLYGON: false,
+};
+
+export const TOKENS_SYMBOLS = {
+  AAVE: "AAVE",
+  DAI: "DAI",
+  ETH: "ETH",
+  JPEGz: "JPEGz",
+  LINK: "LINK",
+  MATIC: "MATIC",
+  SNX: "SNX",
+  TCAP: "TCAP",
+  UNI: "UNI",
+  USDC: "USDC",
+  WETH: "WETH",
+  WBTC: "WBTC",
 };

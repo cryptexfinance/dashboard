@@ -279,7 +279,7 @@ export const isValidNetwork = (chainId: number) => {
     );
   }
   return (
-    chainId === NETWORKS.rinkeby.chainId ||
+    chainId === NETWORKS.goerli.chainId ||
     chainId === NETWORKS.arbitrum_goerli.chainId ||
     (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
     (FEATURES.POLYGON && chainId === NETWORKS.mumbai.chainId)
@@ -288,11 +288,7 @@ export const isValidNetwork = (chainId: number) => {
 
 export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
-    return (
-      chainId === NETWORKS.mainnet.chainId ||
-      chainId === NETWORKS.rinkeby.chainId ||
-      chainId === NETWORKS.goerli.chainId
-    );
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.goerli.chainId;
   }
   return false;
 };
@@ -338,8 +334,8 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
       case NETWORKS.mainnet.chainId:
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
         break;
-      case NETWORKS.rinkeby.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
+      case NETWORKS.goerli.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_GOERLI;
         break;
       case NETWORKS.polygon.chainId:
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_POLYGON;

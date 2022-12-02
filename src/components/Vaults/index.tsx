@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import Monitoring from "./monitoring";
-import Vault from "./vault";
 import Vault2 from "./vault/Vault2";
 import { signerContext } from "../../state";
 import { VaultToUpdateType } from "./types";

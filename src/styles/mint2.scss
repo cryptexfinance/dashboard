@@ -1,12 +1,18 @@
 @import "./colors";
 @import "./fonts";
 
+.wrapper::before {
+  background-image: none;
+  background-color: black;
+}
+
 .vault2 {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   padding-bottom: 0px;
+  margin-left: -1.5rem;
 
   .alert-warning {
     margin-top: 0rem;
@@ -24,19 +30,17 @@
     display: flex;
     flex-direction: column;
     margin-top: 4rem;
-    width: 30%;
+    width: 33%;
     background-color: $darker;
   }
 
   .vault {
-
     &-header {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      height: 4rem;
-      padding: 1.5rem 0.8rem;
+      padding: 2rem 2rem 1.5rem 2rem;
       background-color: $darker;
       border-bottom: 0.5px solid $dark;
       .header-col1 {
@@ -46,9 +50,14 @@
       .go-back {
         // background-color: transparent;
         border: none;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        margin-top: -2rem;
+        margin-right: -1.2rem;
       }
       svg {
         color: white;
+        transform: rotate(45deg);
       }
     }
 
@@ -71,7 +80,7 @@
       .text-muted {
         position: absolute;
         text-align: left;
-        font-size: .85rem;
+        font-size: .9rem;
         margin-top: -1.7rem;
         padding-left: 1rem;
       }
@@ -82,19 +91,19 @@
         border-radius: 5px;
 
         input[type="number"] {
-          font-size: 1rem;
+          font-size: 1.3rem;
           padding-bottom: 1.8rem;
           border-top-left-radius: 5px;
           border-bottom-left-radius: 5px;
           border-color: transparent;
           color: $white;
-          height: 3.7rem;
+          height: 4.1rem;
         }
 
         .btn {
           background-color: $darker;
           width: 7.5rem;
-          height: 3.7rem;
+          height: 4.1rem;
           border-top-right-radius: 5px;
           border-bottom-right-radius: 5px;
         }
@@ -127,6 +136,7 @@
     flex-direction: column;
     border-radius: 10px;
     margin-bottom: 1rem;
+    width: 95%;
 
     h6 {
       color: $white;
@@ -200,16 +210,15 @@
   }
 
   .vault-actions {
-    margin-top: 2rem;
     background-color: $darker;
 
     .btn-max {
       display: flex;
       padding: 0.4rem 0.8rem;
       border: 1px solid $green;
-      border-radius: 20px;
+      border-radius: 5px;
       background-color: $darkest;
-      font-size: 0.7rem;
+      font-size: 0.9rem;
       color: $green;
 
       &.orange {
@@ -248,18 +257,18 @@
 
     .dropdown {
       height: 100%;
-      width: 110px;
+      width: 140px;
       margin-right: 0.5rem;
 
       .dropdown-toggle {
         padding-right: 1rem;
-        border-radius: 20px;
+        border-radius: 5px;
         width: 100%;
         height: 100%;
 
         span {
           font-family: "space mono";
-          font-size: 0.7rem;
+          font-size: 1rem;
         }
       }
     }
@@ -294,7 +303,7 @@
 
       .btn-secondary {
         margin-bottom: 0rem;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         background-color: #281e31;
       }
 
@@ -314,7 +323,6 @@
   }
 
   .create-vault {
-
     .btn {
       width: 13.4375rem;
       height: 3.875rem;
@@ -417,7 +425,14 @@
       justify-content: space-between;
       padding: 0rem 1rem;
     }
+    .asset-box {
+      width: 100%;
+      &.right {
+        align-items: flex-end;
+      }
+    }
     .vault-form {
+      margin-top: 3.5rem;
       padding: 0rem 1rem;
     }
     .assets-balance {
@@ -468,6 +483,7 @@
       background-color: $darker;
       padding: 2rem 1.5rem;
       margin-bottom: 1rem;
+      
 
       h6 {
         color: $white;
@@ -486,12 +502,13 @@
       .asset-box-balance {
         display: flex;
         justify-content: space-between;
-        width: 100%;
+        width: 94%;
         padding: 0.2rem 0.2rem;
 
         &-title {
           color: $lighter;
           font-size: 0.8rem;
+          margin-right: 0.5rem;
         }
 
         &-value {
@@ -512,7 +529,7 @@
       border-radius: 5px;
 
       h6 {
-        font-size: 0.9rem;
+        font-size: 1rem;
         color: $white;
         align-self: center;
         margin-bottom: 0rem;
@@ -540,4 +557,9 @@
     }
   }
 
+  @media (max-width: 1400px) {
+    .vault-container {
+      width: 43%;
+    }
+  }
 }
