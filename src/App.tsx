@@ -901,7 +901,6 @@ const App = () => {
     const currentSigner = currentProvider.getSigner();
     signer.setCurrentSigner(currentSigner);
     const ethcallProvider = new Provider(currentProvider);
-
     if (isArbitrum(network.chainId)) {
       await setArbitrumContracts(network.chainId, currentSigner, ethcallProvider);
     } else if (isPolygon(network.chainId)) {

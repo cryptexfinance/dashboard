@@ -144,13 +144,9 @@ const Vault2 = ({ currentAddress, vaultInitData, goBack }: props) => {
     );
 
     let currentVaultData: any;
-    console.log("Collateral: ", vaultData.collateralSymbol);
-    console.log("Mode: ", vaultData.isHardVault);
-    console.log("Vault: ", currentVault?.address);
     // @ts-ignore
     const vaultID = await currentVault.userToVault(currentAddress);
     setCurrentVaultId(vaultID.toString());
-    console.log("vaultID: ", vaultID.toString());
     if (vaultID.toString() !== "0") {
       // @ts-ignore
       const cVault = await currentVault.vaults(vaultID);
@@ -665,7 +661,6 @@ const Vault2 = ({ currentAddress, vaultInitData, goBack }: props) => {
         setBtnDisabled(true);
         try {
           const amount = ethers.utils.parseEther(mintTxt);
-          console.log("WEI Amount: ", amount.toString());
           const tx = await currentVault?.mint(amount);
           notifyUser(tx, refresh);
         } catch (error) {
@@ -1011,8 +1006,6 @@ const Vault2 = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const creatOrApprovee = async () => {
-    console.log(" Create Vault: ", currentVault?.address);
-    console.log(" currentVaultId: ", currentVaultId);
     if (currentVaultId === "0") {
       setBtnDisabled(true);
       try {

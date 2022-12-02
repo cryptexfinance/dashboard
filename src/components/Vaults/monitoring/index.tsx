@@ -176,8 +176,6 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       }
     }
 
-    console.log("Filter: ", filter);
-
     return filter;
   };
 

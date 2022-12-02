@@ -63,7 +63,7 @@ export const useVault = (
       cAssetRead = tokens.tcapTokenRead;
       cAssetOracleRead = oracles.tcapOracleRead;
     }
-    console.log("UseVault: ", isHardVault);
+
     switch (collateralSymbol) {
       case "DAI":
         if (isHardVault) {

@@ -77,7 +77,6 @@ export const usePrices = (): OraclePricesType => {
           usdcOraclePrice,
           wbtcOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
-        console.log("4. usePrices");
       } else if (isOptimism(currentNetwork.chainId)) {
         // @ts-ignore
         [

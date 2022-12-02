@@ -86,7 +86,7 @@ const Rewards = ({
   const confIncetive = (): any => {
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
-      case NETWORKS.rinkeby.chainId:
+      case NETWORKS.goerli.chainId:
         ethTcapPool = UNIV3.rinkeby.tcapPool;
         break;
       default:
@@ -229,7 +229,7 @@ const Rewards = ({
     const tcapAddress = tokens.tcapToken?.address;
     let { feeTier } = UNIV3.mainnet.tcapPool;
     let wethAddress = NETWORKS.mainnet.eth;
-    if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
+    if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
       feeTier = UNIV3.rinkeby.tcapPool.feeTier;
       wethAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
     }
