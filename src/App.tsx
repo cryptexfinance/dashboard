@@ -16,7 +16,6 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import WelcomeWrapper from "./components/Welcome/index";
-import { Vault, Monitoring } from "./components/Vault";
 import Vaults from "./components/Vaults";
 import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
@@ -34,6 +33,7 @@ import {
   signerContext,
   tokensContext,
   vaultsContext,
+  vaultsPageContext,
   Web3ModalContext,
 } from "./state";
 import cryptexJson from "./contracts/cryptex.json";
@@ -80,6 +80,7 @@ const App = () => {
   const governance = hooks.useGovernance();
   const rewards = hooks.useRewards();
   const mushroomNft = hooks.useMushroomNft();
+  const vaultsPage = hooks.useVaultsPage();
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
@@ -1014,51 +1015,47 @@ const App = () => {
                 <governanceContext.Provider value={governance}>
                   <rewardsContext.Provider value={rewards}>
                     <mushroomNftContext.Provider value={mushroomNft}>
-                      <Sidebar
-                        showSidebar={showSidebar}
-                        setShowSidebar={setShowSidebar}
-                        isMobile={isMobile}
-                      />
-                      <Topbar
-                        showSidebar={showSidebar}
-                        setShowSidebar={setShowSidebar}
-                        isMobile={isMobile}
-                      />
-                      <Suspense fallback={<Loading position="total" />}>
-                        <Container fluid className="wrapper" {...handlers}>
-                          <Warnings />
-                          <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
-                          <ToastContainer />
-                          <Switch>
-                            <Route path={`${match.url}/`}>
-                              <WelcomeWrapper
-                                signerAddress={currentSignerAddress}
-                                loadingContracts={isLoadingContracts}
-                              />
-                            </Route>
-                            <Route path={`${match.url}farm`}>
-                              <Farm />
-                            </Route>
-                            <ApolloProvider client={apolloClient}>
-                              <Route path={`${match.url}vault`}>
-                                <Vault />
+                      <vaultsPageContext.Provider value={vaultsPage}>
+                        <Sidebar
+                          showSidebar={showSidebar}
+                          setShowSidebar={setShowSidebar}
+                          isMobile={isMobile}
+                        />
+                        <Topbar
+                          showSidebar={showSidebar}
+                          setShowSidebar={setShowSidebar}
+                          isMobile={isMobile}
+                        />
+                        <Suspense fallback={<Loading position="total" />}>
+                          <Container fluid className="wrapper" {...handlers}>
+                            <Warnings />
+                            <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
+                            <ToastContainer />
+                            <Switch>
+                              <Route path={`${match.url}/`}>
+                                <WelcomeWrapper
+                                  signerAddress={currentSignerAddress}
+                                  loadingContracts={isLoadingContracts}
+                                />
                               </Route>
-                              <Route path={`${match.url}vaults`}>
-                                <Vaults />
+                              <Route path={`${match.url}farm`}>
+                                <Farm />
                               </Route>
-                              <Route path={`${match.url}vault-monitoring`}>
-                                <Monitoring />
-                              </Route>
-                              <Route path={`${match.url}governance`}>
-                                <Delegators currentSignerAddress={currentSignerAddress} />
-                              </Route>
-                              <Route path={`${match.url}sewagefruitz`}>
-                                <MushroomNft />
-                              </Route>
-                            </ApolloProvider>
-                          </Switch>
-                        </Container>
-                      </Suspense>
+                              <ApolloProvider client={apolloClient}>
+                                <Route path={`${match.url}vaults`}>
+                                  <Vaults />
+                                </Route>
+                                <Route path={`${match.url}governance`}>
+                                  <Delegators currentSignerAddress={currentSignerAddress} />
+                                </Route>
+                                <Route path={`${match.url}sewagefruitz`}>
+                                  <MushroomNft />
+                                </Route>
+                              </ApolloProvider>
+                            </Switch>
+                          </Container>
+                        </Suspense>
+                      </vaultsPageContext.Provider>
                     </mushroomNftContext.Provider>
                   </rewardsContext.Provider>
                 </governanceContext.Provider>

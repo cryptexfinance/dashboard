@@ -5,6 +5,7 @@ import { FaArrowsAltH } from "react-icons/fa";
 import { ethers, BigNumber } from "ethers";
 import { useLazyQuery, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
+import "../../../styles/vault-monitoring.scss";
 import { VaultPagination } from "./Pagination";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { signerContext, hardVaultsContext, networkContext, vaultsContext } from "../../../state";

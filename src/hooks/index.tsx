@@ -23,3 +23,5 @@ export * from "./useTokens";
 export * from "./useVault";
 
 export * from "./useVaults";
+
+export * from "./useVaultsPage";

@@ -16,4 +16,6 @@ export * from "./TokensContext";
 
 export * from "./VaultsContext";
 
+export * from "./VaultsPageContext";
+
 export * from "./Web3ModalContext";

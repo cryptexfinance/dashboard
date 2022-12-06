@@ -352,7 +352,7 @@ export const Vaults = ({
                     </div>
                   </td>
                 )}
-                {myVaults && v.url !== "" && <td>{vaultButtonLink(v)}</td>}
+                <td className="go-to-vault">{v.url !== "" && <>{vaultButtonLink(v)}</>}</td>
               </tr>
             );
           })}

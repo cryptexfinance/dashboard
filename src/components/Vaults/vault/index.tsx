@@ -70,7 +70,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   // Actions
   const [title, setTitle] = useState(t("vault.create"));
-  const [text, setText] = useState(t("vault.create-text", { asset: vaultData.assetSymbol }));
+  const [text, setText] = useState(t("vault.create-text", { asset: "Index" }));
   const [isLoading, setIsLoading] = useState(false);
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [activeAction, setActiveAction] = useState("add");
@@ -236,7 +236,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         // const usdAsset = toUSD(currentAssetPriceFormat, parsedDebt);
         // setVaultDebtUSD(usdAsset.toString());
       } else {
-        setText(t("vault.approve-text", { asset: currentVaultData.assetSymbol }));
+        setText(t("vault.approve-text", { asset: "Index" }));
         setTitle(t("vault.approve"));
         setIsApproved(false);
       }
@@ -258,7 +258,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       const cBalance = ethers.utils.formatUnits(currentAssetBalance, 18);
       setAssetBalance(cBalance);
 
-      setText(t("vault.create-text", { asset: vaultData.assetSymbol }));
+      setText(t("vault.create-text", { asset: "Index" }));
       setTitle(t("vault.create"));
       setIsApproved(false);
     }
@@ -1038,7 +1038,15 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       ) : (
         <>
           <p>
-            <>{text}</>
+            <>{text}</>{" "}
+            <a
+              href="https://cryptex.finance/#solutions"
+              target="_blank"
+              rel="noreferrer"
+              className="learn-more"
+            >
+              Learn More
+            </a>
           </p>
           <Button variant="pink neon-pink" onClick={creatOrApprovee} disabled={btnDisabled}>
             <>{title}</>
