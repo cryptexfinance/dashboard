@@ -55,11 +55,13 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
   }
   const [active, setActive] = useState(activeVal);
   const web3Modal = useContext(Web3ModalContext);
+
   const sidebarClass = () => {
     if (!isMobile) return "sidebar";
     if (showSidebar) return "sidebar mobile slide-out";
     return "sidebar mobile slide-in";
   };
+
   const sideBarLogo = () => {
     if (isMobile) return <MenuLogo className="menu" onClick={() => setShowSidebar(true)} />;
     return <Logo />;

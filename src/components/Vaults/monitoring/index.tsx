@@ -144,6 +144,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       if (currentStatus === "ready") {
         statusFilter = `collateral_gte: "${weiLimit}", debt_lt: "${weiLimit}"`;
       }
+      if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
+        statusFilter = `debt_gt: "${weiLimit}"`;
+      }
     }
     if (vaultMode !== "all") {
       const isHard = vaultMode === "hard" ? "true" : "false";
@@ -630,7 +633,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
   const newVault = () => {
     let newAssetSymbol = TOKENS_SYMBOLS.TCAP;
-    let newCollateralSymbol = "ETH";
+    let newCollateralSymbol = TOKENS_SYMBOLS.ETH;
     let isHardVault = false;
     const createdCollaterals = [];
     for (let i = 0; i < vaultList.length; i += 1) {

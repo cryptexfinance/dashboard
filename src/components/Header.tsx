@@ -68,6 +68,13 @@ const Header = ({ signerAddress, isMobile }: props) => {
     let rpcUrl = "https://mainnet.optimism.io/";
     let blockExplorerUrl = "https://optimistic.etherscan.io";
 
+    if (newChainId === NETWORKS.arbitrum_goerli.hexChainId) {
+      chainName = "Arbitrum Goerli";
+      currency = "GoerliETH";
+      symbol = "AGOR";
+      rpcUrl = "https://goerli-rollup.arbitrum.io/rpc";
+      blockExplorerUrl = "https://goerli.arbiscan.io/";
+    }
     if (newChainId === NETWORKS.okovan.hexChainId) {
       chainName = "Optimistic Ethereum (Kovan)";
       rpcUrl = "https://kovan.optimism.io";
@@ -123,6 +130,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
           error.code === 4902 &&
           (newChainId === NETWORKS.optimism.hexChainId ||
             newChainId === NETWORKS.okovan.hexChainId ||
+            newChainId === NETWORKS.arbitrum_goerli.hexChainId ||
             newChainId === NETWORKS.polygon.hexChainId)
         ) {
           addNetwork(newChainId);
@@ -171,12 +179,11 @@ const Header = ({ signerAddress, isMobile }: props) => {
 
   const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
 
-  const ArbitrumToggle = () => {
+  const ArbitrumToggle = () => (
     <>
-      <OPTIMISMIcon className="optimism" />
-      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "Arbitrum Goerli"}</h6>
-    </>;
-  };
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "A. Goerli"}</h6>
+    </>
+  );
 
   const ArbitrumOpt = () => (
     <Dropdown.Item

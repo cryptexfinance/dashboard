@@ -33,7 +33,6 @@ import {
   signerContext,
   tokensContext,
   vaultsContext,
-  vaultsPageContext,
   Web3ModalContext,
 } from "./state";
 import cryptexJson from "./contracts/cryptex.json";
@@ -80,7 +79,6 @@ const App = () => {
   const governance = hooks.useGovernance();
   const rewards = hooks.useRewards();
   const mushroomNft = hooks.useMushroomNft();
-  const vaultsPage = hooks.useVaultsPage();
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
@@ -889,7 +887,6 @@ const App = () => {
   };
 
   web3Modal.on("connect", async (networkProvider) => {
-    console.log("2. web3Modal");
     setLoadingContracts(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
@@ -939,7 +936,6 @@ const App = () => {
 
   useEffect(() => {
     async function loadProvider() {
-      console.log("1. entra");
       if (web3Modal.cachedProvider && !signer.signer) {
         if (!isLoadingContracts) {
           await web3Modal.connect();
@@ -1015,47 +1011,45 @@ const App = () => {
                 <governanceContext.Provider value={governance}>
                   <rewardsContext.Provider value={rewards}>
                     <mushroomNftContext.Provider value={mushroomNft}>
-                      <vaultsPageContext.Provider value={vaultsPage}>
-                        <Sidebar
-                          showSidebar={showSidebar}
-                          setShowSidebar={setShowSidebar}
-                          isMobile={isMobile}
-                        />
-                        <Topbar
-                          showSidebar={showSidebar}
-                          setShowSidebar={setShowSidebar}
-                          isMobile={isMobile}
-                        />
-                        <Suspense fallback={<Loading position="total" />}>
-                          <Container fluid className="wrapper" {...handlers}>
-                            <Warnings />
-                            <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
-                            <ToastContainer />
-                            <Switch>
-                              <Route path={`${match.url}/`}>
-                                <WelcomeWrapper
-                                  signerAddress={currentSignerAddress}
-                                  loadingContracts={isLoadingContracts}
-                                />
+                      <Sidebar
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        isMobile={isMobile}
+                      />
+                      <Topbar
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        isMobile={isMobile}
+                      />
+                      <Suspense fallback={<Loading position="total" />}>
+                        <Container fluid className="wrapper" {...handlers}>
+                          <Warnings />
+                          <Header signerAddress={currentSignerAddress} isMobile={isMobile} />
+                          <ToastContainer />
+                          <Switch>
+                            <Route path={`${match.url}/`}>
+                              <WelcomeWrapper
+                                signerAddress={currentSignerAddress}
+                                loadingContracts={isLoadingContracts}
+                              />
+                            </Route>
+                            <Route path={`${match.url}farm`}>
+                              <Farm />
+                            </Route>
+                            <ApolloProvider client={apolloClient}>
+                              <Route path={`${match.url}vaults`}>
+                                <Vaults key={Math.random()} />
                               </Route>
-                              <Route path={`${match.url}farm`}>
-                                <Farm />
+                              <Route path={`${match.url}governance`}>
+                                <Delegators currentSignerAddress={currentSignerAddress} />
                               </Route>
-                              <ApolloProvider client={apolloClient}>
-                                <Route path={`${match.url}vaults`}>
-                                  <Vaults />
-                                </Route>
-                                <Route path={`${match.url}governance`}>
-                                  <Delegators currentSignerAddress={currentSignerAddress} />
-                                </Route>
-                                <Route path={`${match.url}sewagefruitz`}>
-                                  <MushroomNft />
-                                </Route>
-                              </ApolloProvider>
-                            </Switch>
-                          </Container>
-                        </Suspense>
-                      </vaultsPageContext.Provider>
+                              <Route path={`${match.url}sewagefruitz`}>
+                                <MushroomNft />
+                              </Route>
+                            </ApolloProvider>
+                          </Switch>
+                        </Container>
+                      </Suspense>
                     </mushroomNftContext.Provider>
                   </rewardsContext.Provider>
                 </governanceContext.Provider>

@@ -123,6 +123,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       if (newMode === "hard") {
         cOptions = ["ETH", "WETH", "DAI", "USDC", "WBTC"];
       }
+      if (isArbitrum(currentNetwork.chainId)) {
+        cOptions = ["ETH", "DAI"];
+      }
       if (isOptimism(currentNetwork.chainId) && !isHardMode()) {
         cOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
       }
@@ -1134,23 +1137,27 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         <div className="vault-header">
           <div className="header-col1">
             <div className="icon-container">
-              <ButtonGroup className="mb-2">
-                {radios.map((radio, idx) => (
-                  <ToggleButton
-                    key={idx}
-                    id={`radio-${idx}`}
-                    type="radio"
-                    variant="secondary"
-                    name="radio"
-                    className={`radio-${idx}`}
-                    value={radio.value}
-                    checked={vaultMode === radio.value}
-                    onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
-                  >
-                    {radio.name}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
+              {!isArbitrum(currentNetwork.chainId) ? (
+                <ButtonGroup className="mb-2">
+                  {radios.map((radio, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`radio-${idx}`}
+                      type="radio"
+                      variant="secondary"
+                      name="radio"
+                      className={`radio-${idx}`}
+                      value={radio.value}
+                      checked={vaultMode === radio.value}
+                      onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+                    >
+                      {radio.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              ) : (
+                <h5>Vault</h5>
+              )}
             </div>
           </div>
           <Button className="go-back" onClick={() => goBack()}>

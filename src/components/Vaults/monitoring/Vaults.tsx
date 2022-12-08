@@ -12,7 +12,7 @@ import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down
 import Liquidate from "./Liquidate";
 import { networkContext } from "../../../state";
 import { PaginationType, VaultsType, VaultToUpdateType } from "../types";
-import { isArbitrum, numberFormatStr } from "../../../utils/utils";
+import { isArbitrum, isInLayer1, numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
   TokenIcon,
@@ -194,9 +194,9 @@ export const Vaults = ({
   const newVault = () => {
     const initData = {
       vaultId: "0",
-      assetSymbol: "TCAP",
-      collateralSymbol: "ETH",
-      isHardVault: true,
+      assetSymbol: !isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.TCAP : TOKENS_SYMBOLS.JPEGz,
+      collateralSymbol: TOKENS_SYMBOLS.ETH,
+      isHardVault: isInLayer1(currentNetwork.chainId),
     };
     setVaultToUpdate(initData);
   };
@@ -260,7 +260,6 @@ export const Vaults = ({
                 {sortingIncon(ratioSort)}
               </button>
             </th>
-            {myVaults && currentAddress !== "" && <th />}
             {currentStatus === "liquidation" && (
               <th className="ratio">
                 <>{t("monitoring.net-reward")}</>
@@ -269,6 +268,7 @@ export const Vaults = ({
                 </button>
               </th>
             )}
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -358,7 +358,7 @@ export const Vaults = ({
           })}
         </tbody>
       </Table>
-      {vaults.length === 0 && currentAddress !== "" && myVaults && (
+      {vaults.length === 0 && currentAddress !== "" && myVaults && currentStatus === "all" && (
         <div className="no-vaults-box">
           <p>
             No Vaults yet. Please
@@ -369,7 +369,7 @@ export const Vaults = ({
           </p>
         </div>
       )}
-      {vaults.length === 0 && currentAddress === "" && (
+      {vaults.length === 0 && !myVaults && (
         <div className="no-vaults-box">
           <p>No vaults found.</p>
         </div>

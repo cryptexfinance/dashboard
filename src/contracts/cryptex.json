@@ -21598,7 +21598,7 @@
       "chainId": "5",
       "contracts": {
         "AAVE": {
-          "address": "0xFc000421075072aB30e288246FAc183916fa47fE",
+          "address": "0x90f860f0D8ab28e821358fa983012A5684abb48F",
           "abi": [
             {
               "inputs": [],
@@ -21914,7 +21914,7 @@
           ]
         },
         "AaveOracle": {
-          "address": "0x59c7a429f38239902C415F031A4087D7E379C35f",
+          "address": "0xE7958A5B90404fc16B4dDF45F8E1F0A72C384071",
           "abi": [
             {
               "inputs": [
@@ -22155,7 +22155,7 @@
           ]
         },
         "AaveVaultHandler": {
-          "address": "0xEc835efca3A67D7efA7F1b7a84dBf0A3CCe9e9E5",
+          "address": "0xDbF72abD93de75C6CD056B91233b365b870b2FBA",
           "abi": [
             {
               "inputs": [
@@ -23379,7 +23379,7 @@
           ]
         },
         "WBTCOracle": {
-          "address": "0x16aDe09b5844FA8096521649F15F77CEBFDC49A4",
+          "address": "0x52620D9bF02B8Abba8b759D66121210Da674D64D",
           "abi": [
             {
               "inputs": [
@@ -23615,7 +23615,7 @@
           ]
         },
         "WBTCVaultHandler": {
-          "address": "0x4b1d93F7318e78d2B895A98a302b31c61886C39A",
+          "address": "0x07e89a2A7723d4B701eE99f8D772585b88aC4D12",
           "abi": [
             {
               "inputs": [
@@ -24839,7 +24839,7 @@
           ]
         },
         "Ctx": {
-          "address": "0xa400D66cE877f572c31Bb5483f17Fee4328da468",
+          "address": "0xba25Feed06c79446F2ACc15A9AE5E53163126022",
           "abi": [
             {
               "inputs": [
@@ -26385,7 +26385,7 @@
           ]
         },
         "DAI": {
-          "address": "0xD2a7627C992Dc37554c7c79bBCcC9875550D9259",
+          "address": "0xB67AD4cd26B33Ec60EbA6718626FF76a41CC676F",
           "abi": [
             {
               "inputs": [],
@@ -26701,7 +26701,7 @@
           ]
         },
         "DAIOracle": {
-          "address": "0xFA306c9C3d8ED101b331024dDabF53321BCcb40e",
+          "address": "0x7E574b5F8B61B71A6A1DA6127A9383F656d1a800",
           "abi": [
             {
               "inputs": [
@@ -31078,7 +31078,7 @@
           ]
         },
         "LINK": {
-          "address": "0xD4B24c3056aA82E300eb5Dac115324E5EBc360A0",
+          "address": "0xb72AcaD4B30eDBD8E59265eD44Bbd4D445D1725C",
           "abi": [
             {
               "inputs": [],
@@ -31394,7 +31394,7 @@
           ]
         },
         "LinkOracle": {
-          "address": "0x800b69270c7AF09F19c6B5a25f67A30E392A2a66",
+          "address": "0x96803dEd22bd51381a7b114bab1EbaC207d81811",
           "abi": [
             {
               "inputs": [
@@ -31635,7 +31635,7 @@
           ]
         },
         "LinkVaultHandler": {
-          "address": "0x7Ccb3Cd07cb2461190E4EF2A5D9c846203CC12f4",
+          "address": "0xfEab8f210a78BFE920D4808E2F7a3F7D939E129B",
           "abi": [
             {
               "inputs": [
@@ -33232,7 +33232,7 @@
           ]
         },
         "TCAP": {
-          "address": "0xE181E0E3254c061E65F1Ad32DD2c3e1Da192fb48",
+          "address": "0x59a47B0738203A65D085b2854EC7a22B6fee927D",
           "abi": [
             {
               "inputs": [
@@ -33813,7 +33813,7 @@
           ]
         },
         "TCAPOracle": {
-          "address": "0xFe36935D83109D389E0a71A3b83464D5905131Ac",
+          "address": "0xe13c4AFEDF1F939217E163cd841A1085e7Ff359a",
           "abi": [
             {
               "inputs": [
@@ -34049,7 +34049,7 @@
           ]
         },
         "Timelock": {
-          "address": "0xeCfaAE58487B64d777cDc8fb9f9e3B154f5563F1",
+          "address": "0xbfBE2a21e0d0280B525f4212F3D004fE29597d8b",
           "abi": [
             {
               "inputs": [
@@ -34502,7 +34502,7 @@
           ]
         },
         "WBTC": {
-          "address": "0xfE4e1A6E857a143A7C425Fd89305d2567b791fc2",
+          "address": "0xe2a460850caE5ee351608182B8534aA48545b590",
           "abi": [
             {
               "inputs": [],
@@ -34818,7 +34818,7 @@
           ]
         },
         "WETH": {
-          "address": "0x9a87De45A1bA9973fb457623Dc86ED992C0BDEe3",
+          "address": "0xB091FCDE940d3303f7174C41e184AEDe3dd7AdBf",
           "abi": [
             {
               "anonymous": false,
@@ -35103,7 +35103,7 @@
           ]
         },
         "WETHOracle": {
-          "address": "0x73e29C6b575d371E63CCA22D1894966699CC5c19",
+          "address": "0x6d10A60caf2055D13900AE8742866Bcd632910f2",
           "abi": [
             {
               "inputs": [
@@ -37390,7 +37390,7 @@
           ]
         },
         "HardWETHVaultHandler": {
-          "address": "0x6cd97e6322d39Fea04E66a2C02b41ae22d914384",
+          "address": "0xfA425b8bAf51E5ab840bC521AFfB1a5F7a7A8d80",
           "abi": [
             {
               "inputs": [
@@ -38696,7 +38696,7 @@
           ]
         },
         "HardDaiVaultHandler": {
-          "address": "0x734777faCE6d6B459F3C2C5a952308041D9985fc",
+          "address": "0x9f3a56dCEbbE9676639EF1FFBa0e45802D20d44d",
           "abi": [
             {
               "inputs": [
@@ -39978,7 +39978,7 @@
           ]
         },
         "USDC": {
-          "address": "0xF027880989ebc4b2084cB43281b18bc58ca45ABA",
+          "address": "0xeC8686387b85cDB589E4Ec3ceF6213Bdb333070A",
           "abi": [
             {
               "inputs": [],
@@ -40294,7 +40294,7 @@
           ]
         },
         "USDCOracle": {
-          "address": "0x0e7D0a817Ad6693d7ccd9c13389394F8E4F48248",
+          "address": "0xE8bc5dD936A974808211C9c7A4F3020366Fd6B61",
           "abi": [
             {
               "inputs": [
@@ -40535,7 +40535,7 @@
           ]
         }, 
         "HardUSDCVaultHandler": {
-          "address": "0x64D2566363d19b817645933b8E503235fFf9b6A7",
+          "address": "0xAFc04bD31061a0c7D4B3A6ef4c7B391C3cd44F81",
           "abi": [
             {
               "inputs": [
@@ -41817,7 +41817,7 @@
           ]
         },
         "HardWBTCVaultHandler": {
-          "address": "0x2364536F4891Ed560A6728f4B36871de8176eE5c",
+          "address": "0x07e89a2A7723d4B701eE99f8D772585b88aC4D12",
           "abi": [
             {
               "inputs": [
