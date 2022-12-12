@@ -489,7 +489,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
             loadVaultData();
           }
-        } else {
+        } else if (prices.daiOraclePrice !== "0") {
           setCurrentOwnerFilter(vaultsOwnerFilter[0]);
           loadVaultData();
         }
@@ -497,7 +497,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       load();
     },
     // eslint-disable-next-line
-    [signer]
+    [signer, prices.daiOraclePrice]
   );
 
   const tokensSymbols = (): Array<DropdownItemType> => {
