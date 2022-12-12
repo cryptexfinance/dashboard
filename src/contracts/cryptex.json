@@ -21598,7 +21598,7 @@
       "chainId": "5",
       "contracts": {
         "AAVE": {
-          "address": "0x90f860f0D8ab28e821358fa983012A5684abb48F",
+          "address": "0x51E4E8Deb87a72A7cF12DECa5e307Ad6E286dad8",
           "abi": [
             {
               "inputs": [],
@@ -21914,7 +21914,7 @@
           ]
         },
         "AaveOracle": {
-          "address": "0xE7958A5B90404fc16B4dDF45F8E1F0A72C384071",
+          "address": "0x891FbB3f9EecB3822A67B20bFf284D0D83b7C30f",
           "abi": [
             {
               "inputs": [
@@ -22155,7 +22155,7 @@
           ]
         },
         "AaveVaultHandler": {
-          "address": "0xDbF72abD93de75C6CD056B91233b365b870b2FBA",
+          "address": "0xaf26aA0F3b19D156499BdC26d3fAA88530024c31",
           "abi": [
             {
               "inputs": [
@@ -23379,7 +23379,7 @@
           ]
         },
         "WBTCOracle": {
-          "address": "0x52620D9bF02B8Abba8b759D66121210Da674D64D",
+          "address": "0xeDA36A1a6315A8208eE188cd45a1522A0a43598b",
           "abi": [
             {
               "inputs": [
@@ -23615,7 +23615,7 @@
           ]
         },
         "WBTCVaultHandler": {
-          "address": "0x07e89a2A7723d4B701eE99f8D772585b88aC4D12",
+          "address": "0x97CC91464Bd943c3f7B56EdD5a348B41bc4b224d",
           "abi": [
             {
               "inputs": [
@@ -24839,7 +24839,7 @@
           ]
         },
         "Ctx": {
-          "address": "0xba25Feed06c79446F2ACc15A9AE5E53163126022",
+          "address": "0xc1BF30f5aD5Cd8829DebA7Bc48ed7a6fDc3e618B",
           "abi": [
             {
               "inputs": [
@@ -26385,7 +26385,7 @@
           ]
         },
         "DAI": {
-          "address": "0xB67AD4cd26B33Ec60EbA6718626FF76a41CC676F",
+          "address": "0x6c913fa678C81c567A11EdF19E06bE758DBeFe2D",
           "abi": [
             {
               "inputs": [],
@@ -26701,7 +26701,7 @@
           ]
         },
         "DAIOracle": {
-          "address": "0x7E574b5F8B61B71A6A1DA6127A9383F656d1a800",
+          "address": "0xdCc78697091f086c4C592d0c6518292Eb7337dB3",
           "abi": [
             {
               "inputs": [
@@ -26937,7 +26937,7 @@
           ]
         },
         "DAIRewardHandler": {
-          "address": "0x92A04c468Da411D43F4Aec977F32F36751B82CeC",
+          "address": "0xA229c41786C977FB69ffd64C88994f6aC43A8F69",
           "abi": [
             {
               "inputs": [
@@ -27740,7 +27740,7 @@
           ]
         },
         "DAIVaultHandler": {
-          "address": "0x7933380EbB0e1c14b21160e7Fb56fAfcb3555f55",
+          "address": "0xC93ff851ADD589D010cabb3a5C9BC7eB840267FA",
           "abi": [
             {
               "inputs": [
@@ -30442,7 +30442,7 @@
           ]
         },
         "GovernorAlpha": {
-          "address": "0xc27e8BfB7a85f54498b2378d2a533126800d14E3",
+          "address": "0x831f5eC3cAc0De0d5211E6b8B1eFdcecac91cF39",
           "abi": [
             {
               "inputs": [
@@ -31078,7 +31078,7 @@
           ]
         },
         "LINK": {
-          "address": "0xb72AcaD4B30eDBD8E59265eD44Bbd4D445D1725C",
+          "address": "0x411366c56df57C0Fe0b7e0b14fb06D3732E83c3F",
           "abi": [
             {
               "inputs": [],
@@ -31394,7 +31394,7 @@
           ]
         },
         "LinkOracle": {
-          "address": "0x96803dEd22bd51381a7b114bab1EbaC207d81811",
+          "address": "0xF34f381c017aD94281823c56098604C93BA95261",
           "abi": [
             {
               "inputs": [
@@ -31635,7 +31635,7 @@
           ]
         },
         "LinkVaultHandler": {
-          "address": "0xfEab8f210a78BFE920D4808E2F7a3F7D939E129B",
+          "address": "0x42D56A7E778863E10C11305f01edC83Ca96489A6",
           "abi": [
             {
               "inputs": [
@@ -32859,7 +32859,7 @@
           ]
         },
         "Orchestrator": {
-          "address": "0xf6bbed61b6118f5f6df4DF1bDc6e8fd598057F14",
+          "address": "0xe8BFaB95180CAAAB795cdD5c2d5Dd4F35bF3f181",
           "abi": [
             {
               "inputs": [
@@ -33232,7 +33232,7 @@
           ]
         },
         "TCAP": {
-          "address": "0x59a47B0738203A65D085b2854EC7a22B6fee927D",
+          "address": "0x8Aa3A478d84d76FF762dc2eD4F4449acd4FD3351",
           "abi": [
             {
               "inputs": [
@@ -33813,7 +33813,7 @@
           ]
         },
         "TCAPOracle": {
-          "address": "0xe13c4AFEDF1F939217E163cd841A1085e7Ff359a",
+          "address": "0xDB0d2fd6d01B12c9444FBdf852A80E27966bA9C9",
           "abi": [
             {
               "inputs": [
@@ -34049,7 +34049,7 @@
           ]
         },
         "Timelock": {
-          "address": "0xbfBE2a21e0d0280B525f4212F3D004fE29597d8b",
+          "address": "0x00531065Af9ED99b19BD21997b3c2B6C13498f26",
           "abi": [
             {
               "inputs": [
@@ -34502,7 +34502,7 @@
           ]
         },
         "WBTC": {
-          "address": "0xe2a460850caE5ee351608182B8534aA48545b590",
+          "address": "0x6A81909f4e0A46FCaC72F9f2653cbe079e008B21",
           "abi": [
             {
               "inputs": [],
@@ -34818,7 +34818,7 @@
           ]
         },
         "WETH": {
-          "address": "0xB091FCDE940d3303f7174C41e184AEDe3dd7AdBf",
+          "address": "0xAEb34d4C107BDa831C0B50d68eb13F2469FB21f5",
           "abi": [
             {
               "anonymous": false,
@@ -35103,7 +35103,7 @@
           ]
         },
         "WETHOracle": {
-          "address": "0x6d10A60caf2055D13900AE8742866Bcd632910f2",
+          "address": "0x7E1bb2f2c2773490598b9E9bA592079dD73E788b",
           "abi": [
             {
               "inputs": [
@@ -35339,7 +35339,7 @@
           ]
         },
         "WETHRewardHandler": {
-          "address": "0x9c0cA2795d023483879adf7671Aa80Cd4fBe15EB",
+          "address": "0xe41E52E8c4F5A525169EaCAB50903fA4326eaDc8",
           "abi": [
             {
               "inputs": [
@@ -36142,7 +36142,7 @@
           ]
         },
         "WETHVaultHandler": {
-          "address": "0x18bE4DAB1D2158D5f4c43D7c9c12D417E65F179d",
+          "address": "0x30412fa1Bdb2380157345DD58e2FE2eb375a1fF8",
           "abi": [
             {
               "inputs": [
@@ -37390,7 +37390,7 @@
           ]
         },
         "HardWETHVaultHandler": {
-          "address": "0xfA425b8bAf51E5ab840bC521AFfB1a5F7a7A8d80",
+          "address": "0xFa035809A0641bEeBa50AB48cB558445E8DE7F51",
           "abi": [
             {
               "inputs": [
@@ -38696,7 +38696,7 @@
           ]
         },
         "HardDaiVaultHandler": {
-          "address": "0x9f3a56dCEbbE9676639EF1FFBa0e45802D20d44d",
+          "address": "0x233Bf8abf661Cf780e1A62b3a6A9C0d28Fb46E3b",
           "abi": [
             {
               "inputs": [
@@ -39978,7 +39978,7 @@
           ]
         },
         "USDC": {
-          "address": "0xeC8686387b85cDB589E4Ec3ceF6213Bdb333070A",
+          "address": "0x9727D87A69d84e747D18F2B36A4cf6cc8A55E653",
           "abi": [
             {
               "inputs": [],
@@ -40294,7 +40294,7 @@
           ]
         },
         "USDCOracle": {
-          "address": "0xE8bc5dD936A974808211C9c7A4F3020366Fd6B61",
+          "address": "0x78AB4F006Ffc7bbd6e058CB449983e72162197c0",
           "abi": [
             {
               "inputs": [
@@ -40535,7 +40535,7 @@
           ]
         }, 
         "HardUSDCVaultHandler": {
-          "address": "0xAFc04bD31061a0c7D4B3A6ef4c7B391C3cd44F81",
+          "address": "0x7a6E78eA1695Dc2666145F97e7fAc78cfb51a6B8",
           "abi": [
             {
               "inputs": [

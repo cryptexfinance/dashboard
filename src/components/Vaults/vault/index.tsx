@@ -24,7 +24,6 @@ import {
   getSafeRemoveCollateral,
   getSafeMint,
   isArbitrum,
-  isInLayer1,
   isPolygon,
   isOptimism,
   notifyUser,
@@ -48,9 +47,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const { t } = useTranslation();
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
-  const [vaultMode, setVaultMode] = useState(
-    isInLayer1(currentNetwork.chainId) ? "hard" : "normal"
-  );
+  const [vaultMode, setVaultMode] = useState(vaultInitData.isHardVault ? "hard" : "normal");
   const [vaultData, setVaultData] = useState(vaultInitData);
   const radios = [
     { name: "Regular", value: "normal" },
@@ -506,7 +503,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         );
         changeVault(r);
         setBurnUSD(usd.toString());
-        const currentBurnFee = await currentVaultRead?.getFee(
+        const currentBurnFee = await currentVault?.getFee(
           ethers.utils.parseEther(event.target.value)
         );
         const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
@@ -716,8 +713,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         const currentBurnFee = await currentVault?.getFee(amount);
         const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
         const ethFee = ethers.utils.formatEther(increasedFee);
+        console.log("Amount: ", amount.toString());
+        console.log("increasedFee: ", increasedFee.toString());
+        console.log("Fee: ", ethFee.toString());
+
         setBurnFee(ethFee.toString());
-        const tx = await currentVault?.burn(amount, { value: increasedFee });
+        const tx = await currentVault?.burn(amount, { value: BigNumber.from(increasedFee) });
         notifyUser(tx, refresh);
       } catch (error) {
         console.error(error);

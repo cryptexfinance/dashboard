@@ -24,9 +24,9 @@ export const NETWORKS = {
     chainId: 5,
     hexChainId: "0x5",
     name: "goerli",
-    dai: "0xB67AD4cd26B33Ec60EbA6718626FF76a41CC676F",
+    dai: "0x6c913fa678C81c567A11EdF19E06bE758DBeFe2D",
     eth: "0xFfb99f4A02712C909d8F7cC44e67C87Ea1E71E83",
-    weth: "0xB091FCDE940d3303f7174C41e184AEDe3dd7AdBf",
+    weth: "0xAEb34d4C107BDa831C0B50d68eb13F2469FB21f5",
     mushroomNft: "0x209c23db16298504354112fa4210d368e1d564da",
     alchemyUrl: "https://eth-goerli.g.alchemy.com/v2/".concat(
       process.env.REACT_APP_ALCHEMY_KEY_GOERLI || ""
