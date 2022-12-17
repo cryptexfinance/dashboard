@@ -9,7 +9,7 @@ import "../styles/header.scss";
 import "@rainbow-me/rainbowkit/styles.css";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
@@ -20,10 +20,6 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
-
-
-
-
 
 type props = {
   signerAddress: string;
@@ -48,6 +44,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
     // Create new element
+    // @ts-ignore
     const el = document.createElement("textarea");
     // Set value (string to be copied)
     el.value = address;
@@ -57,6 +54,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
     // Select text inside element
     el.select();
     // Copy text to clipboard
+    // @ts-ignore
     document.execCommand("copy");
     // Remove temporary element
     document.body.removeChild(el);
@@ -90,6 +88,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
     }
 
     try {
+      // @ts-ignore
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
         params: [
@@ -114,13 +113,16 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const onNetworkChange = async (newChainId: string | null) => {
     if (currentNetwork.isBrowserWallet) {
       try {
+        // @ts-ignore
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
+          // @ts-ignore
           params: [{ chainId: newChainId }],
         });
-      } catch (error: any) {
+      } catch (error) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (
+          // @ts-ignore
           error.code === 4902 &&
           (newChainId === NETWORKS.optimism.hexChainId ||
             newChainId === NETWORKS.okovan.hexChainId ||
@@ -305,7 +307,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>
-              <NumberFormat
+              <NumericFormat
                 className="number mx-2 neon-pink"
                 value={tokenBalance}
                 displayType="text"
@@ -331,14 +333,8 @@ const Header = ({ signerAddress, isMobile }: props) => {
         </>
       ) : (
         <>
-          <Button
-            variant="pink"
-            className="neon-pink btn-connect"
-            onClick={() => {
-              web3Modal.toggleModal();
-            }}
-          >
-            {t("connect")}
+          <Button variant="pink" className="neon-pink btn-connect">
+            <>{t("connect")}</>
           </Button>
           {/* <LangDropDown className="btn-language" /> */}
         </>

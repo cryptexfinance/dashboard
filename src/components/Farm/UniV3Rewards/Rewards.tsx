@@ -7,7 +7,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
 import { useTranslation } from "react-i18next";
 import { BigNumber, ethers } from "ethers";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { Contract } from "ethers-multicall";
 import { useQuery, gql } from "@apollo/client";
 import { FaArrowsAltH } from "react-icons/fa";
@@ -271,7 +271,7 @@ const Rewards = ({
         className=" ml-4 claim"
         disabled={btnDisabled}
       >
-        {t("claim")}
+        <>{t("claim")}</>
       </Button>
     );
   };
@@ -304,7 +304,7 @@ const Rewards = ({
       <div className="rewards-tier">
         <div className="rewards-item">
           <h6>Fee tier:</h6>
-          <NumberFormat
+          <NumericFormat
             className="number"
             value="0.3"
             displayType="text"
@@ -316,7 +316,7 @@ const Rewards = ({
         </div>
         <div className="rewards-item">
           <h6>TCAP/WETH Price: </h6>
-          <NumberFormat
+          <NumericFormat
             className="number"
             value={cumulativePrice}
             displayType="text"
@@ -360,7 +360,7 @@ const Rewards = ({
         </OverlayTrigger>
         <h6>:</h6>
         <div className="amount">
-          <NumberFormat
+          <NumericFormat
             className="number"
             value={availableReward}
             displayType="text"
@@ -498,7 +498,7 @@ const Rewards = ({
               </td>
               <td>{RenderStatusLabel(position)}</td>
               <td className="number">
-                <NumberFormat
+                <NumericFormat
                   className="number"
                   value={position.reward}
                   displayType="text"
@@ -577,7 +577,7 @@ const Rewards = ({
           <div className="rewards-total">
             <h6>Unclaimed Reward:</h6>
             <div className="amount">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={availableReward}
                 displayType="text"

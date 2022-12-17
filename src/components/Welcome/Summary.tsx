@@ -8,7 +8,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { useQuery, gql } from "@apollo/client";
 import NetworkContext from "../../state/NetworkContext";
 import SignerContext from "../../state/SignerContext";
@@ -142,7 +142,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
       <div className="prices">
         <div className="token-price total">
           <h4 className="number neon-dark-blue">
-            <NumberFormat
+            <NumericFormat
               className="number"
               value={totalPrice}
               displayType="text"
@@ -153,7 +153,11 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
             <OverlayTrigger
               key="bottom"
               placement="bottom"
-              overlay={<Tooltip id="tooltip-bottom">{t("welcome.tcap-info")}</Tooltip>}
+              overlay={
+                <Tooltip id="tooltip-bottom">
+                  <>{t("welcome.tcap-info")}</>
+                </Tooltip>
+              }
             >
               <Button variant="dark" className="question">
                 ?
@@ -164,7 +168,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
         </div>
         <div className="token-price">
           <h4 className="number neon-dark-blue">
-            <NumberFormat
+            <NumericFormat
               className="number"
               value={tcapPrice}
               displayType="text"
@@ -178,7 +182,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
         {isInLayer1(currentNetwork.chainId) && (
           <div className="token-price">
             <h4 className="number neon-dark-blue">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={ctxPrice}
                 displayType="text"
@@ -216,7 +220,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     <div className="values">
                       <div className="asset-value">
                         <h5 className="number neon-blue">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={tcapBalance}
                             displayType="text"
@@ -227,7 +231,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                         <TcapIcon className="tcap-neon" />
                       </div>
                       <p className="number usd-balance">
-                        <NumberFormat
+                        <NumericFormat
                           className="number"
                           value={tcapUSDBalance}
                           displayType="text"
@@ -246,7 +250,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                       <div className="values">
                         <div className="asset-value">
                           <h5 className="number neon-dark-blue">
-                            <NumberFormat
+                            <NumericFormat
                               className="number"
                               value={ctxBalance}
                               displayType="text"
@@ -257,7 +261,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                           <CtxIcon className="tcap-neon" />
                         </div>
                         <p className="number usd-balance">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={ctxUSDBalance}
                             displayType="text"
@@ -281,15 +285,8 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                 <Row className="">
                   <p>{t("welcome.subtitle3")}</p>
                   <div>
-                    <Button
-                      variant="primary"
-                      id="connect"
-                      className="neon-pink btn-connect"
-                      onClick={() => {
-                        web3Modal.toggleModal();
-                      }}
-                    >
-                      {t("connect")}
+                    <Button variant="primary" id="connect" className="neon-pink btn-connect">
+                      <>{t("connect")}</>
                     </Button>
                   </div>
                 </Row>
@@ -311,7 +308,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                       window.open("https://app.uniswap.org/#/swap", "_blank");
                     }}
                   >
-                    {t("trade")}
+                    <>{t("trade")}</>
                   </Button>
                   <Button
                     variant="success"
@@ -321,7 +318,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("mint")}
+                    <>{t("mint")}</>
                   </Button>
                 </Col>
               </Row>
@@ -335,7 +332,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("my-vaults")}
+                    <>{t("my-vaults")}</>
                   </Button>
                   <Button
                     variant="warning"
@@ -345,7 +342,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
                     }}
                     disabled={address === ""}
                   >
-                    {t("farm")}
+                    <>{t("farm")}</>
                   </Button>
                 </Col>
               </Row>

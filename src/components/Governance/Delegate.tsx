@@ -105,6 +105,7 @@ const Delegate = ({
         setStakeText("");
         setIsApproved(true);
       } catch (error) {
+        // @ts-ignore
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {

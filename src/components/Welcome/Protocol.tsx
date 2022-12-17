@@ -3,7 +3,7 @@ import Card from "react-bootstrap/esm/Card";
 import Spinner from "react-bootstrap/Spinner";
 import { BigNumber, ethers } from "ethers";
 import { useTranslation } from "react-i18next";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import NetworkContext from "../../state/NetworkContext";
 import TokensContext from "../../state/TokensContext";
 import SignerContext from "../../state/SignerContext";
@@ -325,7 +325,7 @@ const Protocol = ({ data }: props) => {
               <div className="staked">
                 <h6>{t("welcome.summary.staked-usd")}</h6>
                 <h5 className="number neon-green">
-                  <NumberFormat
+                  <NumericFormat
                     value={TotalStake}
                     displayType="text"
                     thousandSeparator
@@ -340,7 +340,7 @@ const Protocol = ({ data }: props) => {
               <div className="staked">
                 <h6>{t("welcome.summary.total-supply")}</h6>
                 <h5 className="number neon-blue">
-                  <NumberFormat
+                  <NumericFormat
                     value={totalSupply}
                     displayType="text"
                     thousandSeparator
@@ -355,7 +355,7 @@ const Protocol = ({ data }: props) => {
                 <div className="staked">
                   <h6>{t("welcome.summary.staked-eth")}</h6>
                   <h5 className="number neon-highlight">
-                    <NumberFormat
+                    <NumericFormat
                       value={ethStake}
                       displayType="text"
                       thousandSeparator
@@ -370,7 +370,7 @@ const Protocol = ({ data }: props) => {
               <div className="staked">
                 <h6>{t("welcome.summary.staked-dai")}</h6>
                 <h5 className="number neon-orange">
-                  <NumberFormat
+                  <NumericFormat
                     value={daiStake}
                     displayType="text"
                     thousandSeparator
@@ -385,7 +385,7 @@ const Protocol = ({ data }: props) => {
                 <div className="staked">
                   <h6>{t("welcome.summary.staked-aave")}</h6>
                   <h5 className="number neon-highlight">
-                    <NumberFormat
+                    <NumericFormat
                       value={aaveStake}
                       displayType="text"
                       thousandSeparator
@@ -401,7 +401,7 @@ const Protocol = ({ data }: props) => {
                 <div className="staked">
                   <h6>{t("welcome.summary.staked-link")}</h6>
                   <h5 className="number neon-highlight">
-                    <NumberFormat
+                    <NumericFormat
                       value={linkStake}
                       displayType="text"
                       thousandSeparator
@@ -418,7 +418,7 @@ const Protocol = ({ data }: props) => {
                   <div className="staked">
                     <h4>{t("welcome.summary.staked-uni")}</h4>
                     <h5 className="number neon-highlight">
-                      <NumberFormat
+                      <NumericFormat
                         value={uniStake}
                         displayType="text"
                         thousandSeparator
@@ -432,7 +432,7 @@ const Protocol = ({ data }: props) => {
                   <div className="staked">
                     <h4>{t("welcome.summary.staked-snx")}</h4>
                     <h5 className="number neon-highlight">
-                      <NumberFormat
+                      <NumericFormat
                         value={snxStake}
                         displayType="text"
                         thousandSeparator
@@ -449,7 +449,7 @@ const Protocol = ({ data }: props) => {
                 <div className="staked">
                   <h6>{t("welcome.summary.staked-matic")}</h6>
                   <h5 className="number neon-blue">
-                    <NumberFormat
+                    <NumericFormat
                       value={maticStake}
                       displayType="text"
                       thousandSeparator
@@ -465,7 +465,7 @@ const Protocol = ({ data }: props) => {
                 <div className="staked">
                   <h6>{t("welcome.summary.staked-wbtc")}</h6>
                   <h5 className="number neon-blue">
-                    <NumberFormat
+                    <NumericFormat
                       value={wbtcStake}
                       displayType="text"
                       thousandSeparator
@@ -480,7 +480,7 @@ const Protocol = ({ data }: props) => {
               <div className="staked">
                 <h6>{t("welcome.summary.staked-usdc")}</h6>
                 <h5 className="number neon-blue">
-                  <NumberFormat
+                  <NumericFormat
                     value={usdcStake}
                     displayType="text"
                     thousandSeparator

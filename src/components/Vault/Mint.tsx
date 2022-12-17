@@ -10,7 +10,7 @@ import ToggleButton from "react-bootstrap/esm/ToggleButton";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { Contract } from "ethers-multicall";
 import { ethers, BigNumber } from "ethers";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { useQuery, gql, NetworkStatus } from "@apollo/client";
 import NetworkContext from "../../state/NetworkContext";
@@ -1146,7 +1146,7 @@ const Mint = ({ address, t }: props) => {
           }
         })()}
         <h4 className=" ml-2 number neon-highlight">
-          <NumberFormat
+          <NumericFormat
             className="number"
             value={tokenBalance}
             displayType="text"
@@ -1156,7 +1156,7 @@ const Mint = ({ address, t }: props) => {
         </h4>
       </div>
       <p className="number">
-        <NumberFormat
+        <NumericFormat
           className="number"
           value={tokenBalanceUSD}
           displayType="text"
@@ -1194,7 +1194,7 @@ const Mint = ({ address, t }: props) => {
           }
         })()}
         <h4 className=" ml-2 number neon-highlight">
-          <NumberFormat
+          <NumericFormat
             className="number"
             value={tokenBalance}
             displayType="text"
@@ -1204,7 +1204,7 @@ const Mint = ({ address, t }: props) => {
         </h4>
         <span className="number">/</span>
       </div>
-      <NumberFormat
+      <NumericFormat
         className="number"
         value={tokenBalanceUSD}
         displayType="text"
@@ -1294,7 +1294,7 @@ const Mint = ({ address, t }: props) => {
                       <div>
                         <div className="amount">
                           <h4 className=" ml-2 number neon-blue">
-                            <NumberFormat
+                            <NumericFormat
                               className="number"
                               value={vaultRatio}
                               displayType="text"
@@ -1338,7 +1338,7 @@ const Mint = ({ address, t }: props) => {
                             }
                           })()}
                           <h4 className=" ml-2 number neon-dark-blue">
-                            <NumberFormat
+                            <NumericFormat
                               className="number"
                               value={vaultCollateral}
                               displayType="text"
@@ -1348,7 +1348,7 @@ const Mint = ({ address, t }: props) => {
                           </h4>
                         </div>
                         <p className="number">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={vaultCollateralUSD}
                             displayType="text"
@@ -1390,7 +1390,7 @@ const Mint = ({ address, t }: props) => {
                           </InputGroup.Append>
                         </InputGroup>
                         <Form.Text className="text-muted">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={addCollateralUSD}
                             displayType="text"
@@ -1430,7 +1430,7 @@ const Mint = ({ address, t }: props) => {
                           </InputGroup.Append>
                         </InputGroup>
                         <Form.Text className="text-muted">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={removeCollateralUSD}
                             displayType="text"
@@ -1451,7 +1451,7 @@ const Mint = ({ address, t }: props) => {
                         <div className="amount">
                           <TcapIcon className="tcap-neon" />
                           <h4 className=" ml-2 number neon-pink">
-                            <NumberFormat
+                            <NumericFormat
                               className="number"
                               value={vaultDebt}
                               displayType="text"
@@ -1461,7 +1461,7 @@ const Mint = ({ address, t }: props) => {
                           </h4>
                         </div>
                         <p className="number">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={vaultDebtUSD}
                             displayType="text"
@@ -1502,7 +1502,7 @@ const Mint = ({ address, t }: props) => {
                           </InputGroup.Append>
                         </InputGroup>
                         <Form.Text className="text-muted">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={mintUSD}
                             displayType="text"
@@ -1540,7 +1540,7 @@ const Mint = ({ address, t }: props) => {
                           </InputGroup.Append>
                         </InputGroup>
                         <Form.Text className="text-muted">
-                          <NumberFormat
+                          <NumericFormat
                             className="number"
                             value={burnUSD}
                             displayType="text"
@@ -1551,7 +1551,7 @@ const Mint = ({ address, t }: props) => {
                         </Form.Text>
                         <Form.Text className="text-muted burn-fee">
                           {t("vault.debt.fee")}:{" "}
-                          <NumberFormat
+                          <NumericFormat
                             className="number neon-pink"
                             value={burnFee}
                             displayType="text"

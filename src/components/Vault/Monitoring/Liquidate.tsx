@@ -4,7 +4,7 @@ import Table from "react-bootstrap/Table";
 import { ethers, BigNumber } from "ethers";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import Modal from "react-bootstrap/esm/Modal";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
@@ -237,20 +237,22 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
 
   const rewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.reward-info")}
+      <>{t("monitoring.reward-info")}</>
     </Tooltip>
   );
 
   const tcapAmountHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.tcap-amount-info")}
+      <>{t("monitoring.tcap-amount-info")}</>
     </Tooltip>
   );
 
   const netRewardHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      {t("monitoring.net-reward-info1")}: <br />
-      {t("monitoring.net-reward-info2")}
+      <>
+        {t("monitoring.net-reward-info1")}: <br />
+        {t("monitoring.net-reward-info2")}
+      </>  
     </Tooltip>
   );
 
@@ -282,7 +284,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t("monitoring.liquidate-vault")}
+          <>{t("monitoring.liquidate-vault")}</>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -290,7 +292,9 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Form>
           <Form.Group className="" controlId="">
             <>
-              <Form.Label>{t("amount-tcap")}</Form.Label>
+              <Form.Label>
+                <>{t("amount-tcap")}</>
+              </Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
                   MIN REQUIRED
@@ -305,7 +309,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                   onChange={onChangeMaxTcap}
                 />
                 <Form.Text className="text-muted">
-                  <NumberFormat
+                  <NumericFormat
                     className="number"
                     value={maxTcapUSD}
                     displayType="text"
@@ -319,7 +323,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                 <Form.Text className="text-muted liquidation-reward">
                   <div>
                     {t("monitoring.reward")}:{" "}
-                    <NumberFormat
+                    <NumericFormat
                       className="number neon-pink"
                       value={reward}
                       displayType="text"
@@ -332,7 +336,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                 <Form.Text className="text-muted liquidation-fee">
                   <div>
                     Burn Fee:{" "}
-                    <NumberFormat
+                    <NumericFormat
                       className="number neon-pink"
                       value={burnFee}
                       displayType="text"
@@ -377,7 +381,9 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
           onClick={liquidate}
           disabled={!canLiquidate}
         >
-          {canLiquidate ? t("monitoring.liquidate-vault") : t("monitoring.liquidating")}
+          <>
+            {canLiquidate ? t("monitoring.liquidate-vault") : t("monitoring.liquidating")}
+          </>  
         </Button>
       </Modal.Footer>
     </Modal>

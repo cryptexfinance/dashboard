@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import Card from "react-bootstrap/esm/Card";
 import Button from "react-bootstrap/esm/Button";
 import { ethers } from "ethers";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
@@ -115,7 +115,7 @@ const Rewards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
               <a href="vault/ETH">ETH Vault</a>
             </td>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={ethDebt}
                 displayType="text"
@@ -126,7 +126,7 @@ const Rewards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
               TCAP
             </td>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={ethRewards}
                 displayType="text"
@@ -175,7 +175,7 @@ const Rewards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
               <a href="vault/DAI">DAI Vault</a>
             </td>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={daiDebt}
                 displayType="text"
@@ -186,7 +186,7 @@ const Rewards = ({ address, ethRewards, daiRewards, claimRewards }: props) => {
               TCAP
             </td>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={daiRewards}
                 displayType="text"

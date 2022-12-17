@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { ethers } from "ethers";
 import Table from "react-bootstrap/esm/Table";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import GovernanceContext from "../../state/GovernanceContext";
 import SignerContext from "../../state/SignerContext";
 import { errorNotification, notifyUser } from "../../utils/utils";
@@ -80,6 +80,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
         const tx = await governance.delegatorFactory.getReward();
         notifyUser(tx, refresh);
       } catch (error) {
+        // @ts-ignore
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {
@@ -120,7 +121,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
         <tbody>
           <tr>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={stake}
                 displayType="text"
@@ -132,7 +133,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
             </td>
             <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
             <td className="number">
-              <NumberFormat
+              <NumericFormat
                 className="number"
                 value={rewards}
                 displayType="text"

@@ -271,7 +271,6 @@ const KeeperForm = ({
   };
 
   const isFormDataValid = (): boolean =>
-    isValidKeeper(delegatee) &&
     isNameValid(name) &&
     isExpertiseValid(expertise) &&
     isWhyValid(why) &&

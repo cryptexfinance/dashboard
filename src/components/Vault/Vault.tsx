@@ -43,13 +43,8 @@ export const Vault = () => {
           <div className="pre-actions">
             <h5 className="action-title mt-4 pt-2">{t("connect")}</h5>
             <p>{t("vault.no-connected")}</p>
-            <Button
-              variant="pink neon-pink btn-connect"
-              onClick={() => {
-                web3Modal.toggleModal();
-              }}
-            >
-              {t("connect")}
+            <Button variant="pink neon-pink btn-connect">
+              <>{t("connect")}</>
             </Button>
           </div>
         ) : (

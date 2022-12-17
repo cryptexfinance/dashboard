@@ -106,7 +106,9 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t("stake")} {poolTitle}
+          <>
+            {t("stake")} {poolTitle}
+          </>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -117,7 +119,9 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           <Form.Group>
             {isApproved ? (
               <>
-                <Form.Label>{t("stake2")}</Form.Label>
+                <Form.Label>
+                  <>{t("stake2")}</>
+                </Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
                     MAX
@@ -139,19 +143,18 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
       </Modal.Body>
       <Modal.Footer>
         {isApproved ? (
-          <>
-            <Button variant="primary" className="neon-highlight" onClick={stakeTokens}>
-              {t("stake")} {t("tokens")}
-            </Button>
-          </>
+          <Button variant="primary" className="neon-highlight" onClick={stakeTokens}>
+            <>
+              {t("stake")}
+              {t("tokens")}
+            </>
+          </Button>
         ) : (
-          <>
-            <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
-              {t("infinite-approve")}
-            </Button>
-          </>
+          <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
+            <>{t("infinite-approve")}</>
+          </Button>
         )}{" "}
-        {t("tokens")}
+        <>{t("tokens")}</>
       </Modal.Footer>
     </Modal>
   );

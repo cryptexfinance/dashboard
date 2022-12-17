@@ -7,7 +7,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import { useTranslation } from "react-i18next";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import SignerContext from "../../state/SignerContext";
 import TokensContext from "../../state/TokensContext";
 import NetworkContext from "../../state/NetworkContext";
@@ -324,6 +324,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
+      // @ts-ignore
       if (error.code === 4001) {
         errorNotification(t("errors.tran-rejected"));
       } else {
@@ -363,6 +364,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
+      // @ts-ignore
       if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
@@ -393,6 +395,7 @@ const Farm = () => {
       }
       notifyUser(tx, refresh);
     } catch (error) {
+      // @ts-ignore
       if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
@@ -427,7 +430,7 @@ const Farm = () => {
                             trigger={["hover", "click"]}
                             overlay={
                               <Tooltip id="ttip-vreward" className="farm-tooltip">
-                                {t("farming.unlocked-info")}
+                                <>{t("farming.unlocked-info")}</>
                               </Tooltip>
                             }
                           >
@@ -446,7 +449,7 @@ const Farm = () => {
                             trigger={["hover", "click"]}
                             overlay={
                               <Tooltip id="tooltip-top" className="farm-tooltip">
-                                {t("farming.locked-info")}
+                                <>{t("farming.locked-info")}</>
                               </Tooltip>
                             }
                           >
@@ -475,7 +478,7 @@ const Farm = () => {
                       </a>
                     </td>
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ethPoolBalance}
                         displayType="text"
@@ -485,7 +488,7 @@ const Farm = () => {
                       />{" "}
                     </td>
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ethPoolStake}
                         displayType="text"
@@ -495,7 +498,7 @@ const Farm = () => {
                       />{" "}
                     </td>
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ethPoolRewards}
                         displayType="text"
@@ -507,7 +510,7 @@ const Farm = () => {
                     </td>
                     <td className="vested-reward">
                       <div>
-                        <NumberFormat
+                        <NumericFormat
                           className="number"
                           value={vethPoolRewards}
                           displayType="text"
@@ -525,10 +528,10 @@ const Farm = () => {
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
+                            <>{t("claim")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       ) : (
@@ -541,7 +544,7 @@ const Farm = () => {
                                 claimRewards("ETHPOOL");
                               }}
                             >
-                              {t("claim")}
+                              <>{t("claim")}</>
                             </Button>
                           ) : (
                             <Button
@@ -551,7 +554,7 @@ const Farm = () => {
                                 claimVest("ETHPOOL");
                               }}
                             >
-                              {t("claim-vest")}
+                              <>{t("claim-vest")}</>
                             </Button>
                           )}
                           <Button
@@ -561,7 +564,7 @@ const Farm = () => {
                               exitRewards("ETHPOOL");
                             }}
                           >
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       )}
@@ -582,7 +585,7 @@ const Farm = () => {
                       </a>
                     </td>
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ctxPoolBalance}
                         displayType="text"
@@ -592,7 +595,7 @@ const Farm = () => {
                       />{" "}
                     </td>{" "}
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ctxPoolStake}
                         displayType="text"
@@ -602,7 +605,7 @@ const Farm = () => {
                       />{" "}
                     </td>
                     <td className="number">
-                      <NumberFormat
+                      <NumericFormat
                         className="number"
                         value={ctxPoolRewards}
                         displayType="text"
@@ -614,7 +617,7 @@ const Farm = () => {
                     </td>{" "}
                     <td className="vested-reward">
                       <div>
-                        <NumberFormat
+                        <NumericFormat
                           className="number"
                           value={vctxPoolRewards}
                           displayType="text"
@@ -634,13 +637,13 @@ const Farm = () => {
                       {address === "" ? (
                         <>
                           <Button variant="dark" className="" disabled>
-                            {t("mint")}
+                            <>{t("mint")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("claim")}
+                            <>{t("claim")}</>
                           </Button>
                           <Button variant="dark" className="ml-4" disabled>
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       ) : (
@@ -668,7 +671,7 @@ const Farm = () => {
                                 claimVest("CTXPOOL");
                               }}
                             >
-                              {t("claim-vest")}
+                              <>{t("claim-vest")}</>
                             </Button>
                           ) : (
                             <Button
@@ -678,7 +681,7 @@ const Farm = () => {
                                 claimRewards("CTXPOOL");
                               }}
                             >
-                              {t("claim")}
+                              <>{t("claim")}</>
                             </Button>
                           )}
                           <Button
@@ -688,7 +691,7 @@ const Farm = () => {
                               exitRewards("CTXPOOL");
                             }}
                           >
-                            {t("exit")}
+                            <>{t("exit")}</>
                           </Button>
                         </>
                       )}

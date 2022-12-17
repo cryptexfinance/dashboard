@@ -16,7 +16,6 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import WelcomeWrapper from "./components/Welcome/index";
-import Graph from "./components/Graph";
 import { Vault, Monitoring } from "./components/Vault";
 import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
@@ -840,6 +839,7 @@ const App = () => {
     }
   };
 
+  /* 
   web3Modal.on("connect", async (networkProvider) => {
     setLoadingContracts(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
@@ -888,36 +888,37 @@ const App = () => {
 
     setLoadingContracts(false);
   });
-
+  */
+  
   useEffect(() => {
     async function loadProvider() {
-      if (web3Modal.cachedProvider && !signer.signer) {
+      /* if (web3Modal.cachedProvider && !signer.signer) {
         if (!isLoadingContracts) {
           await web3Modal.connect();
         }
-      } else {
-        setLoadingContracts(true);
-        const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        let networkName = NETWORKS.mainnet.name;
-        if (isGoerli(parseInt(chainId))) {
-          networkName = NETWORKS.goerli.name;
-        }
-        if (chainId === "4") {
-          networkName = NETWORKS.rinkeby.name;
-        }
-        const provider = getDefaultProvider(parseInt(chainId), networkName);
-        const randomSigner = ethers.Wallet.createRandom().connect(provider);
-        const ethcallProvider = new Provider(randomSigner.provider);
-        if (isPolygon(parseInt(chainId))) {
-          setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
-        } else if (isGoerli(parseInt(chainId))) {
-          setGoerliContracts(randomSigner, ethcallProvider);
-        } else {
-          setContracts(randomSigner, ethcallProvider, parseInt(chainId));
-        }
-        setCurrentNetwork(parseInt(chainId), "", false);
-        setLoadingContracts(false);
+      } else { */
+      setLoadingContracts(true);
+      const chainId = process.env.REACT_APP_NETWORK_ID || "4";
+      let networkName = NETWORKS.mainnet.name;
+      if (isGoerli(parseInt(chainId))) {
+        networkName = NETWORKS.goerli.name;
       }
+      if (chainId === "4") {
+        networkName = NETWORKS.rinkeby.name;
+      }
+      const provider = getDefaultProvider(parseInt(chainId), networkName);
+      const randomSigner = ethers.Wallet.createRandom().connect(provider);
+      const ethcallProvider = new Provider(randomSigner.provider);
+      if (isPolygon(parseInt(chainId))) {
+        setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
+      } else if (isGoerli(parseInt(chainId))) {
+        setGoerliContracts(randomSigner, ethcallProvider);
+      } else {
+        setContracts(randomSigner, ethcallProvider, parseInt(chainId));
+      }
+      setCurrentNetwork(parseInt(chainId), "", false);
+      setLoadingContracts(false);
+      // }
     }
     // Execute the created function directly
     loadProvider();
@@ -996,9 +997,6 @@ const App = () => {
                               <Farm />
                             </Route>
                             <ApolloProvider client={apolloClient}>
-                              <Route path={`${match.url}graph`}>
-                                <Graph />
-                              </Route>
                               <Route path={`${match.url}vault`}>
                                 <Vault />
                               </Route>

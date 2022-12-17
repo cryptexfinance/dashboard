@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import SignerContext from "../../../state/SignerContext";
 import OraclesContext from "../../../state/OraclesContext";
 import TokensContext from "../../../state/TokensContext";
@@ -129,7 +129,7 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
   return (
     <>
       {apr >= 0 ? (
-        <NumberFormat
+        <NumericFormat
           className="number neon-pink"
           value={loading ? "0" : apr}
           displayType="text"

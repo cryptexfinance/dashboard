@@ -178,11 +178,13 @@ export const Vaults = ({
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="vaults-status-tooltip">
-                    <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
-                    <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
-                    <span className="active">Active</span>: {t("monitoring.active-info")} <br />
-                    <span className="liquidation">Liquidation</span>:{" "}
-                    {t("monitoring.liquidation-info")} <br />
+                    <>
+                      <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
+                      <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
+                      <span className="active">Active</span>: {t("monitoring.active-info")} <br />
+                      <span className="liquidation">Liquidation</span>:{" "}
+                      {t("monitoring.liquidation-info")} <br />
+                    </>  
                   </Tooltip>
                 }
               >

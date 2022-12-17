@@ -165,7 +165,6 @@
   "plugins": [
     "html",
     "prettier",
-    "react-hooks",
-    "@typescript-eslint"
+    "react-hooks"
   ]
 }

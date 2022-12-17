@@ -155,7 +155,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             to=""
             onClick={(event) => {
               event.preventDefault();
-              web3Modal.clearCachedProvider();
+              // web3Modal.clearCachedProvider();
               window.location.reload();
             }}
           >
