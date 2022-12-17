@@ -321,7 +321,7 @@ export const isGoerli = (chainId: number | undefined) => {
   return false;
 };
 
-export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
   if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
@@ -347,7 +347,7 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
         break;
     }
-    provider = ethers.getDefaultProvider(name, {
+    provider = ethers.getDefaultProvider(chainId, {
       infura: process.env.REACT_APP_INFURA_ID,
       alchemy: alchemyKey,
     });

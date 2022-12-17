@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import Button from "react-bootstrap/esm/Button";
 import Card from "react-bootstrap/esm/Card";
 import Col from "react-bootstrap/esm/Col";
-import Row from "react-bootstrap/esm/Row";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { GiSpottedMushroom } from "react-icons/gi";
+import { FaArrowRight } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
@@ -24,10 +25,11 @@ import {
   isInLayer1,
   isGoerli,
 } from "../../utils/utils";
-import "../../styles/summary.scss";
-import Protocol from "./Protocol";
-import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
+import "../../styles/summary2.scss";
+import Protocol2 from "./Protocol2";
+import { ReactComponent as VaultIcon } from "../../assets/images/welcome/vault.svg";
+import { ReactComponent as StakeIcon } from "../../assets/images/welcome/stake.svg";
+import { ReactComponent as FarmIcon } from "../../assets/images/welcome/farm.svg";
 import Loading from "../Loading";
 
 type props = {
@@ -35,7 +37,7 @@ type props = {
   loadingContracts: boolean;
 };
 
-const Summary = ({ signerAddress, loadingContracts }: props) => {
+const Summary2 = ({ signerAddress, loadingContracts }: props) => {
   const { t } = useTranslation();
   const history = useHistory();
   const [address, setAddress] = useState("");
@@ -149,7 +151,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
   }
 
   return (
-    <div className="summary">
+    <div className="summary2">
       <div className="prices">
         <div className="token-price total">
           <h4 className="number neon-dark-blue">
@@ -191,7 +193,7 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
             />
           </h4>
           <h4>
-            <>{t("welcome.tcap-price")}:</>
+            <>{t("welcome.tcap-price")}</>
           </h4>
         </div>
         {isInLayer1(currentNetwork.chainId) && (
@@ -207,185 +209,91 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
               />
             </h4>
             <h4>
-              <>{t("welcome.ctx-price")}:</>
+              <>{t("welcome.ctx-price")}</>
             </h4>
           </div>
         )}
+        <div className="token-price">
+          <h4 className="number neon-dark-blue">
+            <NumberFormat
+              className="number"
+              value={tcapBalance}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+            />
+          </h4>
+          <h4>
+            <>{t("welcome.tcap-balance")}</>
+          </h4>
+        </div>
+        <div className="token-price">
+          <h4 className="number neon-dark-blue">
+            <NumberFormat
+              className="number"
+              value={ctxBalance}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+            />
+          </h4>
+          <h4>
+            <>{t("welcome.ctx-balance")}</>
+          </h4>
+        </div>
       </div>
-      <div className="summary2">
-        <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
-          {address !== "" ? (
-            <Card className="balance">
-              <Card.Header>
-                <div className="">
-                  <h2>
-                    <>{t("welcome.title1")}</>
-                  </h2>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <div className="balance-section">
-                  <div className="balance-box">
-                    <div className="title">
-                      <h5 className="tcap">
-                        <>{t("welcome.tcap-balance")}</>
-                      </h5>
-                    </div>
-                    <div className="values">
-                      <div className="asset-value">
-                        <h5 className="number neon-blue">
-                          <NumberFormat
-                            className="number"
-                            value={tcapBalance}
-                            displayType="text"
-                            thousandSeparator
-                            decimalScale={2}
-                          />
-                        </h5>
-                        <TcapIcon className="tcap-neon" />
-                      </div>
-                      <p className="number usd-balance">
-                        <NumberFormat
-                          className="number"
-                          value={tcapUSDBalance}
-                          displayType="text"
-                          thousandSeparator
-                          prefix="$"
-                          decimalScale={2}
-                        />
-                      </p>
-                    </div>
-                  </div>
-                  {isInLayer1(currentNetwork.chainId) && (
-                    <div className="balance-box">
-                      <div className="title">
-                        <h5 className="tcap">
-                          <>{t("welcome.ctx-balance")}</>
-                        </h5>
-                      </div>
-                      <div className="values">
-                        <div className="asset-value">
-                          <h5 className="number neon-dark-blue">
-                            <NumberFormat
-                              className="number"
-                              value={ctxBalance}
-                              displayType="text"
-                              thousandSeparator
-                              decimalScale={2}
-                            />
-                          </h5>
-                          <CtxIcon className="tcap-neon" />
-                        </div>
-                        <p className="number usd-balance">
-                          <NumberFormat
-                            className="number"
-                            value={ctxUSDBalance}
-                            displayType="text"
-                            thousandSeparator
-                            prefix="$"
-                            decimalScale={2}
-                          />
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
-          ) : (
-            <Card className="balance">
-              <Card.Header>
-                <h2>
-                  <>{t("welcome.title3")}</>
-                </h2>
-              </Card.Header>
-              <Card.Body>
-                <Row className="">
-                  <p>
-                    <>{t("welcome.subtitle3")}</>
-                  </p>
-                  <div>
-                    <Button
-                      variant="primary"
-                      id="connect"
-                      className="neon-pink btn-connect"
-                      onClick={() => {
-                        web3Modal.toggleModal();
-                      }}
-                    >
-                      <>{t("connect")}</>
-                    </Button>
-                  </div>
-                </Row>
-              </Card.Body>
-            </Card>
-          )}
-          <Card className="diamond">
+      <div className="summary-protocol">
+        <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper features">
+          <Card>
             <Card.Header>
-              <h2>
-                <>{t("welcome.title2")}</>
-              </h2>
+              <h2>Use Cryptex For</h2>
             </Card.Header>
             <Card.Body>
-              <p>
-                <>{t("welcome.subtitle2")}</>
-              </p>
-              <Row className="">
-                <Col>
-                  <Button
-                    variant="primary"
-                    className="neon-pink"
-                    onClick={() => {
-                      window.open("https://app.uniswap.org/#/swap", "_blank");
-                    }}
-                  >
-                    <>{t("trade")}</>
-                  </Button>
-                  <Button
-                    variant="success"
-                    className="neon-green"
-                    onClick={() => {
-                      history.push("/vault");
-                    }}
-                    disabled={address === ""}
-                  >
-                    <>{t("mint")}</>
-                  </Button>
-                </Col>
-              </Row>
-              <Row className="">
-                <Col>
-                  <Button
-                    variant="info"
-                    className="neon-blue"
-                    onClick={() => {
-                      history.push("/vault-monitoring", { address: signerAddress });
-                    }}
-                    disabled={address === ""}
-                  >
-                    <>{t("my-vaults")}</>
-                  </Button>
-                  <Button
-                    variant="warning"
-                    className="neon-orange"
-                    onClick={() => {
-                      history.push("/farm");
-                    }}
-                    disabled={address === ""}
-                  >
-                    <>{t("farm")}</>
-                  </Button>
-                </Col>
-              </Row>
+              <Button className="btn-feature">
+                <div className="feature-content">
+                  <VaultIcon />
+                  <p>Creating Vaults & Minting Index tokens</p>
+                </div>
+                <div className="feature-action">
+                  <FaArrowRight size={20} />
+                </div>
+              </Button>
+              <Button className="btn-feature">
+                <div className="feature-content">
+                  <FarmIcon />
+                  <p>Providing liquidity</p>
+                </div>
+                <div className="feature-action">
+                  <FaArrowRight size={20} />
+                </div>
+              </Button>
+              <Button className="btn-feature">
+                <div className="feature-content">
+                  <StakeIcon className="stake-icon" />
+                  <p>Staking & delegating to Crypt Keepers</p>
+                </div>
+                <div className="feature-action">
+                  <FaArrowRight size={20} />
+                </div>
+              </Button>
+              <Button className="btn-feature">
+                <div className="feature-content">
+                  <GiSpottedMushroom size={28} className="sewagefruit" />
+                  <p>Going on quests with Sewage Fruitz</p>
+                </div>
+                <div className="feature-action">
+                  <FaArrowRight size={20} />
+                </div>
+              </Button>
             </Card.Body>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
-          <Protocol data={data} />
+          <Protocol2 data={data} />
         </Col>
       </div>
     </div>
   );
 };
 
-export default Summary;
+export default Summary2;

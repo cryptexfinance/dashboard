@@ -10,6 +10,8 @@ export * from "./useNetworks";
 
 export * from "./usePrices";
 
+export * from "./usePrices2";
+
 export * from "./useOracles";
 
 export * from "./useRatios";

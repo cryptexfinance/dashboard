@@ -1,34 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import Button from "react-bootstrap/esm/Button";
-import Card from "react-bootstrap/esm/Card";
-import Col from "react-bootstrap/esm/Col";
-import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
-import Tooltip from "react-bootstrap/esm/Tooltip";
-import { FaArrowRight } from "react-icons/fa";
-import { useHistory } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
-import NumberFormat from "react-number-format";
-import { useQuery, gql } from "@apollo/client";
-import {
-  networkContext,
-  oraclesContext,
-  signerContext,
-  tokensContext,
-  Web3ModalContext,
-} from "../../state";
-import {
-  makeShortAddress,
-  getPriceInUSDFromPair,
-  getENS,
-  isInLayer1,
-  isGoerli,
-} from "../../utils/utils";
+import { Provider } from "ethers-multicall";
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import { Card, Col, Dropdown } from "react-bootstrap/esm";
 import "../../styles/summary.scss";
 import Protocol from "./Protocol";
-import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
-import Loading from "../Loading";
+import { GRAPHQL_ENDPOINT, NETWORKS } from "../../utils/constants";
+import { getDefaultProvider } from "../../utils/utils";
+
+const clientOracle = (graphqlEndpoint: string) =>
+  new ApolloClient({
+    uri: graphqlEndpoint,
+    cache: new InMemoryCache(),
+  });
 
 type props = {
   signerAddress: string;
@@ -36,222 +20,115 @@ type props = {
 };
 
 const Summary = ({ signerAddress, loadingContracts }: props) => {
-  const { t } = useTranslation();
-  const history = useHistory();
-  const [address, setAddress] = useState("");
-  const [currentAddress, setCurrentAddress] = useState("");
-  const [tcapBalance, setTcapBalance] = useState("0.0");
-  const [tcapUSDBalance, setTcapUSDBalance] = useState("0.0");
-  const [totalPrice, setTotalPrice] = useState("0.0");
-  const [tcapPrice, setTcapPrice] = useState("0.0");
-  const [ctxPrice, setCtxPrice] = useState("0.0");
-  const [ctxUSDBalance, setCtxUSDBalance] = useState("0.0");
-  const [ctxBalance, setCtxBalance] = useState("0.0");
-  const [isLoading, setIsLoading] = useState(true);
-  const currentNetwork = useContext(networkContext);
-  const signer = useContext(signerContext);
-  const web3Modal = useContext(Web3ModalContext);
-  const tokens = useContext(tokensContext);
-  const oracles = useContext(oraclesContext);
-
-  const VAULTS_STATE = gql`
-    {
-      states {
-        amountStaked
-        id
-      }
-    }
-  `;
-
-  const { data } = useQuery(VAULTS_STATE, {
-    notifyOnNetworkStatusChange: true,
-    pollInterval: 35000,
-    fetchPolicy: "no-cache",
-  });
+  const options = [
+    { id: "0", name: "My Balance" },
+    { id: "2", name: "Indexes Summary" },
+    { id: "3", name: "Vaults Summary" },
+  ];
+  let chains = [
+    { id: NETWORKS.mainnet.chainId, name: "Mainnet" },
+    { id: NETWORKS.arbitrum.chainId, name: "Arbitrum" },
+    { id: NETWORKS.optimism.chainId, name: "Optimism" },
+  ];
+  if (process.env.REACT_APP_NETWORK_ID !== "1") {
+    chains = [
+      { id: NETWORKS.goerli.chainId, name: "Goerli" },
+      { id: NETWORKS.arbitrum_goerli.chainId, name: "Arbitrum Goerli" },
+      { id: NETWORKS.okovan.chainId, name: "OKovan" },
+    ];
+  }
+  const [currentOption, setCurrentOption] = useState(options[0]);
+  const [currentChain, setCurrentChain] = useState(chains[0]);
+  const [currentEthProvider, setCurrentEthProvider] = useState<Provider | undefined>();
+  const [apolloClient, setApolloClient] = useState(
+    clientOracle(
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.goerli
+    )
+  );
 
   useEffect(() => {
-    const loadAddress = async () => {
-      if (oracles.tcapOracleRead) {
-        const currentTcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        // @ts-ignore
-        const [currentTcapPrice] = await signer.ethcallProvider?.all([currentTcapPriceCall]);
-        const TotalTcapPrice = currentTcapPrice.mul(10000000000);
-        const tPrice = ethers.utils.formatEther(TotalTcapPrice.div(10000000000));
-        setTotalPrice(ethers.utils.formatEther(TotalTcapPrice));
-        setTcapPrice(tPrice);
+    switch (currentChain.id) {
+      case NETWORKS.mainnet.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
+        break;
+      case NETWORKS.goerli.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.goerli));
+        break;
+      case NETWORKS.arbitrum.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum_goerli));
+        break;
+      case NETWORKS.optimism.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
+        break;
+      case NETWORKS.okovan.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
+        break;
+      case NETWORKS.polygon.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
+        break;
+      case NETWORKS.mumbai.chainId:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mumbai));
+        break;
+      default:
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
+        break;
+    }
+    const provider = getDefaultProvider(currentChain.id);
+    const randomSigner = ethers.Wallet.createRandom().connect(provider);
+    const ethcallProvider = new Provider(randomSigner.provider);
+    ethcallProvider.init();
+    setCurrentEthProvider(ethcallProvider);
+  }, [currentChain.id]);
 
-        let currentPriceCTX = 0;
-        if (
-          !isGoerli(currentNetwork.chainId) &&
-          (signerAddress === "" || isInLayer1(currentNetwork.chainId))
-        ) {
-          const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-          const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
-          // @ts-ignore
-          const [wethOraclePrice, reservesCtxPool] = await signer.ethcallProvider?.all([
-            wethOraclePriceCall,
-            reservesCtxPoolCall,
-          ]);
-          const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-          currentPriceCTX = await getPriceInUSDFromPair(
-            reservesCtxPool[0],
-            reservesCtxPool[1],
-            parseFloat(currentPriceETH)
-          );
-          setCtxPrice(currentPriceCTX.toString());
-        }
+  const handleOptionChange = (eventKey: string) => {
+    const o = options.find((option) => option.id === eventKey);
+    setCurrentOption(o || options[0]);
+  };
 
-        if (
-          signer.signer &&
-          tokens.tcapTokenRead &&
-          signerAddress !== "" &&
-          signerAddress !== currentAddress
-        ) {
-          const ens = await getENS(signerAddress);
-          if (ens) {
-            setAddress(ens);
-          } else {
-            setAddress(makeShortAddress(signerAddress));
-          }
-
-          const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(signerAddress);
-          // @ts-ignore
-          const [currentTcapBalance] = await signer.ethcallProvider?.all([currentTcapBalanceCall]);
-          const tcapString = ethers.utils.formatEther(currentTcapBalance);
-          setTcapBalance(tcapString);
-          const tcapUSD = parseFloat(tcapString) * parseFloat(tPrice);
-          if (tcapUSD < 0.0001) {
-            setTcapUSDBalance("0.0");
-          } else {
-            setTcapUSDBalance(tcapUSD.toString());
-          }
-          if (isInLayer1(currentNetwork.chainId)) {
-            const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
-            // @ts-ignore
-            const [currentCtxBalance] = await signer.ethcallProvider?.all([currentCtxBalanceCall]);
-            const ctxString = ethers.utils.formatEther(currentCtxBalance);
-            setCtxBalance(ctxString);
-            const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
-            setCtxUSDBalance(ctxUSD.toString());
-          }
-          setCurrentAddress(signerAddress);
-        }
-        setIsLoading(false);
-      }
-    };
-    loadAddress();
-
-    // eslint-disable-next-line
-  }, [signerAddress, loadingContracts]);
-
-  if (isLoading) {
-    return <Loading title={t("loading")} message={t("wait")} />;
-  }
+  const handleChainChange = (eventKey: string) => {
+    const c = chains.find((chain) => chain.id.toString() === eventKey);
+    setCurrentChain(c || chains[0]);
+  };
 
   return (
-    <div className="summary">
-      <div className="prices">
-        <div className="token-price total">
-          <h4 className="number neon-dark-blue">
-            <NumberFormat
-              className="number"
-              value={totalPrice}
-              displayType="text"
-              thousandSeparator
-              prefix="$"
-              decimalScale={0}
-            />
-            <OverlayTrigger
-              key="bottom"
-              placement="bottom"
-              overlay={
-                <Tooltip id="tooltip-bottom">
-                  <>{t("welcome.tcap-info")}</>
-                </Tooltip>
-              }
-            >
-              <Button variant="dark" className="question">
-                ?
-              </Button>
-            </OverlayTrigger>
-          </h4>
-          <h4 className="title">
-            <>{t("welcome.tcap")}:</>
-          </h4>
-        </div>
-        <div className="token-price">
-          <h4 className="number neon-dark-blue">
-            <NumberFormat
-              className="number"
-              value={tcapPrice}
-              displayType="text"
-              thousandSeparator
-              prefix="$"
-              decimalScale={2}
-            />
-          </h4>
-          <h4>
-            <>{t("welcome.tcap-price")}:</>
-          </h4>
-        </div>
-        {isInLayer1(currentNetwork.chainId) && (
-          <div className="token-price">
-            <h4 className="number neon-dark-blue">
-              <NumberFormat
-                className="number"
-                value={ctxPrice}
-                displayType="text"
-                thousandSeparator
-                prefix="$"
-                decimalScale={2}
-              />
-            </h4>
-            <h4>
-              <>{t("welcome.ctx-price")}:</>
-            </h4>
-          </div>
-        )}
-      </div>
-      <div className="summary-protocol">
-        <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper features">
-          <Button className="btn-feature">
-            <div className="feature-content">
-              <p>Creating vaults & minting index tokens</p>
-            </div>
-            <div className="feature-action">
-              <FaArrowRight size={20} />
-            </div>
-          </Button>
-          <Button className="btn-feature">
-            <div className="feature-content">
-              <p>Providing liquidity</p>
-            </div>
-            <div className="feature-action">
-              <FaArrowRight size={20} />
-            </div>
-          </Button>
-          <Button className="btn-feature">
-            <div className="feature-content">
-              <p>Staking & delegating to Crypt Keepers</p>
-            </div>
-            <div className="feature-action">
-              <FaArrowRight size={20} />
-            </div>
-          </Button>
-          <Button className="btn-feature">
-            <div className="feature-content">
-              <p>Going on quests with Sewage Fruitz</p>
-            </div>
-            <div className="feature-action">
-              <FaArrowRight size={20} />
-            </div>
-          </Button>
-        </Col>
-        <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
-          <Protocol data={data} />
-        </Col>
-      </div>
-    </div>
+    <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
+      <Card className="summary">
+        <Card.Header>
+          <Dropdown onSelect={(eventKey) => handleOptionChange(eventKey || "0")}>
+            <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
+              <h6>{currentOption.name}</h6>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {options.map((item) => (
+                <Dropdown.Item key={item.id} eventKey={item.id}>
+                  {item.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+          <Dropdown onSelect={(eventKey) => handleChainChange(eventKey || "1")}>
+            <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
+              <h6>{currentChain.name}</h6>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {chains.map((item) => (
+                <Dropdown.Item key={item.id} eventKey={item.id}>
+                  {item.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </Card.Header>
+        <Card.Body>
+          <ApolloProvider client={apolloClient}>
+            <Protocol currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
+          </ApolloProvider>
+        </Card.Body>
+      </Card>
+    </Col>
   );
 };
 

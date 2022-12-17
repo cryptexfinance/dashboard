@@ -943,11 +943,7 @@ const App = () => {
       } else {
         setLoadingContracts(true);
         const chainId = process.env.REACT_APP_NETWORK_ID || "5";
-        let networkName = NETWORKS.mainnet.name;
-        if (isGoerli(parseInt(chainId))) {
-          networkName = NETWORKS.goerli.name;
-        }
-        const provider = getDefaultProvider(parseInt(chainId), networkName);
+        const provider = getDefaultProvider(parseInt(chainId));
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
         if (isArbitrum(parseInt(chainId))) {

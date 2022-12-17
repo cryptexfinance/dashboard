@@ -1,30 +1,36 @@
 @import "./colors";
 @import "./fonts";
 
-.summary {
+.summary2 {
   display: flex;
   flex-direction: column;
   padding: 3rem 2rem;
   padding-bottom: 2rem;
+
   .spinner-container {
     padding-top: 3rem;
     width: 100%;
   }
+
   h2 {
     font-size: 1.375rem;
     margin-bottom: 0rem;
   }
+
   h3 {
     font-size: 1.1rem;
     margin-bottom: 0rem;
   }
+
   h4 {
     font-size: 0.9rem;
   }
+
   h5 {
     font-size: 0.9rem;
     text-align: right;
   }
+
   h6 {
     color: $off-white;
   }
@@ -45,6 +51,7 @@
       margin-left: 5px;
     }
   }
+
   .btn:disabled {
     color: $light;
     opacity: 0.8;
@@ -57,74 +64,86 @@
     border-radius: 0;
     font-size: 1rem;
   }
+
   .prices {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     padding: 1rem;
     margin: 0rem 1rem;
     border: 0.7px solid #a440f2;
     border-radius: 5px;
     background-color: #281e31;
+
     .token-price {
       display: flex;
-      flex-direction: row-reverse;
-      align-items: center;
+      flex-direction: column;
       margin-left: 0.5rem;
       margin-right: 1.5rem;
     }
+
     .number {
-      margin-left: 0.5rem;
       display: flex;
       flex-direction: row;
       align-items: center;
+      margin-bottom: 0.5rem;
     }
+
     h4 {
       margin-bottom: 0rem;
+
       @media (max-width: 1499px) {
         font-size: 0.8rem;
       }
+
       @media (max-width: 1400px) {
         font-size: 0.75rem;
       }
+
       @media (max-width: 1320px) {
         font-size: 0.7rem;
       }
+
       @media (max-width: 1279px) {
         font-size: 0.65rem;
       }
     }
   }
-  .summary2 {
+
+  .summary-protocol {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     margin-top: 2rem;
   }
-  .card { 
+
+  .card {
     padding: 1.5rem;
+
     &-header {
       padding: 0.5rem 1rem;
     }
-    
+
     .cls-1 {
       fill: $darker;
     }
+
     b {
       font-family: "Nineteen Ninety Seven";
       color: $purple;
     }
-    p {
-      margin-bottom: 1.5rem;
-    }
+
     .row {
       margin-top: 0rem;
     }
 
     &.diamond {
       padding-bottom: 0rem;
+
       p {
         width: 80%;
       }
+
       .btn {
         width: 11.0625rem;
         margin-bottom: 0.8rem;
@@ -134,6 +153,7 @@
         &.neon-green {
           box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
         }
+
         &.neon-blue {
           box-shadow: 0px 0px 39px -6px rgba(15, 217, 255, 0.4);
         }
@@ -145,12 +165,46 @@
     p {
       font-size: 1rem;
     }
+
     div[class*="col-"] {
       padding: 0rem;
     }
+
     .balance {
       margin-bottom: 1.5rem;
       padding-bottom: 0.8rem;
+    }
+  }
+
+  .features {
+    &-title {
+      margin-bottom: 2rem;
+    }
+
+    .btn-feature {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: $darkest;
+      margin-bottom: 1.5rem;
+      padding: 0rem 2rem;
+      width: 100%;
+      height: 5rem;
+      border: 0.7px solid $highlight;
+    }
+    .feature-content {
+      display: flex;
+
+      svg {
+        height: 25px;
+        margin-right: 1.5rem;
+        -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+        filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
+      }
+
+      .stake-icon {
+        height: 30px;
+      }
     }
   }
 
@@ -158,10 +212,12 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
     p {
       margin-bottom: 0rem;
       margin-left: 1rem;
     }
+
     .balance-box {
       display: flex;
       flex-direction: column;
@@ -172,23 +228,28 @@
         margin-bottom: 0rem;
         margin-left: 0.5rem;
       }
+
       svg {
         height: 2rem;
       }
+
       .title {
         display: flex;
         justify-content: flex-end;
         padding-top: 0.7rem;
         padding-bottom: 0.9rem;
       }
+
       .values {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
+
         h5 {
           font-size: 1.2rem;
         }
       }
+
       .asset-value {
         display: flex;
         align-items: center;
@@ -201,16 +262,20 @@
     height: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
+
     .card-body {
       display: flex;
     }
+
     svg {
       width: 2rem;
     }
+
     .weth {
-      height: 2.1rem;  
+      height: 2.1rem;
       width: 1rem;
     }
+
     .totals {
       display: flex;
       flex-direction: row;
@@ -222,6 +287,7 @@
       border: 0.7px solid $highlight;
       border-radius: 5px;
     }
+
     .detail {
       display: grid;
       grid-template-columns: auto auto;
@@ -230,6 +296,7 @@
       height: fit-content;
       width: 100%;
     }
+
     .asset {
       display: flex;
       flex-direction: row;
@@ -241,36 +308,43 @@
       background-color: #281e31;
       border: 0.7px solid $highlight;
       border-radius: 5px;
+
       h5 {
         margin-bottom: 0.5rem;
       }
     }
+
     .staked {
       display: flex;
       flex-direction: column-reverse;
       margin-left: 1rem;
+
       h6 {
         margin-bottom: 0rem;
         text-align: right;
-        color: $light;
       }
     }
+
     .card-footer {
       padding-top: 2rem;
       padding-bottom: 0rem;
     }
+
     .use-tcap {
       display: flex;
       justify-content: space-evenly;
+
       .btn.neon-blue {
         box-shadow: 0px 0px 14px -6px $blue;
       }
     }
+
     @media (min-width: 1149px) and (max-width: 1320px) {
       h6 {
         font-size: 0.9rem;
       }
     }
+
     @media (min-width: 760px) and (max-width: 1150px) {
       .detail {
         grid-template-columns: auto;
@@ -293,72 +367,90 @@
       }
     }
   }
+
   @media (max-width: 769px) {
     .prices {
       flex-wrap: wrap;
       padding: 0.5rem;
+
       .token-price {
         margin-bottom: 0.5rem;
       }
+
       h4 {
         font-size: 0.68rem;
       }
     }
+
     .protocol {
       margin-top: 2rem;
     }
   }
+
   @media (max-width: 600px) {
     .prices {
       .token-price.total {
         flex-direction: column;
         align-items: flex-start;
         margin-bottom: 1rem;
-        .number{
+
+        .number {
           margin-left: 0rem;
           margin-bottom: 0.2rem;
         }
       }
+
       h4 {
         font-size: 0.85rem;
       }
     }
   }
+
   @media (max-width: 550px) {
     padding-left: 1rem;
     padding-right: 1rem;
+
     h2 {
       font-size: 1.2rem;
     }
+
     .card-header {
       padding: 0.5rem 0rem;
     }
+
     .card-body {
       padding-left: 0rem;
       padding-right: 0rem;
     }
+
     .prices {
       .title {
         display: none;
       }
+
       .token-price {
         width: 100%;
         margin-right: 0rem;
         justify-content: space-between;
       }
     }
+
     .balance-section {
       flex-direction: column;
+
       .balance-box {
         margin-bottom: 1.2rem;
+
         .title {
           justify-content: flex-start;
         }
+
         .values {
           align-items: flex-start;
         }
       }
     }
+
     .protocol {
       .detail {
         grid-template-columns: auto;
