@@ -6,6 +6,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
+import "@rainbow-me/rainbowkit/styles.css";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
@@ -19,6 +20,10 @@ import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
+
+
+
+
 
 type props = {
   signerAddress: string;
@@ -113,7 +118,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
           method: "wallet_switchEthereumChain",
           params: [{ chainId: newChainId }],
         });
-      } catch (error) {
+      } catch (error: any) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (
           error.code === 4902 &&

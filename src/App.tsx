@@ -5,8 +5,8 @@ import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-import { getProviderInfo } from "web3modal";
 import "./i18n";
+import '@rainbow-me/rainbowkit/styles.css';
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
 import { useSwipeable } from "react-swipeable";
@@ -57,6 +57,56 @@ import {
   isGoerli,
 } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
+import { OKX } from './utils/OKX';
+import { RainbowKitProvider, connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+    metaMaskWallet,
+    rainbowWallet,
+    walletConnectWallet,
+    coinbaseWallet,
+    argentWallet,
+    ledgerWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { publicProvider } from 'wagmi/providers/public';
+
+
+const { chains, provider, webSocketProvider } = configureChains(
+    [
+        chain.mainnet,
+        chain.polygon,
+        chain.optimism,
+        chain.arbitrum,
+        ...(process.env.REACT_APP_ENABLE_TESTNETS === 'true' ? [chain.goerli] : []),
+    ],
+    [
+        alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_ID  as string}),
+        publicProvider(),
+    ]
+);
+
+const connectors = connectorsForWallets([
+    {
+        groupName: 'Recommended',
+        wallets: [
+            metaMaskWallet({ chains }),
+            rainbowWallet({ chains }),
+            walletConnectWallet({ chains }),
+            // coinbaseWallet({ chains }),
+            argentWallet({ chains }),
+            ledgerWallet({ chains }),
+            // OKX({ chains })
+        ],
+    },
+]);
+
+const wagmiClient = createClient({
+    autoConnect: true,
+    connectors,
+    provider,
+    webSocketProvider,
+});
 
 const clientOracle = (graphqlEndpoint: string) =>
   new ApolloClient({
@@ -910,7 +960,8 @@ const App = () => {
   }
 
   return (
-    <signerContext.Provider value={signer}>
+    <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains}>
       <NetworkContext.Provider value={networks}>
         <tokensContext.Provider value={tokens}>
           <oraclesContext.Provider value={oracles}>
@@ -972,7 +1023,8 @@ const App = () => {
           </oraclesContext.Provider>
         </tokensContext.Provider>
       </NetworkContext.Provider>
-    </signerContext.Provider>
+      </RainbowKitProvider>
+      </WagmiConfig>
   );
 };
 
