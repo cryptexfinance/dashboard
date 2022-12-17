@@ -148,7 +148,6 @@
       }
     ],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
     "react/destructuring-assignment": "off",
     "react/jsx-props-no-spreading": [
       "error",
