@@ -396,11 +396,11 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       }
 
       if (!showAllVaults) {
-        addVault = v.tokenSymbol === "WETH" || v.tokenSymbol === "DAI";
+        addVault = v.tokenSymbol === TOKENS_SYMBOLS.WETH || v.tokenSymbol === TOKENS_SYMBOLS.DAI;
       }
-      if (addVault && v.tokenSymbol !== "WBTC") {
+      if (addVault && v.tokenSymbol !== TOKENS_SYMBOLS.WBTC) {
         let vaultUrl = "";
-        const symbol = v.tokenSymbol === "WETH" ? "ETH" : v.tokenSymbol;
+        const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
           vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
         }

@@ -7,8 +7,9 @@ import { Provider } from "ethers-multicall";
 import { oraclesContext, tokensContext } from "../../state";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
-import { getPriceInUSDFromPair, isUndefined, isInLayer1 } from "../../utils/utils";
+import { getPriceInUSDFromPair, isUndefined } from "../../utils/utils";
 import { NETWORKS } from "../../utils/constants";
+import { VaultsWarning } from "./warnings/index";
 
 type props = {
   currentChainId: number;
@@ -96,70 +97,79 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
           <Spinner variant="danger" className="spinner" animation="border" />
         </div>
       ) : (
-        <div className="detail">
-          <div className="totals">
-            <TcapIcon className="stake" />
-            <div className="staked">
-              <h6>
-                <>{t("welcome.tcap-balance")}</>
-              </h6>
-              <h5 className="number neon-green">
-                <NumberFormat
-                  value={indexBalance}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
+        <>
+          <div className="detail">
+            <div className="totals">
+              <TcapIcon className="stake" />
+              <div className="staked">
+                <h6>
+                  <>{t("welcome.tcap-balance")}</>
+                </h6>
+                <h5 className="number neon-green">
+                  <NumberFormat
+                    value={indexBalance}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                  />
+                </h5>
+              </div>
+            </div>
+            <div className="totals">
+              <TcapIcon className="h24" />
+              <div className="staked">
+                <h6>TCAP USD Balance</h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={indexUsdBalance}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                    prefix="$"
+                  />
+                </h5>
+              </div>
+            </div>
+            <div className="asset">
+              <CtxIcon className="h24" />
+              <div className="staked">
+                <h6>
+                  <>{t("welcome.ctx-balance")}</>
+                </h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={ctxBalance}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                  />
+                </h5>
+              </div>
+            </div>
+            <div className="totals">
+              <CtxIcon className="h24" />
+              <div className="staked">
+                <h6>CTX USD Balance</h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={ctxUsdBalance}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                    prefix="$"
+                  />
+                </h5>
+              </div>
             </div>
           </div>
-          <div className="totals">
-            <TcapIcon className="h24" />
-            <div className="staked">
-              <h6>TCAP USD Balance</h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={indexUsdBalance}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                  prefix="$"
-                />
-              </h5>
-            </div>
+          <div className="warnings">
+            <VaultsWarning
+              chainId={currentChainId}
+              ethCallProvider={ethCallProvider}
+              ownerAddress={signerAddress}
+            />
           </div>
-          <div className="asset">
-            <CtxIcon className="h24" />
-            <div className="staked">
-              <h6>
-                <>{t("welcome.ctx-balance")}</>
-              </h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={ctxBalance}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
-            </div>
-          </div>
-          <div className="totals">
-            <CtxIcon className="h24" />
-            <div className="staked">
-              <h6>CTX USD Balance</h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={ctxUsdBalance}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                  prefix="$"
-                />
-              </h5>
-            </div>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

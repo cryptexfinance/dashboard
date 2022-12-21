@@ -44,7 +44,7 @@ export const UNIV3 = {
 
 export const GRAPHQL_UNIV3_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-univ3",
-  rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  goerli: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
 };
 
 export const encodeIncentive = (dataMap: any): string => {

@@ -236,5 +236,18 @@
         grid-template-columns: auto;
       }
     }
-  } 
+  }
+
+  .balance {
+    .warnings {
+      padding: 1.5rem 0rem;
+      &-vaults {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.7rem 1rem;
+        width: 100%;
+      }
+    }
+  }
 }

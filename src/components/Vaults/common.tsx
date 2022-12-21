@@ -54,34 +54,34 @@ export const OPTIMISM_COLLATERALS = [
 export const getMinRatio = (ratios: VaultsRatioType, symbol: string, isHardVault: boolean) => {
   let minRatio = 200;
   switch (symbol) {
-    case "ETH":
+    case TOKENS_SYMBOLS.ETH:
       minRatio = isHardVault ? ratios.hardEthRatio : ratios.ethRatio;
       break;
-    case "WETH":
+    case TOKENS_SYMBOLS.WETH:
       minRatio = isHardVault ? ratios.hardWethRatio : ratios.ethRatio;
       break;
-    case "DAI":
+    case TOKENS_SYMBOLS.DAI:
       minRatio = isHardVault ? ratios.hardDaiRatio : ratios.daiRatio;
       break;
-    case "AAVE":
+    case TOKENS_SYMBOLS.AAVE:
       minRatio = ratios.aaveRatio;
       break;
-    case "LINK":
+    case TOKENS_SYMBOLS.LINK:
       minRatio = ratios.linkRatio;
       break;
-    case "UNI":
+    case TOKENS_SYMBOLS.UNI:
       minRatio = ratios.uniRatio;
       break;
-    case "SNX":
+    case TOKENS_SYMBOLS.SNX:
       minRatio = ratios.snxRatio;
       break;
-    case "MATIC":
+    case TOKENS_SYMBOLS.MATIC:
       minRatio = ratios.maticRatio;
       break;
-    case "WBTC":
+    case TOKENS_SYMBOLS.WBTC:
       minRatio = ratios.wbtcRatio;
       break;
-    case "USDC":
+    case TOKENS_SYMBOLS.USDC:
       minRatio = ratios.hardUsdcRatio;
       break;
     default:
@@ -94,34 +94,34 @@ export const getMinRatio = (ratios: VaultsRatioType, symbol: string, isHardVault
 export const getCollateralPrice = (prices: OraclePricesType, symbol: string) => {
   let price = "0";
   switch (symbol) {
-    case "ETH":
+    case TOKENS_SYMBOLS.ETH:
       price = prices.wethOraclePrice;
       break;
-    case "WETH":
+    case TOKENS_SYMBOLS.WETH:
       price = prices.wethOraclePrice;
       break;
-    case "DAI":
+    case TOKENS_SYMBOLS.DAI:
       price = prices.daiOraclePrice;
       break;
-    case "AAVE":
+    case TOKENS_SYMBOLS.AAVE:
       price = prices.aaveOraclePrice;
       break;
-    case "LINK":
+    case TOKENS_SYMBOLS.LINK:
       price = prices.linkOraclePrice;
       break;
-    case "UNI":
+    case TOKENS_SYMBOLS.UNI:
       price = prices.uniOraclePrice;
       break;
-    case "SNX":
+    case TOKENS_SYMBOLS.SNX:
       price = prices.snxOraclePrice;
       break;
-    case "MATIC":
+    case TOKENS_SYMBOLS.MATIC:
       price = prices.maticOraclePrice;
       break;
-    case "WBTC":
+    case TOKENS_SYMBOLS.WBTC:
       price = prices.wbtcOraclePrice;
       break;
-    case "USDC":
+    case TOKENS_SYMBOLS.USDC:
       price = prices.usdcOraclePrice;
       break;
     default:

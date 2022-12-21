@@ -5,14 +5,13 @@ import Summary from "./Summary";
 
 type props = {
   signerAddress: string;
-  loadingContracts: boolean;
 };
 
-const WelcomeWrapper = ({ signerAddress, loadingContracts }: props) => (
+const SummaryPage = ({ signerAddress }: props) => (
   <div className="dashboard">
     <Features />
-    <Summary signerAddress={signerAddress} loadingContracts={loadingContracts} />
+    <Summary signerAddress={signerAddress} />
   </div>
 );
 
-export default WelcomeWrapper;
+export default SummaryPage;

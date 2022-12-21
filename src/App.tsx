@@ -15,7 +15,7 @@ import Container from "react-bootstrap/esm/Container";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
-import WelcomeWrapper from "./components/Welcome/index";
+import SummaryPage from "./components/Summary/index";
 import Vaults from "./components/Vaults";
 import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
@@ -1024,10 +1024,7 @@ const App = () => {
                           <ToastContainer />
                           <Switch>
                             <Route path={`${match.url}/`}>
-                              <WelcomeWrapper
-                                signerAddress={currentSignerAddress}
-                                loadingContracts={isLoadingContracts}
-                              />
+                              <SummaryPage signerAddress={currentSignerAddress} />
                             </Route>
                             <Route path={`${match.url}farm`}>
                               <Farm />

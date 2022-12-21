@@ -51,7 +51,6 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
   const [wbtcStake, setWBTCStake] = useState("0");
   const [usdcStake, setUSDCStake] = useState("0");
   const [TotalStake, setTotalStake] = useState("0");
-  const [totalSupply, setTotalSupply] = useState("0.0");
 
   const VAULTS_STATE = gql`
     {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { Provider } from "ethers-multicall";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
@@ -18,10 +18,9 @@ const clientOracle = (graphqlEndpoint: string) =>
 
 type props = {
   signerAddress: string;
-  loadingContracts: boolean;
 };
 
-const Summary = ({ signerAddress, loadingContracts }: props) => {
+const Summary = ({ signerAddress }: props) => {
   const options = [
     { id: "0", name: "My Balance" },
     { id: "1", name: "TCAP Summary" },

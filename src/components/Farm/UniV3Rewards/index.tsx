@@ -34,7 +34,7 @@ const UniV3Rewards = ({ signer }: props) => {
     clientOracle(
       process.env.REACT_APP_NETWORK_ID === "1"
         ? GRAPHQL_UNIV3_ENDPOINT.mainnet
-        : GRAPHQL_UNIV3_ENDPOINT.rinkeby
+        : GRAPHQL_UNIV3_ENDPOINT.goerli
     )
   );
 
@@ -44,8 +44,8 @@ const UniV3Rewards = ({ signer }: props) => {
         case NETWORKS.mainnet.chainId:
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
           break;
-        case NETWORKS.rinkeby.chainId:
-          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.rinkeby));
+        case NETWORKS.goerli.chainId:
+          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.goerli));
           break;
         default:
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
@@ -64,7 +64,7 @@ const UniV3Rewards = ({ signer }: props) => {
           signer.signer
         );
         let poolRead = new Contract(UNIV3.mainnet.tcapPool.id, toFragment(UniV3Pool));
-        if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
+        if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
           poolRead = new Contract(UNIV3.rinkeby.tcapPool.id, toFragment(UniV3Pool));
         }
 
