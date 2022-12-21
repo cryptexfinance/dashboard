@@ -116,7 +116,7 @@ export const usePrices2 = (
       loadPrices();
     },
     // eslint-disable-next-line
-    []
+    [chainId, ethcallProvider]
   );
 
   return oraclePrices;

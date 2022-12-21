@@ -161,11 +161,11 @@
     } 
   }
 
-  .protocol {
+  .protocol, .indexes, .balance {
     width: 100%;
     .detail {
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: 50% 50%;
       gap: 1rem;
       row-gap: 1.7rem;
       height: fit-content;
@@ -182,6 +182,11 @@
       background-color: #281e31;
       border: 0.7px solid $highlight;
       border-radius: 5px;
+    }
+
+    .market-cap {
+      grid-column-start: 1;
+      grid-column-end: 3;
     }
 
     .asset {

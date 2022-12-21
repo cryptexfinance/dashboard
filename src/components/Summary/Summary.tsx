@@ -4,6 +4,8 @@ import { Provider } from "ethers-multicall";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { Card, Col, Dropdown } from "react-bootstrap/esm";
 import "../../styles/summary.scss";
+import Balance from "./Balance";
+import Indexes from "./Indexes";
 import Protocol from "./Protocol";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "../../utils/constants";
 import { getDefaultProvider } from "../../utils/utils";
@@ -22,8 +24,8 @@ type props = {
 const Summary = ({ signerAddress, loadingContracts }: props) => {
   const options = [
     { id: "0", name: "My Balance" },
-    { id: "2", name: "Indexes Summary" },
-    { id: "3", name: "Vaults Summary" },
+    { id: "1", name: "TCAP Summary" },
+    { id: "2", name: "Vaults Summary" },
   ];
   let chains = [
     { id: NETWORKS.mainnet.chainId, name: "Mainnet" },
@@ -124,7 +126,19 @@ const Summary = ({ signerAddress, loadingContracts }: props) => {
         </Card.Header>
         <Card.Body>
           <ApolloProvider client={apolloClient}>
-            <Protocol currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
+            {currentOption.id === options[0].id && (
+              <Balance
+                currentChainId={currentChain.id}
+                ethCallProvider={currentEthProvider}
+                signerAddress={signerAddress}
+              />
+            )}
+            {currentOption.id === options[1].id && (
+              <Indexes currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
+            )}
+            {currentOption.id === options[2].id && (
+              <Protocol currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
+            )}
           </ApolloProvider>
         </Card.Body>
       </Card>

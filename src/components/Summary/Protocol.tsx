@@ -7,7 +7,6 @@ import { Provider } from "ethers-multicall";
 import { useLazyQuery, gql } from "@apollo/client";
 import { networkContext, oraclesContext, signerContext, tokensContext } from "../../state";
 import { ReactComponent as StakeIcon } from "../../assets/images/graph/stake.svg";
-import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
@@ -63,14 +62,6 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
     }
   `;
 
-  const getMaticUSD = async () => {
-    const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
-    // @ts-ignore
-    const [maticOraclePrice] = await signer.ethcallProvider?.all([maticOraclePriceCall]);
-    const maticUSD = ethers.utils.formatEther(maticOraclePrice.mul(10000000000));
-    return maticUSD;
-  };
-
   const loadStaked = async (data: any) => {
     if (
       oracles &&
@@ -80,84 +71,6 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
       !isUndefined(tokens.tcapTokenRead) &&
       validOracles(currentNetwork.chainId || 1, oracles)
     ) {
-      const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
-      const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
-      const ethcalls = [daiOraclePriceCall, currentTotalSupplyCall];
-
-      if (isInLayer1(currentNetwork.chainId)) {
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
-        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
-        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
-        const usdcOraclePriceCall = await oracles.usdcOracleRead?.getLatestAnswer();
-        ethcalls.push(wethOraclePriceCall);
-        ethcalls.push(aaveOraclePriceCall);
-        ethcalls.push(linkOraclePriceCall);
-        ethcalls.push(wbtcOraclePriceCall);
-        ethcalls.push(usdcOraclePriceCall);
-      }
-      if (isOptimism(currentNetwork.chainId)) {
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
-        const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
-        const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
-        ethcalls.push(wethOraclePriceCall);
-        ethcalls.push(linkOraclePriceCall);
-        ethcalls.push(snxOraclePriceCall);
-        ethcalls.push(uniOraclePriceCall);
-      }
-      if (isPolygon(currentNetwork.chainId)) {
-        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
-        ethcalls.push(wbtcOraclePriceCall);
-      }
-      if (isArbitrum(currentNetwork.chainId)) {
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        ethcalls.push(wethOraclePriceCall);
-      }
-
-      let daiOraclePrice;
-      let currentTotalSupply;
-      let wethOraclePrice;
-      let aaveOraclePrice;
-      let linkOraclePrice;
-      let snxOraclePrice;
-      let uniOraclePrice;
-      let wbtcOraclePrice;
-      let usdcOraclePrice;
-
-      if (isInLayer1(currentNetwork.chainId)) {
-        // @ts-ignore
-        [
-          daiOraclePrice,
-          currentTotalSupply,
-          wethOraclePrice,
-          aaveOraclePrice,
-          linkOraclePrice,
-          wbtcOraclePrice,
-          usdcOraclePrice,
-        ] = await signer.ethcallProvider?.all(ethcalls);
-      } else if (isArbitrum(currentNetwork.chainId)) {
-        // @ts-ignore
-        [daiOraclePrice, currentTotalSupply, wethOraclePrice] = await signer.ethcallProvider?.all(
-          ethcalls
-        );
-      } else if (isOptimism(currentNetwork.chainId)) {
-        // @ts-ignore
-        [
-          daiOraclePrice,
-          currentTotalSupply,
-          wethOraclePrice,
-          linkOraclePrice,
-          snxOraclePrice,
-          uniOraclePrice,
-        ] = await signer.ethcallProvider?.all(ethcalls);
-      } else {
-        // @ts-ignore
-        [daiOraclePrice, currentTotalSupply, wbtcOraclePrice] = await signer.ethcallProvider?.all(
-          ethcalls
-        );
-      }
-
       let currentDAIStake = BigNumber.from(0);
       let currentWETHStake = BigNumber.from(0);
       let currentAAVEStake = BigNumber.from(0);
@@ -297,48 +210,18 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
       const formatUSDC = ethers.utils.formatUnits(currentUSDCStake, 6);
       setUSDCStake(formatUSDC);
 
-      const daiUSD = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
-      let ethUSD = "0";
-      let aaveUSD = "0";
-      let linkUSD = "0";
-      let snxUSD = "0";
-      let uniUSD = "0";
-      let maticUSD = "0";
-      let wbtcUSD = "0";
-      let usdcUSD = "0";
-      if (isInLayer1(currentNetwork.chainId)) {
-        ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        aaveUSD = ethers.utils.formatEther(aaveOraclePrice.mul(10000000000));
-        linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
-        wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
-        usdcUSD = ethers.utils.formatEther(usdcOraclePrice.mul(10000000000));
-      }
-      if (isArbitrum(currentNetwork.chainId)) {
-        ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-      }
-      if (isOptimism(currentNetwork.chainId)) {
-        ethUSD = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
-        linkUSD = ethers.utils.formatEther(linkOraclePrice.mul(10000000000));
-        snxUSD = ethers.utils.formatEther(snxOraclePrice.mul(10000000000));
-        uniUSD = ethers.utils.formatEther(uniOraclePrice.mul(10000000000));
-      }
-      if (isPolygon(currentNetwork.chainId)) {
-        maticUSD = await getMaticUSD();
-        wbtcUSD = ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000));
-      }
-
       const totalUSD =
-        toUSD(ethUSD, formatETH) +
-        toUSD(daiUSD, formatDAI) +
-        toUSD(aaveUSD, formatAAVE) +
-        toUSD(linkUSD, formatLINK) +
-        toUSD(snxUSD, formatSNX) +
-        toUSD(uniUSD, formatUNI) +
-        toUSD(maticUSD, formatMATIC) +
-        toUSD(wbtcUSD, formatWBTC) +
-        toUSD(usdcUSD, formatUSDC);
+        toUSD(prices.wethOraclePrice, formatETH) +
+        toUSD(prices.daiOraclePrice, formatDAI) +
+        toUSD(prices.aaveOraclePrice, formatAAVE) +
+        toUSD(prices.linkOraclePrice, formatLINK) +
+        toUSD(prices.snxOraclePrice, formatSNX) +
+        toUSD(prices.uniOraclePrice, formatUNI) +
+        toUSD(prices.maticOraclePrice, formatMATIC) +
+        toUSD(prices.wbtcOraclePrice, formatWBTC) +
+        toUSD(prices.usdcOraclePrice, formatUSDC);
       setTotalStake(totalUSD.toString());
-      setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
+      // setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
     }
   };
 
@@ -386,22 +269,6 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
                   thousandSeparator
                   decimalScale={2}
                   prefix="$"
-                />
-              </h5>
-            </div>
-          </div>
-          <div className="totals">
-            <TcapIcon className="h24" />
-            <div className="staked">
-              <h6>
-                <>{t("welcome.summary.total-supply")}</>
-              </h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={totalSupply}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
                 />
               </h5>
             </div>
