@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap/esm/";
+// import { Spinner } from "react-bootstrap/esm/";
 import "../../styles/summary.scss";
 import { signerContext } from "../../state";
 import Features from "./Features";
@@ -29,13 +29,7 @@ const SummaryPage = () => {
   return (
     <div className="dashboard">
       <Features />
-      {loading ? (
-        <div className="spinner-container">
-          <Spinner variant="danger" className="spinner" animation="border" />
-        </div>
-      ) : (
-        <Summary signerAddress={signerAddress} signerChainId={signerChainId} />
-      )}
+      {!loading && <Summary signerAddress={signerAddress} signerChainId={signerChainId} />}
     </div>
   );
 };

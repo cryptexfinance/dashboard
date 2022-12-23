@@ -22,11 +22,9 @@ export const VaultsWarning = ({ chainId, ethCallProvider, ownerAddress }: props)
   const [loadingVaults, setLoadingVaults] = useState(false);
   const [liquidableVaults, setLiquidableVaults] = useState(0);
 
-  console.log("ownerAddress: ", ownerAddress);
-
   const VAULTS = gql`
     query ownerVaults($ownerAddress: String!) {
-      vaults(where: { owner: $ownerAddress }) {
+      vaults(where: { owner: $ownerAddress, debt_gt: 0 }) {
         id
         vaultId
         owner

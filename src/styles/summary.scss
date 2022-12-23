@@ -121,6 +121,10 @@
     }
     .feature-content {
       display: flex;
+      align-items: center;
+      p {
+        text-align: left;
+      }
 
       svg {
         height: 25px;
@@ -247,6 +251,47 @@
         justify-content: space-between;
         padding: 1.7rem 1rem;
         width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 3rem 0.5rem;
+
+    .card {
+      padding: 1.5rem 0.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .features {
+      .btn-feature {
+        padding: 0rem 1rem;
+      }
+      .feature-content {        
+        p {
+          font-size: 0.8rem;
+        }
+        svg {
+          height: 45px;
+          margin-right: 0.7rem;
+        }
+        .farm-icon {
+          height: 17px;
+        }
+      }
+    }
+
+    .protocol,
+    .indexes,
+    .balance {
+      .detail {
+        display: grid;
+        grid-template-columns: 100%;
+      }
+
+      .market-cap {
+        grid-column-start: 1;
+        grid-column-end: 2;
       }
     }
   }

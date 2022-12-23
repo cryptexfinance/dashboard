@@ -38,7 +38,7 @@ const Features = () => {
             }}
           >
             <div className="feature-content">
-              <FarmIcon />
+              <FarmIcon className="farm-icon" />
               <p>Providing liquidity</p>
             </div>
             <div className="feature-action">
