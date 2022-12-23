@@ -233,7 +233,6 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
     },
     onCompleted: (data: any) => {
       if (!isUndefined(data)) {
-        console.log("-- data --", data);
         loadStaked(data);
       }
     },
@@ -245,7 +244,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
     };
     load();
     // eslint-disable-next-line
-  }, [currentChainId]);
+  }, [currentChainId, ethCallProvider]);
 
   return (
     <div className="protocol">

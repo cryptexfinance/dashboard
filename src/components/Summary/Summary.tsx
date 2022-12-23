@@ -18,9 +18,10 @@ const clientOracle = (graphqlEndpoint: string) =>
 
 type props = {
   signerAddress: string;
+  signerChainId: number;
 };
 
-const Summary = ({ signerAddress }: props) => {
+const Summary = ({ signerAddress, signerChainId }: props) => {
   const options = [
     { id: "0", name: "My Balance" },
     { id: "1", name: "TCAP Summary" },
@@ -38,8 +39,30 @@ const Summary = ({ signerAddress }: props) => {
       { id: NETWORKS.okovan.chainId, name: "OKovan" },
     ];
   }
-  const [currentOption, setCurrentOption] = useState(options[0]);
-  const [currentChain, setCurrentChain] = useState(chains[0]);
+  const [currentOption, setCurrentOption] = useState(
+    signerAddress !== "" ? options[0] : options[1]
+  );
+
+  const getDefaultChain = () => {
+    if (process.env.REACT_APP_NETWORK_ID === "1") {
+      if (signerChainId === NETWORKS.mainnet.chainId) {
+        return chains[0];
+      }
+      if (signerChainId === NETWORKS.arbitrum.chainId) {
+        return chains[1];
+      }
+      return chains[2];
+    }
+    if (signerChainId === NETWORKS.goerli.chainId) {
+      return chains[0];
+    }
+    if (signerChainId === NETWORKS.arbitrum_goerli.chainId) {
+      return chains[1];
+    }
+    return chains[2];
+  };
+
+  const [currentChain, setCurrentChain] = useState(getDefaultChain());
   const [currentEthProvider, setCurrentEthProvider] = useState<Provider | undefined>();
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
@@ -103,11 +126,17 @@ const Summary = ({ signerAddress }: props) => {
               <h6>{currentOption.name}</h6>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {options.map((item) => (
-                <Dropdown.Item key={item.id} eventKey={item.id}>
-                  {item.name}
+              {signerAddress !== "" && (
+                <Dropdown.Item key={options[0].id} eventKey={options[0].id}>
+                  {options[0].name}
                 </Dropdown.Item>
-              ))}
+              )}
+              <Dropdown.Item key={options[1].id} eventKey={options[1].id}>
+                {options[1].name}
+              </Dropdown.Item>
+              <Dropdown.Item key={options[2].id} eventKey={options[2].id}>
+                {options[2].name}
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
           <Dropdown onSelect={(eventKey) => handleChainChange(eventKey || "1")}>
@@ -125,7 +154,7 @@ const Summary = ({ signerAddress }: props) => {
         </Card.Header>
         <Card.Body>
           <ApolloProvider client={apolloClient}>
-            {currentOption.id === options[0].id && (
+            {currentOption.id === options[0].id && signerAddress !== "" && (
               <Balance
                 currentChainId={currentChain.id}
                 ethCallProvider={currentEthProvider}

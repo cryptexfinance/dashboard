@@ -24,7 +24,12 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
   const [totalSupply, setTotalSupply] = useState("0.0");
 
   const loadData = async () => {
-    if (oracles.tcapOracleRead && tokens && !isUndefined(tokens.tcapTokenRead)) {
+    if (
+      oracles.tcapOracleRead &&
+      tokens &&
+      !isUndefined(tokens.tcapTokenRead) &&
+      !isUndefined(ethCallProvider)
+    ) {
       const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
       const currentIndexPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
 
@@ -33,15 +38,34 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
         currentTotalSupplyCall,
         currentIndexPriceCall,
       ]);
+
       setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
       const totalIndexMarketCap = currentIndexPrice.mul(10000000000);
       const indexPrice = ethers.utils.formatEther(totalIndexMarketCap.div(10000000000));
       setMarketCap(ethers.utils.formatEther(totalIndexMarketCap));
       setIndexOraclePrice(indexPrice);
 
-      /* await fetch("https://api.cryptex.finance/tcap-market-price")
-        .then((response) => response.json())
-        .then((data) => setIndexMarketPrice(data)); */
+      const urlParams = new URLSearchParams({
+        ids: "total-crypto-market-cap-token",
+        vs_currencies: "usd",
+        include_last_updated_at: true,
+        precision: 10,
+      });
+
+      const reponse = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const resp = await reponse.json();
+      if (resp) {
+        setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
+      }
     }
   };
 

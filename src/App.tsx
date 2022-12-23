@@ -1024,7 +1024,7 @@ const App = () => {
                           <ToastContainer />
                           <Switch>
                             <Route path={`${match.url}/`}>
-                              <SummaryPage signerAddress={currentSignerAddress} />
+                              <SummaryPage />
                             </Route>
                             <Route path={`${match.url}farm`}>
                               <Farm />
