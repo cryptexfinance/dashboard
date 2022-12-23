@@ -321,9 +321,13 @@ export const isGoerli = (chainId: number | undefined) => {
   return false;
 };
 
-export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
-  if (chainId === NETWORKS.okovan.chainId) {
+  if (chainId === NETWORKS.arbitrum_goerli.chainId) {
+    provider = ethers.getDefaultProvider(chainId, {
+      infura: process.env.REACT_APP_INFURA_ID,
+    });
+  } else if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
   } else if (chainId === NETWORKS.optimism.chainId) {
     // provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OPTIMISM);
@@ -337,6 +341,12 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
       case NETWORKS.goerli.chainId:
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_GOERLI;
         break;
+      case NETWORKS.arbitrum.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_ARBITRUM;
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_ARBITRUM_GOERLI;
+        break;
       case NETWORKS.polygon.chainId:
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_POLYGON;
         break;
@@ -347,7 +357,7 @@ export const getDefaultProvider = (chainId: number | undefined, name: string | u
         alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
         break;
     }
-    provider = ethers.getDefaultProvider(name, {
+    provider = ethers.getDefaultProvider(chainId, {
       infura: process.env.REACT_APP_INFURA_ID,
       alchemy: alchemyKey,
     });

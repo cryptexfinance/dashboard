@@ -1,11 +1,15 @@
 @import "./colors";
 @import "./fonts";
 
-.summary {
+.dashboard {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 2rem;
   padding: 3rem 2rem;
   padding-bottom: 2rem;
+  display: flex; 
+
   .spinner-container {
     padding-top: 3rem;
     width: 100%;
@@ -24,9 +28,6 @@
   h5 {
     font-size: 0.9rem;
     text-align: right;
-  }
-  h6 {
-    color: $off-white;
   }
 
   .btn {
@@ -50,58 +51,9 @@
     opacity: 0.8;
   }
 
-  #connect {
-    background-color: $pink;
-    width: 15rem;
-    height: 3rem;
-    border-radius: 0;
-    font-size: 1rem;
-  }
-  .prices {
-    display: flex;
-    flex-direction: row;
-    padding: 1rem;
-    margin: 0rem 1rem;
-    border: 0.7px solid #a440f2;
-    border-radius: 5px;
-    background-color: #281e31;
-    .token-price {
-      display: flex;
-      flex-direction: row-reverse;
-      align-items: center;
-      margin-left: 0.5rem;
-      margin-right: 1.5rem;
-    }
-    .number {
-      margin-left: 0.5rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    h4 {
-      margin-bottom: 0rem;
-      @media (max-width: 1499px) {
-        font-size: 0.8rem;
-      }
-      @media (max-width: 1400px) {
-        font-size: 0.75rem;
-      }
-      @media (max-width: 1320px) {
-        font-size: 0.7rem;
-      }
-      @media (max-width: 1279px) {
-        font-size: 0.65rem;
-      }
-    }
-  }
-  .summary2 {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-  }
   .card { 
     padding: 1.5rem;
+  
     &-header {
       padding: 0.5rem 1rem;
     }
@@ -113,9 +65,7 @@
       font-family: "Nineteen Ninety Seven";
       color: $purple;
     }
-    p {
-      margin-bottom: 1.5rem;
-    }
+    
     .row {
       margin-top: 0rem;
     }
@@ -154,63 +104,78 @@
     }
   }
 
-  .balance-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    p {
-      margin-bottom: 0rem;
-      margin-left: 1rem;
+  .features  {
+    &-title {
+      margin-bottom: 2rem;
     }
-    .balance-box {
+    .btn-feature {
       display: flex;
-      flex-direction: column;
       justify-content: space-between;
-
-      h5 {
+      align-items: center;
+      background-color: $darkest;
+      margin-bottom: 1.5rem;
+      padding: 0rem 2rem;
+      width: 100%;
+      height: 5rem;
+      border: 0.7px solid $highlight;
+    }
+    .feature-content {
+      display: flex;
+      align-items: center;
+      p {
         text-align: left;
-        margin-bottom: 0rem;
-        margin-left: 0.5rem;
       }
+
       svg {
-        height: 2rem;
+        height: 25px;
+        margin-right: 1.5rem;
+        -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+        filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
       }
-      .title {
-        display: flex;
-        justify-content: flex-end;
-        padding-top: 0.7rem;
-        padding-bottom: 0.9rem;
-      }
-      .values {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        h5 {
-          font-size: 1.2rem;
-        }
-      }
-      .asset-value {
-        display: flex;
-        align-items: center;
-        flex-direction: row-reverse;
+
+      .stake-icon {
+        height: 30px;
       }
     }
   }
 
-  .protocol {
+  .summary { 
     height: 100%;
+    width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
-    .card-body {
+    
+    .dropdown {
+      margin-right: 1rem;
+      
+      .btn {
+        width: 100%;
+        background-color: $darkest;
+      }
+      .btn:after {
+        margin-top: 0.2rem;
+        margin-left: 0.6rem;
+        border-top: 0.5em solid;
+        border-right: 0.5em solid transparent;
+        border-left: 0.5em solid transparent;
+      }
+    }
+    .card-header {
       display: flex;
+    } 
+  }
+
+  .protocol, .indexes, .balance {
+    width: 100%;
+    .detail {
+      display: grid;
+      grid-template-columns: 50% 50%;
+      gap: 1rem;
+      row-gap: 1.7rem;
+      height: fit-content;
+      width: 100%;
     }
-    svg {
-      width: 2rem;
-    }
-    .weth {
-      height: 2.1rem;  
-      width: 1rem;
-    }
+
     .totals {
       display: flex;
       flex-direction: row;
@@ -222,14 +187,12 @@
       border: 0.7px solid $highlight;
       border-radius: 5px;
     }
-    .detail {
-      display: grid;
-      grid-template-columns: auto auto;
-      gap: 1rem;
-      row-gap: 1.7rem;
-      height: fit-content;
-      width: 100%;
+
+    .market-cap {
+      grid-column-start: 1;
+      grid-column-end: 3;
     }
+
     .asset {
       display: flex;
       flex-direction: row;
@@ -241,36 +204,37 @@
       background-color: #281e31;
       border: 0.7px solid $highlight;
       border-radius: 5px;
+
       h5 {
         margin-bottom: 0.5rem;
       }
     }
+
     .staked {
       display: flex;
       flex-direction: column-reverse;
       margin-left: 1rem;
+
       h6 {
         margin-bottom: 0rem;
         text-align: right;
-        color: $light;
+        color: $lighter;
       }
     }
-    .card-footer {
-      padding-top: 2rem;
-      padding-bottom: 0rem;
+    svg {
+      width: 2rem;
     }
-    .use-tcap {
-      display: flex;
-      justify-content: space-evenly;
-      .btn.neon-blue {
-        box-shadow: 0px 0px 14px -6px $blue;
-      }
+    .weth {
+      height: 2.1rem;
+      width: 1rem;
     }
+    
     @media (min-width: 1149px) and (max-width: 1320px) {
       h6 {
         font-size: 0.9rem;
       }
     }
+
     @media (min-width: 760px) and (max-width: 1150px) {
       .detail {
         grid-template-columns: auto;
@@ -278,91 +242,56 @@
     }
   }
 
-  @media (max-width: 1000px) {
-    padding: 3rem 1.2rem;
-
-    .card-wrapper {
-      .card {
-        margin-bottom: 1.2rem;
-
-        &.diamond {
-          p {
-            width: 85%;
-          }
-        }
-      }
-    }
-  }
-  @media (max-width: 769px) {
-    .prices {
-      flex-wrap: wrap;
-      padding: 0.5rem;
-      .token-price {
-        margin-bottom: 0.5rem;
-      }
-      h4 {
-        font-size: 0.68rem;
-      }
-    }
-    .protocol {
-      margin-top: 2rem;
-    }
-  }
-  @media (max-width: 600px) {
-    .prices {
-      .token-price.total {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-        .number{
-          margin-left: 0rem;
-          margin-bottom: 0.2rem;
-        }
-      }
-      h4 {
-        font-size: 0.85rem;
-      }
-    }
-  }
-  @media (max-width: 550px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    h2 {
-      font-size: 1.2rem;
-    }
-    .card-header {
-      padding: 0.5rem 0rem;
-    }
-    .card-body {
-      padding-left: 0rem;
-      padding-right: 0rem;
-    }
-    .prices {
-      .title {
-        display: none;
-      }
-      .token-price {
-        width: 100%;
-        margin-right: 0rem;
+  .balance {
+    .warnings {
+      padding: 1.5rem 0rem;
+      &-vaults {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
+        padding: 1.7rem 1rem;
+        width: 100%;
       }
     }
-    .balance-section {
-      flex-direction: column;
-      .balance-box {
-        margin-bottom: 1.2rem;
-        .title {
-          justify-content: flex-start;
+  }
+
+  @media (max-width: 600px) {
+    padding: 3rem 0.5rem;
+
+    .card {
+      padding: 1.5rem 0.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .features {
+      .btn-feature {
+        padding: 0rem 1rem;
+      }
+      .feature-content {        
+        p {
+          font-size: 0.8rem;
         }
-        .values {
-          align-items: flex-start;
+        svg {
+          height: 45px;
+          margin-right: 0.7rem;
+        }
+        .farm-icon {
+          height: 17px;
         }
       }
     }
-    .protocol {
+
+    .protocol,
+    .indexes,
+    .balance {
       .detail {
-        grid-template-columns: auto;
-        row-gap: 1rem;
+        display: grid;
+        grid-template-columns: 100%;
+      }
+
+      .market-cap {
+        grid-column-start: 1;
+        grid-column-end: 2;
       }
     }
   }
