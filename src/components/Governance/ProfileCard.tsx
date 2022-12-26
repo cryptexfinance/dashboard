@@ -34,6 +34,7 @@ type props = {
   openWithdraw: (currentDelegator: string, ownerStake: string, withdrawTime: number) => void;
   addWithdrawTime: (waitingTime: number) => void;
   isSigner: boolean;
+  t: any;
 };
 
 const ProfileCard = ({
@@ -44,6 +45,7 @@ const ProfileCard = ({
   openWithdraw,
   addWithdrawTime,
   isSigner,
+  t,
 }: props) => {
   const [shortAddress, setShortAddress] = useState("");
   const [actionText, setActionText] = useState("");
@@ -89,7 +91,8 @@ const ProfileCard = ({
     }
 
     await getProvider();
-  }, [signer, delegator, governance, mediaQuery, addWithdrawTime]);
+    // eslint-disable-next-line
+  }, [signer, delegator, governance, mediaQuery]);
 
   const onRemoveClick = async () => {
     if (tokenOwnerStake) {
@@ -197,19 +200,19 @@ const ProfileCard = ({
                       <Badge variant="highlight">
                         <CtxIcon className="tcap-neon" />
                         <span className="staked-label">
-                          {round2(parseFloat(tokenOwnerStake.stake))} Staked
+                          {round2(parseFloat(tokenOwnerStake.stake))} {t("staked")}
                         </span>
                       </Badge>
                     )}
                     <VoteBadge
                       address={delegator.id}
                       amount={Math.round(parseFloat(delegator.delegatedVotes)).toString()}
-                      label="Votes"
+                      label={t("votes")}
                     />
                     <VoteBadge
                       address={delegator.id}
                       amount={delegator.totalHoldersRepresented.toString()}
-                      label="Represented"
+                      label={t("governance.respresented")}
                     />
                     <Badge variant="highlight">
                       <img src={tallyImg} className="tally" alt="tally logo" />
@@ -218,7 +221,7 @@ const ProfileCard = ({
                         target="_blank"
                         rel="noreferrer"
                       >
-                        History
+                        {t("history")}
                       </a>
                     </Badge>
                     <Badge variant="highlight">
@@ -228,7 +231,7 @@ const ProfileCard = ({
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Contract
+                        {t("contract")}
                       </a>
                     </Badge>
                   </>
@@ -238,7 +241,7 @@ const ProfileCard = ({
                     <OverlayTrigger
                       key="bottom"
                       placement="bottom"
-                      overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+                      overlay={<Tooltip id="tooltip-bottom">{t("click-copy")}</Tooltip>}
                     >
                       <Badge pill variant="highlight">
                         <img src={discordImg} className="discord" alt="discord logo" />
@@ -265,7 +268,7 @@ const ProfileCard = ({
             </div>
             <div className="why">
               <div className="why-title">
-                <h5 className="mt-2">Why me?</h5>
+                <h5 className="mt-2">{t("governance.why-me")}</h5>
               </div>
               <OverlayTrigger
                 key="auto"
@@ -286,7 +289,7 @@ const ProfileCard = ({
             <div className="columns">
               <Col md={12} lg={12} className="content-col1">
                 <div>
-                  <h5 className="mt-2">Expertise</h5>
+                  <h5 className="mt-2">{t("governance.expertise")}</h5>
                   <p>{info?.expertise}</p>
                 </div>
               </Col>
@@ -299,7 +302,7 @@ const ProfileCard = ({
               {isTokenOwner() && (
                 <Col md={6} lg={6}>
                   <Button variant="pink" className="mt-3 mb-4 w-100" onClick={onRemoveClick}>
-                    Withdraw
+                    {t("governance.withdraw")}
                   </Button>
                 </Col>
               )}

@@ -1,0 +1,158 @@
+import React, { useEffect, useState } from "react";
+import Button from "react-bootstrap/esm/Button";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import { BigNumber, ethers } from "ethers";
+import { useTranslation } from "react-i18next";
+import { UNIV3, encodeIncentive } from "../../../utils/univ3";
+import { IncentiveType, PositionType, StakeStatus } from "./types";
+import { notifyUser, errorNotification } from "../../../utils/utils";
+
+type props = {
+  ownerAddress: string;
+  position: PositionType;
+  incentive: IncentiveType;
+  nfpmContract: ethers.Contract | undefined;
+  stakerContract: ethers.Contract | undefined;
+  refresh: () => void;
+};
+
+const Stake = ({
+  ownerAddress,
+  position,
+  incentive,
+  nfpmContract,
+  stakerContract,
+  refresh,
+}: props) => {
+  const { t } = useTranslation();
+  const [title, setTitle] = useState("Stake");
+  const [btnDisabled, setBtnDisabled] = useState(true);
+  const [showToolTip, setShowToolTip] = useState(true);
+
+  useEffect(() => {
+    const cDate = new Date();
+    const currentTime = cDate.getTime() / 1000;
+    let btnTitle = "Stake";
+    let bDisabled = true;
+    if (position.status === StakeStatus.not_approved) {
+      btnTitle = t("approve");
+      bDisabled = false;
+    } else if (position.status === StakeStatus.staked) {
+      bDisabled = false;
+      btnTitle = t("unstake");
+    } else if (currentTime < incentive.startTime) {
+      bDisabled = false;
+      btnTitle = t("deposit");
+    } else if (currentTime >= incentive.startTime && currentTime <= incentive.endTime) {
+      // eslint-disable-next-line
+      bDisabled =  !(position.status === StakeStatus.empty || position.status === StakeStatus.deposited);
+      // eslint-disable-next-line
+    } else {
+      bDisabled = true;
+    }
+    setTitle(btnTitle);
+    setBtnDisabled(bDisabled);
+    // eslint-disable-next-line
+  }, [position]);
+
+  const approve = async () => {
+    try {
+      setBtnDisabled(true);
+      const tx = await nfpmContract?.approve(UNIV3.stakerAddress, position.lpTokenId);
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error);
+      errorNotification(t("errors.tran-rejected"));
+    }
+    setBtnDisabled(false);
+  };
+
+  const deposit = async () => {
+    try {
+      setBtnDisabled(true);
+      const tx = await nfpmContract?.safeTransferFrom(
+        ownerAddress,
+        UNIV3.stakerAddress,
+        BigNumber.from(position.lpTokenId),
+        encodeIncentive(incentive)
+      );
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error);
+      errorNotification(t("errors.tran-rejected"));
+    }
+    setBtnDisabled(false);
+  };
+
+  const stake = async () => {
+    try {
+      setBtnDisabled(true);
+      const tx = await stakerContract?.stakeToken(incentive, position.lpTokenId);
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error);
+      errorNotification(t("errors.tran-rejected"));
+    }
+    setBtnDisabled(false);
+  };
+
+  const unstake = async () => {
+    try {
+      setBtnDisabled(true);
+      const tx = await stakerContract?.unstakeToken(incentive, position.lpTokenId);
+      notifyUser(tx, refresh);
+    } catch (error) {
+      console.log(error);
+      errorNotification(t("errors.tran-rejected"));
+    }
+    setBtnDisabled(false);
+  };
+
+  const handleOnClick = () => {
+    if (position.status === StakeStatus.not_approved) {
+      approve();
+    } else if (position.status === StakeStatus.empty) {
+      deposit();
+    } else if (position.status === StakeStatus.deposited) {
+      stake();
+    } else if (position.status === StakeStatus.staked) {
+      unstake();
+    }
+  };
+
+  return (
+    <>
+      {position.incentiveIndex === 0 ? (
+        <Button variant="primary" onClick={() => handleOnClick()} disabled={btnDisabled}>
+          {title}
+        </Button>
+      ) : (
+        <OverlayTrigger
+          key="top"
+          placement="top"
+          show={showToolTip}
+          overlay={
+            <Tooltip id="tooltip-bottom" className="univ3-expired-tooltip">
+              You aren't earning rewards because your LP token is staked on an incentive that
+              already ended.
+            </Tooltip>
+          }
+        >
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowToolTip(!showToolTip);
+              handleOnClick();
+            }}
+            disabled={btnDisabled}
+          >
+            {title}
+          </Button>
+        </OverlayTrigger>
+      )}
+    </>
+  );
+};
+
+export default Stake;

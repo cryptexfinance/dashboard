@@ -2,7 +2,7 @@
 @import "./fonts";
 
 .farm {
-  padding: 1rem 3rem;
+  padding: 3rem 3rem;
   padding-bottom: 2rem;
 
   // Small devices (landscape phones, 576px and up)
@@ -75,7 +75,7 @@
     p {
       font-size: 0.875;
     }
-
+    
     // Small devices (landscape phones, 576px and up)
     @media (min-width: 576px) {
       .use-tcap {
@@ -190,6 +190,7 @@
 
       small {
         color: white;
+        filter: drop-shadow(0 0 5px #a440f2);
       }
 
       &.pool {
@@ -219,41 +220,22 @@
             box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
           }
         }
+        .btn:disabled {
+          color: $white;
+        }
 
         .table {
-          color: $white;
-          tr:hover {
-            color: $white;
-          }
-
           td {
-            vertical-align: middle;
-
-            a {
-              font-weight: bold;
-              color: $purple;
-            }
-
             a.uniswap {
               color: #ff007a;
             }
-
+             a.btn {
+              padding-top: 0.4rem;
+            }
             .end-date {
               font-size: 0.8rem;
               color: $light;
             }
-            &.vested-reward {
-              padding-top: 2.2rem;
-            }
-          }
-
-          a.btn {
-            padding-top: 0.4rem;
-            height: 2.5rem;
-            color: white;
-            width: 5rem;
-            margin-left: auto;
-            margin-right: auto;
           }
 
           .btn {
@@ -283,6 +265,11 @@
           }
 
           thead {
+            .rewards {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+            }
             .btn {
               width: 37px;
               min-width: 35px;
@@ -291,11 +278,6 @@
               background-color: $dark;
               margin-top: 5px;
               margin-left: 7px;
-            }
-            .rewards {
-              display: flex;
-              flex-direction: row;
-              align-items: center;
             }
             @media (max-width: 1500px) {
               .title {
@@ -315,8 +297,263 @@
             }
           }
         }
-      }
+        &.univ3 {
+          .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-left: 0rem;            
+          }
+          .card-body {
+            padding: 1rem 0rem;
+          }
+          thead {
+            .btn {
+              margin-top: 0rem;
+              margin-bottom: 0rem;
+            }
+          }
+          tbody{
+            border-bottom: 1px solid #a440f2;
+            .status {
+              font-family: "Nineteen Ninety Seven";
+              font-size: 15px;
+              color: #fff !important;
+            }
+          }
+          th.right {
+            text-align: right;
+          }
+          th.center {
+            text-align: center;
+          }
+          th.status {
+            width: 15%;
+          }
+          .btn {
+            width: 7rem;
+            margin-left: 1.5rem;
+          }
+          .btn.small {
+            width: 5rem;
+            @media (max-width: 1550px) { 
+              width: 7rem !important;
+            }
+          }
+          .btn.claim {
+            background-color: #281e31;
+            border-radius: 5px;
+            height: 2.2rem;
+            width: 6rem;
+            margin-right: 1rem;
+            padding: 0.1rem 1rem;
+          }
+          .claim-button2 {
+            .btn.claim {
+              margin-right: 0rem;
+            }
+          }
+          .btn.position-url {
+            border-width: 1px;
+            border-color: $green;
+            word-wrap: wrap;
+          }
+          .number {
+            font-size: 1rem;
+            color: $white;
+            text-shadow: 0 0 4px #f195f9,0 0 10px #fff,0 0 20px #e440f2,0 -10px 40px #b626c4;
+          }       
+          .current-rewards {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+          }
+          .fire {
+            .number {
+              font-family: "Nineteen Ninety Seven";
+            }
+          }
+          h6 {
+            color: $white;
+            margin-top: 3px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+          }
+          .rewards {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
 
+            h6 {
+              margin: 0rem;
+              margin-right: 0.4rem;
+            }
+            .btn {
+              margin-left: 0.5rem;
+            }
+            &-item {
+              display: flex;
+              padding-right: 2.2rem;
+              align-items: center;              
+            }
+            &-tier {
+              display: flex;
+              flex-direction: row;
+              align-items: center;              
+            }
+            &-total {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              .btn {
+                margin-left: 0rem;
+              }
+              .amount {
+                display: flex;
+                
+                svg {
+                  margin-top: -3px;
+                  margin-left: 4px;
+                }
+              }
+            }            
+          }
+          .position {
+            padding-right: 4rem;
+            .description{
+              display: flex;
+              align-items: center;
+              font-weight: bold;
+              small {
+                margin-left: 10px;
+              }
+            }
+            .tokens {
+              font-size: 0.9rem;
+              color: $purple ;
+            }
+            .status {
+              font-size: 0.6rem;
+              font-family: "Space Mono";
+              background-color: #281e31;
+              padding: 0.2rem;
+              border-radius: 5px;
+              border: 1px solid #38d6b2;
+            }
+            .ranges {
+              display: flex;
+              width: 100%;
+              flex-direction: row;
+              align-items: center;
+              .min-range {
+                font-size: 1rem;
+                margin-right: 2.5rem;
+              }
+              .max-range {
+                font-size: 1rem;
+                margin-left: 2.5rem;
+              }
+              @media (max-width: 1350px) {
+                .min-range {
+                  margin-right: 1rem;
+                }
+                .max-range {
+                  margin-left: 1rem;
+                }
+              }
+            }
+          }
+          .unstaked {
+            text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
+          }
+          .deposited {
+            text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
+          }
+          .staked {
+            text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
+          }
+          .not_approved {
+            text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
+          }
+          .out_range {
+            text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
+          }
+          .empty-lp{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .lp-box {
+              border: 1px solid $light;
+              border-radius: 5px;
+              background-color: #281e31a3;
+            }
+            .lp-info {
+              display: flex;
+              flex-direction: column;
+              padding: 15px;
+              .row1 {
+                display: flex;
+                flex-direction: row;
+              }
+              .row2 {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                margin-top: 0.6rem;
+                h6 {
+                  font-size: 0.9rem;
+                  margin: 0rem;
+                }
+                .number {
+                  font-size: 0.85rem;
+                  margin-left: 0.3rem;                  
+                }
+                .neon-pink {
+                  margin-left: 0.3rem;
+                  font-size: 0.9rem;                  
+                  text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+                }
+              }
+            }
+            .icons {
+              display: flex;
+              align-items: center;
+              padding: 5px;
+              padding-top: 0px;
+            }
+            .description {
+              margin-left: 10px;
+              padding: 5px;
+            }
+            .uni {
+              margin-left: -10px;
+              filter: drop-shadow(0 0 5px #a440f2);
+            }
+            .btn-box {
+              width: 100%;
+            }
+            .btn {
+              font-size: 0.9rem;
+              height: 2.5rem;
+              width: 100%;
+              border: 0px;
+              border-top: 0.8px solid $light;
+              background-color: #281e31;
+              margin: 0px;
+              padding-top: 8px;
+              border-bottom-left-radius: 5px;
+              border-bottom-right-radius: 5px;
+            }
+            .btn:hover {
+              color: $white;
+            }
+            small {
+              margin-left: -10px;
+            }
+          }
+        }
+      }
       th {
         vertical-align: middle;
       }
@@ -377,6 +614,16 @@
         height: 35px;
         margin-right: 0.5rem;
       }
+    }
+    .question-small {
+      border-radius: 2px;
+      width: 20px !important;
+      height: 20px  !important;
+      margin-right: 0;
+      font-size: 10px;
+      padding: 2px;
+      margin-left: 5px;
+      margin-bottom: 0px !important;
     }
   }
 

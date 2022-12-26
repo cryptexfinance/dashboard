@@ -16,7 +16,7 @@
   &.off { 
     margin-top: 0rem;
   }
-  
+
   .create {
     position: relative;
     width: 15rem;
@@ -87,6 +87,9 @@
         }
         .btn:focus {
           border: none;
+        }
+        .btn:hover {
+          background-color: transparent;
         }
       }
     }
@@ -359,10 +362,30 @@
             }
           }
         }
+
+        .end-date {
+          text-align: right;
+        }
       }
       @media (max-width: 450px) {
         padding: 2rem 1rem;
       }
+    }
+  }
+}
+
+.cryptkeeper-form {
+  .avatar {
+    border: 0.8px solid $green;
+  }
+  .add-file-icon {
+    svg {
+      background:rgba(0, 0, 0, 0.175);
+      border: 3px solid rgba(209, 194, 239, 0.65);
+      color: rgba(209, 194, 239, 0.65);
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
     }
   }
 }

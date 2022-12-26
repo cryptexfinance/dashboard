@@ -9,12 +9,16 @@ export const useVaults = (): VaultsContext => {
   const [wbtcVault, setWBTCVault] = useState<ethers.Contract>();
   const [aaveVault, setAAVEVault] = useState<ethers.Contract>();
   const [linkVault, setLINKVault] = useState<ethers.Contract>();
+  const [snxVault, setSNXVault] = useState<ethers.Contract>();
+  const [uniVault, setUNIVault] = useState<ethers.Contract>();
   const [maticVault, setMaticVault] = useState<ethers.Contract>();
   const [wethVaultRead, setWETHVaultRead] = useState<Contract>();
   const [daiVaultRead, setDAIVaultRead] = useState<Contract>();
   const [wbtcVaultRead, setWBTCVaultRead] = useState<Contract>();
   const [aaveVaultRead, setAAVEVaultRead] = useState<Contract>();
   const [linkVaultRead, setLINKVaultRead] = useState<Contract>();
+  const [snxVaultRead, setSNXVaultRead] = useState<Contract>();
+  const [uniVaultRead, setUNIVaultRead] = useState<Contract>();
   const [maticVaultRead, setMaticVaultRead] = useState<Contract>();
 
   const setCurrentWETHVault = React.useCallback((currentWETHVault: ethers.Contract): void => {
@@ -31,6 +35,12 @@ export const useVaults = (): VaultsContext => {
   }, []);
   const setCurrentLINKVault = React.useCallback((currentLINKVault: ethers.Contract): void => {
     setLINKVault(currentLINKVault);
+  }, []);
+  const setCurrentSNXVault = React.useCallback((currentSNXVault: ethers.Contract): void => {
+    setSNXVault(currentSNXVault);
+  }, []);
+  const setCurrentUNIVault = React.useCallback((currentUNIVault: ethers.Contract): void => {
+    setUNIVault(currentUNIVault);
   }, []);
   const setCurrentMaticVault = React.useCallback((currentMaticVault: ethers.Contract): void => {
     setMaticVault(currentMaticVault);
@@ -50,6 +60,12 @@ export const useVaults = (): VaultsContext => {
   const setCurrentLINKVaultRead = React.useCallback((currentLINKVaultRead: Contract): void => {
     setLINKVaultRead(currentLINKVaultRead);
   }, []);
+  const setCurrentSNXVaultRead = React.useCallback((currentSNXVaultRead: Contract): void => {
+    setSNXVaultRead(currentSNXVaultRead);
+  }, []);
+  const setCurrentUNIVaultRead = React.useCallback((currentUNIVaultRead: Contract): void => {
+    setUNIVaultRead(currentUNIVaultRead);
+  }, []);
   const setCurrentMaticVaultRead = React.useCallback((currentMaticVaultRead: Contract): void => {
     setMaticVaultRead(currentMaticVaultRead);
   }, []);
@@ -64,6 +80,10 @@ export const useVaults = (): VaultsContext => {
     setCurrentAAVEVault,
     linkVault,
     setCurrentLINKVault,
+    snxVault,
+    setCurrentSNXVault,
+    uniVault,
+    setCurrentUNIVault,
     maticVault,
     setCurrentMaticVault,
     wethVaultRead,
@@ -76,6 +96,10 @@ export const useVaults = (): VaultsContext => {
     setCurrentAAVEVaultRead,
     linkVaultRead,
     setCurrentLINKVaultRead,
+    snxVaultRead,
+    setCurrentSNXVaultRead,
+    uniVaultRead,
+    setCurrentUNIVaultRead,
     maticVaultRead,
     setCurrentMaticVaultRead,
   };

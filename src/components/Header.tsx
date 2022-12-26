@@ -1,19 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import Button from "react-bootstrap/esm/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
 import { ethers } from "ethers";
 import Davatar from "@davatar/react";
 import NumberFormat from "react-number-format";
-import { ChangeNetwork } from "./modals/ChangeNetwork";
 import SignerContext from "../state/SignerContext";
 import { Web3ModalContext } from "../state/Web3ModalContext";
 import TokensContext from "../state/TokensContext";
 import NetworkContext from "../state/NetworkContext";
-import { makeShortAddress, getENS } from "../utils/utils";
-import { FEATURES, NETWORKS } from "../utils/constants";
+import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
+import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
@@ -21,17 +22,23 @@ import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
 type props = {
   signerAddress: string;
+  isMobile: boolean;
 };
+/* type propsDD = {
+  className: string;
+}; */
 
-const Header = ({ signerAddress }: props) => {
+const Header = ({ signerAddress, isMobile }: props) => {
+  const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(SignerContext);
   const tokens = useContext(TokensContext);
   const currentNetwork = useContext(NetworkContext);
-  const [showChangeNetwork, setShowChangeNetwork] = useState(false);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
   const [tokenBalance, setTokenBalance] = useState("0.0");
+  // const [language, setLanguage] = useState("EN");
+  const [loading, setLoading] = useState(false);
 
   const copyCodeToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,8 +57,57 @@ const Header = ({ signerAddress }: props) => {
     document.body.removeChild(el);
   };
 
-  async function changeNetwork(newChainId: string) {
-    if (currentNetwork.wallet === "metamask") {
+  async function addNetwork(newChainId: string) {
+    let chainName = "Optimism";
+    let currency = "Ether (ETH)";
+    let symbol = "ETH";
+    let rpcUrl = "https://mainnet.optimism.io/";
+    let blockExplorerUrl = "https://optimistic.etherscan.io";
+
+    if (newChainId === NETWORKS.okovan.hexChainId) {
+      chainName = "Optimistic Ethereum (Kovan)";
+      rpcUrl = "https://kovan.optimism.io";
+      blockExplorerUrl = "https://kovan-optimistic.etherscan.io";
+    }
+    if (newChainId === NETWORKS.polygon.hexChainId) {
+      chainName = "Polygon Mainnet";
+      currency = "Matic Token";
+      symbol = "MATIC";
+      rpcUrl = "https://rpc-mainnet.maticvigil.com/";
+      blockExplorerUrl = "https://polygonscan.com/";
+    }
+    if (newChainId === NETWORKS.mumbai.hexChainId) {
+      chainName = "Mumbai";
+      currency = "Matic Token";
+      symbol = "MATIC";
+      rpcUrl = "https://rpc-mumbai.maticvigil.com/";
+      blockExplorerUrl = "https://mumbai.polygonscan.com/";
+    }
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: newChainId,
+            chainName,
+            nativeCurrency: {
+              name: currency,
+              symbol,
+              decimals: 18,
+            },
+            rpcUrls: [rpcUrl],
+            blockExplorerUrls: [blockExplorerUrl],
+          },
+        ],
+      });
+    } catch (addError) {
+      // handle "add" error
+    }
+  }
+
+  const onNetworkChange = async (newChainId: string | null) => {
+    if (currentNetwork.isBrowserWallet) {
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
@@ -61,44 +117,19 @@ const Header = ({ signerAddress }: props) => {
         // This error code indicates that the chain has not been added to MetaMask.
         if (
           error.code === 4902 &&
-          (newChainId === NETWORKS.okovan.hexChainId || newChainId === NETWORKS.polygon.hexChainId)
+          (newChainId === NETWORKS.optimism.hexChainId ||
+            newChainId === NETWORKS.okovan.hexChainId ||
+            newChainId === NETWORKS.polygon.hexChainId)
         ) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  chainId: newChainId,
-                  chainName:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? "Optimistic Ethereum (Kovan)"
-                      : "Polygon Mainnet",
-                  nativeCurrency: {
-                    name: newChainId === NETWORKS.okovan.hexChainId ? "Ether (ETH)" : "Matic Token",
-                    symbol: newChainId === NETWORKS.okovan.hexChainId ? "ETH" : "MATIC",
-                    decimals: 18,
-                  },
-                  rpcUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan.optimism.io"]
-                      : ["https://rpc-mainnet.maticvigil.com/"],
-                  blockExplorerUrls:
-                    newChainId === NETWORKS.okovan.hexChainId
-                      ? ["https://kovan-optimistic.etherscan.io"]
-                      : ["https://polygonscan.com/"],
-                },
-              ],
-            });
-          } catch (addError) {
-            // handle "add" error
-          }
+          addNetwork(newChainId);
         }
       }
     }
-  }
+  };
 
   useEffect(() => {
     const loadAddress = async () => {
+      setLoading(true);
       if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
         const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
         const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
@@ -121,54 +152,151 @@ const Header = ({ signerAddress }: props) => {
         setAddress(signerAddress);
         const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
         setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
+        setLoading(false);
       }
+      /* let lng = localStorage.getItem("language");
+      if (lng) {
+        if (lng === "en-US") lng = "en";
+        setLanguage(lng.toUpperCase());
+      } */
     };
 
     loadAddress();
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
+  /* const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLanguage(lng.toUpperCase());
+    localStorage.setItem("language", lng);
+  }; */
+
+  /* const handleOnSelect = (eventKey: any, event: Object) => {
+    console.log(event);
+    changeLanguage(eventKey);
+  }; */
+
+  /* const LangDropDown = ({ className }: propsDD) => (
+    <Dropdown onSelect={handleOnSelect} className={className}>
+      <Dropdown.Toggle variant="success" id="dropdown-basic">
+        {language}
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.Item eventKey="en">English</Dropdown.Item>
+        <Dropdown.Item eventKey="fr">French</Dropdown.Item>
+        <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  ); */
+
+  const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
+
+  const EthereumToggle = () => (
+    <>
+      <ETHIcon className="eth" />
+      {process.env.REACT_APP_NETWORK_ID === "5" ? (
+        <h6>Goerli</h6>
+      ) : (
+        <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
+      )}
+    </>
+  );
+
+  const EthereumOpt = () => {
+    let { chainId } = NETWORKS.mainnet;
+    let { hexChainId } = NETWORKS.mainnet;
+    if (process.env.REACT_APP_NETWORK_ID === "4") {
+      chainId = NETWORKS.rinkeby.chainId;
+      hexChainId = NETWORKS.rinkeby.hexChainId;
+    }
+    if (process.env.REACT_APP_NETWORK_ID === "5") {
+      chainId = NETWORKS.goerli.chainId;
+      hexChainId = NETWORKS.goerli.hexChainId;
+    }
+
+    return (
+      <Dropdown.Item key={chainId} eventKey={hexChainId}>
+        {EthereumToggle()}
+      </Dropdown.Item>
+    );
+  };
+
+  const OptimismToggle = () => (
+    <>
+      <OPTIMISMIcon className="optimism" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Optimism" : "Kovan"}</h6>
+    </>
+  );
+
+  const OptimismOpt = () => (
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.optimism.chainId
+          : NETWORKS.okovan.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.optimism.hexChainId
+          : NETWORKS.okovan.hexChainId
+      }
+    >
+      {OptimismToggle()}
+    </Dropdown.Item>
+  );
+
+  const PolygonToggle = () => (
+    <>
+      <POLYGONIcon className="eth" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Polygon" : "Mumbai"}</h6>
+    </>
+  );
+
+  const PolygonOpt = () => (
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.polygon.chainId
+          : NETWORKS.mumbai.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.polygon.hexChainId
+          : NETWORKS.mumbai.hexChainId
+      }
+    >
+      {PolygonToggle()}
+    </Dropdown.Item>
+  );
+
   return (
     <Nav className="header">
       {signer.signer ? (
         <>
-          {(FEATURES.OPTIMISM || FEATURES.POLYGON) &&
-            !window.location.pathname.includes("/governance") && (
-              <div className="network-container">
-                <Button
-                  className="btn"
-                  onClick={
-                    currentNetwork.wallet === "metamask"
-                      ? () => setShowChangeNetwork(true)
-                      : () => {}
-                  }
+          {!window.location.pathname.includes("/governance") && showDropdown() && (
+            <div className="network-container">
+              <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
+                <Dropdown.Toggle
+                  variant="secondary"
+                  id="dropdown-flags"
+                  className="text-left"
+                  style={{ width: 200 }}
                 >
-                  {currentNetwork.chainId === NETWORKS.okovan.chainId ||
-                  currentNetwork.chainId === NETWORKS.polygon.chainId ? (
-                    <div className="title">
-                      {currentNetwork.chainId === NETWORKS.okovan.chainId ? (
-                        <>
-                          <OPTIMISMIcon className="optimism" /> <h6>Kovan</h6>
-                        </>
-                      ) : (
-                        <>
-                          <POLYGONIcon className="eth" /> <h6>Polygon</h6>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="title">
-                      <ETHIcon className="eth" />
-                      {currentNetwork.chainId === NETWORKS.mainnet.chainId ? (
-                        <h6>Ethereum</h6>
-                      ) : (
-                        <h6>Rinkeby</h6>
-                      )}
-                    </div>
-                  )}
-                </Button>
-              </div>
-            )}
+                  <div className="network-toggle">
+                    {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
+                    {isOptimism(currentNetwork.chainId) && OptimismToggle()}
+                    {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                  </div>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {EthereumOpt()}
+                  {OptimismOpt()}
+                  {FEATURES.POLYGON && PolygonOpt()}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          )}
           <div className="info">
             <TcapIcon className="tcap-neon" />
             <h5>
@@ -193,23 +321,22 @@ const Header = ({ signerAddress }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
+            {/* <LangDropDown className="btn-language small" /> */}
           </div>
-          <ChangeNetwork
-            show={showChangeNetwork}
-            onHide={() => setShowChangeNetwork(false)}
-            changeNetwork={changeNetwork}
-          />
         </>
       ) : (
-        <Button
-          variant="pink"
-          className="neon-pink"
-          onClick={() => {
-            web3Modal.toggleModal();
-          }}
-        >
-          Connect Wallet
-        </Button>
+        <>
+          <Button
+            variant="pink"
+            className="neon-pink btn-connect"
+            onClick={() => {
+              web3Modal.toggleModal();
+            }}
+          >
+            {t("connect")}
+          </Button>
+          {/* <LangDropDown className="btn-language" /> */}
+        </>
       )}
     </Nav>
   );

@@ -75,9 +75,11 @@
     }
 
     .avatar {
-      height: 92%;
-      width: 80%;
       position: absolute;
+      height: 92%;
+      width: 65%;
+      margin-left: 20px;
+      cursor: pointer;
     }
 
     .image-group {
@@ -91,13 +93,27 @@
       }
       a {
         position: absolute;
-        margin-left: 20px;
+        margin-left: 35px;
       }
     }
 
     .text-muted {
       text-align: left;
       font-size: 0.8rem;
+    }
+    .text-muted.liquidation-fee,
+    .text-muted.liquidation-reward {
+      color: #9ca5ad !important;
+      font-size: 0.9rem;
+    }
+    .liquidation-data {
+      display: flex;
+      margin-top: 5px;
+      justify-content: space-between;
+
+      .reward-usd {
+        padding-left: 25px;
+      }
     }
 
     input[type="text"].neon-green {
@@ -120,8 +136,10 @@
     }
     input[type="file"] {
       background-color: $dark;
-      height: 90%;
+      height: 100%;
       width: 90%;
+      margin-left: 20px;
+      cursor: pointer;
     }
     .custom-file-label {
       border-color: $green;
@@ -156,16 +174,45 @@
         font-family: "Space Mono";
       }
     }
-
     .btn {
       background-color: $darker;
       border-radius: 1px;
       height: 3.375rem;
       width: 100%;
     }
-
     .remove {
       margin-top: 3.5rem;
+    }
+
+    .liquidate-input {
+      .form-control {
+        z-index: 1;
+      }
+      .text-muted {
+        position: absolute;
+        width: 100%;
+        text-align: right;
+        font-size: 0.9rem;
+        padding: 0.7rem 0.75rem 0.375rem 0.75rem;
+      }
+    }
+  }
+  table.liq-info {
+    margin-top: 3rem !important;
+    .btn-dark {
+      padding-top: 5px;
+      padding-left: 10px;
+    }
+    th {
+      text-align: right;
+      border-bottom: 1px;
+    }
+    td {
+      text-align: right;
+    }
+    .net-reward {
+      font-size: 18px;
+      text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
     }
   }
 
@@ -222,5 +269,4 @@
       overflow-x: scroll;
     }
   }
-
 }

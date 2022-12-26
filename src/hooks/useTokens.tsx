@@ -11,7 +11,10 @@ export const useTokens = (): TokensContext => {
   const [ctxToken, setCtxToken] = useState<ethers.Contract>();
   const [aaveToken, setAAVEToken] = useState<ethers.Contract>();
   const [linkToken, setLINKToken] = useState<ethers.Contract>();
+  const [snxToken, setSNXToken] = useState<ethers.Contract>();
+  const [uniToken, setUNIToken] = useState<ethers.Contract>();
   const [maticToken, setMATICToken] = useState<ethers.Contract>();
+  const [usdcToken, setUSDCToken] = useState<ethers.Contract>();
   const [wethPoolToken, setWETHPoolToken] = useState<ethers.Contract>();
   const [daiPoolToken, setDAIPoolToken] = useState<ethers.Contract>();
   const [wbtcPoolToken, setWBTCPoolToken] = useState<ethers.Contract>();
@@ -23,7 +26,10 @@ export const useTokens = (): TokensContext => {
   const [ctxTokenRead, setCtxTokenRead] = useState<Contract>();
   const [aaveTokenRead, setAAVETokenRead] = useState<Contract>();
   const [linkTokenRead, setLINKTokenRead] = useState<Contract>();
+  const [snxTokenRead, setSNXTokenRead] = useState<Contract>();
+  const [uniTokenRead, setUNITokenRead] = useState<Contract>();
   const [maticTokenRead, setMATICTokenRead] = useState<Contract>();
+  const [usdcTokenRead, setUSDCTokenRead] = useState<Contract>();
   const [wethPoolTokenRead, setWETHPoolTokenRead] = useState<Contract>();
   const [daiPoolTokenRead, setDAIPoolTokenRead] = useState<Contract>();
   const [wbtcPoolTokenRead, setWBTCPoolTokenRead] = useState<Contract>();
@@ -50,8 +56,17 @@ export const useTokens = (): TokensContext => {
   const setCurrentLINKToken = React.useCallback((currentLINKToken: ethers.Contract): void => {
     setLINKToken(currentLINKToken);
   }, []);
+  const setCurrentSNXToken = React.useCallback((currentSNXToken: ethers.Contract): void => {
+    setSNXToken(currentSNXToken);
+  }, []);
+  const setCurrentUNIToken = React.useCallback((currentUNIToken: ethers.Contract): void => {
+    setUNIToken(currentUNIToken);
+  }, []);
   const setCurrentMATICToken = React.useCallback((currentMATIC: ethers.Contract): void => {
     setMATICToken(currentMATIC);
+  }, []);
+  const setCurrentUSDCToken = React.useCallback((currentUSDC: ethers.Contract): void => {
+    setUSDCToken(currentUSDC);
   }, []);
   const setCurrentWETHPoolToken = React.useCallback(
     (currentWETHPoolToken: ethers.Contract): void => {
@@ -92,8 +107,17 @@ export const useTokens = (): TokensContext => {
   const setCurrentLINKTokenRead = React.useCallback((currentLINKTokenRead: Contract): void => {
     setLINKTokenRead(currentLINKTokenRead);
   }, []);
+  const setCurrentSNXTokenRead = React.useCallback((currentSNXTokenRead: Contract): void => {
+    setSNXTokenRead(currentSNXTokenRead);
+  }, []);
+  const setCurrentUNITokenRead = React.useCallback((currentUNITokenRead: Contract): void => {
+    setUNITokenRead(currentUNITokenRead);
+  }, []);
   const setCurrentMATICTokenRead = React.useCallback((currentMATICRead: Contract): void => {
     setMATICTokenRead(currentMATICRead);
+  }, []);
+  const setCurrentUSDCTokenRead = React.useCallback((currentUSDCRead: Contract): void => {
+    setUSDCTokenRead(currentUSDCRead);
   }, []);
   const setCurrentWETHPoolTokenRead = React.useCallback(
     (currentWETHPoolTokenRead: Contract): void => {
@@ -135,8 +159,14 @@ export const useTokens = (): TokensContext => {
     setCurrentAAVEToken,
     linkToken,
     setCurrentLINKToken,
+    snxToken,
+    setCurrentSNXToken,
+    uniToken,
+    setCurrentUNIToken,
     maticToken,
     setCurrentMATICToken,
+    usdcToken,
+    setCurrentUSDCToken,
     wethPoolToken,
     setCurrentWETHPoolToken,
     daiPoolToken,
@@ -159,8 +189,14 @@ export const useTokens = (): TokensContext => {
     setCurrentAAVETokenRead,
     linkTokenRead,
     setCurrentLINKTokenRead,
+    snxTokenRead,
+    setCurrentSNXTokenRead,
+    uniTokenRead,
+    setCurrentUNITokenRead,
     maticTokenRead,
     setCurrentMATICTokenRead,
+    usdcTokenRead,
+    setCurrentUSDCTokenRead,
     wethPoolTokenRead,
     setCurrentWETHPoolTokenRead,
     daiPoolTokenRead,

@@ -62,7 +62,7 @@ export const NewProposal = ({ show, onHide, refresh }: props) => {
           setDescription("");
           onHide();
         } catch (error) {
-          if (error.code === 4001) {
+          if (error.code === 4001 || error.code === -32603) {
             errorNotification("Transaction rejected");
           } else {
             errorNotification("Description can't be empty");

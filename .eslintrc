@@ -37,6 +37,7 @@
     "no-debugger": 0,
     "no-alert": 0,
     "no-await-in-loop": 0,
+    "react/prop-types": "off",
     "no-return-assign": [
       "error",
       "except-parens"
@@ -77,6 +78,7 @@
         "props": false
       }
     ],
+    "no-array-constructor": "off",
     "no-console": 0,
     "import/prefer-default-export": 0,
     "import": 0,
@@ -147,6 +149,7 @@
     ],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "react/destructuring-assignment": "off",
     "react/jsx-props-no-spreading": [
       "error",
       {
@@ -154,7 +157,7 @@
         "custom": "enforce",
         "exceptions": [
           "Container"
-        ],
+        ]
       }
     ],
     "react/jsx-no-bind": 0

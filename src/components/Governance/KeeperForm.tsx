@@ -24,6 +24,7 @@ type props = {
   keeperInfo: any | null;
   onHide: () => void;
   refresh: () => void;
+  t: any;
 };
 
 const KeeperForm = ({
@@ -35,6 +36,7 @@ const KeeperForm = ({
   keeperInfo,
   onHide,
   refresh,
+  t,
 }: props) => {
   const [saving, setSaving] = useState(false);
   const [delegatee, setDelegatee] = useState("");
@@ -66,7 +68,7 @@ const KeeperForm = ({
   };
 
   useEffect(() => {
-    if (keeperInfo !== null) {
+    if (keeperInfo !== null && typeof keeperInfo !== "undefined") {
       setDelegatee(keeperInfo.eth_name);
       setAddress(keeperInfo.address);
       setName(keeperInfo.name);
@@ -110,11 +112,11 @@ const KeeperForm = ({
       if (re2.test(value.trim())) {
         add = await getAddressFromENS(value);
         if (add === null) {
-          setDelegateeError("Please enter a valid ENS name");
+          setDelegateeError(t("errors.invalid-ens"));
           return false;
         }
         if (keeperExists(add)) {
-          setDelegateeError("Crypt keeper already exists for this address.");
+          setDelegateeError(t("governance.errors.exists"));
           return false;
         }
 
@@ -126,11 +128,11 @@ const KeeperForm = ({
 
       add = await isValidAddress(value.trim());
       if (add === null) {
-        setDelegateeError("Please enter a valid address");
+        setDelegateeError(t("errors.invalid-address"));
         return false;
       }
       if (keeperExists(add)) {
-        setDelegateeError("Crypt keeper already exists for this address.");
+        setDelegateeError(t("governance.errors.exists"));
         return false;
       }
       setIsEthName(false);
@@ -138,17 +140,17 @@ const KeeperForm = ({
       setDelegateeError("");
       return true;
     }
-    setDelegateeError("Please enter a valid eth name or address");
+    setDelegateeError(t("governance.errors.invalid-ens-address"));
     return false;
   };
 
   const isNameValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setNameError("Name cannot be empty");
+      setNameError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 25) {
-      setNameError("Name is too long (25 characters max)");
+      setNameError(t("governance.errors.too-long", { max: "25" }));
       return false;
     }
     setNameError("");
@@ -159,7 +161,7 @@ const KeeperForm = ({
     const re = /^[a-zA-Z0-9_]{1,15}$/;
     if (value.trim().length > 0) {
       if (!re.test(value.trim())) {
-        setTwitterError("It is not a valid twitter username)");
+        setTwitterError(t("governance.errors.invalid-twitter"));
         return false;
       }
     }
@@ -171,7 +173,7 @@ const KeeperForm = ({
     const re = /^.{3,32}#[0-9]{4}$/;
     if (value.trim().length > 0) {
       if (!re.test(value.trim())) {
-        setDiscordError("It is not a valid twitter username)");
+        setDiscordError(t("governance.errors.invalid-discord"));
         return false;
       }
     }
@@ -181,11 +183,11 @@ const KeeperForm = ({
 
   const isExpertiseValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setExpertiseError("Expertise cannot be empty");
+      setExpertiseError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 120) {
-      setExpertiseError("Expertise is too loong (120 characters  max)");
+      setExpertiseError(t("governance.errors.too-long", { max: "25" }));
       return false;
     }
     setExpertiseError("");
@@ -194,11 +196,11 @@ const KeeperForm = ({
 
   const isWhyValid = (value: string): boolean => {
     if (value.trim().length === 0) {
-      setWhyError("Why field cannot be empty");
+      setWhyError(t("errors.empty"));
       return false;
     }
     if (value.trim().length > 2500) {
-      setWhyError("Why field is too loong (2500 characters  max)");
+      setWhyError(t("governance.errors.too-long", { max: "2500" }));
       return false;
     }
     setWhyError("");
@@ -208,16 +210,16 @@ const KeeperForm = ({
   const isImageValid = (value: File | null): boolean => {
     if (value === null) {
       if (isNew) {
-        setImageError("Image cannot be empty");
+        setImageError(t("errors.empty"));
       }
       return !isNew;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
-      setImageError("Invalid file type");
+      setImageError(t("errors.invalid-file-type"));
       return false;
     }
     if (value.size > 100000) {
-      setImageError("Image max size is 100 KB");
+      setImageError(t("errors.invalid-image-size", { size: Math.round(value.size / 1000) }));
       setImageUrl("");
       return false;
     }
@@ -299,8 +301,7 @@ const KeeperForm = ({
         }
       })
       .catch((error) => {
-        console.error("Error creating");
-        errorNotification("Error creating keeper.");
+        errorNotification(t("governance.errors.creating-keeper"));
         console.error(error);
       });
   };
@@ -308,23 +309,21 @@ const KeeperForm = ({
   const createKeeper = async (event: React.MouseEvent) => {
     event.preventDefault();
     setSaving(true);
-    /* if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      saveKeeper();
-    } */
     if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      if (delegatee) {
+      if (address && delegatee) {
         try {
-          const tx = await delegatorFactory.createDelegator(delegatee);
+          const tx = await delegatorFactory.createDelegator(address);
           notifyUser(tx, refresh);
           setDelegatee("");
           await saveKeeper();
           refresh();
           onHide();
         } catch (error) {
-          errorNotification("Delegator for the address already exists.");
+          console.log(error);
+          errorNotification(t("governance.errors.creating-keeper"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
     }
     setSaving(false);
@@ -352,8 +351,8 @@ const KeeperForm = ({
           if (responseJson.status === "success") {
             refresh();
             sendNotification(
-              "Crypt. Keepers",
-              "Crypt Keeper updated",
+              t("governance.success.title"),
+              t("governance.success.message"),
               3000,
               onHide(),
               1000,
@@ -364,8 +363,7 @@ const KeeperForm = ({
           }
         })
         .catch((error) => {
-          errorNotification("Unexpected error saving to DB");
-          console.error("Unexpected error");
+          errorNotification(t("errors.unexpected"));
           console.error(error);
         });
     }
@@ -384,7 +382,7 @@ const KeeperForm = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Create Crypt Keeper</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">{t("governance.form.create")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
@@ -417,7 +415,7 @@ const KeeperForm = ({
                     type="text"
                     required
                     className={delegateeError === "" ? "neon-green" : "neon-orange"}
-                    placeholder="Delegatee eth name or address"
+                    placeholder={t("governance.form.keeper")}
                     value={delegatee}
                     onChange={onChangeDelegatee}
                     disabled={!isNew}
@@ -437,7 +435,7 @@ const KeeperForm = ({
                     type="text"
                     required
                     className={nameError === "" ? "neon-green" : "neon-orange"}
-                    placeholder="Name"
+                    placeholder={t("governance.form.name")}
                     value={name}
                     onChange={onChangeName}
                   />
@@ -453,7 +451,7 @@ const KeeperForm = ({
                   type="text"
                   required
                   className={expertiseError === "" ? "neon-green" : "neon-orange"}
-                  placeholder="Expertise"
+                  placeholder={t("governance.expertise")}
                   value={expertise}
                   onChange={onChangeExpertise}
                 />
@@ -469,7 +467,7 @@ const KeeperForm = ({
                   as="textarea"
                   rows={7}
                   className={whyError === "" ? "neon-green" : "neon-orange"}
-                  placeholder="Why?"
+                  placeholder={t("governance.form.why")}
                   value={why}
                   onChange={onChangeWhy}
                 />

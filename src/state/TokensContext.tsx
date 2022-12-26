@@ -14,11 +14,17 @@ export interface TokensContext {
   ctxToken?: ethers.Contract;
   setCurrentCtxToken: (currentCtx: ethers.Contract) => void;
   aaveToken?: ethers.Contract;
-  setCurrentAAVEToken: (currentCtx: ethers.Contract) => void;
+  setCurrentAAVEToken: (currentAave: ethers.Contract) => void;
   linkToken?: ethers.Contract;
-  setCurrentLINKToken: (currentCtx: ethers.Contract) => void;
+  setCurrentLINKToken: (currentLink: ethers.Contract) => void;
+  snxToken?: ethers.Contract;
+  setCurrentSNXToken: (currentSnx: ethers.Contract) => void;
+  uniToken?: ethers.Contract;
+  setCurrentUNIToken: (currentUni: ethers.Contract) => void;
   maticToken?: ethers.Contract;
   setCurrentMATICToken: (currentMATIC: ethers.Contract) => void;
+  usdcToken?: ethers.Contract;
+  setCurrentUSDCToken: (currentUSDC: ethers.Contract) => void;
   wethPoolToken?: ethers.Contract;
   setCurrentWETHPoolToken: (currentPoolToken: ethers.Contract) => void;
   daiPoolToken?: ethers.Contract;
@@ -38,11 +44,17 @@ export interface TokensContext {
   ctxTokenRead?: Contract;
   setCurrentCtxTokenRead: (currentCtx: Contract) => void;
   aaveTokenRead?: Contract;
-  setCurrentAAVETokenRead: (currentCtx: Contract) => void;
+  setCurrentAAVETokenRead: (currentAave: Contract) => void;
   linkTokenRead?: Contract;
-  setCurrentLINKTokenRead: (currentCtx: Contract) => void;
+  setCurrentLINKTokenRead: (currentLink: Contract) => void;
+  snxTokenRead?: Contract;
+  setCurrentSNXTokenRead: (currentSnx: Contract) => void;
+  uniTokenRead?: Contract;
+  setCurrentUNITokenRead: (currentUni: Contract) => void;
   maticTokenRead?: Contract;
   setCurrentMATICTokenRead: (currentMATIC: Contract) => void;
+  usdcTokenRead?: Contract;
+  setCurrentUSDCTokenRead: (currentUSDC: Contract) => void;
   wethPoolTokenRead?: Contract;
   setCurrentWETHPoolTokenRead: (currentPoolTokenRead: Contract) => void;
   daiPoolTokenRead?: Contract;
@@ -61,7 +73,10 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentCtxToken: () => {},
   setCurrentAAVEToken: () => {},
   setCurrentLINKToken: () => {},
+  setCurrentSNXToken: () => {},
+  setCurrentUNIToken: () => {},
   setCurrentMATICToken: () => {},
+  setCurrentUSDCToken: () => {},
   setCurrentWETHPoolToken: () => {},
   setCurrentDAIPoolToken: () => {},
   setCurrentWBTCPoolToken: () => {},
@@ -73,7 +88,10 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentCtxTokenRead: () => {},
   setCurrentAAVETokenRead: () => {},
   setCurrentLINKTokenRead: () => {},
+  setCurrentSNXTokenRead: () => {},
+  setCurrentUNITokenRead: () => {},
   setCurrentMATICTokenRead: () => {},
+  setCurrentUSDCTokenRead: () => {},
   setCurrentWETHPoolTokenRead: () => {},
   setCurrentDAIPoolTokenRead: () => {},
   setCurrentWBTCPoolTokenRead: () => {},
