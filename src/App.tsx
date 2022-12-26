@@ -490,7 +490,7 @@ const App = () => {
     }
   };
 
-  web3Modal.on("connect", async (networkProvider) => {
+  web3Modal.on("connect", async (networkProvider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc) => {
     setLoading(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();

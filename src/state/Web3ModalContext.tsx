@@ -1,11 +1,8 @@
 import React from "react";
 
 import Web3Modal from "web3modal";
-import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import Authereum from "authereum";
 import WalletLink from "walletlink";
-import Fortmatic from "fortmatic";
 import { NETWORKS } from "../utils/constants";
 
 let network = "mainnet";
@@ -47,28 +44,13 @@ const providerOptions = {
       infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
-  fortmatic: {
-    package: Fortmatic,
-    options: {
-      key: process.env.REACT_APP_FORTMATIC_KEY,
-      network: {
-        chainId: process.env.REACT_APP_NETWORK_ID,
-        rpcUrl:
-          process.env.REACT_APP_NETWORK_ID === "1"
-            ? NETWORKS.mainnet.infuraFortmaticRpcUrl
-            : NETWORKS.rinkeby.infuraFortmaticRpcUrl,
-      }, // if we don't pass it, it will default to localhost:8454
+  "custom-example": {
+    display: {
+      logo: "data:image/gif;base64,INSERT_BASE64_STRING",
+      name: "OKX",
+      description: "Connect to your example provider account"
     },
-  },
-  portis: {
-    package: Portis, // required
-    options: {
-      id: process.env.REACT_APP_PORTIS_ID,
-    },
-  },
-  authereum: {
-    package: Authereum, // required
-  },
+  }
 };
 
 const web3Modal = new Web3Modal({
