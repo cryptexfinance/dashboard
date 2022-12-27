@@ -4,8 +4,10 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
 import { NETWORKS } from "../utils/constants";
+import okxImage from "../assets/images/okx.jpg";
 
 let network = "mainnet";
+let okxConnector = WalletConnectProvider;
 
 switch (process.env.REACT_APP_NETWORK_ID) {
   case "1":
@@ -44,13 +46,21 @@ const providerOptions = {
       infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
-  "custom-example": {
+  burnerconnect: {
     display: {
-      logo: "data:image/gif;base64,INSERT_BASE64_STRING",
-      name: "OKX",
-      description: "Connect to your example provider account"
+        logo: okxImage,
+        name: "OKX",
+        description: "Scan with OKX mobile app to connect"
+      },
+    package: WalletConnectProvider, // required
+    options: {
+      infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
-  }
+    // connector: async (ProviderPackage: new (arg0: any) => any, options: any) => {
+    //     const provider = WalletConnectProvider;
+    //     return provider;
+    //   }
+  },
 };
 
 const web3Modal = new Web3Modal({
