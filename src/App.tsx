@@ -790,43 +790,49 @@ const App = () => {
     }
   };
 
-  web3Modal.on("connect", async (networkProvider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc) => {
-    setLoadingContracts(true);
-    const currentProvider = new ethers.providers.Web3Provider(networkProvider);
-    const network = await currentProvider.getNetwork();
-    const isNftFruit =
-      window.location.toString().includes("sewagefruit") && isGoerli(network.chainId);
+  web3Modal.on(
+    "connect",
+    async (
+      networkProvider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc
+    ) => {
+      setLoadingContracts(true);
+      const currentProvider = new ethers.providers.Web3Provider(networkProvider);
+      const network = await currentProvider.getNetwork();
+      const isNftFruit =
+        window.location.toString().includes("sewagefruit") && isGoerli(network.chainId);
 
-    if (!isValidNetwork(network.chainId) && !isNftFruit) {
-      setInvalidNetwork(true);
-    }
-    const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
-    const currentSigner = currentProvider.getSigner();
-    signer.setCurrentSigner(currentSigner);
-    const ethcallProvider = new Provider(currentProvider);
-
-    if (isPolygon(network.chainId)) {
-      await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
-    } else if (isGoerli(network.chainId)) {
-      await setGoerliContracts(currentSigner, ethcallProvider);
-    } else {
-      await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
-    }
-// @ts-ignore
-    const isBrowserWallet = networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
-    const cAddress = await currentSigner.getAddress();
-    setCurrentSignerAddress(cAddress);
-    setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
-
-    // @ts-ignore
-    networkProvider.on("chainChanged", (chainId: number) => {
-      if (chainId !== network.chainId) {
-        setCurrentNetwork(chainId, "", isBrowserWallet);
-        window.location.reload();
+      if (!isValidNetwork(network.chainId) && !isNftFruit) {
+        setInvalidNetwork(true);
       }
-    });
-    setLoadingContracts(false);
-  });
+      const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
+      const currentSigner = currentProvider.getSigner();
+      signer.setCurrentSigner(currentSigner);
+      const ethcallProvider = new Provider(currentProvider);
+
+      if (isPolygon(network.chainId)) {
+        await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
+      } else if (isGoerli(network.chainId)) {
+        await setGoerliContracts(currentSigner, ethcallProvider);
+      } else {
+        await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
+      }
+      // @ts-ignore
+      const isBrowserWallet =
+        networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
+      const cAddress = await currentSigner.getAddress();
+      setCurrentSignerAddress(cAddress);
+      setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
+
+      // @ts-ignore
+      networkProvider.on("chainChanged", (chainId: number) => {
+        if (chainId !== network.chainId) {
+          setCurrentNetwork(chainId, "", isBrowserWallet);
+          window.location.reload();
+        }
+      });
+      setLoadingContracts(false);
+    }
+  );
 
   useEffect(() => {
     async function loadProvider() {
