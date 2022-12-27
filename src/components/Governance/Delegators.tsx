@@ -186,6 +186,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           </Row>
         </>
       )}
+      <div className="search-box" />
       <div className="grid profiles">
         {keepersInfo.map((keeperInfo, index) => {
           const keeper = getDelegatorData(keeperInfo.address);
