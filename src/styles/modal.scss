@@ -1,6 +1,7 @@
 @import "./colors";
 @import "./fonts";
 
+
 .modal-content {
   padding: 2rem;
   background-color: $primary;
@@ -22,6 +23,20 @@
   .modal-header,
   .modal-footer {
     border: 0px;
+  }
+
+  .modal-header {
+    .btn-close {
+      box-sizing: content-box;
+      width: 1em;
+      height: 1em;
+      padding: 0.25em;
+      color: #000;
+      background: transparent url("/assets/images/x-symbol.svg");
+      border: 0;
+      border-radius: 0.375rem;
+      opacity: .5;
+    }    
   }
 
   .modal-title {
@@ -80,6 +95,7 @@
       width: 65%;
       margin-left: 20px;
       cursor: pointer;
+      z-index: 0;
     }
 
     .image-group {
@@ -135,25 +151,23 @@
       width: 80%;
     }
     input[type="file"] {
-      background-color: $dark;
+      background-color: transparent;
+      border: none;
+      color: transparent;
       height: 100%;
       width: 90%;
       margin-left: 20px;
       cursor: pointer;
+      z-index: 1;      
     }
-    .custom-file-label {
-      border-color: $green;
-      height: 3.375rem;
-      line-height: 1.5;
-      display: none;
+    input[type="file"]:focus {
+      box-shadow: none;
     }
-    .custom-file-label::after {
-      background-color: $darker;
-      border-color: $pink;
-      color: $white;
-      font-family: "Nineteen Ninety Seven";
-      font-size: 0.9rem;
-      font-weight: 400;
+
+    input::file-selector-button {
+      background-color: transparent;
+      color: transparent;
+      border: none;
     }
 
     textarea.neon-green {
@@ -197,6 +211,7 @@
       }
     }
   }
+
   table.liq-info {
     margin-top: 3rem !important;
     .btn-dark {

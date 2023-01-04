@@ -59,6 +59,10 @@ body {
   margin-top: 2rem;
 }
 
+.badge.bg-light {
+  background-color: $off-white !important;
+}
+
 .btn {
   color: $white;
   font-family: "Nineteen Ninety Seven";

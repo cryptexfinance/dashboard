@@ -402,7 +402,7 @@ const KeeperForm = ({
                 type="file"
                 id="custom-file"
                 onChange={onChangeImage}
-                className={imageError === "" ? "neon-green" : "neon-orange"}
+                className={imageError === "" ? "neon-green custom-file" : "neon-orange custom-file"}
               />
               <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>
