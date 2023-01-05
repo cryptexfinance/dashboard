@@ -218,7 +218,7 @@ const KeeperForm = ({
       setImageError(t("errors.invalid-file-type"));
       return false;
     }
-    if (value.size > 100000) {
+    if (value.size > 180000) {
       setImageError(t("errors.invalid-image-size", { size: Math.round(value.size / 1000) }));
       setImageUrl("");
       return false;
@@ -296,6 +296,7 @@ const KeeperForm = ({
     })
       .then((response) => response.json())
       .then((responseJson) => {
+        console.log(responseJson.errors);
         if (responseJson.status === "error") {
           console.log(responseJson.errors);
         }

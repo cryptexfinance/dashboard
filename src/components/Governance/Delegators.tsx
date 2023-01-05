@@ -23,7 +23,9 @@ type keeperType = {
   tokenOwners: { stake: string; stakeRaw: string }[];
   totalHoldersRepresented: number;
 };
+
 type keepeInfoType = {
+  id: number;
   address: string;
   name: string;
   eth_name: string;
@@ -106,6 +108,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
       const kData = getDelegatorData(dbInfo[i].address, currentDelegators);
       if (kData !== null) {
         const info = {
+          id: dbInfo[i].id,
           address: dbInfo[i].address,
           name: dbInfo[i].name,
           eth_name: dbInfo[i].eth_name,
