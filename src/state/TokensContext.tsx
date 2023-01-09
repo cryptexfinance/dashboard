@@ -9,6 +9,8 @@ export interface ITokensContext {
   setCurrentDAIToken: (currentToken: ethers.Contract) => void;
   wbtcToken?: ethers.Contract;
   setCurrentWBTCToken: (currentToken: ethers.Contract) => void;
+  jpegzToken?: ethers.Contract;
+  setCurrentJPEGZToken: (currentToken: ethers.Contract) => void;
   tcapToken?: ethers.Contract;
   setCurrentTCAPToken: (currentToken: ethers.Contract) => void;
   ctxToken?: ethers.Contract;
@@ -39,6 +41,8 @@ export interface ITokensContext {
   setCurrentDAITokenRead: (currentTokenRead: Contract) => void;
   wbtcTokenRead?: Contract;
   setCurrentWBTCTokenRead: (currentTokenRead: Contract) => void;
+  jpegzTokenRead?: Contract;
+  setCurrentJPEGZTokenRead: (currentTokenRead: Contract) => void;
   tcapTokenRead?: Contract;
   setCurrentTCAPTokenRead: (currentTokenRead: Contract) => void;
   ctxTokenRead?: Contract;
@@ -69,6 +73,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHToken: () => {},
   setCurrentDAIToken: () => {},
   setCurrentWBTCToken: () => {},
+  setCurrentJPEGZToken: () => {},
   setCurrentTCAPToken: () => {},
   setCurrentCtxToken: () => {},
   setCurrentAAVEToken: () => {},
@@ -84,6 +89,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHTokenRead: () => {},
   setCurrentDAITokenRead: () => {},
   setCurrentWBTCTokenRead: () => {},
+  setCurrentJPEGZTokenRead: () => {},
   setCurrentTCAPTokenRead: () => {},
   setCurrentCtxTokenRead: () => {},
   setCurrentAAVETokenRead: () => {},

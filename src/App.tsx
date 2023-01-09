@@ -452,7 +452,7 @@ const App = () => {
 
     switch (chainId) {
       case NETWORKS.arbitrum.chainId:
-        contracts = cryptexJson[42161].mainnet.contracts;
+        contracts = cryptexJson[42161].arbitrum.contracts;
         wethAddress = NETWORKS.arbitrum.weth;
         daiAddress = NETWORKS.arbitrum.dai;
         break;
@@ -498,19 +498,19 @@ const App = () => {
     tokens.setCurrentWETHToken(currentWETHToken);
     const currentDAIToken = new ethers.Contract(daiAddress, WETH.abi, currentSigner);
     tokens.setCurrentDAIToken(currentDAIToken);
-    const currentTCAPToken = new ethers.Contract(
-      contracts.TCAP.address,
-      contracts.TCAP.abi,
+    const currentJPEGZToken = new ethers.Contract(
+      contracts.JPEGZ.address,
+      contracts.JPEGZ.abi,
       currentSigner
     );
-    tokens.setCurrentTCAPToken(currentTCAPToken);
+    tokens.setCurrentJPEGZToken(currentJPEGZToken);
 
     const currentWETHTokenRead = new Contract(wethAddress, ERC20.abi);
     tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
     const currentDAITokenRead = new Contract(daiAddress, WETH.abi);
     tokens.setCurrentDAITokenRead(currentDAITokenRead);
-    const currentTCAPTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
-    tokens.setCurrentTCAPTokenRead(currentTCAPTokenRead);
+    const currentJPEGZTokenRead = new Contract(contracts.JPEGZ.address, contracts.JPEGZ.abi);
+    tokens.setCurrentJPEGZTokenRead(currentJPEGZTokenRead);
 
     // Set Oracles
     const currentWETHOracle = new ethers.Contract(
@@ -525,12 +525,13 @@ const App = () => {
       currentSigner
     );
     oracles.setCurrentDAIOracle(currentDAIOracle);
-    const currentTCAPOracle = new ethers.Contract(
-      contracts.TCAPOracle.address,
-      contracts.TCAPOracle.abi,
+
+    const currentJPEGZOracle = new ethers.Contract(
+      contracts.JPEGZOracle.address,
+      contracts.JPEGZOracle.abi,
       currentSigner
     );
-    oracles.setCurrentTCAPOracle(currentTCAPOracle);
+    oracles.setCurrentJPEGZOracle(currentJPEGZOracle);
 
     const currentWETHOracleRead = new Contract(
       contracts.WETHOracle.address,
@@ -539,11 +540,11 @@ const App = () => {
     oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
     const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
     oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
-    const currentTCAPOracleRead = new Contract(
-      contracts.TCAPOracle.address,
-      contracts.TCAPOracle.abi
+    const currentJPEGZOracleRead = new Contract(
+      contracts.JPEGZOracle.address,
+      contracts.JPEGZOracle.abi
     );
-    oracles.setCurrentTCAPOracleRead(currentTCAPOracleRead);
+    oracles.setCurrentJPEGZOracleRead(currentJPEGZOracleRead);
   };
 
   const setOptimismContracts = async (currentSigner: ethers.Signer) => {

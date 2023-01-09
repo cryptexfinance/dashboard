@@ -10,7 +10,7 @@ import {
   vaultsContext,
 } from "../state/index";
 import { validVaults, validHardVaults } from "../utils/utils";
-import { NETWORKS } from "../utils/constants";
+import { NETWORKS, TOKENS_SYMBOLS } from "../utils/constants";
 
 type contractsType = {
   currentAsset: ethers.Contract | null;
@@ -58,14 +58,14 @@ export const useVault = (
       cVault = hardVaults.wethVault;
       cVaultRead = hardVaults.wethVaultRead;
     }
-    if (assetSymbol === "JPEGz") {
-      cAsset = tokens.tcapToken;
-      cAssetRead = tokens.tcapTokenRead;
-      cAssetOracleRead = oracles.tcapOracleRead;
+    if (assetSymbol === TOKENS_SYMBOLS.JPEGz) {
+      cAsset = tokens.jpegzToken;
+      cAssetRead = tokens.jpegzTokenRead;
+      cAssetOracleRead = oracles.jpegzOracleRead;
     }
 
     switch (collateralSymbol) {
-      case "DAI":
+      case TOKENS_SYMBOLS.DAI:
         if (isHardVault) {
           cVault = hardVaults.daiVault;
           cVaultRead = hardVaults.daiVaultRead;
@@ -77,49 +77,49 @@ export const useVault = (
         cCollateralRead = tokens.daiTokenRead;
         cOracleRead = oracles.daiOracleRead;
         break;
-      case "AAVE":
+      case TOKENS_SYMBOLS.AAVE:
         cVault = vaults.aaveVault;
         cVaultRead = vaults.aaveVaultRead;
         cCollateral = tokens.aaveToken;
         cCollateralRead = tokens.aaveTokenRead;
         cOracleRead = oracles.aaveOracleRead;
         break;
-      case "LINK":
+      case TOKENS_SYMBOLS.LINK:
         cVault = vaults.linkVault;
         cVaultRead = vaults.linkVaultRead;
         cCollateral = tokens.daiToken;
         cCollateralRead = tokens.daiTokenRead;
         cOracleRead = oracles.linkOracleRead;
         break;
-      case "SNX":
+      case TOKENS_SYMBOLS.SNX:
         cVault = vaults.snxVault;
         cVaultRead = vaults.snxVaultRead;
         cCollateral = tokens.snxToken;
         cCollateralRead = tokens.snxTokenRead;
         cOracleRead = oracles.snxOracleRead;
         break;
-      case "UNI":
+      case TOKENS_SYMBOLS.UNI:
         cVault = vaults.uniVault;
         cVaultRead = vaults.uniVaultRead;
         cCollateral = tokens.uniToken;
         cCollateralRead = tokens.uniTokenRead;
         cOracleRead = oracles.uniOracleRead;
         break;
-      case "MATIC":
+      case TOKENS_SYMBOLS.MATIC:
         cVault = vaults.maticVault;
         cVaultRead = vaults.maticVaultRead;
         cCollateral = tokens.maticToken;
         cCollateralRead = tokens.maticTokenRead;
         cOracleRead = oracles.maticOracleRead;
         break;
-      case "WBTC":
+      case TOKENS_SYMBOLS.WBTC:
         cVault = vaults.wbtcVault;
         cVaultRead = vaults.wbtcVaultRead;
         cCollateral = tokens.wbtcToken;
         cCollateralRead = tokens.wbtcTokenRead;
         cOracleRead = oracles.wbtcOracleRead;
         break;
-      case "USDC":
+      case TOKENS_SYMBOLS.USDC:
         cVault = hardVaults.usdcVault;
         cVaultRead = hardVaults.usdcVaultRead;
         cCollateral = tokens.usdcToken;

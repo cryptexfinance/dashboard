@@ -10,6 +10,7 @@ export type PaginationType = {
 };
 
 export type OraclePricesType = {
+  jpegzOraclePrice: string;
   tcapOraclePrice: string;
   wethOraclePrice: string;
   daiOraclePrice: string;

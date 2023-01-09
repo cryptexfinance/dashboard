@@ -1,6 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { hardVaultsContext, networkContext, signerContext, vaultsContext } from "../state/index";
-import { isInLayer1, isOptimism, isPolygon, validVaults, validHardVaults } from "../utils/utils";
+import {
+  isArbitrum,
+  isInLayer1,
+  isOptimism,
+  isPolygon,
+  validVaults,
+  validHardVaults,
+} from "../utils/utils";
 import { VaultsRatioType } from "../components/Vaults/types";
 
 export const useRatios = (): VaultsRatioType => {
@@ -65,6 +72,10 @@ export const useRatios = (): VaultsRatioType => {
         ethcalls.push(maticRatioCall);
         ethcalls.push(wbtcRatioCall);
       }
+      if (isArbitrum(currentNetwork.chainId)) {
+        const wethRatioCall = await vaults.wethVaultRead?.ratio();
+        ethcalls.push(wethRatioCall);
+      }
       let ethRatio = 0;
       let daiRatio = 0;
       let aaveRatio = 0;
@@ -88,6 +99,9 @@ export const useRatios = (): VaultsRatioType => {
       } else if (isPolygon(currentNetwork.chainId)) {
         // @ts-ignore
         [daiRatio, maticRatio, wbtcRatio] = await signer.ethcallProvider?.all(ethcalls);
+      } else {
+        // @ts-ignore
+        [daiRatio, ethRatio] = await signer.ethcallProvider?.all(ethcalls);
       }
       setVaultsRatio({
         ethRatio,

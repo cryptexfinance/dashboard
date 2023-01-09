@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ethers, BigNumber } from "ethers";
 import { Provider } from "ethers-multicall";
 import { oraclesContext } from "../state/index";
-import { isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
+import { isArbitrum, isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
 import { OraclePricesType } from "../components/Vaults/types";
 
 export const usePrices2 = (
@@ -11,6 +11,7 @@ export const usePrices2 = (
 ): OraclePricesType => {
   const oracles = useContext(oraclesContext);
   const [oraclePrices, setOraclePrices] = useState<OraclePricesType>({
+    jpegzOraclePrice: "0",
     tcapOraclePrice: "0",
     wethOraclePrice: "0",
     daiOraclePrice: "0",
@@ -26,16 +27,17 @@ export const usePrices2 = (
   const loadPrices = async () => {
     if (oracles && ethcallProvider && validOracles(chainId, oracles)) {
       await ethcallProvider.init();
-      const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
       const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
 
-      const ethcalls = [tcapPriceCall, daiOraclePriceCall];
+      const ethcalls = [daiOraclePriceCall];
       if (isInLayer1(chainId)) {
+        const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
         const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
         const usdcOraclePriceCall = await oracles.usdcOracleRead?.getLatestAnswer();
         const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+        ethcalls.push(tcapPriceCall);
         ethcalls.push(wethOraclePriceCall);
         ethcalls.push(aaveOraclePriceCall);
         ethcalls.push(linkOraclePriceCall);
@@ -43,21 +45,33 @@ export const usePrices2 = (
         ethcalls.push(wbtcOraclePriceCall);
       }
       if (isOptimism(chainId)) {
+        const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
         const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
         const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
         const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
+        ethcalls.push(tcapPriceCall);
         ethcalls.push(wethOraclePriceCall);
         ethcalls.push(linkOraclePriceCall);
         ethcalls.push(snxOraclePriceCall);
         ethcalls.push(uniOraclePriceCall);
       }
       if (isPolygon(chainId)) {
+        const tcapPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
         const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
         const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+        ethcalls.push(tcapPriceCall);
         ethcalls.push(maticOraclePriceCall);
         ethcalls.push(wbtcOraclePriceCall);
       }
+      if (isArbitrum(chainId)) {
+        const jpegzPriceCall = await oracles.jpegzOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        ethcalls.push(jpegzPriceCall);
+        ethcalls.push(wethOraclePriceCall);
+      }
+
+      let jpegzOraclePrice = BigNumber.from(0);
       let tcapOraclePrice = BigNumber.from(0);
       let wethOraclePrice = BigNumber.from(0);
       let daiOraclePrice = BigNumber.from(0);
@@ -72,8 +86,8 @@ export const usePrices2 = (
       if (isInLayer1(chainId)) {
         // @ts-ignore
         [
-          tcapOraclePrice,
           daiOraclePrice,
+          tcapOraclePrice,
           wethOraclePrice,
           aaveOraclePrice,
           linkOraclePrice,
@@ -83,8 +97,8 @@ export const usePrices2 = (
       } else if (isOptimism(chainId)) {
         // @ts-ignore
         [
-          tcapOraclePrice,
           daiOraclePrice,
+          tcapOraclePrice,
           wethOraclePrice,
           linkOraclePrice,
           snxOraclePrice,
@@ -92,11 +106,15 @@ export const usePrices2 = (
         ] = await ethcallProvider?.all(ethcalls);
       } else if (isPolygon(chainId)) {
         // @ts-ignore
-        [tcapOraclePrice, daiOraclePrice, maticOraclePrice, wbtcOraclePrice] =
+        [daiOraclePrice, tcapOraclePrice, maticOraclePrice, wbtcOraclePrice] =
           await ethcallProvider?.all(ethcalls);
+      } else {
+        // @ts-ignore
+        [daiOraclePrice, jpegzOraclePrice, wethOraclePrice] = await ethcallProvider?.all(ethcalls);
       }
 
       setOraclePrices({
+        jpegzOraclePrice: ethers.utils.formatEther(jpegzOraclePrice),
         tcapOraclePrice: ethers.utils.formatEther(tcapOraclePrice),
         wethOraclePrice: ethers.utils.formatEther(wethOraclePrice.mul(10000000000)),
         daiOraclePrice: ethers.utils.formatEther(daiOraclePrice.mul(10000000000)),

@@ -111,23 +111,41 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const setCollaterals = (newMode: string) => {
     if (currentAddress !== "") {
-      let aOptions = ["TCAP"];
+      let aOptions = [TOKENS_SYMBOLS.TCAP];
       if (isArbitrum(currentNetwork.chainId)) {
-        aOptions = ["JPEGz"];
+        aOptions = [TOKENS_SYMBOLS.JPEGz];
       }
 
-      let cOptions = ["ETH", "WETH", "DAI", "AAVE", "LINK"];
+      let cOptions = [
+        TOKENS_SYMBOLS.ETH,
+        TOKENS_SYMBOLS.WETH,
+        TOKENS_SYMBOLS.DAI,
+        TOKENS_SYMBOLS.AAVE,
+        TOKENS_SYMBOLS.LINK,
+      ];
       if (newMode === "hard") {
-        cOptions = ["ETH", "WETH", "DAI", "USDC", "WBTC"];
+        cOptions = [
+          TOKENS_SYMBOLS.ETH,
+          TOKENS_SYMBOLS.WETH,
+          TOKENS_SYMBOLS.DAI,
+          TOKENS_SYMBOLS.USDC,
+          TOKENS_SYMBOLS.WBTC,
+        ];
       }
       if (isArbitrum(currentNetwork.chainId)) {
-        cOptions = ["ETH", "DAI"];
+        cOptions = [TOKENS_SYMBOLS.ETH, TOKENS_SYMBOLS.WETH, TOKENS_SYMBOLS.DAI];
       }
       if (isOptimism(currentNetwork.chainId) && !isHardMode()) {
-        cOptions = ["ETH", "DAI", "LINK", "UNI", "SNX"];
+        cOptions = [
+          TOKENS_SYMBOLS.ETH,
+          TOKENS_SYMBOLS.DAI,
+          TOKENS_SYMBOLS.LINK,
+          TOKENS_SYMBOLS.UNI,
+          TOKENS_SYMBOLS.SNX,
+        ];
       }
       if (isPolygon(currentNetwork.chainId) && !isHardMode()) {
-        cOptions = ["MATIC", "DAI", "WBTC"];
+        cOptions = [TOKENS_SYMBOLS.MATIC, TOKENS_SYMBOLS.DAI, TOKENS_SYMBOLS.WBTC];
       }
 
       setAssetOptions(aOptions);
@@ -138,10 +156,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   async function loadVault() {
     setIsLoading(true);
     let balance;
-    const provider = getDefaultProvider(
-      currentNetwork.chainId || NETWORKS.mainnet.chainId,
-      currentNetwork.chainId === 1 ? NETWORKS.mainnet.name : NETWORKS.goerli.name
-    );
+    const provider = getDefaultProvider(currentNetwork.chainId || NETWORKS.mainnet.chainId);
 
     let currentVaultData: any;
     // @ts-ignore
@@ -157,7 +172,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       };
     }
 
-    if (vaultData.collateralSymbol !== "ETH") {
+    if (vaultData.collateralSymbol !== TOKENS_SYMBOLS.ETH) {
       // @ts-ignore
       balance = await currentCollateral.balanceOf(currentAddress);
     } else {
@@ -165,10 +180,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
 
     let decimals = 18;
-    if (vaultData.collateralSymbol === "WBTC") {
+    if (vaultData.collateralSymbol === TOKENS_SYMBOLS.WBTC) {
       decimals = 8;
     }
-    if (vaultData.collateralSymbol === "USDC") {
+    if (vaultData.collateralSymbol === TOKENS_SYMBOLS.USDC) {
       decimals = 6;
     }
 
@@ -208,7 +223,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       const cBalance = ethers.utils.formatUnits(currentAssetBalance, 18);
       setAssetBalance(cBalance);
 
-      if (!allowance.isZero() || vaultData.collateralSymbol === "ETH") {
+      if (!allowance.isZero() || vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
         const safeValue = isHardMode() ? 20 : 50;
         const warnValue = isHardMode() ? 10 : 30;
 
@@ -542,7 +557,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       try {
         if (isGasAsset()) {
           let tx;
-          if (vaultData.collateralSymbol === "ETH") {
+          if (vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
             tx = await currentVault?.addCollateralETH({
               value: amount,
             });
@@ -575,8 +590,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const maxAddCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
     let balance = "0";
-    if (vaultData.collateralSymbol === "ETH") {
-      const provider = getDefaultProvider(currentNetwork.chainId, currentNetwork.name);
+    if (vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
+      const provider = getDefaultProvider(currentNetwork.chainId);
       balance = ethers.utils.formatEther(await provider.getBalance(currentAddress));
     } else if (currentCollateral) {
       const value = BigNumber.from(await currentCollateral.balanceOf(currentAddress));
@@ -602,7 +617,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       try {
         if (isGasAsset()) {
           let tx;
-          if (vaultData.collateralSymbol === "ETH") {
+          if (vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
             tx = await currentVault?.removeCollateralETH(amount);
           } else {
             tx = await currentVault?.removeCollateralMATIC(amount);
@@ -1010,6 +1025,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const creatOrApprovee = async () => {
+    // currentCollateral?.mint();
     if (currentVaultId === "0") {
       setBtnDisabled(true);
       try {

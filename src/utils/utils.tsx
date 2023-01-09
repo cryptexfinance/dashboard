@@ -324,7 +324,7 @@ export const isGoerli = (chainId: number | undefined) => {
 export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
   if (chainId === NETWORKS.arbitrum_goerli.chainId) {
-    provider = ethers.getDefaultProvider(chainId, {
+    provider = new ethers.providers.InfuraProvider("arbitrum-goerli", {
       infura: process.env.REACT_APP_INFURA_ID,
     });
   } else if (chainId === NETWORKS.okovan.chainId) {
@@ -411,9 +411,11 @@ export const validVaults = (chainId: number, vaults: IVaultsContext): boolean =>
       !isUndefined(vaults.snxVaultRead) &&
       !isUndefined(vaults.uniVaultRead);
   }
-
   if (isPolygon(chainId)) {
     valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
+  }
+  if (isArbitrum(chainId)) {
+    valid = valid && !isUndefined(vaults.wethVaultRead);
   }
   return valid;
 };

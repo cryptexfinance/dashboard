@@ -9,6 +9,8 @@ export interface IOraclesContext {
   setCurrentDAIOracle: (currentOracle: ethers.Contract) => void;
   wbtcOracle?: ethers.Contract;
   setCurrentWBTCOracle: (currentOracle: ethers.Contract) => void;
+  jpegzOracle?: ethers.Contract;
+  setCurrentJPEGZOracle: (currentOracle: ethers.Contract) => void;
   tcapOracle?: ethers.Contract;
   setCurrentTCAPOracle: (currentOracle: ethers.Contract) => void;
   aaveOracle?: ethers.Contract;
@@ -29,6 +31,8 @@ export interface IOraclesContext {
   setCurrentDAIOracleRead: (currentOracle: Contract) => void;
   wbtcOracleRead?: Contract;
   setCurrentWBTCOracleRead: (currentOracle: Contract) => void;
+  jpegzOracleRead?: Contract;
+  setCurrentJPEGZOracleRead: (currentOracle: Contract) => void;
   tcapOracleRead?: Contract;
   setCurrentTCAPOracleRead: (currentOracle: Contract) => void;
   aaveOracleRead?: Contract;
@@ -49,6 +53,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentWETHOracle: () => {},
   setCurrentDAIOracle: () => {},
   setCurrentWBTCOracle: () => {},
+  setCurrentJPEGZOracle: () => {},
   setCurrentTCAPOracle: () => {},
   setCurrentAAVEOracle: () => {},
   setCurrentLINKOracle: () => {},
@@ -59,6 +64,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentWETHOracleRead: () => {},
   setCurrentDAIOracleRead: () => {},
   setCurrentWBTCOracleRead: () => {},
+  setCurrentJPEGZOracleRead: () => {},
   setCurrentTCAPOracleRead: () => {},
   setCurrentAAVEOracleRead: () => {},
   setCurrentLINKOracleRead: () => {},

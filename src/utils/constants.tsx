@@ -48,9 +48,9 @@ export const NETWORKS = {
     chainId: 421613,
     hexChainId: "0x66EED",
     name: "Arbitrum Goerli",
-    eth: "0x85f85C12FADEec638c63850117203f098386e6b9",
-    weth: "0x85f85C12FADEec638c63850117203f098386e6b9",
-    dai: "0x17aC26AB292660126d2baF16e5304DcbEc54340C",
+    eth: "0xE8bc5dD936A974808211C9c7A4F3020366Fd6B61",
+    weth: "0xE8bc5dD936A974808211C9c7A4F3020366Fd6B61",
+    dai: "0x7E574b5F8B61B71A6A1DA6127A9383F656d1a800",
   },
   optimism: {
     chainId: 10,
