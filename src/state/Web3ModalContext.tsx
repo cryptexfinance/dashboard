@@ -1,12 +1,9 @@
 import React from "react";
 
 import Web3Modal from "web3modal";
-import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import Authereum from "authereum";
 import WalletLink from "walletlink";
-import Fortmatic from "fortmatic";
-import { NETWORKS } from "../utils/constants";
+import okxImage from "../assets/images/okx.jpg";
 
 let network = "mainnet";
 
@@ -47,27 +44,20 @@ const providerOptions = {
       infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
   },
-  fortmatic: {
-    package: Fortmatic,
-    options: {
-      key: process.env.REACT_APP_FORTMATIC_KEY,
-      network: {
-        chainId: process.env.REACT_APP_NETWORK_ID,
-        rpcUrl:
-          process.env.REACT_APP_NETWORK_ID === "1"
-            ? NETWORKS.mainnet.infuraFortmaticRpcUrl
-            : NETWORKS.rinkeby.infuraFortmaticRpcUrl,
-      }, // if we don't pass it, it will default to localhost:8454
+  burnerconnect: {
+    display: {
+      logo: okxImage,
+      name: "OKX",
+      description: "Scan with OKX mobile app to connect",
     },
-  },
-  portis: {
-    package: Portis, // required
+    package: WalletConnectProvider, // required
     options: {
-      id: process.env.REACT_APP_PORTIS_ID,
+      infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
-  },
-  authereum: {
-    package: Authereum, // required
+    // connector: async (ProviderPackage: new (arg0: any) => any, options: any) => {
+    //     const provider = WalletConnectProvider;
+    //     return provider;
+    //   }
   },
 };
 
