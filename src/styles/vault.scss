@@ -22,6 +22,10 @@
     width: 70%;
   }
 
+  .btn-dark  {
+    background-color: $dark;
+  }
+
   .btn:active {
     background-color: transparent;
   }
@@ -233,9 +237,15 @@
       align-items: center;
       margin-bottom: 0.6rem;
 
-      .choices {
+      .options-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+
+        .options-buttons {
+          display: flex;
+          flex-direction: row;
+          margin-top: 0.3rem;
+        }
       }
 
       .burn-fee {
@@ -257,7 +267,7 @@
 
     .dropdown {
       height: 100%;
-      width: 140px;
+      width: 160px;
       margin-right: 0.5rem;
 
       .dropdown-toggle {

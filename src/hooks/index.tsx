@@ -1,3 +1,9 @@
+export * from "./useArbitrum";
+
+export * from "./useBalances";
+
+export * from "./useEthereum";
+
 export * from "./useGovernance";
 
 export * from "./useHardVaults";
@@ -13,6 +19,8 @@ export * from "./usePrices";
 export * from "./usePrices2";
 
 export * from "./useOracles";
+
+export * from "./useOptimism";
 
 export * from "./useRatios";
 

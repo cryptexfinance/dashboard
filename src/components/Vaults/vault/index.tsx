@@ -6,13 +6,15 @@ import {
   Dropdown,
   Form,
   InputGroup,
+  OverlayTrigger,
   Spinner,
   ToggleButton,
+  Tooltip,
 } from "react-bootstrap/esm";
 import NumberFormat from "react-number-format";
 import { useTranslation } from "react-i18next";
 import { FaPlus } from "react-icons/fa";
-import "../../../styles/mint2.scss";
+import "../../../styles/vault.scss";
 import { useVault } from "../../../hooks";
 import { networkContext, signerContext } from "../../../state";
 import { capitalize, TokenIcon } from "../common";
@@ -54,23 +56,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     { name: "Hard", value: "hard" },
   ];
 
-  const {
-    currentCollateral,
-    currentVault,
-    currentAssetRead,
-    currentCollateralRead,
-    currentVaultRead,
-    currentCollateralOracleRead,
-    currentAssetOracleRead,
-  } = useVault(vaultData.assetSymbol, vaultData.collateralSymbol, vaultData.isHardVault);
+  const [
+    {
+      currentCollateral,
+      currentVault,
+      currentAssetRead,
+      currentCollateralRead,
+      currentVaultRead,
+      currentCollateralOracleRead,
+      currentAssetOracleRead,
+    },
+    loadingVault,
+  ] = useVault(vaultData.assetSymbol, vaultData.collateralSymbol, vaultData.isHardVault);
   const actions = ["add", "remove", "mint", "burn"];
 
   // Actions
   const [title, setTitle] = useState(t("vault.create"));
   const [text, setText] = useState(t("vault.create-text", { asset: "Index" }));
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMax, setLoadingMax] = useState(false);
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [activeAction, setActiveAction] = useState("add");
+  const [refreshVault, setRefreshVault] = useState(false);
 
   // Vault Data
   // Vault Data
@@ -157,7 +164,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setIsLoading(true);
     let balance;
     const provider = getDefaultProvider(currentNetwork.chainId || NETWORKS.mainnet.chainId);
-
     let currentVaultData: any;
     // @ts-ignore
     const vaultID = await currentVault.userToVault(currentAddress);
@@ -295,14 +301,19 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     () => {
       const load = async () => {
         setCollaterals(vaultData.isHardVault ? "hard" : "normal");
-        if (currentAddress !== "" && currentCollateral !== null && currentAssetRead !== null) {
+        if (
+          currentAddress !== "" &&
+          currentCollateral !== null &&
+          currentAssetRead !== null &&
+          !loadingVault
+        ) {
           await loadVault();
         }
       };
       load();
     },
     // eslint-disable-next-line
-    [currentAddress, currentVault]
+    [currentAddress, currentVault, refreshVault]
   );
 
   const assetPrice = async () => {
@@ -328,6 +339,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const refresh = async () => {
     try {
       await loadVault();
+      if (activeAction === "add") {
+        setActiveAction("mint");
+      }
+      if (activeAction === "burn") {
+        setActiveAction("remove");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -589,6 +606,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const maxAddCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
+    setLoadingMax(true);
     let balance = "0";
     if (vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
       const provider = getDefaultProvider(currentNetwork.chainId);
@@ -608,6 +626,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentAssetPrice);
     changeVault(r);
     setAddCollateralUSD(usd.toString());
+    setLoadingMax(false);
   };
 
   const removeCollateral = async () => {
@@ -645,6 +664,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const safeRemoveCollateral = async (e: React.MouseEvent) => {
     e.preventDefault();
+    setLoadingMax(true);
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
     const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
     let collateralToRemove = await getSafeRemoveCollateral(
@@ -668,6 +688,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     const r = await getRatio(newCollateral.toString(), currentPrice, vaultDebt, currentAssetPrice);
     changeVault(r);
     setRemoveCollateralUSD(usd.toString());
+    setLoadingMax(false);
   };
 
   const mintTCAP = async () => {
@@ -699,6 +720,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const safeMintTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
+    setLoadingMax(true);
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
     const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
     const safeMint = await getSafeMint(
@@ -718,6 +740,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentAssetPrice);
     changeVault(r);
     setMintUSD(usd.toString());
+    setLoadingMax(false);
   };
 
   const burnTCAP = async () => {
@@ -728,9 +751,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         const currentBurnFee = await currentVault?.getFee(amount);
         const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
         const ethFee = ethers.utils.formatEther(increasedFee);
-        console.log("Amount: ", amount.toString());
-        console.log("increasedFee: ", increasedFee.toString());
-        console.log("Fee: ", ethFee.toString());
 
         setBurnFee(ethFee.toString());
         const tx = await currentVault?.burn(amount, { value: BigNumber.from(increasedFee) });
@@ -754,6 +774,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const maxBurnTCAP = async (e: React.MouseEvent) => {
     e.preventDefault();
+    setLoadingMax(true);
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
     const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
     const currentBalanceCall = await currentAssetRead?.balanceOf(currentAddress);
@@ -792,6 +813,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     } else {
       setBurnFee("0");
     }
+    setLoadingMax(false);
   };
 
   const ActionsDropdown = () => (
@@ -947,6 +969,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const MaxButton = () => {
+    if (loadingMax) {
+      let colorClass = "spinner-green";
+      if (activeAction === "remove" || activeAction === "burn") {
+        colorClass = "spinner-orange";
+      }
+      return <Spinner className={"spinner small ".concat(colorClass)} animation="border" />;
+    }
     if (activeAction === "add") {
       return (
         <Button className="btn-max number" onClick={maxAddCollateral}>
@@ -982,13 +1011,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       <div className="asset-box-balance">
         <span className="asset-box-balance-title">Wallet Balance:</span>
         <span className="number asset-box-balance-value">
-          <NumberFormat
-            className="number"
-            value={aBalance}
-            displayType="text"
-            thousandSeparator
-            decimalScale={2}
-          />
+          {isLoading ? (
+            <Spinner className="spinner xsmall spinner-gray" animation="border" />
+          ) : (
+            <NumberFormat
+              className="number"
+              value={aBalance}
+              displayType="text"
+              thousandSeparator
+              decimalScale={2}
+            />
+          )}
         </span>
       </div>
     );
@@ -998,13 +1031,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     <div className="asset-box-balance">
       <span className="asset-box-balance-title">Collateral:</span>
       <span className="number asset-box-balance-value">
-        <NumberFormat
-          className="number"
-          value={vaultCollateral}
-          displayType="text"
-          thousandSeparator
-          decimalScale={tokenBalanceDecimals}
-        />
+        {isLoading ? (
+          <Spinner className="spinner xsmall spinner-gray" animation="border" />
+        ) : (
+          <NumberFormat
+            className="number"
+            value={vaultCollateral}
+            displayType="text"
+            thousandSeparator
+            decimalScale={tokenBalanceDecimals}
+          />
+        )}
       </span>
     </div>
   );
@@ -1013,13 +1050,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     <div className="asset-box-balance">
       <span className="asset-box-balance-title">Debt:</span>
       <span className="number asset-box-balance-value">
-        <NumberFormat
-          className="number"
-          value={vaultDebt}
-          displayType="text"
-          thousandSeparator
-          decimalScale={tokenBalanceDecimals}
-        />
+        {isLoading ? (
+          <Spinner className="spinner xsmall spinner-gray" animation="border" />
+        ) : (
+          <NumberFormat
+            className="number"
+            value={vaultDebt}
+            displayType="text"
+            thousandSeparator
+            decimalScale={tokenBalanceDecimals}
+          />
+        )}
       </span>
     </div>
   );
@@ -1082,18 +1123,18 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setVaultData({
       vaultId: "0",
       assetSymbol: vaultData.assetSymbol,
-      collateralSymbol:
-        vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH
-          ? TOKENS_SYMBOLS.WETH
-          : TOKENS_SYMBOLS.ETH,
+      collateralSymbol: TOKENS_SYMBOLS.ETH,
       isHardVault: value === "hard",
     });
   };
 
   const handleTokenChange = async (value: string) => {
     let keepVaultId = false;
-    if (vaultData.collateralSymbol === "ETH" || vaultData.collateralSymbol === "WETH") {
-      keepVaultId = value === "ETH" || value === "WETH";
+    if (
+      vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH ||
+      vaultData.collateralSymbol === TOKENS_SYMBOLS.WETH
+    ) {
+      keepVaultId = value === TOKENS_SYMBOLS.ETH || value === TOKENS_SYMBOLS.WETH;
     }
 
     setVaultData({
@@ -1102,6 +1143,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       collateralSymbol: value,
       isHardVault: vaultData.isHardVault,
     });
+    setRefreshVault(!refreshVault);
   };
 
   const AssetDropdown = () => (
@@ -1155,23 +1197,42 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <div className="header-col1">
             <div className="icon-container">
               {!isArbitrum(currentNetwork.chainId) ? (
-                <ButtonGroup className="mb-2">
-                  {radios.map((radio, idx) => (
-                    <ToggleButton
-                      key={idx}
-                      id={`radio-${idx}`}
-                      type="radio"
-                      variant="secondary"
-                      name="radio"
-                      className={`radio-${idx}`}
-                      value={radio.value}
-                      checked={vaultMode === radio.value}
-                      onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+                <>
+                  <ButtonGroup className="mb-2">
+                    {radios.map((radio, idx) => (
+                      <ToggleButton
+                        key={idx}
+                        id={`radio-${idx}`}
+                        type="radio"
+                        variant="secondary"
+                        name="radio"
+                        className={`radio-${idx}`}
+                        value={radio.value}
+                        checked={vaultMode === radio.value}
+                        onChange={(e) => handleRadioBtnChange(e.currentTarget.value)}
+                      >
+                        {radio.name}
+                      </ToggleButton>
+                    ))}
+                  </ButtonGroup>
+                  {vaultMode === "hard" && (
+                    <OverlayTrigger
+                      key="top"
+                      placement="right"
+                      trigger={["hover", "click"]}
+                      overlay={
+                        <Tooltip id="ttip-status" className="ttip-hard-vault">
+                          <>
+                            {t("vault.hard-mode-info")} <br />
+                            {t("vault.hard-mode-info2")}
+                          </>
+                        </Tooltip>
+                      }
                     >
-                      {radio.name}
-                    </ToggleButton>
-                  ))}
-                </ButtonGroup>
+                      <Button variant="dark">?</Button>
+                    </OverlayTrigger>
+                  )}
+                </>
               ) : (
                 <h5>Vault</h5>
               )}
@@ -1186,17 +1247,25 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
             <div className="assets-box-options">
               <div className="asset-box">
                 <AssetDropdown />
-                {AssetBalance(false)}
-                {isApproved && <MintedAmount />}
+                {!isLoading && (
+                  <>
+                    {AssetBalance(false)}
+                    {isApproved && <MintedAmount />}
+                  </>
+                )}
               </div>
               <div className="asset-box right">
                 <CollateralDropdown />
-                {AssetBalance(true)}
-                {isApproved && <CollateralAmount />}
+                {!isLoading && (
+                  <>
+                    {AssetBalance(true)}
+                    {isApproved && <CollateralAmount />}
+                  </>
+                )}
               </div>
             </div>
             {isLoading ? (
-              <Spinner variant="danger" className="spinner" animation="border" />
+              <Spinner className="spinner" animation="border" />
             ) : (
               <div className="vault-form">
                 {!isApproved ? (
@@ -1205,9 +1274,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   <>
                     <div className="vault-actions">
                       <div className="actions-options">
-                        <div className="choices">
-                          <ActionsDropdown />
-                          <MaxButton />
+                        <div className="options-container">
+                          <p>Choose Action</p>
+                          <div className="options-buttons">
+                            <ActionsDropdown />
+                            <MaxButton />
+                          </div>
                         </div>
                         {activeAction === actions[3] && (
                           <div className="burn-fee">

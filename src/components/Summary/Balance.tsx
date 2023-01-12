@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap/esm/";
-import { ethers } from "ethers";
-import { useTranslation } from "react-i18next";
+import { Image, Spinner } from "react-bootstrap/esm/";
+// import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import { Provider } from "ethers-multicall";
-import { oraclesContext, tokensContext } from "../../state";
-import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import jpegzIcon from "../../assets/images/jpegz-coin.png";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
-import { getPriceInUSDFromPair, isUndefined } from "../../utils/utils";
+import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
+import { BalancesType, OraclePricesType } from "../../hooks/types";
+import { ethereumContext } from "../../state";
+import { getPriceInUSDFromPair, isArbitrum, isInLayer1 } from "../../utils/utils";
 import { NETWORKS } from "../../utils/constants";
 import { VaultsWarning } from "./warnings/index";
 
@@ -15,12 +16,14 @@ type props = {
   currentChainId: number;
   ethCallProvider: Provider | undefined;
   signerAddress: string;
+  balances: BalancesType;
+  prices: OraclePricesType;
 };
 
-const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
-  const { t } = useTranslation();
-  const oracles = useContext(oraclesContext);
-  const tokens = useContext(tokensContext);
+const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, prices }: props) => {
+  // const { t } = useTranslation();
+  const currentIndexName = isArbitrum(currentChainId) ? "JPEGz" : "TCAP";
+  const ethereumContracts = useContext(ethereumContext);
   const [loading, setLoading] = useState(true);
   const [indexBalance, setIndexBalance] = useState("0.0");
   const [ctxBalance, setCtxBalance] = useState("0.0");
@@ -28,54 +31,38 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
   const [ctxUsdBalance, setCtxUsdBalance] = useState("0.0");
 
   const loadData = async () => {
-    if (oracles.tcapOracleRead && tokens && !isUndefined(tokens.tcapTokenRead) && ethCallProvider) {
-      const currentIndexPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-      // @ts-ignore
-      const [currentIndexPrice] = await ethCallProvider?.all([currentIndexPriceCall]);
-      const totalIndexPrice = currentIndexPrice.mul(10000000000);
-      const indexPrice = ethers.utils.formatEther(totalIndexPrice.div(10000000000));
-
+    if (ethCallProvider) {
+      console.log("Entra: ");
       let currentPriceCTX = 0;
       if (signerAddress === "" || currentChainId === NETWORKS.mainnet.chainId) {
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        const reservesCtxPoolCall = await tokens.ctxPoolTokenRead?.getReserves();
+        const reservesCtxPoolCall = await ethereumContracts.ctxPoolTokenRead?.getReserves();
         // @ts-ignore
-        const [wethOraclePrice, reservesCtxPool] = await ethCallProvider?.all([
-          wethOraclePriceCall,
-          reservesCtxPoolCall,
-        ]);
-        const currentPriceETH = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
+        const [reservesCtxPool] = await ethCallProvider?.all([reservesCtxPoolCall]);
         currentPriceCTX = await getPriceInUSDFromPair(
           reservesCtxPool[0],
           reservesCtxPool[1],
-          parseFloat(currentPriceETH)
+          parseFloat(prices.wethOraclePrice)
         );
       }
 
-      if (tokens.tcapTokenRead && signerAddress !== "") {
-        const currentTcapBalanceCall = await tokens.tcapTokenRead?.balanceOf(signerAddress);
-        // @ts-ignore
-        const [currentIndexBalance] = await ethCallProvider?.all([currentTcapBalanceCall]);
-        const indexString = ethers.utils.formatEther(currentIndexBalance);
-        setIndexBalance(indexString);
-        const indexUSD = parseFloat(indexString) * parseFloat(indexPrice);
-        if (indexUSD < 0.0001) {
-          setIndexUsdBalance("0.0");
-        } else {
-          setIndexUsdBalance(indexUSD.toString());
-        }
-        if (currentChainId === NETWORKS.mainnet.chainId) {
-          const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(signerAddress);
-          // @ts-ignore
-          const [currentCtxBalance] = await ethCallProvider?.all([currentCtxBalanceCall]);
-          const ctxString = ethers.utils.formatEther(currentCtxBalance);
-          setCtxBalance(ctxString);
-          const ctxUSD = parseFloat(ctxString) * currentPriceCTX;
-          setCtxUsdBalance(ctxUSD.toString());
-        } else {
-          setCtxBalance("21.5");
-          setCtxUsdBalance("67.08");
-        }
+      let indexUSD = 0;
+      if (isArbitrum(currentChainId)) {
+        indexUSD = parseFloat(balances.jpegzBalance) * parseFloat(prices.jpegzOraclePrice);
+        setIndexBalance(balances.jpegzBalance);
+      } else {
+        indexUSD = parseFloat(balances.tcapBalance) * parseFloat(prices.tcapOraclePrice);
+        setIndexBalance(balances.tcapBalance);
+      }
+      if (indexUSD < 0.0001) {
+        setIndexUsdBalance("0.0");
+      } else {
+        setIndexUsdBalance(indexUSD.toString());
+      }
+
+      if (currentChainId === NETWORKS.mainnet.chainId) {
+        setCtxBalance(balances.ctxBalance);
+        const ctxUSD = parseFloat(balances.ctxBalance) * currentPriceCTX;
+        setCtxUsdBalance(ctxUSD.toString());
       }
     }
   };
@@ -88,10 +75,17 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
     };
     load();
     // eslint-disable-next-line
-  }, [currentChainId, ethCallProvider, signerAddress]);
+  }, [ethCallProvider, signerAddress, balances]);
+
+  const IndexIcon = () => {
+    if (!isArbitrum(currentChainId)) {
+      return <TcapIcon className="stake" />;
+    }
+    return <Image className="jpegz-icon" src={jpegzIcon} alt="JPEGz icon" />;
+  };
 
   return (
-    <div className="balance">
+    <div className="balance-container">
       {loading ? (
         <div className="spinner-container">
           <Spinner variant="danger" className="spinner" animation="border" />
@@ -100,25 +94,36 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
         <>
           <div className="detail">
             <div className="totals">
-              <TcapIcon className="stake" />
+              <IndexIcon />
               <div className="staked">
-                <h6>
-                  <>{t("welcome.tcap-balance")}</>
-                </h6>
-                <h5 className="number neon-green">
-                  <NumberFormat
-                    value={indexBalance}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                  />
-                </h5>
+                {/* <h6>{currentIndexName} Balance</h6> */}
+                <div className="value">
+                  <h5 className="number neon-green">
+                    <NumberFormat
+                      value={indexBalance}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                      suffix={" ".concat(currentIndexName)}
+                    />
+                  </h5>
+                  <h5 className="value-separator">/</h5>
+                  <h5 className="number neon-blue">
+                    <NumberFormat
+                      value={indexUsdBalance}
+                      displayType="text"
+                      thousandSeparator
+                      decimalScale={2}
+                      prefix="$"
+                    />
+                  </h5>
+                </div>
               </div>
             </div>
-            <div className="totals">
-              <TcapIcon className="h24" />
+            {/* <div className="totals">
+              <IndexIcon />
               <div className="staked">
-                <h6>TCAP USD Balance</h6>
+                <h6>{currentIndexName} USD Balance</h6>
                 <h5 className="number neon-blue">
                   <NumberFormat
                     value={indexUsdBalance}
@@ -129,45 +134,58 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress }: props) => {
                   />
                 </h5>
               </div>
-            </div>
-            <div className="asset">
-              <CtxIcon className="h24" />
-              <div className="staked">
-                <h6>
-                  <>{t("welcome.ctx-balance")}</>
-                </h6>
-                <h5 className="number neon-blue">
-                  <NumberFormat
-                    value={ctxBalance}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                  />
-                </h5>
-              </div>
-            </div>
-            <div className="totals">
-              <CtxIcon className="h24" />
-              <div className="staked">
-                <h6>CTX USD Balance</h6>
-                <h5 className="number neon-blue">
-                  <NumberFormat
-                    value={ctxUsdBalance}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={2}
-                    prefix="$"
-                  />
-                </h5>
-              </div>
-            </div>
+            </div> */}
+            {isInLayer1(currentChainId) && (
+              <>
+                <div className="totals">
+                  <CtxIcon className="h24" />
+                  <div className="staked">
+                    {/* <h6>
+                      <>{t("welcome.ctx-balance")}</>
+                    </h6> */}
+                    <div className="value">
+                      <h5 className="number neon-blue">
+                        <NumberFormat
+                          value={ctxBalance}
+                          displayType="text"
+                          thousandSeparator
+                          decimalScale={2}
+                          suffix=" CTX"
+                        />
+                      </h5>
+                      <h5 className="value-separator">/</h5>
+                      <h5 className="number neon-blue">
+                        <NumberFormat
+                          value={ctxUsdBalance}
+                          displayType="text"
+                          thousandSeparator
+                          decimalScale={2}
+                          prefix="$"
+                        />
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                {/* <div className="totals">
+                  <CtxIcon className="h24" />
+                  <div className="staked">
+                    <h6>CTX USD Balance</h6>
+                    <h5 className="number neon-blue">
+                      <NumberFormat
+                        value={ctxUsdBalance}
+                        displayType="text"
+                        thousandSeparator
+                        decimalScale={2}
+                        prefix="$"
+                      />
+                    </h5>
+                  </div>
+                </div> */}
+              </>
+            )}
           </div>
           <div className="warnings">
-            <VaultsWarning
-              chainId={currentChainId}
-              ethCallProvider={ethCallProvider}
-              ownerAddress={signerAddress}
-            />
+            <VaultsWarning ownerAddress={signerAddress} prices={prices} />
           </div>
         </>
       )}

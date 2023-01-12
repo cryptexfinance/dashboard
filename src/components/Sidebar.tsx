@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
@@ -55,6 +55,19 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
   }
   const [active, setActive] = useState(activeVal);
   const web3Modal = useContext(Web3ModalContext);
+
+  useEffect(
+    () => {
+      const path = window.location.pathname.replace("/", "");
+      if (path !== "") {
+        setActive(path);
+      } else {
+        setActive(activeVal);
+      }
+    },
+    // eslint-disable-next-line
+    [window.location.pathname]
+  );
 
   const sidebarClass = () => {
     if (!isMobile) return "sidebar";

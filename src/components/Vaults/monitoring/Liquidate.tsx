@@ -12,6 +12,7 @@ import "../../../styles/modal.scss";
 import { networkContext, oraclesContext, signerContext } from "../../../state";
 import { VaultsType } from "../types";
 import { useVault } from "../../../hooks";
+import { TOKENS_SYMBOLS } from "../../../utils/constants";
 import {
   errorNotification,
   isPolygon,
@@ -33,15 +34,17 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const oracles = useContext(oraclesContext);
-  const {
-    currentVault,
-    currentAssetRead,
-    currentVaultRead,
-    currentCollateralOracleRead,
-    currentAssetOracleRead,
-  } = useVault(
+  const [
+    {
+      currentVault,
+      currentAssetRead,
+      currentVaultRead,
+      currentCollateralOracleRead,
+      currentAssetOracleRead,
+    },
+  ] = useVault(
     "TCAP",
-    liqVault ? liqVault?.collateralSymbol : "WETH",
+    liqVault ? liqVault?.collateralSymbol : TOKENS_SYMBOLS.WETH,
     liqVault ? liqVault.isHardVault : true
   );
 

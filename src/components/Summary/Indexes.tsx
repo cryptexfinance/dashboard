@@ -1,22 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap/esm/";
-import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import { Image, Spinner } from "react-bootstrap/esm/";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import { Provider } from "ethers-multicall";
-import { oraclesContext, tokensContext } from "../../state";
+import jpegzIcon from "../../assets/images/jpegz-coin.png";
+import { BalancesType, OraclePricesType } from "../../hooks/types";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
-import { isUndefined } from "../../utils/utils";
+import { isArbitrum } from "../../utils/utils";
 
 type props = {
   currentChainId: number;
   ethCallProvider: Provider | undefined;
+  balances: BalancesType;
+  prices: OraclePricesType;
 };
 
-const Indexes = ({ currentChainId, ethCallProvider }: props) => {
+const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) => {
   const { t } = useTranslation();
-  const oracles = useContext(oraclesContext);
-  const tokens = useContext(tokensContext);
+  const currentIndexName = isArbitrum(currentChainId) ? "JPEGz" : "TCAP";
   const [loading, setLoading] = useState(true);
   const [marketCap, setMarketCap] = useState("0.0");
   const [indexOraclePrice, setIndexOraclePrice] = useState("0.0");
@@ -24,48 +25,37 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
   const [totalSupply, setTotalSupply] = useState("0.0");
 
   const loadData = async () => {
-    if (
-      oracles.tcapOracleRead &&
-      tokens &&
-      !isUndefined(tokens.tcapTokenRead) &&
-      !isUndefined(ethCallProvider)
-    ) {
-      const currentTotalSupplyCall = await tokens.tcapTokenRead?.totalSupply();
-      const currentIndexPriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
+    if (!isArbitrum(currentChainId)) {
+      setTotalSupply(balances.tcapSupplly);
+      setIndexOraclePrice(prices.tcapOraclePrice);
+      setMarketCap(prices.tcapMarketCap);
+    } else {
+      setTotalSupply(balances.jpegzSupplly);
+      setIndexOraclePrice(prices.jpegzOraclePrice);
+      setMarketCap(prices.jpegzMarketCap);
+    }
 
-      // @ts-ignore
-      const [currentTotalSupply, currentIndexPrice] = await ethCallProvider?.all([
-        currentTotalSupplyCall,
-        currentIndexPriceCall,
-      ]);
+    // @ts-ignore
+    const urlParams = new URLSearchParams({
+      ids: "total-crypto-market-cap-token",
+      vs_currencies: "usd",
+      include_last_updated_at: true,
+      precision: 10,
+    });
 
-      setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
-      const totalIndexMarketCap = currentIndexPrice.mul(10000000000);
-      const indexPrice = ethers.utils.formatEther(totalIndexMarketCap.div(10000000000));
-      setMarketCap(ethers.utils.formatEther(totalIndexMarketCap));
-      setIndexOraclePrice(indexPrice);
-
-      const urlParams = new URLSearchParams({
-        ids: "total-crypto-market-cap-token",
-        vs_currencies: "usd",
-        include_last_updated_at: true,
-        precision: 10,
-      });
-
-      const reponse = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
-        {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const resp = await reponse.json();
-      if (resp) {
-        setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
+    const reponse = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
+      {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
+    );
+    const resp = await reponse.json();
+    if (resp) {
+      setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
     }
   };
 
@@ -77,7 +67,14 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
     };
     load();
     // eslint-disable-next-line
-  }, [currentChainId, ethCallProvider]);
+  }, [currentChainId, ethCallProvider, balances, prices]);
+
+  const IndexIcon = () => {
+    if (!isArbitrum(currentChainId)) {
+      return <TcapIcon className="h24" />;
+    }
+    return <Image className="jpegz-icon" src={jpegzIcon} alt="JPEGz icon" />;
+  };
 
   return (
     <div className="indexes">
@@ -88,7 +85,7 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
       ) : (
         <div className="detail">
           <div className="totals market-cap">
-            <TcapIcon className="stake" />
+            <IndexIcon />
             <div className="staked">
               <h6>
                 <>{t("welcome.tcap")}</>
@@ -105,9 +102,9 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
             </div>
           </div>
           <div className="totals">
-            <TcapIcon className="h24" />
+            <IndexIcon />
             <div className="staked">
-              <h6>TCAP Oracle Price</h6>
+              <h6>{currentIndexName} Oracle Price</h6>
               <h5 className="number neon-blue">
                 <NumberFormat
                   value={indexOraclePrice}
@@ -120,9 +117,9 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
             </div>
           </div>
           <div className="totals">
-            <TcapIcon className="h24" />
+            <IndexIcon />
             <div className="staked">
-              <h6>TCAP Market Price</h6>
+              <h6>{currentIndexName} Market Price</h6>
               <h5 className="number neon-blue">
                 <NumberFormat
                   value={indexMarketPrice}
@@ -135,11 +132,9 @@ const Indexes = ({ currentChainId, ethCallProvider }: props) => {
             </div>
           </div>
           <div className="asset">
-            <TcapIcon className="h24" />
+            <IndexIcon />
             <div className="staked">
-              <h6>
-                <>{t("welcome.summary.total-supply")}</>
-              </h6>
+              <h6>{currentIndexName} Supply</h6>
               <h5 className="number neon-blue">
                 <NumberFormat
                   value={totalSupply}

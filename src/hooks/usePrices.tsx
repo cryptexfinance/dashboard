@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ethers, BigNumber } from "ethers";
 import { oraclesContext, networkContext, signerContext } from "../state/index";
 import { isArbitrum, isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
-import { OraclePricesType } from "../components/Vaults/types";
+import { OraclePricesType } from "./types";
 
 export const usePrices = (): OraclePricesType => {
   const currentNetwork = useContext(networkContext);
@@ -10,7 +10,9 @@ export const usePrices = (): OraclePricesType => {
   const signer = useContext(signerContext);
   const [oraclePrices, setOraclePrices] = useState<OraclePricesType>({
     jpegzOraclePrice: "0",
+    jpegzMarketCap: "0",
     tcapOraclePrice: "0",
+    tcapMarketCap: "0",
     wethOraclePrice: "0",
     daiOraclePrice: "0",
     aaveOraclePrice: "0",
@@ -114,7 +116,9 @@ export const usePrices = (): OraclePricesType => {
 
       setOraclePrices({
         jpegzOraclePrice: ethers.utils.formatEther(jpegzOraclePrice),
+        jpegzMarketCap: ethers.utils.formatEther(jpegzOraclePrice.mul(10000000000)),
         tcapOraclePrice: ethers.utils.formatEther(tcapOraclePrice),
+        tcapMarketCap: ethers.utils.formatEther(tcapOraclePrice.mul(10000000000)),
         wethOraclePrice: ethers.utils.formatEther(wethOraclePrice.mul(10000000000)),
         daiOraclePrice: ethers.utils.formatEther(daiOraclePrice.mul(10000000000)),
         aaveOraclePrice: ethers.utils.formatEther(aaveOraclePrice.mul(10000000000)),

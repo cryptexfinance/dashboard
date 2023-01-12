@@ -2,22 +2,20 @@ import React, { useState } from "react";
 import { Button, Spinner } from "react-bootstrap/esm/";
 import { FaArrowRight } from "react-icons/fa";
 import { ethers } from "ethers";
-import { Provider } from "ethers-multicall";
 import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import { usePrices2, useRatios } from "../../../hooks";
+import { useRatios } from "../../../hooks";
+import { OraclePricesType } from "../../../hooks/types";
 import { getCollateralPrice, getMinRatio } from "../../Vaults/common";
 import { getRatio2, isUndefined } from "../../../utils/utils";
 
 type props = {
-  chainId: number;
-  ethCallProvider: Provider | undefined;
   ownerAddress: string;
+  prices: OraclePricesType;
 };
 
-export const VaultsWarning = ({ chainId, ethCallProvider, ownerAddress }: props) => {
+export const VaultsWarning = ({ ownerAddress, prices }: props) => {
   const history = useHistory();
-  const prices = usePrices2(chainId, ethCallProvider);
   const ratios = useRatios();
   const [loadingVaults, setLoadingVaults] = useState(false);
   const [liquidableVaults, setLiquidableVaults] = useState(0);

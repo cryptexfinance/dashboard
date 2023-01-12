@@ -9,20 +9,6 @@ export type PaginationType = {
   lastId: string;
 };
 
-export type OraclePricesType = {
-  jpegzOraclePrice: string;
-  tcapOraclePrice: string;
-  wethOraclePrice: string;
-  daiOraclePrice: string;
-  aaveOraclePrice: string;
-  linkOraclePrice: string;
-  uniOraclePrice: string;
-  snxOraclePrice: string;
-  maticOraclePrice: string;
-  wbtcOraclePrice: string;
-  usdcOraclePrice: string;
-};
-
 export type VaultsRatioType = {
   ethRatio: number;
   wethRatio: number;

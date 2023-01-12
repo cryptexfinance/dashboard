@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { Provider } from "ethers-multicall";
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { Card, Col, Dropdown } from "react-bootstrap/esm";
 import "../../styles/summary.scss";
-import Balance from "./Balance";
-import Indexes from "./Indexes";
-import Protocol from "./Protocol";
-import { GRAPHQL_ENDPOINT, NETWORKS } from "../../utils/constants";
-import { getDefaultProvider } from "../../utils/utils";
-
-const clientOracle = (graphqlEndpoint: string) =>
-  new ApolloClient({
-    uri: graphqlEndpoint,
-    cache: new InMemoryCache(),
-  });
+import SummaryOptions from "./SummaryOptions";
+import { NETWORKS } from "../../utils/constants";
+import { getDefaultProvider, isArbitrum } from "../../utils/utils";
 
 type props = {
   signerAddress: string;
@@ -22,11 +13,12 @@ type props = {
 };
 
 const Summary = ({ signerAddress, signerChainId }: props) => {
-  const options = [
+  const indexName = isArbitrum(signerChainId) ? "JPEGz" : "TCAP";
+  const [options, setOptions] = useState([
     { id: "0", name: "My Balance" },
-    { id: "1", name: "TCAP Summary" },
+    { id: "1", name: indexName.concat(" Summary") },
     { id: "2", name: "Vaults Summary" },
-  ];
+  ]);
   let chains = [
     { id: NETWORKS.mainnet.chainId, name: "Mainnet" },
     { id: NETWORKS.arbitrum.chainId, name: "Arbitrum" },
@@ -39,6 +31,7 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
       { id: NETWORKS.okovan.chainId, name: "OKovan" },
     ];
   }
+  const [updatingChain, setUpdatingChain] = useState(false);
   const [currentOption, setCurrentOption] = useState(
     signerAddress !== "" ? options[0] : options[1]
   );
@@ -64,47 +57,15 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
 
   const [currentChain, setCurrentChain] = useState(getDefaultChain());
   const [currentEthProvider, setCurrentEthProvider] = useState<Provider | undefined>();
-  const [apolloClient, setApolloClient] = useState(
-    clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.goerli
-    )
-  );
 
   useEffect(() => {
-    switch (currentChain.id) {
-      case NETWORKS.mainnet.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
-        break;
-      case NETWORKS.goerli.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.goerli));
-        break;
-      case NETWORKS.arbitrum.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));
-        break;
-      case NETWORKS.arbitrum_goerli.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum_goerli));
-        break;
-      case NETWORKS.optimism.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
-        break;
-      case NETWORKS.okovan.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
-        break;
-      case NETWORKS.polygon.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.polygon));
-        break;
-      case NETWORKS.mumbai.chainId:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mumbai));
-        break;
-      default:
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
-        break;
-    }
+    setUpdatingChain(true);
     const provider = getDefaultProvider(currentChain.id);
     const randomSigner = ethers.Wallet.createRandom().connect(provider);
     const ethcallProvider = new Provider(randomSigner.provider);
     ethcallProvider.init();
     setCurrentEthProvider(ethcallProvider);
+    setUpdatingChain(false);
   }, [currentChain.id]);
 
   const handleOptionChange = (eventKey: string) => {
@@ -114,7 +75,23 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
 
   const handleChainChange = (eventKey: string) => {
     const c = chains.find((chain) => chain.id.toString() === eventKey);
+    setUpdatingChain(true);
     setCurrentChain(c || chains[0]);
+
+    const ops = [...options];
+    if (c) {
+      if (!isArbitrum(c.id)) {
+        ops[1].name = "TCAP Summary";
+      } else {
+        ops[1].name = "JPEGz Summary";
+      }
+    }
+    if (currentOption.id === "1") {
+      const cOpt = currentOption;
+      cOpt.name = ops[1].name;
+      setCurrentOption(cOpt);
+    }
+    setOptions(ops);
   };
 
   return (
@@ -153,21 +130,14 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
           </Dropdown>
         </Card.Header>
         <Card.Body>
-          <ApolloProvider client={apolloClient}>
-            {currentOption.id === options[0].id && signerAddress !== "" && (
-              <Balance
-                currentChainId={currentChain.id}
-                ethCallProvider={currentEthProvider}
-                signerAddress={signerAddress}
-              />
-            )}
-            {currentOption.id === options[1].id && (
-              <Indexes currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
-            )}
-            {currentOption.id === options[2].id && (
-              <Protocol currentChainId={currentChain.id} ethCallProvider={currentEthProvider} />
-            )}
-          </ApolloProvider>
+          {!updatingChain && (
+            <SummaryOptions
+              signerAddress={signerAddress}
+              currentOption={currentOption.id}
+              currentChainId={currentChain.id}
+              ethCallProvider={currentEthProvider}
+            />
+          )}
         </Card.Body>
       </Card>
     </Col>

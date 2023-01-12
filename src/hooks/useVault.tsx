@@ -27,7 +27,7 @@ export const useVault = (
   assetSymbol: string,
   collateralSymbol: string,
   isHardVault: boolean
-): contractsType => {
+): [contractsType, boolean] => {
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const oracles = useContext(oraclesContext);
@@ -35,6 +35,7 @@ export const useVault = (
   const vaults = useContext(vaultsContext);
   const tokens = useContext(tokensContext);
 
+  const [loadingVault, setLoadingVault] = useState(true);
   const [currentAsset, setCurrentAsset] = useState<ethers.Contract | null>(null);
   const [currentCollateral, setCurrentCollateral] = useState<ethers.Contract | null>(null);
   const [currentVault, setCurrentVault] = useState<ethers.Contract | null>(null);
@@ -167,20 +168,24 @@ export const useVault = (
         validHardVaults(currentNetwork.chainId || NETWORKS.mainnet.chainId, hardVaults)
       ) {
         await loadContracts();
+        setLoadingVault(false);
       }
     };
     load();
     // eslint-disable-next-line
   }, [signer.signer, collateralSymbol, isHardVault]);
 
-  return {
-    currentAsset,
-    currentCollateral,
-    currentVault,
-    currentAssetRead,
-    currentCollateralRead,
-    currentVaultRead,
-    currentCollateralOracleRead: currentOracleRead,
-    currentAssetOracleRead,
-  };
+  return [
+    {
+      currentAsset,
+      currentCollateral,
+      currentVault,
+      currentAssetRead,
+      currentCollateralRead,
+      currentVaultRead,
+      currentCollateralOracleRead: currentOracleRead,
+      currentAssetOracleRead,
+    },
+    loadingVault,
+  ];
 };

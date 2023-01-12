@@ -9,7 +9,10 @@
   padding: 3rem 2rem;
   padding-bottom: 2rem;
   display: flex; 
-
+  
+  .jpegz-icon {
+    width: 2.1rem;
+  }
   .spinner-container {
     padding-top: 3rem;
     width: 100%;
@@ -165,8 +168,9 @@
     } 
   }
 
-  .protocol, .indexes, .balance {
+  .protocol, .indexes, .balance-container {
     width: 100%;
+
     .detail {
       display: grid;
       grid-template-columns: 50% 50%;
@@ -188,7 +192,7 @@
       border-radius: 5px;
     }
 
-    .market-cap {
+    .market-cap, .total-supply {
       grid-column-start: 1;
       grid-column-end: 3;
     }
@@ -221,8 +225,9 @@
         color: $lighter;
       }
     }
+
     svg {
-      width: 2rem;
+      width: 2.1rem;
     }
     .weth {
       height: 2.1rem;
@@ -242,7 +247,31 @@
     }
   }
 
-  .balance {
+  .balance-container {
+    .spinner {
+      margin: 3.7rem 50%;
+    }
+    .detail {
+      grid-template-columns: 100%;
+      .staked {
+        .value {
+          display: flex;
+
+          &-separator {
+            margin: 0px 15px;
+          }
+        }
+        .number {
+          margin-bottom: 0rem;
+        }
+      }
+    }
+    .jpegz-icon {
+      width: 2.5rem;
+    }
+    svg {
+      width: 2.5rem;
+    }
     .warnings {
       padding: 1.5rem 0rem;
       &-vaults {

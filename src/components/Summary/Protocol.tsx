@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap/esm/";
 import { BigNumber, ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import { Provider } from "ethers-multicall";
 import { useLazyQuery, gql } from "@apollo/client";
-import { networkContext, oraclesContext, signerContext, tokensContext } from "../../state";
 import { ReactComponent as StakeIcon } from "../../assets/images/graph/stake.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
@@ -17,7 +16,7 @@ import { ReactComponent as POLYGONIcon } from "../../assets/images/graph/polygon
 import { ReactComponent as WBTCIcon } from "../../assets/images/graph/wbtc.svg";
 import { ReactComponent as USDCIcon } from "../../assets/images/graph/usdc.svg";
 import cryptexJson from "../../contracts/cryptex.json";
-import { usePrices2 } from "../../hooks";
+import { OraclePricesType } from "../../hooks/types";
 import {
   isArbitrum,
   isInLayer1,
@@ -25,22 +24,17 @@ import {
   isPolygon,
   isUndefined,
   toUSD,
-  validOracles,
 } from "../../utils/utils";
 import { NETWORKS } from "../../utils/constants";
 
 type props = {
   currentChainId: number;
   ethCallProvider: Provider | undefined;
+  prices: OraclePricesType;
 };
 
-const Protocol = ({ currentChainId, ethCallProvider }: props) => {
+const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
   const { t } = useTranslation();
-  const currentNetwork = useContext(networkContext);
-  const tokens = useContext(tokensContext);
-  const signer = useContext(signerContext);
-  const oracles = useContext(oraclesContext);
-  const prices = usePrices2(currentChainId, ethCallProvider);
   const [ethStake, setETHStake] = useState("0");
   const [daiStake, setDAIStake] = useState("0");
   const [maticStake, setMATICStake] = useState("0");
@@ -62,14 +56,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
   `;
 
   const loadStaked = async (data: any) => {
-    if (
-      oracles &&
-      tokens &&
-      data &&
-      signer &&
-      !isUndefined(tokens.tcapTokenRead) &&
-      validOracles(currentNetwork.chainId || 1, oracles)
-    ) {
+    if (data) {
       let currentDAIStake = BigNumber.from(0);
       let currentWETHStake = BigNumber.from(0);
       let currentAAVEStake = BigNumber.from(0);
@@ -80,7 +67,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
       let currentWBTCStake = BigNumber.from(0);
       let currentUSDCStake = BigNumber.from(0);
 
-      const networkId = currentNetwork.chainId;
+      const networkId = currentChainId;
       // @ts-ignore
       let contracts;
       switch (networkId) {
@@ -122,19 +109,19 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
           );
         }
 
-        if (isPolygon(currentNetwork.chainId)) {
+        if (isPolygon(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.MATICVaultHandler.address.toLowerCase()) {
             currentMATICStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
           }
         }
-        if (isInLayer1(currentNetwork.chainId) || isPolygon(currentNetwork.chainId)) {
+        if (isInLayer1(currentChainId) || isPolygon(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.HardWBTCVaultHandler.address.toLowerCase()) {
             currentWBTCStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
           }
         }
-        if (isInLayer1(currentNetwork.chainId) || isOptimism(currentNetwork.chainId)) {
+        if (isInLayer1(currentChainId) || isOptimism(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
             currentWETHStake = currentWETHStake.add(
@@ -147,7 +134,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
           }
         }
 
-        if (isInLayer1(currentNetwork.chainId)) {
+        if (isInLayer1(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.AaveVaultHandler.address.toLowerCase()) {
             currentAAVEStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
@@ -169,7 +156,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
             );
           }
         }
-        if (isOptimism(currentNetwork.chainId)) {
+        if (isOptimism(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.SNXVaultHandler.address.toLowerCase()) {
             currentSNXStake = s.amountStaked ? s.amountStaked : BigNumber.from(0);
@@ -180,7 +167,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
           }
         }
 
-        if (isArbitrum(currentNetwork.chainId)) {
+        if (isArbitrum(currentChainId)) {
           // @ts-ignore
           if (cAddress === contracts.WETHVaultHandler.address.toLowerCase()) {
             currentWETHStake = currentWETHStake.add(
@@ -254,7 +241,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
         </div>
       ) : (
         <div className="detail">
-          <div className="totals">
+          <div className="totals total-supply">
             <StakeIcon className="stake" />
             <div className="staked">
               <h6>
@@ -271,7 +258,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </h5>
             </div>
           </div>
-          {!isPolygon(currentNetwork.chainId) && (
+          {!isPolygon(currentChainId) && (
             <div className="asset">
               <WETHIcon className="weth" />
               <div className="staked">
@@ -305,7 +292,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </h5>
             </div>
           </div>
-          {isInLayer1(currentNetwork.chainId) && (
+          {isInLayer1(currentChainId) && (
             <div className="asset">
               <AAVEIcon className="ctx" />
               <div className="staked">
@@ -323,7 +310,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </div>
             </div>
           )}
-          {!isPolygon(currentNetwork.chainId) && (
+          {!isPolygon(currentChainId) && !isArbitrum(currentChainId) && (
             <div className="asset">
               <LINKIcon className="ctx" />
               <div className="staked">
@@ -341,7 +328,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </div>
             </div>
           )}
-          {isOptimism(currentNetwork.chainId) && (
+          {isOptimism(currentChainId) && (
             <>
               <div className="asset">
                 <UNIIcon className="ctx" />
@@ -377,7 +364,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </div>
             </>
           )}
-          {isPolygon(currentNetwork.chainId) && (
+          {isPolygon(currentChainId) && (
             <div className="asset">
               <POLYGONIcon className="eth" />
               <div className="staked">
@@ -395,7 +382,7 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </div>
             </div>
           )}
-          {!isOptimism(currentNetwork.chainId) && (
+          {!isOptimism(currentChainId) && !isArbitrum(currentChainId) && (
             <div className="asset">
               <WBTCIcon className="eth" />
               <div className="staked">
@@ -413,22 +400,24 @@ const Protocol = ({ currentChainId, ethCallProvider }: props) => {
               </div>
             </div>
           )}
-          <div className="asset">
-            <USDCIcon className="eth" />
-            <div className="staked">
-              <h6>
-                <>{t("welcome.summary.staked-usdc")}</>
-              </h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={usdcStake}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </h5>
+          {!isArbitrum(currentChainId) && (
+            <div className="asset">
+              <USDCIcon className="eth" />
+              <div className="staked">
+                <h6>
+                  <>{t("welcome.summary.staked-usdc")}</>
+                </h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={usdcStake}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                  />
+                </h5>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

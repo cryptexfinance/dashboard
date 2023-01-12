@@ -535,6 +535,27 @@ form {
 .spinner {
   margin: 5rem 50%;
   color: $highlight !important;
+
+  &.small {
+    margin: 0.1rem 0.5rem;
+    padding: 0.5rem;
+  }
+  &.xsmall {
+    margin: 0.1rem 0.5rem;
+    padding: 0.4rem;
+    font-size: 0.4em;
+    height: 5px;
+    width: 5px;
+  }
+}
+.spinner-green {
+  color: $green  !important;
+}
+.spinner-orange {
+  color: $orange !important;
+}
+.spinner-gray {
+  color: $light !important;
 }
 
 .info-message {

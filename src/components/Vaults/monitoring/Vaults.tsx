@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
-import Button from "react-bootstrap/esm/Button";
+import { Button, Image } from "react-bootstrap/esm";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import { useTranslation } from "react-i18next";
+import jpegzIcon from "../../../assets/images/jpegz-coin.png";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
@@ -201,6 +202,13 @@ export const Vaults = ({
     setVaultToUpdate(initData);
   };
 
+  const IndexIcon = () => {
+    if (!isArbitrum(currentNetwork.chainId)) {
+      return <TcapIcon className="tcap" />;
+    }
+    return <Image className="jpegz-icon" src={jpegzIcon} alt="JPEGz icon" />;
+  };
+
   return (
     <>
       <Table hover className="mt-2 vaults">
@@ -242,7 +250,7 @@ export const Vaults = ({
             </th>
             <th>
               <div className="debt">
-                <TcapIcon className="tcap" />
+                <IndexIcon />
                 <span>
                   <>{t("debt")}</>
                 </span>
