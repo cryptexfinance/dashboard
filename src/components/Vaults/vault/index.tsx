@@ -1120,6 +1120,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const handleRadioBtnChange = async (value: string) => {
     setVaultMode(value);
     // setCollaterals(value);
+    setActiveAction("add");
+    resetFields();
     setVaultData({
       vaultId: "0",
       assetSymbol: vaultData.assetSymbol,
@@ -1136,7 +1138,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     ) {
       keepVaultId = value === TOKENS_SYMBOLS.ETH || value === TOKENS_SYMBOLS.WETH;
     }
-
+    resetFields();
     setVaultData({
       vaultId: !keepVaultId ? "0" : vaultData.vaultId,
       assetSymbol: vaultData.assetSymbol,

@@ -410,6 +410,11 @@ html,
   width: 390px;
   text-align: left;
 }
+.ttip-features > .tooltip-inner {
+  max-width: 550px;
+  width: 550px;
+  text-align: left;
+}
 
 .univ3-expired-tooltip > .tooltip-inner {
   min-width: 300px;
