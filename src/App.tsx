@@ -21,7 +21,7 @@ import Delegators from "./components/Governance/Delegators";
 import MushroomNft from "./components/MushroomNft";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
-import Warnings from "./components/Warnings";
+import { Warnings } from "./components/Warnings/index";
 import * as hooks from "./hooks";
 import {
   governanceContext,

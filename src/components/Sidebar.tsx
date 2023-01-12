@@ -4,8 +4,6 @@ import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
 import { Web3ModalContext } from "../state/Web3ModalContext";
-import { networkContext } from "../state";
-import { isGoerli, isInLayer1 } from "../utils/utils";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
@@ -21,7 +19,6 @@ type props = {
 };
 
 const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
-  const currentNetwork = useContext(networkContext);
   const location = useLocation();
   let activeVal = "dashboard";
   switch (location.pathname) {
@@ -108,50 +105,44 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <span className={active === "vaults" ? "title active" : "title"}>Vaults</span>
           </Link>
         </Nav.Item>
-        {!isGoerli(currentNetwork.chainId) && (
-          <Nav.Item>
-            <Link
-              to="/farm"
-              className={active === "farm" ? "active" : ""}
-              onClick={() => {
-                setActive("farm");
-              }}
-            >
-              <FarmIcon />
-              <span className={active === "farm" ? "title active" : "title"}>Farm</span>
-            </Link>
-          </Nav.Item>
-        )}
-        {isInLayer1(currentNetwork.chainId) && !isGoerli(currentNetwork.chainId) && (
-          <Nav.Item>
-            <Link
-              to="/governance"
-              className={active === "governance" ? "active" : ""}
-              onClick={() => {
-                setActive("governance");
-              }}
-            >
-              <StakeIcon className="governance" />
-              <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
-            </Link>
-          </Nav.Item>
-        )}
-        {isInLayer1(currentNetwork.chainId) && (
-          <Nav.Item>
-            <Link
-              to="/sewagefruitz"
-              className={active === "sewagefruit" ? "active" : ""}
-              onClick={() => {
-                setActive("sewagefruitz");
-              }}
-            >
-              <GiSpottedMushroom size={28} className="sewagefruit" />
-              <span className={active === "sewagefruitz" ? "title active" : "title"}>
-                Sewagefruitz
-              </span>
-            </Link>
-          </Nav.Item>
-        )}
+        <Nav.Item>
+          <Link
+            to="/farm"
+            className={active === "farm" ? "active" : ""}
+            onClick={() => {
+              setActive("farm");
+            }}
+          >
+            <FarmIcon />
+            <span className={active === "farm" ? "title active" : "title"}>Farm</span>
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/governance"
+            className={active === "governance" ? "active" : ""}
+            onClick={() => {
+              setActive("governance");
+            }}
+          >
+            <StakeIcon className="governance" />
+            <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/sewagefruitz"
+            className={active === "sewagefruit" ? "active" : ""}
+            onClick={() => {
+              setActive("sewagefruitz");
+            }}
+          >
+            <GiSpottedMushroom size={28} className="sewagefruit" />
+            <span className={active === "sewagefruitz" ? "title active" : "title"}>
+              Sewagefruitz
+            </span>
+          </Link>
+        </Nav.Item>
         <Nav.Item>
           <Link
             to=""

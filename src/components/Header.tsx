@@ -276,7 +276,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          {!window.location.pathname.includes("/governance") && showDropdown() && (
+          {showDropdown() && (
             <div className="network-container">
               <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
                 <Dropdown.Toggle

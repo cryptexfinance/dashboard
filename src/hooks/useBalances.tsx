@@ -98,8 +98,9 @@ export const useBalances = (
   useEffect(
     () => {
       if (ethcallProvider && address !== "") {
-        console.log("Entra balance: ");
         loadBalance();
+      } else {
+        setLoadingBalances(false);
       }
     },
     // eslint-disable-next-line

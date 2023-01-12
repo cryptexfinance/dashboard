@@ -8,9 +8,9 @@ import KeeperForm from "./KeeperForm";
 import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
-import { governanceContext, signerContext } from "../../state";
-import { API_ENDPOINT, FEATURES } from "../../utils/constants";
-// import { delegatorsInfo } from "./data";
+import { governanceContext, networkContext, signerContext } from "../../state";
+import { API_ENDPOINT } from "../../utils/constants";
+import { isInLayer1 } from "../../utils/utils";
 
 type props = {
   currentSignerAddress: string;
@@ -59,6 +59,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
   const [withdrawTimes, setWithdrawTimes] = useState<number[]>([]);
   const [updateData, setUpdateData] = useState(false);
   const [updateTimes, setUpdateTimes] = useState(false);
+  const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const governance = useContext(governanceContext);
 
@@ -127,33 +128,37 @@ const Delegators = ({ currentSignerAddress }: props) => {
   };
 
   useEffect(() => {
-    const loadKeepersFromDB = async (currentDelegators: any) => {
-      await fetch(`${API_ENDPOINT}/cryptkeeper/all`, {
-        method: "GET",
-      })
-        .then((response) => response.json())
-        .then((responseJson) => {
-          buildKeeperInfo(responseJson, currentDelegators);
+    const loadData = async () => {
+      const loadKeepersFromDB = async (currentDelegators: any) => {
+        await fetch(`${API_ENDPOINT}/cryptkeeper/all`, {
+          method: "GET",
         })
-        .catch((error) => {
-          console.error(error);
-          setKeepersInfo([]);
-        });
-    };
-    const loadKeepers = async () => {
-      if (governance.delegatorFactoryRead) {
-        if (data) {
-          const currentDelegators: any[] = [];
-          await data.delegators.forEach((d: any) => {
-            currentDelegators.push(d);
+          .then((response) => response.json())
+          .then((responseJson) => {
+            buildKeeperInfo(responseJson, currentDelegators);
+          })
+          .catch((error) => {
+            console.error(error);
+            setKeepersInfo([]);
           });
-          setKeepers(currentDelegators);
-          loadKeepersFromDB(currentDelegators);
+      };
+      const loadKeepers = async () => {
+        if (governance.delegatorFactoryRead) {
+          if (data) {
+            const currentDelegators: any[] = [];
+            await data.delegators.forEach((d: any) => {
+              currentDelegators.push(d);
+            });
+            setKeepers(currentDelegators);
+            loadKeepersFromDB(currentDelegators);
+          }
         }
-      }
+      };
+      await loadKeepers();
     };
-    loadKeepers();
-
+    if (isInLayer1(currentNetwork.chainId)) {
+      loadData();
+    }
     /* if (FEATURES.KEEPERS_API) {
       loadKeepersFromDB();
     } else {
@@ -258,7 +263,12 @@ const Delegators = ({ currentSignerAddress }: props) => {
           <div className="sort-box">
             <h6 className="titles">Sort by:</h6>
             <Dropdown onSelect={(eventKey) => handleSortingChange(eventKey || "0")}>
-              <Dropdown.Toggle variant="secondary" id="dropdown-filters" className="text-left">
+              <Dropdown.Toggle
+                variant="secondary"
+                id="dropdown-filters"
+                className="text-left"
+                disabled={!isInLayer1(currentNetwork.chainId)}
+              >
                 <div className="sort-by-toggle">
                   <span>{currentSorting.name}</span>
                 </div>
@@ -273,13 +283,16 @@ const Delegators = ({ currentSignerAddress }: props) => {
             </Dropdown>
           </div>
         </div>
-        {signer.signer && FEATURES.KEEPERS_API && (
-          <div className="create">
-            <Button variant="pink" className="w-100" onClick={() => showCreateKeeper()}>
-              <>{t("governance.new")}</>
-            </Button>
-          </div>
-        )}
+        <div className="create">
+          <Button
+            variant="pink"
+            className="w-100"
+            onClick={() => showCreateKeeper()}
+            disabled={currentSignerAddress === "" || !isInLayer1(currentNetwork.chainId)}
+          >
+            <>{t("governance.new")}</>
+          </Button>
+        </div>
       </div>
       <div className="grid profiles">
         {keepersInfo.map((keeperInfo, index) => {

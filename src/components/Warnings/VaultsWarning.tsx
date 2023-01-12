@@ -3,17 +3,17 @@ import Alert from "react-bootstrap/esm/Alert";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const Warnings = () => {
+const VaultsWarning = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [vaultWarning, setVaultWarning] = useState(true);
+  const [showWarning, setShowWarning] = useState(true);
 
   return (
     <>
-      {vaultWarning && location.pathname === "/vault" && (
+      {showWarning && location.pathname === "/vault" && (
         <Alert
           onClose={() => {
-            setVaultWarning(false);
+            setShowWarning(false);
             localStorage.setItem("alert", "false");
           }}
           dismissible
@@ -27,4 +27,4 @@ const Warnings = () => {
   );
 };
 
-export default Warnings;
+export default VaultsWarning;
