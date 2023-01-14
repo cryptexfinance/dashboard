@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { Provider } from "ethers-multicall";
-import { Card, Col, Dropdown } from "react-bootstrap/esm";
+import { Card, Dropdown } from "react-bootstrap/esm";
 import "../../styles/summary.scss";
 import SummaryOptions from "./SummaryOptions";
 import { NETWORKS } from "../../utils/constants";
@@ -95,52 +95,50 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
   };
 
   return (
-    <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper">
-      <Card className="summary">
-        <Card.Header>
-          <Dropdown onSelect={(eventKey) => handleOptionChange(eventKey || "0")}>
-            <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
-              <h6>{currentOption.name}</h6>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {signerAddress !== "" && (
-                <Dropdown.Item key={options[0].id} eventKey={options[0].id}>
-                  {options[0].name}
-                </Dropdown.Item>
-              )}
-              <Dropdown.Item key={options[1].id} eventKey={options[1].id}>
-                {options[1].name}
+    <Card className="summary">
+      <Card.Header>
+        <Dropdown onSelect={(eventKey) => handleOptionChange(eventKey || "0")}>
+          <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
+            <h6>{currentOption.name}</h6>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {signerAddress !== "" && (
+              <Dropdown.Item key={options[0].id} eventKey={options[0].id}>
+                {options[0].name}
               </Dropdown.Item>
-              <Dropdown.Item key={options[2].id} eventKey={options[2].id}>
-                {options[2].name}
+            )}
+            <Dropdown.Item key={options[1].id} eventKey={options[1].id}>
+              {options[1].name}
+            </Dropdown.Item>
+            <Dropdown.Item key={options[2].id} eventKey={options[2].id}>
+              {options[2].name}
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown onSelect={(eventKey) => handleChainChange(eventKey || "1")}>
+          <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
+            <h6>{currentChain.name}</h6>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {chains.map((item) => (
+              <Dropdown.Item key={item.id} eventKey={item.id}>
+                {item.name}
               </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          <Dropdown onSelect={(eventKey) => handleChainChange(eventKey || "1")}>
-            <Dropdown.Toggle variant="secondary" id="dropdown-summary" className="text-left">
-              <h6>{currentChain.name}</h6>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {chains.map((item) => (
-                <Dropdown.Item key={item.id} eventKey={item.id}>
-                  {item.name}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </Card.Header>
-        <Card.Body>
-          {!updatingChain && (
-            <SummaryOptions
-              signerAddress={signerAddress}
-              currentOption={currentOption.id}
-              currentChainId={currentChain.id}
-              ethCallProvider={currentEthProvider}
-            />
-          )}
-        </Card.Body>
-      </Card>
-    </Col>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </Card.Header>
+      <Card.Body>
+        {!updatingChain && (
+          <SummaryOptions
+            signerAddress={signerAddress}
+            currentOption={currentOption.id}
+            currentChainId={currentChain.id}
+            ethCallProvider={currentEthProvider}
+          />
+        )}
+      </Card.Body>
+    </Card>
   );
 };
 

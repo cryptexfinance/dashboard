@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Card, Col } from "react-bootstrap/esm";
+import { Button, Card } from "react-bootstrap/esm";
 import { GiSpottedMushroom } from "react-icons/gi";
 import { FaArrowRight } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
@@ -11,7 +11,7 @@ const Features = () => {
   const history = useHistory();
 
   return (
-    <Col xs={12} sm={12} md={6} lg={6} className="col-wrapper features">
+    <div className="col-wrapper features">
       <Card>
         <Card.Header>
           <h2>Use Cryptex For</h2>
@@ -75,7 +75,7 @@ const Features = () => {
           </Button>
         </Card.Body>
       </Card>
-    </Col>
+    </div>
   );
 };
 

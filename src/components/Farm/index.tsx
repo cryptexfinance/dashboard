@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import {
   governanceContext,
-  networkContext,
   oraclesContext,
   rewardsContext,
   signerContext,
@@ -22,13 +21,7 @@ import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import Loading from "../Loading";
-import {
-  notifyUser,
-  errorNotification,
-  getPriceInUSDFromPair,
-  isInLayer1,
-} from "../../utils/utils";
-// import { Stake } from "../modals/Stake";
+import { notifyUser, errorNotification, getPriceInUSDFromPair } from "../../utils/utils";
 
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
@@ -49,17 +42,12 @@ const Farm = () => {
   const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [updateData, setUpdateData] = useState(false);
-  const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const tokens = useContext(tokensContext);
   const oracles = useContext(oraclesContext);
   const governance = useContext(governanceContext);
   const rewards = useContext(rewardsContext);
-  // const [stakeShow, setStakeShow] = useState(false);
-  // const [stakeBalance, setStakeBalance] = useState("0");
-  // const [selectedPoolTitle, setSelectedPoolTitle] = useState("");
-  // const [selectedPool, setSelectedPool] = useState<ethers.Contract>();
-  // const [selectedPoolToken, setSelectedPoolToken] = useState<ethers.Contract>();
+
   // APY
   const [, setEthVaultAPY] = useState("0");
   const [, setDaiVaultAPY] = useState("0");
@@ -411,7 +399,7 @@ const Farm = () => {
         </h3>{" "}
         <Row className="card-wrapper">
           <Row>
-            {isInLayer1(currentNetwork.chainId) && <UniV3Rewards signer={signer} />}
+            <UniV3Rewards signer={signer} />
             <Card className="diamond mt-4">
               <h2>
                 <>{t("farming.liquidity")}</>

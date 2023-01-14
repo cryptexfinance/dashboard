@@ -8,7 +8,6 @@
   margin-top: 2rem;
   padding: 3rem 2rem;
   padding-bottom: 2rem;
-  display: flex; 
   
   .jpegz-icon {
     width: 2.1rem;
@@ -109,6 +108,8 @@
   }
 
   .features  {
+    flex: 1;
+    margin-right: 1rem;
     &-title {
       margin-bottom: 2rem;
     }
@@ -144,6 +145,8 @@
   }
 
   .summary { 
+    flex: 1;
+    margin-left: 1rem;
     height: 100%;
     width: 100%;
     padding-left: 1rem;
@@ -285,15 +288,42 @@
     }
   }
 
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    
+    .features {      
+      margin-bottom: 2rem;
+      margin-right: 0rem;
+    }
+    .summary {
+      margin-left: 0rem;
+    }
+  }
+
   @media (max-width: 600px) {
-    padding: 3rem 0.5rem;
+    padding: 3rem 1rem;
 
     .card {
-      padding: 1.5rem 0.5rem;
+      padding: 1.5rem 0rem;
       margin-bottom: 3rem;
+
+      &-header {
+        display: flex;
+        flex-direction: column;
+        .dropdown {
+          margin-bottom: 0.7rem;
+          .btn {
+            h6 {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
     }
 
     .features {
+      margin-bottom: 1rem;
       .btn-feature {
         padding: 0rem 1rem;
       }
@@ -313,15 +343,27 @@
 
     .protocol,
     .indexes,
-    .balance {
+    .balance-container {
       .detail {
-        display: grid;
-        grid-template-columns: 100%;
-      }
+        display: flex;
+        flex-direction: column;
 
-      .market-cap {
-        grid-column-start: 1;
-        grid-column-end: 2;
+        h6 {
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    .balance-container {
+      .value {
+        display: flex;
+        flex-direction: column;
+        .number {
+          margin-bottom: 0.5rem !important;
+        }
+      }
+      .value-separator {
+        display: none;
       }
     }
   }

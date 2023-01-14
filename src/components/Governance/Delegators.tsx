@@ -245,19 +245,15 @@ const Delegators = ({ currentSignerAddress }: props) => {
 
   return (
     <div className={signer.signer ? "delegation" : "delegation off"}>
-      {signer.signer && (
-        <>
-          <Row className="staker-wrapper">
-            <StakerStats
-              refresh={refresh}
-              updateData={updateData}
-              withdrawTimes={withdrawTimes}
-              updateTimes={updateTimes}
-              t={t}
-            />
-          </Row>
-        </>
-      )}
+      <Row className="staker-wrapper">
+        <StakerStats
+          refresh={refresh}
+          updateData={updateData}
+          withdrawTimes={withdrawTimes}
+          updateTimes={updateTimes}
+          t={t}
+        />
+      </Row>
       <div className="keepers-options">
         <div className="search-box">
           <div className="sort-box">

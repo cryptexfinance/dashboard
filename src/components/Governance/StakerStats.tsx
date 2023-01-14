@@ -155,7 +155,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
                 onClick={() => {
                   claimRewards();
                 }}
-                disabled={!isInLayer1(currentNetwork.chainId)}
+                disabled={!signer.signer || !isInLayer1(currentNetwork.chainId)}
               >
                 {t("claim")}
               </Button>

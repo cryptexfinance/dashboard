@@ -8,7 +8,7 @@ import Loading from "../Loading";
 import { mushroomNftContext, networkContext, signerContext } from "../../state";
 import { useMerkleTree } from "../../hooks/useMerkleTree";
 import { NETWORKS } from "../../utils/constants";
-import { errorNotification, isGoerli, notifyUser } from "../../utils/utils";
+import { errorNotification, isGoerli, isInLayer1, notifyUser } from "../../utils/utils";
 import mushroomMan from "../../assets/images/noti-error.png";
 import sewageFruit from "../../assets/images/sewage-fruit.png";
 import { whitelist, whitelistGoerli } from "./whitelist";
@@ -26,7 +26,7 @@ type UserStatusType = {
   tokenURI: string;
 };
 
-const SewageFruit = () => {
+const SewageFruitz = () => {
   const { t } = useTranslation();
   // const { isInitialized, Moralis } = useMoralis();
   const currentNetwork = useContext(networkContext);
@@ -301,7 +301,7 @@ const SewageFruit = () => {
     <div className="sewage-fruit">
       <h2>Sewage Fruitz</h2>
       <div className="content">
-        {signerAddress !== "" && (
+        {signerAddress !== "" && isInLayer1(currentNetwork.chainId) && (
           <Card className="diamond mint">
             <Card.Header>{!refreshing && !loadingFruit && renderMintInfo()}</Card.Header>
             <Card.Body>
@@ -351,7 +351,7 @@ const SewageFruit = () => {
               </a>
             </p>
             <br />
-            {signerAddress === "" && (
+            {signerAddress === "" && isInLayer1(currentNetwork.chainId) && (
               <p>
                 Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
                 eligible, public mint will be available on {mintPeriodEnd.toLocaleDateString()}.
@@ -364,4 +364,4 @@ const SewageFruit = () => {
   );
 };
 
-export default SewageFruit;
+export default SewageFruitz;

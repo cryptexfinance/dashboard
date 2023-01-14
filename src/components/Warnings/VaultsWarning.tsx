@@ -10,7 +10,7 @@ const VaultsWarning = () => {
 
   return (
     <>
-      {showWarning && location.pathname === "/vault" && (
+      {showWarning && location.pathname === "/vaults" && (
         <Alert
           onClose={() => {
             setShowWarning(false);

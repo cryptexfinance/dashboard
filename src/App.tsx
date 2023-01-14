@@ -18,7 +18,7 @@ import Topbar from "./components/Topbar";
 import SummaryPage from "./components/Summary/index";
 import Vaults from "./components/Vaults";
 import Delegators from "./components/Governance/Delegators";
-import MushroomNft from "./components/MushroomNft";
+import MushroomNft from "./components/SewageFruitz";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
 import { Warnings } from "./components/Warnings/index";

@@ -8,7 +8,7 @@ import UniV3Pool from "../../../contracts/UniV3Pool.json";
 import { networkContext, ISignerContext } from "../../../state";
 import { NETWORKS } from "../../../utils/constants";
 import { GRAPHQL_UNIV3_ENDPOINT, UNIV3 } from "../../../utils/univ3";
-import { toFragment } from "../../../utils/utils";
+import { isOptimism, toFragment } from "../../../utils/utils";
 
 import Rewards from "./Rewards";
 
@@ -51,7 +51,7 @@ const UniV3Rewards = ({ signer }: props) => {
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
           break;
       }
-      if (signer) {
+      if (signer && !isOptimism(currentNetwork.chainId)) {
         const stakerRead = new Contract(UNIV3.stakerAddress, UniswapV3Staker);
         const staker = new ethers.Contract(UNIV3.stakerAddress, UniswapV3Staker, signer.signer);
         const nfpmRead = new Contract(
@@ -65,7 +65,7 @@ const UniV3Rewards = ({ signer }: props) => {
         );
         let poolRead = new Contract(UNIV3.mainnet.tcapPool.id, toFragment(UniV3Pool));
         if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
-          poolRead = new Contract(UNIV3.rinkeby.tcapPool.id, toFragment(UniV3Pool));
+          poolRead = new Contract(UNIV3.goerli.tcapPool.id, toFragment(UniV3Pool));
         }
 
         setStakerContractRead(stakerRead);

@@ -24,6 +24,7 @@ import {
   errorNotification,
   notifyUser,
   numberFormatStr,
+  isOptimism,
 } from "../../../utils/utils";
 import { IncentiveType, PositionType, positionDefaultValues, StakeStatus } from "./types";
 import ClaimReward from "./ClaimReward";
@@ -56,6 +57,7 @@ const Rewards = ({
   const { t } = useTranslation();
   const tokens = useContext(tokensContext);
   const currentNetwork = useContext(networkContext);
+  const disableActions = isOptimism(currentNetwork.chainId);
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
   const [cumulativePrice, setCumulativePrice] = useState(0);
@@ -87,7 +89,7 @@ const Rewards = ({
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
       case NETWORKS.goerli.chainId:
-        ethTcapPool = UNIV3.rinkeby.tcapPool;
+        ethTcapPool = UNIV3.goerli.tcapPool;
         break;
       default:
         ethTcapPool = UNIV3.mainnet.tcapPool;
@@ -209,8 +211,10 @@ const Rewards = ({
     },
     onCompleted: (data: any) => {
       if (signer.signer && ownerAddress !== "") {
-        loadData(data);
-        setFirstLoad(false);
+        if (!disableActions) {
+          loadData(data);
+          setFirstLoad(false);
+        }
       } else {
         confIncetive();
       }
@@ -226,11 +230,14 @@ const Rewards = ({
   };
 
   const lpUrl = () => {
+    if (disableActions) {
+      return "https://app.uniswap.org/";
+    }
     const tcapAddress = tokens.tcapToken?.address;
     let { feeTier } = UNIV3.mainnet.tcapPool;
     let wethAddress = NETWORKS.mainnet.eth;
     if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
-      feeTier = UNIV3.rinkeby.tcapPool.feeTier;
+      feeTier = UNIV3.goerli.tcapPool.feeTier;
       wethAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
     }
 

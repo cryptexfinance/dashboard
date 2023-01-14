@@ -25,7 +25,7 @@ export const UNIV3 = {
       ],
     },
   },
-  rinkeby: {
+  goerli: {
     tcapPool: {
       id: "0xfb7BDD5B703f57BC7807b9D731503050EdC8c722",
       feeTier: 3000,
