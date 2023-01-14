@@ -6,7 +6,7 @@
   background-color: black;
 }
 
-.vault2 {
+.vault {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,6 +89,12 @@
         padding-left: 1rem;
       }
 
+      .form-group {
+        .burn-fee2 {
+          display: none;
+        }
+      }
+
       .input-group {
         background-color: #281e31;
         border: 1px solid $dark;
@@ -110,7 +116,7 @@
           height: 4.1rem;
           border-top-right-radius: 5px;
           border-bottom-right-radius: 5px;
-        }
+        } 
       }
 
       .burn-fee.text-muted {
@@ -262,6 +268,9 @@
           color: $white;
           padding: 0rem 0.3rem;
         }
+      }
+      .burn-fee:hover {
+        cursor: pointer;
       }
     }
 
@@ -571,5 +580,107 @@
     .vault-container {
       width: 43%;
     }
+  }
+
+  @media (max-width: 1200px) {
+    .vault-container {
+      width: 55%;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .vault-container {
+      width: 80%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    margin-left: 0rem;
+    
+    .vault {
+      &-container {
+        width: 95%;
+        margin-bottom: 6rem;
+      }
+      &-header {
+        padding: 2rem 1rem 1.5rem 0.5rem;
+      }
+
+      &-actions  {
+        .dropdown {
+          width: 170px;
+        }
+        .actions-options {
+          .burn-fee {
+            display: none;
+          }  
+        }
+      }
+
+      &-assets {
+        &-box {
+          padding: 2rem 0.5rem;
+      
+          .assets-box-options {
+            display: flex;
+            flex-direction: column;
+          }
+      
+          .asset-box.right {
+            margin-top: 1.5rem;
+            align-items: flex-start;
+          }
+        }
+        .vault-ratio {
+          .title {
+            width: 30%;
+          }
+
+          .values {
+            width: 70%;
+
+            .number {
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+      
+      &-controls {
+        .form-group {
+          display: flex;
+          flex-direction: column;
+
+          .burn-fee2 {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            margin-right: 0.5rem;
+
+            span {
+              color: $off-white;
+              font-size: 0.85rem;
+            }
+          
+            .number {
+              color: $white;
+              padding: 0rem 0.3rem;
+            }
+          }
+          .burn-fee2:hover {
+            cursor: pointer;
+          }
+        }
+        .input-group {
+          .btn {
+            width: 6.2rem;
+            font-size: 0.9rem;
+          }
+        }
+        .text-muted {
+          position: relative;
+        }        
+      }      
+    }    
   }
 }

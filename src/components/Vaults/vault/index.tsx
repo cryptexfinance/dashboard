@@ -840,7 +840,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const AddCollateral = () => (
-    <Form.Group>
+    <Form.Group className="form-group add">
       <InputGroup>
         <Form.Control
           type="number"
@@ -869,7 +869,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const RemoveCollateral = () => (
-    <Form.Group>
+    <Form.Group className="form-group remove">
       <InputGroup>
         <Form.Control
           type="number"
@@ -898,7 +898,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const MintAsset = () => (
-    <Form.Group>
+    <Form.Group className="form-group mint">
       <InputGroup>
         <Form.Control
           type="number"
@@ -926,8 +926,37 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Form.Group>
   );
 
+  const BurnFeeLabel = (className: string) => (
+    <OverlayTrigger
+      key="top"
+      placement="top"
+      trigger={["hover", "click"]}
+      overlay={
+        <Tooltip id="ttip-status" className="ttip-hard-vault">
+          <>
+            {t("vault.debt.fee")}: {burnFee} {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
+          </>
+        </Tooltip>
+      }
+    >
+      <div className={className}>
+        <span>
+          <>{t("vault.debt.fee")}:</>
+        </span>
+        <NumberFormat
+          className="number neon-pink"
+          value={burnFee}
+          displayType="text"
+          thousandSeparator
+          decimalScale={4}
+        />{" "}
+        <span>{isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}</span>
+      </div>
+    </OverlayTrigger>
+  );
+
   const BurnAsset = () => (
-    <Form.Group className="remove">
+    <Form.Group className="form-group remove">
       <InputGroup>
         <Form.Control
           type="number"
@@ -952,6 +981,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           decimalScale={2}
         />
       </Form.Text>
+      {BurnFeeLabel("burn-fee2")}
     </Form.Group>
   );
 
@@ -1193,7 +1223,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   return (
-    <div className="vault2">
+    <div className="vault">
       <div className="vault-container">
         <div className="vault-header">
           <div className="header-col1">
@@ -1283,21 +1313,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                             <MaxButton />
                           </div>
                         </div>
-                        {activeAction === actions[3] && (
-                          <div className="burn-fee">
-                            <span>
-                              <>{t("vault.debt.fee")}:</>
-                            </span>
-                            <NumberFormat
-                              className="number neon-pink"
-                              value={burnFee}
-                              displayType="text"
-                              thousandSeparator
-                              decimalScale={4}
-                            />{" "}
-                            <span>{isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}</span>
-                          </div>
-                        )}
+                        {activeAction === actions[3] && BurnFeeLabel("burn-fee")}
                       </div>
                       <Form className="vault-controls">{ActionControls()}</Form>
                     </div>
