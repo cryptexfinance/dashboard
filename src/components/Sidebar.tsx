@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
-import { Web3ModalContext } from "../state/Web3ModalContext";
+// import { Web3ModalContext } from "../state/Web3ModalContext";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
-import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
+// import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
@@ -51,7 +51,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
       break;
   }
   const [active, setActive] = useState(activeVal);
-  const web3Modal = useContext(Web3ModalContext);
+  // const web3Modal = useContext(Web3ModalContext);
 
   useEffect(
     () => {
@@ -143,7 +143,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             </span>
           </Link>
         </Nav.Item>
-        <Nav.Item>
+        {/* <Nav.Item>
           <Link
             to=""
             onClick={(event) => {
@@ -155,7 +155,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <LogoutIcon className="logout-icon" />
             <span className="title">Disconnect</span>
           </Link>
-        </Nav.Item>
+        </Nav.Item> */}
       </Nav>
     </>
   );

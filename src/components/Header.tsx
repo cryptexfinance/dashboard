@@ -17,6 +17,7 @@ import {
   isArbitrum,
 } from "../utils/utils";
 import { NETWORKS, FEATURES } from "../utils/constants";
+import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
@@ -297,6 +298,16 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 </a>
               </OverlayTrigger>
             </h5>
+            <Button
+              className="logout"
+              onClick={(event) => {
+                event.preventDefault();
+                web3Modal.clearCachedProvider();
+                window.location.reload();
+              }}
+            >
+              <LogoutIcon className="logout-icon" />
+            </Button>
             {/* <LangDropDown className="btn-language small" /> */}
           </div>
         </>

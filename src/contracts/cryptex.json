@@ -85056,7 +85056,7 @@
       "chainId": "421613",
       "contracts": {
         "DAI": {
-          "address": "0x630c6B571ba97081215a10690364eF352AA98d20",
+          "address": "0xe8BFaB95180CAAAB795cdD5c2d5Dd4F35bF3f181",
           "abi": [
             {
               "inputs": [],
@@ -86957,7 +86957,7 @@
           ]
         },
         "JPEGZ": {
-          "address": "0x17582E17C2e06Bf1A7FE0Fd83f3cE6f4AF1DD218",
+          "address": "0x7E1bb2f2c2773490598b9E9bA592079dD73E788b",
           "abi": [
             {
               "inputs": [
@@ -87538,7 +87538,7 @@
           ]
         },
         "JPEGZOracle": {
-          "address": "0xc58328b0aaE23449CAC2f6157C2d0FAbF0408047",
+          "address": "0xDB0d2fd6d01B12c9444FBdf852A80E27966bA9C9",
           "abi": [
             {
               "inputs": [
@@ -88601,7 +88601,7 @@
           ]
         },
         "WETH": {
-          "address": "0xfe46F29B9fC3d83d09336dDe9195553aDb812A16",
+          "address": "0x2B5a9D411F631491CE71127B1600b26215C63C14",
           "abi": [
             {
               "anonymous": false,
@@ -88886,7 +88886,7 @@
           ]    
         },
         "WETHOracle": {
-          "address": "0xFE1f104F05c9d75005e2972b82817CAA0618a3BF",
+          "address": "0xaf26aA0F3b19D156499BdC26d3fAA88530024c31",
           "abi": [
             {
               "inputs": [
@@ -89127,7 +89127,7 @@
           ]
         },
         "WETHVaultHandler": {
-          "address": "0xC5806761dB5Ed00D44709fe1d7e6F4416B9C47f6",
+          "address": "0x6c913fa678C81c567A11EdF19E06bE758DBeFe2D",
           "abi": [
             {
               "inputs": [

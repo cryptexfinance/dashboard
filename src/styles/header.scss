@@ -156,6 +156,14 @@
     margin-top:-5px;
   }
 
+  .logout {
+    border: 0.5px solid $highlight;
+    width: auto;
+    height: 2.7rem;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+
   @media (max-width: 769px) {
     .address {
       font-size: 1rem;
