@@ -85056,7 +85056,7 @@
       "chainId": "421613",
       "contracts": {
         "DAI": {
-          "address": "0x7E574b5F8B61B71A6A1DA6127A9383F656d1a800",
+          "address": "0x630c6B571ba97081215a10690364eF352AA98d20",
           "abi": [
             {
               "inputs": [],
@@ -86957,7 +86957,7 @@
           ]
         },
         "JPEGZ": {
-          "address": "0xB091FCDE940d3303f7174C41e184AEDe3dd7AdBf",
+          "address": "0x17582E17C2e06Bf1A7FE0Fd83f3cE6f4AF1DD218",
           "abi": [
             {
               "inputs": [
@@ -87538,7 +87538,7 @@
           ]
         },
         "JPEGZOracle": {
-          "address": "0xB67AD4cd26B33Ec60EbA6718626FF76a41CC676F",
+          "address": "0xc58328b0aaE23449CAC2f6157C2d0FAbF0408047",
           "abi": [
             {
               "inputs": [
@@ -87779,7 +87779,7 @@
           ]
         },
         "TCAP": {
-          "address": "0xe2a460850caE5ee351608182B8534aA48545b590",
+          "address": "0x8a6d2Cf959dedAf4ba5aBd5A349f33D38782948A",
           "abi": [
             {
               "inputs": [
@@ -88360,7 +88360,7 @@
           ]
         },
         "TCAPOracle": {
-          "address": "0x67672B15FF09EBdc2e6e606FaB3B3be5cb84CAc2",
+          "address": "0x32a183C40721CF253E9F91b2c6411119aa09fCEf",
           "abi": [
             {
               "inputs": [
@@ -88601,7 +88601,7 @@
           ]
         },
         "WETH": {
-          "address": "0xE8bc5dD936A974808211C9c7A4F3020366Fd6B61",
+          "address": "0xfe46F29B9fC3d83d09336dDe9195553aDb812A16",
           "abi": [
             {
               "anonymous": false,
@@ -88886,7 +88886,7 @@
           ]    
         },
         "WETHOracle": {
-          "address": "0x59a47B0738203A65D085b2854EC7a22B6fee927D",
+          "address": "0xFE1f104F05c9d75005e2972b82817CAA0618a3BF",
           "abi": [
             {
               "inputs": [
@@ -89127,7 +89127,7 @@
           ]
         },
         "WETHVaultHandler": {
-          "address": "0xfA425b8bAf51E5ab840bC521AFfB1a5F7a7A8d80",
+          "address": "0xC5806761dB5Ed00D44709fe1d7e6F4416B9C47f6",
           "abi": [
             {
               "inputs": [
@@ -89149,6 +89149,11 @@
                 {
                   "internalType": "uint256",
                   "name": "_burnFee",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_mintFee",
                   "type": "uint256"
                 },
                 {
@@ -89325,6 +89330,25 @@
                 }
               ],
               "name": "NewMinimumTCAP",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "_owner",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "NewMintFee",
               "type": "event"
             },
             {
@@ -89821,7 +89845,26 @@
                   "type": "uint256"
                 }
               ],
-              "name": "getFee",
+              "name": "getBurnFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "fee",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getMintFee",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -90100,7 +90143,20 @@
               ],
               "name": "mint",
               "outputs": [],
-              "stateMutability": "nonpayable",
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "mintFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -90322,6 +90378,19 @@
                 }
               ],
               "name": "setMinimumTCAP",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "setMintFee",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"

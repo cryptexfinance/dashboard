@@ -109,6 +109,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [removeCollateralUSD, setRemoveCollateralUSD] = useState("0");
   const [mintTxt, setMintTxt] = useState("0");
   const [mintUSD, setMintUSD] = useState("0");
+  const [mintFee, setMintFee] = useState("0");
   const [burnTxt, setBurnTxt] = useState("0");
   const [burnUSD, setBurnUSD] = useState("0");
   const [burnFee, setBurnFee] = useState("0");
@@ -333,8 +334,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const isGasAsset = () =>
-    (!isPolygon(currentNetwork.chainId) && vaultData.collateralSymbol === "ETH") ||
-    (isPolygon(currentNetwork.chainId) && vaultData.collateralSymbol === "MATIC");
+    (!isPolygon(currentNetwork.chainId) && vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) ||
+    (isPolygon(currentNetwork.chainId) && vaultData.collateralSymbol === TOKENS_SYMBOLS.MATIC);
 
   const refresh = async () => {
     try {
@@ -391,6 +392,27 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       setVaultRatio("0");
       setVaultStatus(t("vault.status.error"));
     }
+  };
+
+  // Mint, Burn fees
+  const calculateMintFee = async (amount: string) => {
+    const currentMintFee = await currentVault?.getMintFee(ethers.utils.parseEther(amount));
+    const increasedFee = currentMintFee.add(currentMintFee.div(100)).toString();
+
+    return increasedFee;
+  };
+
+  const calculateBurnFee = async (amount: string) => {
+    let increasedFee = BigNumber.from("0");
+    if (!isArbitrum(currentNetwork.chainId)) {
+      const currentBurnFee = await currentVault?.getFee(ethers.utils.parseEther(amount));
+      increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+    } else {
+      const currentBurnFee = await currentVault?.getBurnFee(ethers.utils.parseEther(amount));
+      increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+    }
+
+    return increasedFee;
   };
 
   // forms
@@ -498,6 +520,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       );
       changeVault(r);
       setMintUSD(usd.toString());
+
+      if (isArbitrum(currentNetwork.chainId)) {
+        const increasedFee = await calculateMintFee(event.target.value);
+        const ethFee = ethers.utils.formatEther(increasedFee);
+        setMintFee(ethFee.toString());
+      }
     } else {
       changeVault(0, false);
       setMintUSD("0");
@@ -535,10 +563,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         );
         changeVault(r);
         setBurnUSD(usd.toString());
-        const currentBurnFee = await currentVault?.getFee(
-          ethers.utils.parseEther(event.target.value)
-        );
-        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+
+        const increasedFee = await calculateBurnFee(event.target.value);
         const ethFee = ethers.utils.formatEther(increasedFee);
         setBurnFee(ethFee.toString());
       } else {
@@ -691,14 +717,23 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setLoadingMax(false);
   };
 
-  const mintTCAP = async () => {
+  const mintIndex = async () => {
     if (mintTxt && parseFloat(mintTxt) > 0) {
       if (isMinRequiredTcap(parseFloat(mintTxt), true)) {
         setBtnDisabled(true);
         try {
           const amount = ethers.utils.parseEther(mintTxt);
-          const tx = await currentVault?.mint(amount);
-          notifyUser(tx, refresh);
+          if (!isArbitrum(currentNetwork.chainId)) {
+            const tx = await currentVault?.mint(amount);
+            notifyUser(tx, refresh);
+          } else {
+            const increasedFee = await calculateBurnFee(mintTxt);
+            const ethFee = ethers.utils.formatEther(increasedFee);
+            setMintFee(ethFee.toString());
+            console.log("ethFee:", ethFee);
+            const tx = await currentVault?.mint(amount, { value: BigNumber.from(increasedFee) });
+            notifyUser(tx, refresh);
+          }
         } catch (error) {
           console.error(error);
           if (error.code === 4001) {
@@ -718,7 +753,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
   };
 
-  const safeMintTCAP = async (e: React.MouseEvent) => {
+  const safeMintIndex = async (e: React.MouseEvent) => {
     e.preventDefault();
     setLoadingMax(true);
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
@@ -736,6 +771,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     if (!usd) {
       usd = 0;
     }
+
+    if (isArbitrum(currentNetwork.chainId)) {
+      const increasedFee = await calculateMintFee(safeMint.toString());
+      const ethFee = ethers.utils.formatEther(increasedFee);
+      setMintFee(ethFee.toString());
+    }
+
     const newDebt = safeMint + parseFloat(vaultDebt);
     const r = await getRatio(vaultCollateral, currentPrice, newDebt.toString(), currentAssetPrice);
     changeVault(r);
@@ -743,13 +785,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setLoadingMax(false);
   };
 
-  const burnTCAP = async () => {
+  const burnIndex = async () => {
     if (burnTxt && parseFloat(burnTxt) > 0) {
       const amount = ethers.utils.parseEther(burnTxt);
       setBtnDisabled(true);
       try {
-        const currentBurnFee = await currentVault?.getFee(amount);
-        const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+        const increasedFee = await calculateBurnFee(burnTxt);
         const ethFee = ethers.utils.formatEther(increasedFee);
 
         setBurnFee(ethFee.toString());
@@ -772,7 +813,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
   };
 
-  const maxBurnTCAP = async (e: React.MouseEvent) => {
+  const maxBurnIndex = async (e: React.MouseEvent) => {
     e.preventDefault();
     setLoadingMax(true);
     const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
@@ -806,8 +847,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setBurnUSD(usd.toString());
 
     if (balanceFormat !== "0") {
-      const currentBurnFee = await currentVault?.getFee(balance);
-      const increasedFee = currentBurnFee.add(currentBurnFee.div(100)).toString();
+      const increasedFee = await calculateBurnFee(balance);
       const ethFee = ethers.utils.formatEther(increasedFee);
       setBurnFee(ethFee.toString());
     } else {
@@ -897,6 +937,38 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Form.Group>
   );
 
+  const BurnFeeLabel = (className: string, isBurning: boolean) => (
+    <OverlayTrigger
+      key="top"
+      placement="top"
+      trigger={["hover", "click"]}
+      overlay={
+        <Tooltip id="ttip-status" className="ttip-hard-vault">
+          {isBurning ? (
+            <>
+              {t("vault.debt.fee")}: {burnFee}
+            </>
+          ) : (
+            <>Mint Fee: {mintFee}</>
+          )}
+          {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
+        </Tooltip>
+      }
+    >
+      <div className={className}>
+        <span>{isBurning ? <>{t("vault.debt.fee")}:</> : "Mint Fee: "}</span>
+        <NumberFormat
+          className="number neon-pink"
+          value={isBurning ? burnFee : mintFee}
+          displayType="text"
+          thousandSeparator
+          decimalScale={4}
+        />{" "}
+        <span>{isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}</span>
+      </div>
+    </OverlayTrigger>
+  );
+
   const MintAsset = () => (
     <Form.Group className="form-group mint">
       <InputGroup>
@@ -909,7 +981,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           onFocus={onFocusMint}
           onBlur={onBlurMint}
         />
-        <Button id="btn-mint-tcap" className="neon-green" onClick={mintTCAP} disabled={btnDisabled}>
+        <Button
+          id="btn-mint-tcap"
+          className="neon-green"
+          onClick={mintIndex}
+          disabled={btnDisabled}
+        >
           <>{t("mint")}</>
         </Button>
       </InputGroup>
@@ -923,36 +1000,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           decimalScale={2}
         />
       </Form.Text>
+      {BurnFeeLabel("burn-fee2", false)}
     </Form.Group>
-  );
-
-  const BurnFeeLabel = (className: string) => (
-    <OverlayTrigger
-      key="top"
-      placement="top"
-      trigger={["hover", "click"]}
-      overlay={
-        <Tooltip id="ttip-status" className="ttip-hard-vault">
-          <>
-            {t("vault.debt.fee")}: {burnFee} {isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}
-          </>
-        </Tooltip>
-      }
-    >
-      <div className={className}>
-        <span>
-          <>{t("vault.debt.fee")}:</>
-        </span>
-        <NumberFormat
-          className="number neon-pink"
-          value={burnFee}
-          displayType="text"
-          thousandSeparator
-          decimalScale={4}
-        />{" "}
-        <span>{isPolygon(currentNetwork.chainId) ? "MATIC" : "ETH"}</span>
-      </div>
-    </OverlayTrigger>
   );
 
   const BurnAsset = () => (
@@ -967,7 +1016,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           onFocus={onFocusBurn}
           onBlur={onBlurBurn}
         />
-        <Button className="neon-orange" onClick={burnTCAP} disabled={btnDisabled}>
+        <Button className="neon-orange" onClick={burnIndex} disabled={btnDisabled}>
           <>{t("burn")}</>
         </Button>
       </InputGroup>
@@ -981,7 +1030,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           decimalScale={2}
         />
       </Form.Text>
-      {BurnFeeLabel("burn-fee2")}
+      {BurnFeeLabel("burn-fee2", true)}
     </Form.Group>
   );
 
@@ -1022,13 +1071,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
     if (activeAction === "mint") {
       return (
-        <Button className="btn-max number" onClick={safeMintTCAP}>
+        <Button className="btn-max number" onClick={safeMintIndex}>
           <>{t("max-safe")}</>
         </Button>
       );
     }
     return (
-      <Button className="btn-max number orange" onClick={maxBurnTCAP}>
+      <Button className="btn-max number orange" onClick={maxBurnIndex}>
         <>{t("max")}</>
       </Button>
     );
@@ -1313,7 +1362,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                             <MaxButton />
                           </div>
                         </div>
-                        {activeAction === actions[3] && BurnFeeLabel("burn-fee")}
+                        {activeAction === actions[2] &&
+                          isArbitrum(currentNetwork.chainId) &&
+                          BurnFeeLabel("burn-fee", false)}
+                        {activeAction === actions[3] && BurnFeeLabel("burn-fee", true)}
                       </div>
                       <Form className="vault-controls">{ActionControls()}</Form>
                     </div>
@@ -1325,7 +1377,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                         <div className="amount">
                           <h4 className=" ml-2 number neon-highlight">
                             <NumberFormat
-                              className="number ratio neon-blue"
+                              className={`number ratio ${vaultStatus}`}
                               value={vaultRatio}
                               displayType="text"
                               thousandSeparator

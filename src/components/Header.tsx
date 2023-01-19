@@ -6,10 +6,8 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
-import { ethers } from "ethers";
 import Davatar from "@davatar/react";
-import NumberFormat from "react-number-format";
-import { networkContext, signerContext, tokensContext, Web3ModalContext } from "../state";
+import { networkContext, signerContext, Web3ModalContext } from "../state";
 import {
   makeShortAddress,
   getENS,
@@ -19,7 +17,6 @@ import {
   isArbitrum,
 } from "../utils/utils";
 import { NETWORKS, FEATURES } from "../utils/constants";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
@@ -36,11 +33,9 @@ const Header = ({ signerAddress, isMobile }: props) => {
   const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(signerContext);
-  const tokens = useContext(tokensContext);
   const currentNetwork = useContext(networkContext);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
-  const [tokenBalance, setTokenBalance] = useState("0.0");
   // const [language, setLanguage] = useState("EN");
   const [loading, setLoading] = useState(false);
 
@@ -142,28 +137,14 @@ const Header = ({ signerAddress, isMobile }: props) => {
   useEffect(() => {
     const loadAddress = async () => {
       setLoading(true);
-      if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
-        const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
-        const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
-        tokens.tcapToken.on(filterMint, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
-          setTokenBalance(ethers.utils.formatEther(currentBalance));
-        });
-
-        tokens.tcapToken.on(filterBurn, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
-          setTokenBalance(ethers.utils.formatEther(currentBalance));
-        });
+      if (signerAddress !== "" && signer.signer) {
         const ens = await getENS(signerAddress);
         if (ens) {
           setAddressField(ens);
         } else {
           setAddressField(makeShortAddress(signerAddress));
         }
-
         setAddress(signerAddress);
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
-        setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
         setLoading(false);
       }
       /* let lng = localStorage.getItem("language");
@@ -304,17 +285,6 @@ const Header = ({ signerAddress, isMobile }: props) => {
             </div>
           )}
           <div className="info">
-            <TcapIcon className="tcap-neon" />
-            <h5>
-              <NumberFormat
-                className="number mx-2 neon-pink"
-                value={tokenBalance}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={2}
-              />
-            </h5>
             <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
             <h5 className="ml-2">
               <OverlayTrigger

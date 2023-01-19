@@ -228,21 +228,11 @@
         .status {
           text-align: left; 
         }
-        .collateral, .collateral-usd, .debt-usd, .ratio {
+        .collateral, .collateral-usd, .debt, .debt-usd, .ratio {
           text-align: right;
         }
         .collateral {
           padding-right: 40px;    
-        }
-        .debt {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: flex-end; 
-          .tcap, .jpegz-icon {
-            width: 30px;
-            margin-right: 10px;
-          }
         }
         .sort {
           background-color: transparent;
@@ -283,6 +273,18 @@
           svg {
             flex: 1;
             height: 25px;
+          }
+        }
+        .debt {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-end;
+        
+          .tcap,
+          .jpegz {
+            width: 30px;
+            margin-left: 10px;
           }
         }
         .ratio {
@@ -413,10 +415,11 @@
     .number {
       color: $white;
       text-shadow: 0 0 4px #f195f9,0 0 10px #fff,0 0 20px #e440f2,0 -10px 40px #b626c4;
+      margin-bottom: 8px;
     }
-    .tcap-icon {
-      width: 25px;
-      margin-left: 7px;
+    .tcap, .jpegz {
+      width: 30px;
+      margin-left: 10px;
     }
   }
   .card-header {

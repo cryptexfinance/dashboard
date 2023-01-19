@@ -147,7 +147,6 @@
   .summary { 
     flex: 1;
     margin-left: 1rem;
-    height: 100%;
     width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -256,17 +255,25 @@
       margin: 3.7rem 50%;
     }
     .detail {
-      grid-template-columns: 100%;
+      grid-template-columns: 50% 50%;
       .staked {
         .value {
           display: flex;
+          flex-direction: column;
 
           &-separator {
+            display: none;
             margin: 0px 15px;
           }
         }
+        h6 {
+          margin-top: 0.35rem;
+        }
         .number {
           margin-bottom: 0rem;
+        }
+        .number.neon-green {
+          margin-bottom: 0.45rem;
         }
       }
     }

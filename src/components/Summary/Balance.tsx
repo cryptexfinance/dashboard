@@ -9,7 +9,7 @@ import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { BalancesType, OraclePricesType } from "../../hooks/types";
 import { ethereumContext } from "../../state";
 import { getPriceInUSDFromPair, isArbitrum, isInLayer1 } from "../../utils/utils";
-import { NETWORKS } from "../../utils/constants";
+import { NETWORKS, TOKENS_SYMBOLS } from "../../utils/constants";
 import { VaultsWarning } from "./warnings/index";
 
 type props = {
@@ -22,17 +22,18 @@ type props = {
 
 const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, prices }: props) => {
   // const { t } = useTranslation();
-  const currentIndexName = isArbitrum(currentChainId) ? "JPEGz" : "TCAP";
+  const currentIndexName = isArbitrum(currentChainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
   const ethereumContracts = useContext(ethereumContext);
   const [loading, setLoading] = useState(true);
   const [indexBalance, setIndexBalance] = useState("0.0");
   const [ctxBalance, setCtxBalance] = useState("0.0");
   const [indexUsdBalance, setIndexUsdBalance] = useState("0.0");
   const [ctxUsdBalance, setCtxUsdBalance] = useState("0.0");
+  const [indexPrice, setIndexPrice] = useState("0.0");
+  const [ctxPrice, setCtxPrice] = useState("0.0");
 
   const loadData = async () => {
     if (ethCallProvider) {
-      console.log("Entra: ");
       let currentPriceCTX = 0;
       if (signerAddress === "" || currentChainId === NETWORKS.mainnet.chainId) {
         const reservesCtxPoolCall = await ethereumContracts.ctxPoolTokenRead?.getReserves();
@@ -49,9 +50,11 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
       if (isArbitrum(currentChainId)) {
         indexUSD = parseFloat(balances.jpegzBalance) * parseFloat(prices.jpegzOraclePrice);
         setIndexBalance(balances.jpegzBalance);
+        setIndexPrice(prices.jpegzOraclePrice);
       } else {
         indexUSD = parseFloat(balances.tcapBalance) * parseFloat(prices.tcapOraclePrice);
         setIndexBalance(balances.tcapBalance);
+        setIndexPrice(prices.tcapOraclePrice);
       }
       if (indexUSD < 0.0001) {
         setIndexUsdBalance("0.0");
@@ -63,6 +66,7 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
         setCtxBalance(balances.ctxBalance);
         const ctxUSD = parseFloat(balances.ctxBalance) * currentPriceCTX;
         setCtxUsdBalance(ctxUSD.toString());
+        setCtxPrice(currentPriceCTX.toFixed(8));
       }
     }
   };
@@ -120,13 +124,13 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
                 </div>
               </div>
             </div>
-            {/* <div className="totals">
+            <div className="totals">
               <IndexIcon />
               <div className="staked">
-                <h6>{currentIndexName} USD Balance</h6>
+                <h6>{currentIndexName} Oracle Price</h6>
                 <h5 className="number neon-blue">
                   <NumberFormat
-                    value={indexUsdBalance}
+                    value={indexPrice}
                     displayType="text"
                     thousandSeparator
                     decimalScale={2}
@@ -134,7 +138,7 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
                   />
                 </h5>
               </div>
-            </div> */}
+            </div>
             {isInLayer1(currentChainId) && (
               <>
                 <div className="totals">
@@ -144,7 +148,7 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
                       <>{t("welcome.ctx-balance")}</>
                     </h6> */}
                     <div className="value">
-                      <h5 className="number neon-blue">
+                      <h5 className="number neon-green">
                         <NumberFormat
                           value={ctxBalance}
                           displayType="text"
@@ -166,13 +170,13 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
                     </div>
                   </div>
                 </div>
-                {/* <div className="totals">
+                <div className="totals">
                   <CtxIcon className="h24" />
                   <div className="staked">
-                    <h6>CTX USD Balance</h6>
+                    <h6>CTX Price</h6>
                     <h5 className="number neon-blue">
                       <NumberFormat
-                        value={ctxUsdBalance}
+                        value={ctxPrice}
                         displayType="text"
                         thousandSeparator
                         decimalScale={2}
@@ -180,7 +184,7 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
                       />
                     </h5>
                   </div>
-                </div> */}
+                </div>
               </>
             )}
           </div>

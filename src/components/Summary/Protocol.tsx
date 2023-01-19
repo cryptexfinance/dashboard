@@ -247,7 +247,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
               <h6>
                 <>{t("welcome.summary.staked-usd")}</>
               </h6>
-              <h5 className="number neon-green">
+              <h5 className="number neon-blue">
                 <NumberFormat
                   value={TotalStake}
                   displayType="text"
@@ -265,7 +265,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-eth")}</>
                 </h6>
-                <h5 className="number neon-highlight">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={ethStake}
                     displayType="text"
@@ -282,7 +282,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
               <h6>
                 <>{t("welcome.summary.staked-dai")}</>
               </h6>
-              <h5 className="number neon-orange">
+              <h5 className="number neon-green">
                 <NumberFormat
                   value={daiStake}
                   displayType="text"
@@ -299,7 +299,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-aave")}</>
                 </h6>
-                <h5 className="number neon-highlight">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={aaveStake}
                     displayType="text"
@@ -317,7 +317,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-link")}</>
                 </h6>
-                <h5 className="number neon-highlight">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={linkStake}
                     displayType="text"
@@ -336,7 +336,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                   <h4>
                     <>{t("welcome.summary.staked-uni")}</>
                   </h4>
-                  <h5 className="number neon-highlight">
+                  <h5 className="number neon-green">
                     <NumberFormat
                       value={uniStake}
                       displayType="text"
@@ -371,7 +371,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-matic")}</>
                 </h6>
-                <h5 className="number neon-blue">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={maticStake}
                     displayType="text"
@@ -389,7 +389,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-wbtc")}</>
                 </h6>
-                <h5 className="number neon-blue">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={wbtcStake}
                     displayType="text"
@@ -407,7 +407,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
                 <h6>
                   <>{t("welcome.summary.staked-usdc")}</>
                 </h6>
-                <h5 className="number neon-blue">
+                <h5 className="number neon-green">
                   <NumberFormat
                     value={usdcStake}
                     displayType="text"

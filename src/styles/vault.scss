@@ -178,8 +178,9 @@
           height: 23px;
           margin-right: 5px;
         }
-        .tcap {
+        .tcap, .jpegz {
           width: 30px;
+          margin-right: 7px;
         }
       }
 
@@ -379,7 +380,7 @@
     width: 100%;
     background-color: transparent;
 
-    svg.tcap {
+    svg.tcap, svg.jpegz {
       width: 23px;
       height: 23px;
     }
@@ -503,7 +504,6 @@
       padding: 2rem 1.5rem;
       margin-bottom: 1rem;
       
-
       h6 {
         color: $white;
         margin: 0px;

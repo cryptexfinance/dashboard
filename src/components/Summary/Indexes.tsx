@@ -90,7 +90,7 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
               <h6>
                 <>{t("welcome.tcap")}</>
               </h6>
-              <h5 className="number neon-green">
+              <h5 className="number neon-blue">
                 <NumberFormat
                   value={marketCap}
                   displayType="text"

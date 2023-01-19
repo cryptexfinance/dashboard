@@ -7,7 +7,6 @@ import { useLazyQuery, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import "../../../styles/vault-monitoring.scss";
 import { VaultPagination } from "./Pagination";
-import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { signerContext, hardVaultsContext, networkContext, vaultsContext } from "../../../state";
 import { Vaults } from "./Vaults";
 import { usePrices, useRatios } from "../../../hooks";
@@ -663,6 +662,13 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     });
   };
 
+  const IndexIcon = () => {
+    if (!isArbitrum(currentNetwork.chainId)) {
+      return <TokenIcon name={TOKENS_SYMBOLS.TCAP} />;
+    }
+    return <TokenIcon name={TOKENS_SYMBOLS.JPEGz} />;
+  };
+
   return (
     <div className="vault-monitoring">
       <Row className="card-wrapper">
@@ -694,7 +700,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                     <h6>
                       <>{t("debt")}</>
                     </h6>
-                    <TcapIcon className="tcap-icon" />
+                    <IndexIcon />
                   </div>
                   <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
                 </Col>

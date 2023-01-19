@@ -1,12 +1,10 @@
 import React, { useContext, useState } from "react";
-import { Button, Image } from "react-bootstrap/esm";
+import { Button } from "react-bootstrap/esm";
 import Table from "react-bootstrap/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import { useTranslation } from "react-i18next";
-import jpegzIcon from "../../../assets/images/jpegz-coin.png";
-import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as SortIcon } from "../../../assets/images/sort.svg";
 import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg";
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
@@ -204,9 +202,9 @@ export const Vaults = ({
 
   const IndexIcon = () => {
     if (!isArbitrum(currentNetwork.chainId)) {
-      return <TcapIcon className="tcap" />;
+      return <TokenIcon name={TOKENS_SYMBOLS.TCAP} />;
     }
-    return <Image className="jpegz-icon" src={jpegzIcon} alt="JPEGz icon" />;
+    return <TokenIcon name={TOKENS_SYMBOLS.JPEGz} />;
   };
 
   return (
@@ -250,7 +248,6 @@ export const Vaults = ({
             </th>
             <th>
               <div className="debt">
-                <IndexIcon />
                 <span>
                   <>{t("debt")}</>
                 </span>
@@ -327,6 +324,7 @@ export const Vaults = ({
                     >
                       <span className="number">{numberFormatStr(v.debt, 4, 4)}</span>
                     </OverlayTrigger>
+                    <IndexIcon />
                   </div>
                 </td>
                 <td>

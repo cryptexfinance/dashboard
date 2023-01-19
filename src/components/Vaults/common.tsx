@@ -1,6 +1,8 @@
 import React from "react";
+import { Image } from "react-bootstrap/esm";
 import { TOKENS_SYMBOLS } from "../../utils/constants";
-import { OraclePricesType, VaultsRatioType, VaultsType } from "./types";
+import { VaultsRatioType, VaultsType } from "./types";
+import { OraclePricesType } from "../../hooks/types";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import { ReactComponent as DAIIcon } from "../../assets/images/graph/DAI.svg";
 import { ReactComponent as AAVEIcon } from "../../assets/images/graph/aave.svg";
@@ -20,6 +22,7 @@ import { ReactComponent as MATICIconSmall } from "../../assets/images/vault/poly
 import { ReactComponent as WBTCIconSmall } from "../../assets/images/vault/bitcoin.svg";
 import { ReactComponent as USDCIconSmall } from "../../assets/images/vault/usdc.svg";
 import { ReactComponent as TCAPIcon } from "../../assets/images/tcap-coin.svg";
+import jpegzIcon from "../../assets/images/jpegz-coin.png";
 
 type iconProps = {
   name: string;
@@ -140,58 +143,62 @@ export const VAULT_STATUS = {
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const TokenIcon = ({ name }: iconProps) => {
-  switch (name.toLowerCase()) {
-    case "eth":
-      return <WETHIcon className="eth" />;
-    case "weth":
-      return <WETHIcon className="eth" />;
-    case "dai":
-      return <DAIIcon className="dai" />;
-    case "aave":
+  switch (name.toUpperCase()) {
+    case TOKENS_SYMBOLS.AAVE:
       return <AAVEIcon className="aave" />;
-    case "link":
+    case TOKENS_SYMBOLS.DAI:
+      return <DAIIcon className="dai" />;
+    case TOKENS_SYMBOLS.ETH:
+      return <WETHIcon className="eth" />;
+    case TOKENS_SYMBOLS.JPEGz.toUpperCase():
+      return <Image className="jpegz" src={jpegzIcon} alt="JPEGz icon" />;
+    case TOKENS_SYMBOLS.LINK:
       return <LINKIcon className="link" />;
-    case "uni":
-      return <UNIIcon className="uni" />;
-    case "snx":
-      return <SNXIcon className="snx" />;
-    case "matic":
+    case TOKENS_SYMBOLS.MATIC:
       return <MATICIcon className="matic" />;
-    case "wbtc":
-      return <WBTCIcon className="wbtc" />;
-    case "tcap":
+    case TOKENS_SYMBOLS.SNX:
+      return <SNXIcon className="snx" />;
+    case TOKENS_SYMBOLS.TCAP:
       return <TCAPIcon className="tcap" />;
-    case "usdc":
+    case TOKENS_SYMBOLS.UNI:
+      return <UNIIcon className="uni" />;
+    case TOKENS_SYMBOLS.USDC:
       return <USDCIcon className="usdc" />;
+    case TOKENS_SYMBOLS.WBTC:
+      return <WBTCIcon className="wbtc" />;
+    case TOKENS_SYMBOLS.WETH:
+      return <WETHIcon className="eth" />;
     default:
       return <></>;
   }
 };
 
 export const TokenIconSmall = ({ name }: iconProps) => {
-  switch (name.toLowerCase()) {
-    case "eth":
-      return <WETHIconSmall className="eth small" />;
-    case "weth":
-      return <WETHIconSmall className="eth small" />;
-    case "dai":
-      return <DAIIconSmall className="dai small" />;
-    case "aave":
+  switch (name.toUpperCase()) {
+    case TOKENS_SYMBOLS.AAVE:
       return <AAVEIconSmall className="aave small" />;
-    case "link":
+    case TOKENS_SYMBOLS.DAI:
+      return <DAIIconSmall className="dai small" />;
+    case TOKENS_SYMBOLS.ETH:
+      return <WETHIconSmall className="eth small" />;
+    case TOKENS_SYMBOLS.JPEGz.toUpperCase():
+      return <Image className="jpegz-icon small" src={jpegzIcon} alt="JPEGz icon" />;
+    case TOKENS_SYMBOLS.LINK:
       return <LINKIconSmall className="link small" />;
-    case "uni":
-      return <UNIIconSmall className="uni small" />;
-    case "snx":
-      return <SNXIconSmall className="snx small" />;
-    case "matic":
+    case TOKENS_SYMBOLS.MATIC:
       return <MATICIconSmall className="matic small" />;
-    case "wbtc":
-      return <WBTCIconSmall className="wbtc small" />;
-    case "tcap":
+    case TOKENS_SYMBOLS.SNX:
+      return <SNXIconSmall className="snx small" />;
+    case TOKENS_SYMBOLS.TCAP:
       return <TCAPIcon className="tcap small" />;
-    case "usdc":
+    case TOKENS_SYMBOLS.UNI:
+      return <UNIIconSmall className="uni small" />;
+    case TOKENS_SYMBOLS.USDC:
       return <USDCIconSmall className="eth small" />;
+    case TOKENS_SYMBOLS.WBTC:
+      return <WBTCIconSmall className="wbtc small" />;
+    case TOKENS_SYMBOLS.WETH:
+      return <WETHIconSmall className="eth small" />;
     default:
       return <></>;
   }
