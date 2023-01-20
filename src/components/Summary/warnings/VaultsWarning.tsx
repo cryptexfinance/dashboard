@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Spinner } from "react-bootstrap/esm/";
 import { FaArrowRight } from "react-icons/fa";
 import { ethers } from "ethers";
@@ -6,8 +6,9 @@ import { useHistory } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import { useRatios } from "../../../hooks";
 import { OraclePricesType } from "../../../hooks/types";
+import { networkContext } from "../../../state";
 import { getCollateralPrice, getMinRatio } from "../../Vaults/common";
-import { getRatio2, isUndefined } from "../../../utils/utils";
+import { getRatio2, isArbitrum, isUndefined } from "../../../utils/utils";
 
 type props = {
   ownerAddress: string;
@@ -17,6 +18,7 @@ type props = {
 export const VaultsWarning = ({ ownerAddress, prices }: props) => {
   const history = useHistory();
   const ratios = useRatios();
+  const currentNetwork = useContext(networkContext);
   const [loadingVaults, setLoadingVaults] = useState(false);
   const [liquidableVaults, setLiquidableVaults] = useState(0);
 
@@ -52,13 +54,10 @@ export const VaultsWarning = ({ ownerAddress, prices }: props) => {
     const debtText = ethers.utils.formatEther(debtWei);
     const collateralPrice = getCollateralPrice(prices, symbol);
     const minRatio = getMinRatio(ratios, symbol, isHardVault);
-
-    const ratio = getRatio2(
-      collateralText,
-      collateralPrice,
-      debtText,
-      prices.tcapOraclePrice || "1"
-    );
+    const indexPrice = !isArbitrum(currentNetwork.chainId)
+      ? prices.tcapOraclePrice
+      : prices.jpegzOraclePrice;
+    const ratio = getRatio2(collateralText, collateralPrice, debtText, indexPrice || "1");
 
     return ratio < minRatio;
   };
@@ -77,7 +76,6 @@ export const VaultsWarning = ({ ownerAddress, prices }: props) => {
         v.hardVault,
         cVaultDecimals
       );
-      console.log("isLiquidable: ", isLiquidable);
       if (isLiquidable) {
         liqVaults += 1;
       }
