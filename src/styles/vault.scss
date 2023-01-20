@@ -535,6 +535,10 @@
           color: $white;
           text-shadow: 0px 4px 13px rgba(223, 33, 254, 0.8);
         }
+
+        &-value:hover {
+          cursor: pointer;
+        }
       }
     }
 

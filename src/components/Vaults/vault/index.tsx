@@ -80,16 +80,15 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [refreshVault, setRefreshVault] = useState(false);
 
   // Vault Data
-  // Vault Data
   const [assetOptions, setAssetOptions] = useState<Array<string>>([]);
   const [collateralOptions, setCollateralOptions] = useState<Array<string>>([]);
 
   const [currentVaultId, setCurrentVaultId] = useState("0");
   const [isApproved, setIsApproved] = useState(false);
   const [vaultDebt, setVaultDebt] = useState("0");
-  //  const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
+  const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
   const [vaultCollateral, setVaultCollateral] = useState("0");
-  // const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
+  const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [tempRatio, setTempRatio] = useState("");
   const [minRatio, setMinRatio] = useState("0");
@@ -97,9 +96,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   // General Data
   const isHardMode = () => vaultMode === "hard";
-  const [assetBalance, setAssetBalance] = useState("0");
-  // const [tokenBalanceUSD, setTokenBalanceUSD] = useState("0");
-  const [tokenBalance, setTokenBalance] = useState("0");
+  const [indexBalance, setIndexBalance] = useState("0");
+  const [indexBalanceUSD, setIndexBalanceUSD] = useState("0");
+  const [collateralBalance, setCollateralBalance] = useState("0");
+  const [collateralBalanceUSD, setCollateralBalanceUSD] = useState("0");
   const [tokenBalanceDecimals, setTokenBalanceDecimals] = useState(2);
 
   // Inputs
@@ -163,7 +163,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   async function loadVault() {
     setIsLoading(true);
-    let balance;
+    let cBalance;
+    let iBalance;
+    let currentIndexPrice = "0";
+    let currentCollateralPrice = "0";
     const provider = getDefaultProvider(currentNetwork.chainId || NETWORKS.mainnet.chainId);
     let currentVaultData: any;
     // @ts-ignore
@@ -181,9 +184,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
     if (vaultData.collateralSymbol !== TOKENS_SYMBOLS.ETH) {
       // @ts-ignore
-      balance = await currentCollateral.balanceOf(currentAddress);
+      cBalance = await currentCollateral.balanceOf(currentAddress);
     } else {
-      balance = await provider.getBalance(currentAddress);
+      cBalance = await provider.getBalance(currentAddress);
     }
 
     let decimals = 18;
@@ -206,29 +209,37 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       const currentRatioCall = await currentVaultRead.getVaultRatio(currentVaultData.vaultId);
 
       // @ts-ignore
-      // const currentAssetPriceCall = await currentAssetOracleRead?.getLatestAnswer();
+      const currentIndexPriceCall = await currentAssetOracleRead?.getLatestAnswer();
       // @ts-ignore
       //  const decimalsCall = await currentCollateralRead.decimals();
       // @ts-ignore
-      // const currentCollateralPriceCall = await currentCollateralOracleRead.getLatestAnswer();
+      const currentCollateralPriceCall = await currentCollateralOracleRead.getLatestAnswer();
       // @ts-ignore
       const currentMinRatioCall = await currentVaultRead.ratio();
       // @ts-ignore
-      const currentAssetBalanceCall = await currentAssetRead?.balanceOf(currentAddress);
+      const currentIndexBalanceCall = await currentAssetRead?.balanceOf(currentAddress);
 
       // @ts-ignore
-      const [allowance, currentRatio, currentMinRatio, currentAssetBalance] =
-        await signer.ethcallProvider?.all([
-          allowanceCall,
-          currentRatioCall,
-          // currentAssetPriceCall,
-          currentMinRatioCall,
-          currentAssetBalanceCall,
-        ]);
-      // currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
+      const [
+        allowance,
+        currentRatio,
+        currentMinRatio,
+        currentIndexBalance,
+        currentIndexPriceVal,
+        currentCollateralPriceVal,
+      ] = await signer.ethcallProvider?.all([
+        allowanceCall,
+        currentRatioCall,
+        currentMinRatioCall,
+        currentIndexBalanceCall,
+        currentIndexPriceCall,
+        currentCollateralPriceCall,
+      ]);
+      currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+      currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
 
-      const cBalance = ethers.utils.formatUnits(currentAssetBalance, 18);
-      setAssetBalance(cBalance);
+      iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
+      setIndexBalance(iBalance);
 
       if (!allowance.isZero() || vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
         const safeValue = isHardMode() ? 20 : 50;
@@ -249,14 +260,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
         const parsedCollateral = ethers.utils.formatUnits(collateral, decimals);
         setVaultCollateral(parsedCollateral);
-        // const usdCollateral = toUSD(currentCollateralPrice, parsedCollateral);
-        // setVaultCollateralUSD(usdCollateral.toString());
+        const usdCollateral = toUSD(currentCollateralPrice, parsedCollateral);
+        setVaultCollateralUSD(usdCollateral.toString());
 
-        // const currentAssetPriceFormat = ethers.utils.formatEther(currentAssetPrice);
         const parsedDebt = ethers.utils.formatEther(debt);
         setVaultDebt(parsedDebt);
-        // const usdAsset = toUSD(currentAssetPriceFormat, parsedDebt);
-        // setVaultDebtUSD(usdAsset.toString());
+        const usdIndex = toUSD(currentIndexPrice, parsedDebt);
+        setVaultDebtUSD(usdIndex.toString());
       } else {
         setText(t("vault.approve-text", { asset: "Index" }));
         setTitle(t("vault.approve"));
@@ -266,19 +276,23 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       // @ts-ignore
       //  const decimalsCall = await currentCollateralRead.decimals();
       // @ts-ignore
-      // const currentPriceCall = await currentCollateralOracleRead.getLatestAnswer();
+      const currentPriceCall = await currentCollateralOracleRead.getLatestAnswer();
       // @ts-ignore
-      const currentAssetBalanceCall = await currentAssetRead?.balanceOf(currentAddress);
+      const currentIndexBalanceCall = await currentAssetRead?.balanceOf(currentAddress);
+      // @ts-ignore
+      const currentIndexPriceCall = await currentAssetOracleRead?.getLatestAnswer();
 
       // @ts-ignore
-      const [currentAssetBalance] = await signer.ethcallProvider?.all([
-        // currentPriceCall,
-        currentAssetBalanceCall,
-      ]);
-      // currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
-
-      const cBalance = ethers.utils.formatUnits(currentAssetBalance, 18);
-      setAssetBalance(cBalance);
+      const [currentCollateralPriceVal, currentIndexBalance, currentIndexPriceVal] =
+        await signer.ethcallProvider?.all([
+          currentPriceCall,
+          currentIndexBalanceCall,
+          currentIndexPriceCall,
+        ]);
+      currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
+      currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+      iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
+      setIndexBalance(iBalance);
 
       setText(t("vault.create-text", { asset: "Index" }));
       setTitle(t("vault.create"));
@@ -286,16 +300,18 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
 
     setSelectedVaultDecimals(decimals);
-    const currentBalance = ethers.utils.formatUnits(balance, decimals);
+    const currentBalance = ethers.utils.formatUnits(cBalance, decimals);
     if (parseFloat(currentBalance) < 0.09) {
       setTokenBalanceDecimals(4);
     } else {
       setTokenBalanceDecimals(2);
     }
-    setTokenBalance(currentBalance);
+    setCollateralBalance(currentBalance);
     setIsLoading(false);
-    // const usdBalance = toUSD(currentCollateralPrice, currentBalance);
-    // setTokenBalanceUSD(usdBalance.toString());
+    const iUsdBalance = toUSD(currentIndexPrice, iBalance);
+    const cUsdBalance = toUSD(currentCollateralPrice, currentBalance);
+    setIndexBalanceUSD(iUsdBalance.toString());
+    setCollateralBalanceUSD(cUsdBalance.toString());
   }
 
   useEffect(
@@ -1083,8 +1099,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     );
   };
 
-  const AssetBalance = (isCollateral: boolean) => {
-    const aBalance = isCollateral ? tokenBalance : assetBalance;
+  const RenderIndexBalance = (isCollateral: boolean) => {
+    const aBalance = isCollateral ? collateralBalance : indexBalance;
+    const aBalanceUSD = isCollateral ? collateralBalanceUSD : indexBalanceUSD;
 
     return (
       <div className="asset-box-balance">
@@ -1093,13 +1110,24 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           {isLoading ? (
             <Spinner className="spinner xsmall spinner-gray" animation="border" />
           ) : (
-            <NumberFormat
-              className="number"
-              value={aBalance}
-              displayType="text"
-              thousandSeparator
-              decimalScale={2}
-            />
+            <OverlayTrigger
+              key="top"
+              placement="right"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-balance" className="ttip-balance">
+                  ${parseFloat(aBalanceUSD).toFixed(2)}
+                </Tooltip>
+              }
+            >
+              <NumberFormat
+                className="number"
+                value={aBalance}
+                displayType="text"
+                thousandSeparator
+                decimalScale={2}
+              />
+            </OverlayTrigger>
           )}
         </span>
       </div>
@@ -1113,13 +1141,24 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         {isLoading ? (
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
-          <NumberFormat
-            className="number"
-            value={vaultCollateral}
-            displayType="text"
-            thousandSeparator
-            decimalScale={tokenBalanceDecimals}
-          />
+          <OverlayTrigger
+            key="top"
+            placement="right"
+            trigger={["hover", "click"]}
+            overlay={
+              <Tooltip id="ttip-balance" className="ttip-balance">
+                ${parseFloat(vaultCollateralUSD).toFixed(2)}
+              </Tooltip>
+            }
+          >
+            <NumberFormat
+              className="number"
+              value={vaultCollateral}
+              displayType="text"
+              thousandSeparator
+              decimalScale={tokenBalanceDecimals}
+            />
+          </OverlayTrigger>
         )}
       </span>
     </div>
@@ -1132,13 +1171,24 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         {isLoading ? (
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
-          <NumberFormat
-            className="number"
-            value={vaultDebt}
-            displayType="text"
-            thousandSeparator
-            decimalScale={tokenBalanceDecimals}
-          />
+          <OverlayTrigger
+            key="top"
+            placement="right"
+            trigger={["hover", "click"]}
+            overlay={
+              <Tooltip id="ttip-balance" className="ttip-balance">
+                ${parseFloat(vaultDebtUSD).toFixed(2)}
+              </Tooltip>
+            }
+          >
+            <NumberFormat
+              className="number"
+              value={vaultDebt}
+              displayType="text"
+              thousandSeparator
+              decimalScale={tokenBalanceDecimals}
+            />
+          </OverlayTrigger>
         )}
       </span>
     </div>
@@ -1330,7 +1380,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 <AssetDropdown />
                 {!isLoading && (
                   <>
-                    {AssetBalance(false)}
+                    {RenderIndexBalance(false)}
                     {isApproved && <MintedAmount />}
                   </>
                 )}
@@ -1339,7 +1389,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 <CollateralDropdown />
                 {!isLoading && (
                   <>
-                    {AssetBalance(true)}
+                    {RenderIndexBalance(true)}
                     {isApproved && <CollateralAmount />}
                   </>
                 )}

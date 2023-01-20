@@ -322,19 +322,16 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     isHardVault: boolean,
     decimals: number
   ) => {
+    const indexPrice = !isArbitrum(currentNetwork.chainId)
+      ? prices.tcapOraclePrice
+      : prices.jpegzOraclePrice;
     const collateralText = ethers.utils.formatUnits(collateralWei, decimals);
     const debtText = ethers.utils.formatEther(debtWei);
     const collateralPrice = getCollateralPrice(prices, symbol);
     const collateralUSD = toUSD(collateralText, collateralPrice);
-    const debtUSD = toUSD(debtText, prices.tcapOraclePrice || "0");
+    const debtUSD = toUSD(debtText, indexPrice || "0");
     const minRatio = getMinRatio(ratios, symbol, isHardVault);
-
-    const ratio = getRatio2(
-      collateralText,
-      collateralPrice,
-      debtText,
-      prices.tcapOraclePrice || "1"
-    );
+    const ratio = getRatio2(collateralText, collateralPrice, debtText, indexPrice || "1");
 
     let status = VAULT_STATUS.liquidation;
     if (parseFloat(collateralText) < 0.0000000001) {
