@@ -65,7 +65,6 @@ export const VaultsWarning = ({ ownerAddress, prices }: props) => {
   const loadVaults = async (vaultsData: any) => {
     setLoadingVaults(true);
     let liqVaults = 0;
-    console.log("vaultsData: ", vaultsData);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
       const cVaultDecimals = v.underlyingProtocol.underlyingToken.decimals;

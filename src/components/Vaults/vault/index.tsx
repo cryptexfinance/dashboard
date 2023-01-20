@@ -743,7 +743,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
             const tx = await currentVault?.mint(amount);
             notifyUser(tx, refresh);
           } else {
-            const increasedFee = await calculateBurnFee(mintTxt);
+            const increasedFee = await calculateMintFee(mintTxt);
             const ethFee = ethers.utils.formatEther(increasedFee);
             setMintFee(ethFee.toString());
             console.log("ethFee:", ethFee);
@@ -844,13 +844,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     ]);
 
     let balanceFormat = "0";
-    let balance;
     if (currentBalance.lt(cVault.Debt)) {
       balanceFormat = ethers.utils.formatEther(currentBalance);
-      balance = currentBalance;
     } else {
       balanceFormat = vaultDebt;
-      balance = cVault.Debt;
     }
     setBurnTxt(balanceFormat);
     let usd = toUSD(currentAssetPrice, balanceFormat);
@@ -863,7 +860,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setBurnUSD(usd.toString());
 
     if (balanceFormat !== "0") {
-      const increasedFee = await calculateBurnFee(balance);
+      const increasedFee = await calculateBurnFee(balanceFormat);
       const ethFee = ethers.utils.formatEther(increasedFee);
       setBurnFee(ethFee.toString());
     } else {
