@@ -746,12 +746,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
             const increasedFee = await calculateMintFee(mintTxt);
             const ethFee = ethers.utils.formatEther(increasedFee);
             setMintFee(ethFee.toString());
-            console.log("ethFee:", ethFee);
             const tx = await currentVault?.mint(amount, { value: BigNumber.from(increasedFee) });
             notifyUser(tx, refresh);
           }
         } catch (error) {
           console.error(error);
+          console.error("Code: ", error.code);
           if (error.code === 4001) {
             errorNotification(t("errors.tran-rejected"));
           } else {
