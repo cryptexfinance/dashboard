@@ -1,6 +1,32 @@
 @import "./colors";
 @import "./fonts";
 
+span {
+  &.empty, &.ready, &.active, &.liquidation, &.liquidated {
+    font-family: "Nineteen Ninety Seven";
+    font-size: 15px;
+    -webkit-animation: fire 2s infinite alternate;
+    animation: fire 2s infinite alternate;
+    color: #fff !important;
+  }
+}
+
+.empty {
+  text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+}
+.ready {
+  text-shadow: 0 0 4px #167226, 0 0 10px #61c4b3, 0 0 20px #167226, 0 -10px 40px #167226;
+}
+.active {
+  text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+}
+.liquidation {
+  text-shadow: 0 0 4px #c33, 0 0 10px rgb(236, 97, 97), 0 0 20px #c33, 0 -10px 40px #c33;
+}
+.liquidated {
+  text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+}
+
 .vault-monitoring {
   margin-left: 1.5rem;
   padding: 1rem 2rem;
@@ -333,22 +359,7 @@
           a {
             color: $white;
           }
-        }
-        .empty {
-          text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
-        }
-        .ready {
-          text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
-        }
-        .active {
-          text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
-        }
-        .liquidation {
-          text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
-        }
-        .liquidated {
-          text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
-        }
+        }        
       }      
     }
     .pag-container{
@@ -450,5 +461,129 @@
         display: flex;
       }
     }
+  }
+}
+
+.vaults-mobile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0rem;
+  padding: 1rem; 
+  .status {
+    font-size: 1.2rem;
+  }
+  .vault {
+    width: 100%;
+    background-color: $darker;
+    padding: 1rem 0.3rem;
+    margin: 1rem 0rem;
+    h5 {
+      font-size: 1rem;
+      margin-bottom: 0rem;
+    }
+
+    svg, .tcap {
+      height: 30px;
+      margin-right: 10px;
+    }
+    .jpegz {
+      height: 30px;
+      width: 30px;
+    }
+
+    &-assets {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .asset-box {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+      .asset {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        background-color: $darkest;
+        border-radius: 5px;
+        border: 1px solid $light;
+
+        &.index {
+          margin-right: 0.8rem;
+        }
+        &.collateral {
+          margin-left: 0.8rem;
+        }
+      }
+    }
+
+    &-values {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0rem;
+      border: 0.5px solid $off-white;
+      border-radius: 5px;
+      .title {
+        display: flex;
+        align-items: center;
+        background-color: $darkest;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        padding-left: 0.6rem;
+        height: 3.5rem;
+        width: 40%;
+      }
+      .values {
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem;        
+      }
+      .status {
+        font-size: 1rem;
+      }
+      .number {
+        font-size: 0.85rem;
+        text-align: right;
+      }
+      .neon-green {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    &-actions {
+      display: grid;
+      grid-template-columns: 100%;
+      &.two  {
+        grid-template-columns: 50% 50%;
+        gap: 1rem;
+        padding-right: 2.5rem;
+      }
+      .btn {
+        height: 2.7rem;
+        width: 100%;
+      }
+      .liquidation {
+        border: 1px solid rgb(236, 97, 97);
+      }
+    }
+    /* .ratio {
+      .values {
+        display: flex;
+        flex-direction: row;
+         align-items: center;
+        .empty {
+          font-size: 0.9rem;
+        }
+        .separator {
+          margin: 0px 8px;
+        }
+      }
+    } */
   }
 }

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Monitoring from "./monitoring";
 import Vault from "./vault";
+import { VaultsMobile } from "./monitoring/VaultsMobile";
 import { signerContext } from "../../state";
 import { VaultToUpdateType } from "./types";
 
@@ -41,11 +42,14 @@ const Vaults = () => {
 
   if (isMinting) {
     return (
-      <Vault
-        currentAddress={currentAddress}
-        vaultInitData={currrentVault}
-        goBack={() => setMinting(false)}
-      />
+      <>
+        <VaultsMobile />
+        {/* <Vault
+          currentAddress={currentAddress}
+          vaultInitData={currrentVault}
+          goBack={() => setMinting(false)}
+        /> */}
+      </>
     );
   }
 

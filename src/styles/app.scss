@@ -350,6 +350,22 @@ textarea.neon-green:focus {
 
 .card {
   background-color: $darker;
+
+  /* &.box-empty {
+    box-shadow: 0 0 10px 1px #f28040;
+  }
+  &.box-ready {
+    box-shadow: 0 0 10px 1px #167226;
+  }
+  &.box-active {
+    box-shadow: 0 0 10px 1px #e440f2;
+  }
+  &.box-liquidation {
+    box-shadow: 0 0 10px 1px #c33;
+  }
+  &.box-liquidated {
+    box-shadow: 0 0 4px #7940f2, 0 0 1px #fcdf49, 0 0 2px #f28040, 0 0px 4px #c33;
+  } */
 }
 .custom-file {
   label {
@@ -369,10 +385,7 @@ textarea.neon-green:focus {
   overflow: overlay;
 }
 .wrapper::before {
-  background-image: url("../assets/images/liquid.png");
-  // background-color: black;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-color: black;
   opacity: 0.3;
   position: absolute;
   z-index: -1;
@@ -489,6 +502,21 @@ form {
     svg {
       border: 3px solid $orange;  
     }
+  }
+}
+
+.btn {
+  &.empty {
+    border: 1px solid #f28040;
+  }
+  &.ready {
+    border: 1px solid #167226;
+  }
+  &.active {
+    border: 1px solid #e440f2;
+  }
+  &.liquidation {
+    border: 1px solid #c33;
   }
 }
 

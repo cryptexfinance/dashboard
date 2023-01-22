@@ -9,6 +9,7 @@ import "../../../styles/vault-monitoring.scss";
 import { VaultPagination } from "./Pagination";
 import { signerContext, hardVaultsContext, networkContext, vaultsContext } from "../../../state";
 import { Vaults } from "./Vaults";
+// import { VaultsMobile } from "./VaultsMobile";
 import { usePrices, useRatios } from "../../../hooks";
 import {
   getRatio2,
