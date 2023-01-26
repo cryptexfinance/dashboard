@@ -28,6 +28,7 @@ span {
 }
 
 .vault-monitoring {
+  margin-top: 2rem;
   margin-left: 1.5rem;
   padding: 1rem 2rem;
 
@@ -35,12 +36,7 @@ span {
     background-color: transparent;
   }
 
-  .row {
-    display: block;
-    margin-top: 2rem;
-  }
-
-  .card {
+  .card, .accordion {
     padding: 1.5rem 2.8125rem;
     width: 100%;
     @media (max-width: 1400px) {
@@ -383,26 +379,9 @@ span {
           background-color: $neon-highlight;
         }
       }
-    }
-    .no-vaults-box {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      padding-top: 2rem;
-      padding-bottom: 1rem;
-
-      p {
-        font-size: 1.2rem;
-      }
-      .btn-create-vault {
-        border: none;
-        padding-top: 0rem;
-        padding-bottom: 0.25rem;
-        color: $highlight;
-      }
-    }
+    }    
   }
-  .card.totals {
+  .accordion.totals {
     .totals-container {
       display: flex;
       flex-direction: row;
@@ -451,6 +430,25 @@ span {
     }
   }
 
+  .no-vaults-box {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+
+    p {
+      font-size: 1.2rem;
+    }
+
+    .btn-create-vault {
+      border: none;
+      padding-top: 0rem;
+      padding-bottom: 0.25rem;
+      color: $highlight;
+    }
+  }
+
   @media (max-width: 1200px) {
     .row {
       display: flex;
@@ -462,121 +460,196 @@ span {
       }
     }
   }
-}
 
-.vaults-mobile {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 2rem 0rem;
-  padding: 1rem; 
-  .status {
-    font-size: 1.2rem;
+  @media (min-width: 801px) {
+    .accordion {
+      &-button:after {
+        display: none;
+      }
+    }
   }
-  .vault {
-    width: 100%;
-    background-color: $darker;
-    padding: 1rem 0.3rem;
-    margin: 1rem 0rem;
-    h5 {
-      font-size: 1rem;
-      margin-bottom: 0rem;
-    }
 
-    svg, .tcap {
-      height: 30px;
-      margin-right: 10px;
-    }
-    .jpegz {
-      height: 30px;
-      width: 30px;
-    }
-
-    &-assets {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      .asset-box {
-        display: flex;
+  @media (max-width: 800px) {
+    margin-left: 0rem;
+    padding: 1rem;
+    
+    .accordion.totals {
+      .totals-container {
         flex-direction: column;
-        width: 100%;
       }
-      .asset {
-        display: flex;
+      .total-box {
         flex-direction: row;
-        align-items: center;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-        background-color: $darkest;
-        border-radius: 5px;
-        border: 1px solid $light;
+        justify-content: space-between;
+        margin: 0.7rem 0rem;
+      }
+    }
+    .accordion.actions {
+      margin-top: 1rem;
+      .accordion-body {
+        margin: 1rem 0rem;
 
-        &.index {
-          margin-right: 0.8rem;
+        .dd-container {
+          margin-bottom: 1.2rem;
+          .titles {
+            margin-bottom: 0.3rem;
+          }
         }
-        &.collateral {
-          margin-left: 0.8rem;
+        .btn-create-vault {
+          display: none;
         }
       }
     }
-
-    &-values {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      margin: 1rem 0rem;
-      border: 0.5px solid $off-white;
+    .no-vaults-box {
+      padding: 2rem;
+      border: 1px solid $neon-highlight;
       border-radius: 5px;
-      .title {
-        display: flex;
-        align-items: center;
-        background-color: $darkest;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-        padding-left: 0.6rem;
-        height: 3.5rem;
-        width: 40%;
+      .btn-create-vault {
+        padding-left: 0rem;
       }
-      .values {
-        display: flex;
-        flex-direction: column;
-        padding: 0.5rem;        
-      }
-      .status {
-        font-size: 1rem;
-      }
-      .number {
-        font-size: 0.85rem;
-        text-align: right;
-      }
-      .neon-green {
-        margin-bottom: 0.5rem;
-      }
+    }
+  }  
+
+  .vaults-mobile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0rem;
+
+    .status {
+      font-size: 1.2rem;
     }
 
-    &-actions {
-      display: grid;
-      grid-template-columns: 100%;
-      &.two  {
-        grid-template-columns: 50% 50%;
-        gap: 1rem;
-        padding-right: 2.5rem;
-      }
-      .btn {
-        height: 2.7rem;
+    .card  {
+      &-body {
         width: 100%;
+        padding: 0.5rem 0.7rem;
       }
-      .liquidation {
-        border: 1px solid rgb(236, 97, 97);
+      &-footer {
+        width: 100%;
+        padding: 0.5rem 0.7rem;
       }
-    }
-    /* .ratio {
+    }     
+
+    .vault {
+      width: 100%;
+      background-color: $darker;
+      padding: 1rem 0.3rem;
+      margin: 1rem 0rem;      
+
+      h5 {
+        font-size: 1rem;
+        margin-bottom: 0rem;
+      }
+
+      svg,
+      .tcap {
+        height: 30px;
+        margin-right: 10px;
+      }
+
+      .jpegz {
+        height: 30px;
+        width: 30px;
+        margin-right: 10px;
+      }
+
+      &-assets {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        .asset-box {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .asset {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0.5rem;
+          margin-top: 0.5rem;
+          background-color: $darkest;
+          border-radius: 5px;
+          border: 1px solid $light;
+
+          &.index {
+            margin-right: 0.8rem;
+          }
+
+          &.collateral {
+            margin-left: 0.8rem;
+          }
+        }
+      }
+
+      &-values {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 0rem;
+        border: 0.5px solid $off-white;
+        border-radius: 5px;
+
+        .title {
+          display: flex;
+          align-items: center;
+          background-color: $darkest;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          padding-left: 0.6rem;
+          height: 3.5rem;
+          width: 40%;
+        }
+
+        .values {
+          display: flex;
+          flex-direction: column;
+          padding: 0.5rem;
+        }
+
+        .status {
+          font-size: 1rem;
+        }
+
+        .number {
+          font-size: 0.85rem;
+          text-align: right;
+        }
+
+        .neon-green {
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      &-actions {
+        display: grid;
+        grid-template-columns: 100%;
+
+        &.two {
+          grid-template-columns: 50% 50%;
+          gap: 1rem;
+          padding-right: 2.5rem;
+        }
+
+        .btn {
+          height: 2.7rem;
+          width: 100%;
+        }
+
+        .liquidation {
+          border: 1px solid rgb(236, 97, 97);
+        }
+      }
+
+      /* .ratio {
       .values {
         display: flex;
         flex-direction: row;
-         align-items: center;
+          align-items: center;
         .empty {
           font-size: 0.9rem;
         }
@@ -585,5 +658,6 @@ span {
         }
       }
     } */
+    }
   }
 }

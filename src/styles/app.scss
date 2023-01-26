@@ -348,25 +348,39 @@ textarea.neon-green:focus {
   color: $white;
 }
 
-.card {
+.card, .accordion {
   background-color: $darker;
-
-  /* &.box-empty {
-    box-shadow: 0 0 10px 1px #f28040;
-  }
-  &.box-ready {
-    box-shadow: 0 0 10px 1px #167226;
-  }
-  &.box-active {
-    box-shadow: 0 0 10px 1px #e440f2;
-  }
-  &.box-liquidation {
-    box-shadow: 0 0 10px 1px #c33;
-  }
-  &.box-liquidated {
-    box-shadow: 0 0 4px #7940f2, 0 0 1px #fcdf49, 0 0 2px #f28040, 0 0px 4px #c33;
-  } */
 }
+.accordion {
+  border-radius: 5px;
+
+  &-header {
+    margin-bottom: 0rem;
+  }
+  &-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0px;
+    background-color: transparent;
+    border: none;
+  }
+  &-button:after {
+    content: "";
+    color: $white;
+    border-top: .3em solid;
+    border-right: .25em solid transparent;
+    border-bottom: 0;
+    border-left: .25em solid transparent;
+    margin-top: -5px;
+  }
+  .accordion-button:not(.collapsed):after {
+    border-top: 0;
+    border-bottom: .3em solid;
+  }
+}
+
 .custom-file {
   label {
     background: no-repeat;
@@ -652,7 +666,7 @@ form {
   }
 }
 
-.card {
+.card, .accordion {
   &-header  {
     background-color: transparent;
   }

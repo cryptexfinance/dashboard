@@ -10,7 +10,7 @@ import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
 import Liquidate from "./Liquidate";
 import { networkContext } from "../../../state";
-import { PaginationType, VaultsType, VaultToUpdateType } from "../types";
+import { PaginationType, VaultsPropsType, VaultsType, VaultToUpdateType } from "../types";
 import { isArbitrum, isInLayer1, numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,
@@ -25,25 +25,9 @@ import {
   sortRatioAsc,
   sortRewardDesc,
   sortRewardAsc,
+  VAULT_STATUS,
 } from "../common";
 import { TOKENS_SYMBOLS } from "../../../utils/constants";
-
-type dataType = {
-  currentAddress: string;
-  vaults: Array<VaultsType>;
-  setVaults: (v: Array<VaultsType>) => void;
-  currentStatus: string;
-  pagination: PaginationType;
-  refresh: (
-    index: number,
-    symbol: string,
-    vaultId: string,
-    collateral: ethers.BigNumberish,
-    debt: ethers.BigNumberish
-  ) => void;
-  setVaultToUpdate: (initData: VaultToUpdateType) => void;
-  myVaults: boolean;
-};
 
 export const Vaults = ({
   currentAddress,
@@ -54,7 +38,7 @@ export const Vaults = ({
   refresh,
   setVaultToUpdate,
   myVaults,
-}: dataType) => {
+}: VaultsPropsType) => {
   const { t } = useTranslation();
   const currentNetwork = useContext(networkContext);
   const [showLiquidate, setShowLiquidate] = useState(false);
@@ -351,7 +335,7 @@ export const Vaults = ({
                     </OverlayTrigger>
                   </div>
                 </td>
-                {currentStatus === "liquidation" && (
+                {currentStatus === VAULT_STATUS.liquidation && (
                   <td>
                     <div className="ratio">
                       <span className="active">${v.netReward.toFixed(2)}</span>
