@@ -4,19 +4,10 @@ import { ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { networkContext } from "../../../state";
 import Liquidate from "./Liquidate";
-import {
-  capitalize,
-  TokenIcon,
-  getMinRatio,
-  getCollateralPrice,
-  findNewArbitrumVaultCollateral,
-  findNewMainnetVaultCollateral,
-  findNewOptimismVaultCollateral,
-  VAULT_STATUS,
-} from "../common";
-import { PaginationType, VaultsPropsType, VaultsType, VaultToUpdateType } from "../types";
+import { capitalize, TokenIcon, VAULT_STATUS } from "../common";
+import { VaultsPropsType, VaultsType } from "../types";
 import { TOKENS_SYMBOLS } from "../../../utils/constants";
-import { isArbitrum, isInLayer1, numberFormatStr } from "../../../utils/utils";
+import { isArbitrum, isInLayer1 } from "../../../utils/utils";
 
 export const VaultsMobile = ({
   currentAddress,
@@ -32,12 +23,7 @@ export const VaultsMobile = ({
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
   const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
-
-  const liquidateVault = (index: number, lVault: VaultsType) => {
-    setVaultIndex(index);
-    setLiqVault(lVault);
-    setShowLiquidate(true);
-  };
+  const [vaultsShown, setVaultsShown] = useState(pagination.itemsPerPage);
 
   const updateLiqVault = (collateral: ethers.BigNumberish, debt: ethers.BigNumberish) => {
     if (liqVault !== null) {
@@ -49,14 +35,21 @@ export const VaultsMobile = ({
     const vtu = {
       vaultId: v.id,
       assetSymbol: isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP,
-      collateralSymbol: v.collateralSymbol !== "WETH" ? v.collateralSymbol : "ETH",
+      collateralSymbol:
+        v.collateralSymbol !== TOKENS_SYMBOLS.WETH ? v.collateralSymbol : TOKENS_SYMBOLS.ETH,
       isHardVault: v.isHardVault,
     };
+    const vStatus = v.status === VAULT_STATUS.liquidation ? "active" : v.status;
     return (
-      <Button className={v.status} onClick={() => setVaultToUpdate(vtu)}>
-        <span className={v.status}>Go to Vault</span>
+      <Button className={vStatus} onClick={() => setVaultToUpdate(vtu)}>
+        <span className={vStatus}>Go to Vault</span>
       </Button>
     );
+  };
+
+  const loadMore = () => {
+    const n = vaultsShown + pagination.itemsPerPage;
+    setVaultsShown(n);
   };
 
   const newVault = () => {
@@ -67,6 +60,7 @@ export const VaultsMobile = ({
       isHardVault: isInLayer1(currentNetwork.chainId),
     };
     setVaultToUpdate(initData);
+    console.log(setVaults);
   };
 
   const IndexIcon = () => {
@@ -79,10 +73,15 @@ export const VaultsMobile = ({
   return (
     <div className="vaults-mobile">
       {vaults.map((v, index) => {
-        const itemPage = Math.ceil((index + 1) / pagination.itemsPerPage);
+        const classN = index < vaultsShown ? "vault" : "vault hide";
         return (
-          <Card key={index} className="vault">
+          <Card key={index} className={classN}>
             <Card.Body>
+              {v.isHardVault && (
+                <div className="vault-type">
+                  <h6 className={v.status}>H Mode</h6>
+                </div>
+              )}
               <div className="vault-assets">
                 <div className="asset-box">
                   <h6>Index</h6>
@@ -172,7 +171,7 @@ export const VaultsMobile = ({
             {(v.status === VAULT_STATUS.liquidation || v.url !== "") && (
               <Card.Footer
                 className={"vault-actions".concat(
-                  v.status === VAULT_STATUS.liquidation ? "  two" : ""
+                  v.status === VAULT_STATUS.liquidation ? " two" : ""
                 )}
               >
                 {v.status === VAULT_STATUS.liquidation && (
@@ -184,6 +183,11 @@ export const VaultsMobile = ({
           </Card>
         );
       })}
+      {vaultsShown < pagination.itemsCount && (
+        <Button className="btn-load-more" onClick={() => loadMore()}>
+          Load More
+        </Button>
+      )}
       {vaults.length === 0 && currentAddress !== "" && myVaults && currentStatus === "all" && (
         <div className="no-vaults-box">
           <p>

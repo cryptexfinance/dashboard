@@ -52,8 +52,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [vaultMode, setVaultMode] = useState(vaultInitData.isHardVault ? "hard" : "normal");
   const [vaultData, setVaultData] = useState(vaultInitData);
   const radios = [
-    { name: "Regular", value: "normal" },
-    { name: "Hard", value: "hard" },
+    { name: "R Mode", value: "normal" },
+    { name: "H Mode", value: "hard" },
   ];
 
   const [

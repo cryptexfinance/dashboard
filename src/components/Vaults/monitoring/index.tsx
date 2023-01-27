@@ -74,7 +74,7 @@ const showAllVaults = true;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const vaults = useContext(vaultsContext);
@@ -913,19 +913,28 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
+          <Button
+            className="btn-create-vault"
+            onClick={() => newVault()}
+            disabled={currentAddress === ""}
+          >
+            New Vault
+          </Button>
           {loading || filteringRatios ? (
             <Spinner variant="danger" className="spinner" animation="border" />
           ) : (
-            <VaultsMobile
-              currentAddress={currentAddress}
-              vaults={vaultList}
-              setVaults={(v: Array<VaultsType>) => setVaultList(v)}
-              currentStatus={currentStatus}
-              pagination={pagination}
-              refresh={updateLiquidatedVault}
-              setVaultToUpdate={setVaultToUpdate}
-              myVaults={currentOwnerFilter.value === "1"}
-            />
+            <>
+              <VaultsMobile
+                currentAddress={currentAddress}
+                vaults={vaultList}
+                setVaults={(v: Array<VaultsType>) => setVaultList(v)}
+                currentStatus={currentStatus}
+                pagination={pagination}
+                refresh={updateLiquidatedVault}
+                setVaultToUpdate={setVaultToUpdate}
+                myVaults={currentOwnerFilter.value === "1"}
+              />
+            </>
           )}
         </>
       )}

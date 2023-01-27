@@ -10,7 +10,7 @@ import { ReactComponent as SortUpIcon } from "../../../assets/images/sort-up.svg
 import { ReactComponent as SortDownIcon } from "../../../assets/images/sort-down.svg";
 import Liquidate from "./Liquidate";
 import { networkContext } from "../../../state";
-import { PaginationType, VaultsPropsType, VaultsType, VaultToUpdateType } from "../types";
+import { VaultsPropsType, VaultsType } from "../types";
 import { isArbitrum, isInLayer1, numberFormatStr } from "../../../utils/utils";
 import {
   capitalize,

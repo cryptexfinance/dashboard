@@ -99,7 +99,7 @@ body {
 .btn-primary:not(:disabled):not(.disabled):active
 {
   background-color: $darker;
-  border: none;
+  border: 1px solid $highlight;
 }
 
 .btn-primary:focus,
@@ -122,7 +122,6 @@ body {
 .btn.neon-pink {
   background-color: $pink;
 }
-
 
 .input-group .btn.neon-orange {
   border: 1px solid $orange;
@@ -254,7 +253,7 @@ body {
   color: $white !important;
 }
 
-@keyframes fire {
+/* @keyframes fire {
   80% {
     text-shadow: 0px -2px 8px $purple, 0px -2px 10px $yellow, 0px -5px 20px $orange,
       0px -20px 40px #c33;
@@ -263,7 +262,7 @@ body {
     text-shadow: 0px -2px 4px $purple, 0px -2px 10px $yellow, 0px -5px 20px $orange,
       0px -20px 40px #c33;
   }
-}
+} */
 
 .table thead th {
   border-top: 2px solid $highlight;
@@ -519,6 +518,10 @@ form {
   }
 }
 
+.btn-primary:not(:disabled):not(.disabled).active {
+  background-color: $darker;
+}
+
 .btn {
   &.empty {
     border: 1px solid #f28040;
@@ -527,7 +530,7 @@ form {
     border: 1px solid #167226;
   }
   &.active {
-    border: 1px solid #e440f2;
+    border: 1px solid #e440f2 !important;
   }
   &.liquidation {
     border: 1px solid #c33;
