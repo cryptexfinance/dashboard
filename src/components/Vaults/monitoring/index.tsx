@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, Card, Col, Dropdown, Form, Row } from "react-bootstrap/esm";
+import { Accordion, Button, Card, Col, Dropdown, Form } from "react-bootstrap/esm";
 import Spinner from "react-bootstrap/Spinner";
 import { FaArrowsAltH } from "react-icons/fa";
 import { ethers, BigNumber } from "ethers";
+import { useMediaQuery } from "react-responsive";
 import { useLazyQuery, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import "../../../styles/vault-monitoring.scss";
 import { VaultPagination } from "./Pagination";
 import { signerContext, hardVaultsContext, networkContext, vaultsContext } from "../../../state";
 import { Vaults } from "./Vaults";
+import { VaultsMobile } from "./VaultsMobile";
 import { usePrices, useRatios } from "../../../hooks";
 import {
   getRatio2,
@@ -72,6 +74,7 @@ const showAllVaults = true;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const vaults = useContext(vaultsContext);
@@ -666,257 +669,272 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     return <TokenIcon name={TOKENS_SYMBOLS.JPEGz} />;
   };
 
+  const RenderFilters = () => (
+    <>
+      <div className="items-view">
+        <div className="dd-container view">
+          <h6 className="titles">
+            <>{t("view")}:</>
+          </h6>
+          <Dropdown onSelect={(eventKey) => handleItemsViewChange(eventKey || "15")}>
+            <Dropdown.Toggle variant="secondary" id="dropdown-filters" className="text-left">
+              <div className="items-view-toggle">
+                <span>{pagination.itemsPerPage}</span>
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {viewsList.map((item) => (
+                <Dropdown.Item key={item.key} eventKey={item.key}>
+                  {item.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </div>
+      <div className="filters">
+        <div className="dd-container">
+          <h6 className="titles">
+            <>{t("collateral")}</>
+          </h6>
+          <Dropdown
+            className="dd-collateral"
+            onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
+          >
+            <Dropdown.Toggle variant="secondary" id="dropdown-filters" className="text-left">
+              <div className="collateral-toggle">
+                <TokenIcon name={tokenSymbol} />
+                <span>{tokenSymbol.toUpperCase()}</span>
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {tokensSymbols().map((item) => (
+                <Dropdown.Item key={item.key} eventKey={item.key}>
+                  {item.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+        <div className="dd-container">
+          <h6 className="titles">Status</h6>
+          <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
+            <Dropdown.Toggle id="dropdown-flags" variant="secondary" className="text-left">
+              <div className="status-toggle">
+                <span>{capitalize(currentStatus)}</span>
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {statusList.map((item) => (
+                <Dropdown.Item key={item.key} eventKey={item.key}>
+                  {item.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+        {isInLayer1(currentNetwork.chainId) && (
+          <div className="dd-container">
+            <h6 className="titles">
+              <>{t("mode")}</>
+            </h6>
+            <Dropdown
+              className="dd-mode"
+              onSelect={(eventKey) => handleModeChange(eventKey || "ALL")}
+            >
+              <Dropdown.Toggle id="dropdown-flags" variant="secondary" className="text-left">
+                <div className="status-toggle">
+                  <span>{capitalize(vaultMode)}</span>
+                </div>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {modeList.map((item) => (
+                  <Dropdown.Item key={item.key} eventKey={item.key}>
+                    {item.name}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+        )}
+        <div className="dd-container">
+          <h6 className="titles">Ratio Range</h6>
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="secondary"
+              id="dropdown-flags"
+              className="text-left ratio-range-toggle"
+              ref={ratioRangeDropdown}
+            >
+              <div className="status-toggle">
+                <span>
+                  {currentMinRatio} <FaArrowsAltH /> {currentMaxRatio}
+                </span>
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="ratio-range-menu">
+              <div className="range-container">
+                <Form.Control
+                  type="number"
+                  placeholder=""
+                  className="neon-green"
+                  defaultValue="0"
+                  ref={minRatioInput}
+                />
+                <FaArrowsAltH />
+                <Form.Control
+                  type="number"
+                  placeholder=""
+                  className="neon-green"
+                  defaultValue="2500"
+                  ref={maxRatioInput}
+                />
+              </div>
+              <Button onClick={() => onFilterRatioClick()}>Apply</Button>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+        <div className="dd-container">
+          <h6 className="titles">Vaults</h6>
+          <Dropdown onSelect={(eventKey) => handleVaultOwnerFilterChange(eventKey || "1")}>
+            <Dropdown.Toggle id="dropdown-flags" variant="secondary" className="text-left">
+              <div className="status-toggle">
+                <span>{capitalize(currentOwnerFilter.name)}</span>
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item key={vaultsOwnerFilter[0].value} eventKey={vaultsOwnerFilter[0].value}>
+                {vaultsOwnerFilter[0].name}
+              </Dropdown.Item>
+              <Dropdown.Item
+                key={vaultsOwnerFilter[1].value}
+                eventKey={vaultsOwnerFilter[1].value}
+                disabled={currentAddress === ""}
+              >
+                {vaultsOwnerFilter[1].name}
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+        <div className="dd-container">
+          <Button
+            className="btn-create-vault"
+            onClick={() => newVault()}
+            disabled={currentAddress === ""}
+          >
+            New Vault
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="vault-monitoring">
-      <Row className="card-wrapper">
-        <Row>
-          <Card className="diamond mb-2 totals">
-            <Card.Header>
-              <h5>
-                <>{t("totals")}</>
-              </h5>
-            </Card.Header>
-            <Card.Body>
-              <Col md={12} className="totals-container">
-                <Col md={3} className="total-box">
-                  <h6>
-                    <>{t("vaults")}</>
-                  </h6>
-                  <span className="number">{vaultsTotals.vaults}</span>
-                </Col>
-                <Col md={3} className="total-box">
-                  <h6>
-                    <>{t("collateral")} (USD)</>
-                  </h6>
-                  <span className="number">
-                    ${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}
-                  </span>
-                </Col>
-                <Col md={3} className="total-box">
-                  <div className="debt">
-                    <h6>
-                      <>{t("debt")}</>
-                    </h6>
-                    <IndexIcon />
-                  </div>
-                  <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
-                </Col>
-                <Col md={3} className="total-box">
-                  <h6>
-                    <>{t("debt")} (USD)</>
-                  </h6>
-                  <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
-                </Col>
+      <Accordion defaultActiveKey={isMobile ? "1" : "0"} className="diamond mb-2 totals">
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>
+            <h5>
+              <>{t("totals")}</>
+            </h5>
+          </Accordion.Header>
+          <Accordion.Body>
+            <Col md={12} className="totals-container">
+              <Col md={3} className="total-box">
+                <h6>
+                  <>{t("vaults")}</>
+                </h6>
+                <span className="number">{vaultsTotals.vaults}</span>
               </Col>
-            </Card.Body>
-          </Card>
-          <Card className="diamond mb-2">
-            <Card.Body>
-              <Col md={12} className="actions">
-                <div className="items-view">
-                  <div className="dd-container view">
-                    <h6 className="titles">
-                      <>{t("view")}:</>
-                    </h6>
-                    <Dropdown onSelect={(eventKey) => handleItemsViewChange(eventKey || "15")}>
-                      <Dropdown.Toggle
-                        variant="secondary"
-                        id="dropdown-filters"
-                        className="text-left"
-                      >
-                        <div className="items-view-toggle">
-                          <span>{pagination.itemsPerPage}</span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {viewsList.map((item) => (
-                          <Dropdown.Item key={item.key} eventKey={item.key}>
-                            {item.name}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                </div>
-                <div className="filters">
-                  <div className="dd-container">
-                    <h6 className="titles">
-                      <>{t("collateral")}</>
-                    </h6>
-                    <Dropdown
-                      className="dd-collateral"
-                      onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
-                    >
-                      <Dropdown.Toggle
-                        variant="secondary"
-                        id="dropdown-filters"
-                        className="text-left"
-                      >
-                        <div className="collateral-toggle">
-                          <TokenIcon name={tokenSymbol} />
-                          <span>{tokenSymbol.toUpperCase()}</span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {tokensSymbols().map((item) => (
-                          <Dropdown.Item key={item.key} eventKey={item.key}>
-                            {item.name}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="dd-container">
-                    <h6 className="titles">Status</h6>
-                    <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
-                      <Dropdown.Toggle
-                        variant="secondary"
-                        id="dropdown-flags"
-                        className="text-left"
-                      >
-                        <div className="status-toggle">
-                          <span>{capitalize(currentStatus)}</span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {statusList.map((item) => (
-                          <Dropdown.Item key={item.key} eventKey={item.key}>
-                            {item.name}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  {isInLayer1(currentNetwork.chainId) && (
-                    <div className="dd-container">
-                      <h6 className="titles">
-                        <>{t("mode")}</>
-                      </h6>
-                      <Dropdown
-                        className="dd-mode"
-                        onSelect={(eventKey) => handleModeChange(eventKey || "ALL")}
-                      >
-                        <Dropdown.Toggle
-                          variant="secondary"
-                          id="dropdown-flags"
-                          className="text-left"
-                        >
-                          <div className="status-toggle">
-                            <span>{capitalize(vaultMode)}</span>
-                          </div>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {modeList.map((item) => (
-                            <Dropdown.Item key={item.key} eventKey={item.key}>
-                              {item.name}
-                            </Dropdown.Item>
-                          ))}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </div>
-                  )}
-                  <div className="dd-container">
-                    <h6 className="titles">Ratio Range</h6>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        variant="secondary"
-                        id="dropdown-flags"
-                        className="text-left ratio-range-toggle"
-                        ref={ratioRangeDropdown}
-                      >
-                        <div className="status-toggle">
-                          <span>
-                            {currentMinRatio} <FaArrowsAltH /> {currentMaxRatio}
-                          </span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu className="ratio-range-menu">
-                        <div className="range-container">
-                          <Form.Control
-                            type="number"
-                            placeholder=""
-                            className="neon-green"
-                            defaultValue="0"
-                            ref={minRatioInput}
-                          />
-                          <FaArrowsAltH />
-                          <Form.Control
-                            type="number"
-                            placeholder=""
-                            className="neon-green"
-                            defaultValue="2500"
-                            ref={maxRatioInput}
-                          />
-                        </div>
-                        <Button onClick={() => onFilterRatioClick()}>Apply</Button>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="dd-container">
-                    <h6 className="titles">Vaults</h6>
-                    <Dropdown
-                      onSelect={(eventKey) => handleVaultOwnerFilterChange(eventKey || "1")}
-                    >
-                      <Dropdown.Toggle
-                        variant="secondary"
-                        id="dropdown-flags"
-                        className="text-left"
-                      >
-                        <div className="status-toggle">
-                          <span>{capitalize(currentOwnerFilter.name)}</span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item
-                          key={vaultsOwnerFilter[0].value}
-                          eventKey={vaultsOwnerFilter[0].value}
-                        >
-                          {vaultsOwnerFilter[0].name}
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          key={vaultsOwnerFilter[1].value}
-                          eventKey={vaultsOwnerFilter[1].value}
-                          disabled={currentAddress === ""}
-                        >
-                          {vaultsOwnerFilter[1].name}
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="dd-container">
-                    <Button
-                      className="btn-create-vault"
-                      onClick={() => newVault()}
-                      disabled={currentAddress === ""}
-                    >
-                      New Vault
-                    </Button>
-                  </div>
-                </div>
+              <Col md={3} className="total-box">
+                <h6>
+                  <>{t("collateral")} (USD)</>
+                </h6>
+                <span className="number">${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}</span>
               </Col>
-              {loading || filteringRatios ? (
-                <Spinner variant="danger" className="spinner" animation="border" />
-              ) : (
-                <Vaults
-                  currentAddress={currentAddress}
-                  vaults={vaultList}
-                  setVaults={(v: Array<VaultsType>) => setVaultList(v)}
-                  currentStatus={currentStatus}
-                  pagination={pagination}
-                  refresh={updateLiquidatedVault}
-                  setVaultToUpdate={setVaultToUpdate}
-                  myVaults={currentOwnerFilter.value === "1"}
-                />
+              <Col md={3} className="total-box">
+                <div className="debt">
+                  <h6>
+                    <>{t("debt")}</>
+                  </h6>
+                  <IndexIcon />
+                </div>
+                <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
+              </Col>
+              <Col md={3} className="total-box">
+                <h6>
+                  <>{t("debt")} (USD)</>
+                </h6>
+                <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
+              </Col>
+            </Col>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+      {!isMobile ? (
+        <Card className="diamond mb-2">
+          <Col md={12} className="actions">
+            <RenderFilters />
+          </Col>
+          <Card.Body>
+            {loading || filteringRatios ? (
+              <Spinner variant="danger" className="spinner" animation="border" />
+            ) : (
+              <Vaults
+                currentAddress={currentAddress}
+                vaults={vaultList}
+                setVaults={(v: Array<VaultsType>) => setVaultList(v)}
+                currentStatus={currentStatus}
+                pagination={pagination}
+                refresh={updateLiquidatedVault}
+                setVaultToUpdate={setVaultToUpdate}
+                myVaults={currentOwnerFilter.value === "1"}
+              />
+            )}
+            <Col md={12} className="pag-container">
+              {pagination.pages > 0 && !loading && (
+                <VaultPagination pagination={pagination} onPageSelected={onPageSelected} />
               )}
-              <Col md={12} className="pag-container">
-                {pagination.pages > 0 && !loading && (
-                  <VaultPagination pagination={pagination} onPageSelected={onPageSelected} />
-                )}
-              </Col>
-            </Card.Body>
-          </Card>
-        </Row>
-      </Row>
+            </Col>
+          </Card.Body>
+        </Card>
+      ) : (
+        <>
+          <Accordion defaultActiveKey="1" className="actions">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                <h5>Filters</h5>
+              </Accordion.Header>
+              <Accordion.Body>
+                <RenderFilters />
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <Button
+            className="btn-create-vault"
+            onClick={() => newVault()}
+            disabled={currentAddress === ""}
+          >
+            New Vault
+          </Button>
+          {loading || filteringRatios ? (
+            <Spinner variant="danger" className="spinner" animation="border" />
+          ) : (
+            <>
+              <VaultsMobile
+                currentAddress={currentAddress}
+                vaults={vaultList}
+                setVaults={(v: Array<VaultsType>) => setVaultList(v)}
+                currentStatus={currentStatus}
+                pagination={pagination}
+                refresh={updateLiquidatedVault}
+                setVaultToUpdate={setVaultToUpdate}
+                myVaults={currentOwnerFilter.value === "1"}
+              />
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };

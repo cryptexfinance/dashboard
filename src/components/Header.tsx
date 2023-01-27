@@ -286,18 +286,20 @@ const Header = ({ signerAddress, isMobile }: props) => {
             </div>
           )}
           <div className="info">
-            <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
-            <h5 className="ml-2">
-              <OverlayTrigger
-                key="bottom"
-                placement="bottom"
-                overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
-              >
-                <a href="/" onClick={copyCodeToClipboard} className="address">
-                  {addressField}
-                </a>
-              </OverlayTrigger>
-            </h5>
+            <div className="info-address">
+              <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
+              <h5 className="ml-2">
+                <OverlayTrigger
+                  key="bottom"
+                  placement="bottom"
+                  overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+                >
+                  <a href="/" onClick={copyCodeToClipboard} className="address">
+                    {addressField}
+                  </a>
+                </OverlayTrigger>
+              </h5>
+            </div>
             <Button
               className="logout"
               onClick={(event) => {

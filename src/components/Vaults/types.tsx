@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 export type PaginationType = {
   previous: number;
   current: number;
@@ -7,6 +9,23 @@ export type PaginationType = {
   itemsPerPage: number;
   itemsCount: number;
   lastId: string;
+};
+
+export type VaultsPropsType = {
+  currentAddress: string;
+  vaults: Array<VaultsType>;
+  setVaults: (v: Array<VaultsType>) => void;
+  currentStatus: string;
+  pagination: PaginationType;
+  refresh: (
+    index: number,
+    symbol: string,
+    vaultId: string,
+    collateral: ethers.BigNumberish,
+    debt: ethers.BigNumberish
+  ) => void;
+  setVaultToUpdate: (initData: VaultToUpdateType) => void;
+  myVaults: boolean;
 };
 
 export type VaultsRatioType = {
