@@ -917,6 +917,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
             className="btn-create-vault"
             onClick={() => newVault()}
             disabled={currentAddress === ""}
+            variant="secondary"
           >
             New Vault
           </Button>

@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
 import {
   governanceContext,
+  networkContext,
   oraclesContext,
   rewardsContext,
   signerContext,
@@ -22,11 +23,18 @@ import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { ReactComponent as WETHIcon } from "../../assets/images/graph/weth.svg";
 import Loading from "../Loading";
 import { notifyUser, errorNotification, getPriceInUSDFromPair } from "../../utils/utils";
+import { NETWORKS } from "../../utils/constants";
 
 const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
 const Farm = () => {
   const { t } = useTranslation();
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
+  const tokens = useContext(tokensContext);
+  const oracles = useContext(oraclesContext);
+  const governance = useContext(governanceContext);
+  const rewards = useContext(rewardsContext);
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   /* const [ethRewards, setEthRewards] = useState("0");
@@ -42,11 +50,6 @@ const Farm = () => {
   const [ethVestAmount, setEthVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [ctxVestAmount, setCtxVestAmount] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [updateData, setUpdateData] = useState(false);
-  const signer = useContext(signerContext);
-  const tokens = useContext(tokensContext);
-  const oracles = useContext(oraclesContext);
-  const governance = useContext(governanceContext);
-  const rewards = useContext(rewardsContext);
 
   // APY
   const [, setEthVaultAPY] = useState("0");
@@ -398,9 +401,9 @@ const Farm = () => {
           <>{t("farming.farming")}</>
         </h3>{" "}
         <Row className="card-wrapper">
-          <Row>
-            <UniV3Rewards signer={signer} />
-            <Card className="diamond mt-4">
+          <UniV3Rewards signer={signer} />
+          {currentNetwork.chainId === NETWORKS.mainnet.chainId && (
+            <Card className="diamond mt-4 liquidity">
               <h2>
                 <>{t("farming.liquidity")}</>
               </h2>
@@ -705,7 +708,7 @@ const Farm = () => {
                 </tbody>
               </Table>
             </Card>
-          </Row>
+          )}
         </Row>
       </div>
       {/* <Stake

@@ -5,6 +5,7 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
+import { useMediaQuery } from "react-responsive";
 import { useTranslation } from "react-i18next";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
@@ -58,6 +59,7 @@ const Rewards = ({
   const tokens = useContext(tokensContext);
   const currentNetwork = useContext(networkContext);
   const disableActions = isOptimism(currentNetwork.chainId);
+  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
   const [cumulativePrice, setCumulativePrice] = useState(0);
@@ -541,6 +543,72 @@ const Rewards = ({
     </>
   );
 
+  const RenderRewardsMobile = () => (
+    <div className="positions-mobile">
+      {ethTcapPositions.sort(sortPositions).map((position, index) => (
+        <Card key={index} className="position">
+          <Card.Body>
+            <div className="description">
+              <div className="icons">
+                <WETHIcon className="weth" />
+                <TcapIcon className="tcap" />
+              </div>
+              <div className="title">
+                <span className="tokens">TCAP/WETH Pool</span>
+                <small>Uniswap</small>
+              </div>
+            </div>
+            <div className="position-title">
+              <h6>Position</h6>
+            </div>
+            <div className="box ranges">
+              <div className="min-range">
+                <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
+              </div>
+              <FaArrowsAltH />
+              <div className="max-range">
+                <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
+              </div>
+            </div>
+            <div className="box status">
+              <div className="title">
+                <h6>Status:</h6>
+              </div>
+              <div className="value">{RenderStatusLabel(position)}</div>
+            </div>
+            <div className="box reward">
+              <div className="title">
+                <h6>Reward:</h6>
+              </div>
+              <div className="value">
+                <NumberFormat
+                  className="number"
+                  value={position.reward}
+                  displayType="text"
+                  thousandSeparator
+                  prefix=""
+                  suffix="CTX"
+                  decimalScale={2}
+                />
+              </div>
+            </div>
+          </Card.Body>
+          <Card.Footer className="position-actions">
+            <Stake
+              ownerAddress={ownerAddress}
+              position={position}
+              incentive={ethTcapIncentive[position.incentiveIndex]}
+              nfpmContract={nfpmContract}
+              stakerContract={stakerContract}
+              refresh={() => refresh()}
+            />
+            <WithdrawButton position={position} />
+          </Card.Footer>
+        </Card>
+      ))}
+    </div>
+  );
+
   const RenderEmptyLP = () => (
     <div className="empty-lp">
       <div className="lp-box">
@@ -576,41 +644,50 @@ const Rewards = ({
 
   return (
     <Card className="diamond mb-2 univ3">
-      <Card.Header>
-        <h2>Uniswap V3 Liquidity Rewards</h2>
-        {availableReward > 0.001 && ethTcapPositions.length === 0 && (
-          <div className="rewards-total">
-            <h6>Unclaimed Reward:</h6>
-            <div className="amount">
-              <NumberFormat
-                className="number"
-                value={availableReward}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={4}
-              />
-              <CtxIcon />
-            </div>
-            <div className="claim-button2">
-              <ClaimButton />
-            </div>
-          </div>
-        )}
-      </Card.Header>
-      <Card.Body>
-        {ownerAddress !== "" ? (
-          <>
-            {loading && firstLoad ? (
-              <Spinner variant="danger" className="spinner" animation="border" />
-            ) : (
-              <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>
+      {!isMobile ? (
+        <>
+          <Card.Header>
+            <h2>Uniswap V3 Liquidity Rewards</h2>
+            {availableReward > 0.001 && ethTcapPositions.length === 0 && (
+              <div className="rewards-total">
+                <h6>Unclaimed Reward:</h6>
+                <div className="amount">
+                  <NumberFormat
+                    className="number"
+                    value={availableReward}
+                    displayType="text"
+                    thousandSeparator
+                    prefix=""
+                    decimalScale={4}
+                  />
+                  <CtxIcon />
+                </div>
+                <div className="claim-button2">
+                  <ClaimButton />
+                </div>
+              </div>
             )}
-          </>
-        ) : (
-          <RenderEmptyLP />
-        )}
-      </Card.Body>
+          </Card.Header>
+          <Card.Body>
+            {ownerAddress !== "" ? (
+              <>
+                {loading && firstLoad ? (
+                  <Spinner variant="danger" className="spinner" animation="border" />
+                ) : (
+                  <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>
+                )}
+              </>
+            ) : (
+              <RenderEmptyLP />
+            )}
+          </Card.Body>
+        </>
+      ) : (
+        <>
+          <RenderHeader />
+          <RenderRewardsMobile />
+        </>
+      )}
       <ClaimReward
         show={showClaim}
         ownerAddress={ownerAddress}

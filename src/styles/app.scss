@@ -29,6 +29,10 @@ h6 {
   color: $white;
 }
 
+span {
+  color: $white;
+}
+
 h6, p {
   margin-bottom: 0rem;
   color: $off-white
@@ -350,6 +354,7 @@ textarea.neon-green:focus {
 .card, .accordion {
   background-color: $darker;
 }
+
 .accordion {
   border-radius: 5px;
 
