@@ -306,41 +306,100 @@ const Rewards = ({
 
   const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
 
+  const AprOverlayTrigger = (): React.ReactElement => (
+    <OverlayTrigger
+      key="bottom"
+      placement="bottom"
+      overlay={
+        <Tooltip id="tooltip-bottom">
+          Incentive ends on <span className="neon-pink">{incentiveEndDate()}</span>
+        </Tooltip>
+      }
+    >
+      <Button variant="dark" className="question-small">
+        ?
+      </Button>
+    </OverlayTrigger>
+  );
+
+  const StatusToolTip = (): React.ReactElement => (
+    <>
+      <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be approved in
+      order to be staked. <br />
+      <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked or deposited.{" "}
+      <br />
+      <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be stake to earn
+      rewards. <br />
+      <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning rewards.{" "}
+      <br />
+      <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning rewards
+      because the price is out of your position range. <br />
+      <span className={StakeStatus.out_range}>Expired</span>: LP token is staked on an incentive
+      that already ended.
+    </>
+  );
+
+  const CurrentRewardToolTip = (): React.ReactElement => (
+    <>
+      Amount of CTX that it's been earn while the LP token is staked. You must unstake the LP token
+      in order to claim the reward.s
+    </>
+  );
+
   const RenderHeader = (): React.ReactElement => (
     <div className="rewards">
       <div className="rewards-tier">
-        <div className="rewards-item">
-          <h6>Fee tier:</h6>
-          <NumberFormat
-            className="number"
-            value="0.3"
-            displayType="text"
-            thousandSeparator
-            prefix=""
-            suffix="%"
-            decimalScale={4}
-          />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6>Fee tier:</h6>
+          </div>
+          <div className="value">
+            <NumberFormat
+              className="number"
+              value="0.3"
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              suffix="%"
+              decimalScale={4}
+            />
+          </div>
         </div>
-        <div className="rewards-item">
-          <h6>TCAP/WETH Price: </h6>
-          <NumberFormat
-            className="number"
-            value={cumulativePrice}
-            displayType="text"
-            thousandSeparator
-            suffix=""
-            decimalScale={4}
-          />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6 className="title-price">TCAP/WETH Price: </h6>
+          </div>
+          <div className="value">
+            <NumberFormat
+              className="number"
+              value={cumulativePrice}
+              displayType="text"
+              thousandSeparator
+              suffix=""
+              decimalScale={4}
+            />
+          </div>
         </div>
-        <div className="rewards-item">
-          <h6>APR:</h6>
-          <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6>APR:</h6>
+            {isMobile && <AprOverlayTrigger />}
+          </div>
+          <div className="value">
+            <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+            {!isMobile && <AprOverlayTrigger />}
+          </div>
+        </div>
+      </div>
+      <div className="rewards-total">
+        <div className="rewards-total-heading">
+          <h6>Available to Claim</h6>
           <OverlayTrigger
             key="bottom"
             placement="bottom"
             overlay={
               <Tooltip id="tooltip-bottom">
-                Incentive ends on <span className="neon-pink">{incentiveEndDate()}</span>
+                In order to claim rewards, you need to unstake your token.
               </Tooltip>
             }
           >
@@ -348,37 +407,23 @@ const Rewards = ({
               ?
             </Button>
           </OverlayTrigger>
+          <h6>:</h6>
         </div>
-      </div>
-      <div className="rewards-total">
-        <h6>Available to Claim</h6>
-        <OverlayTrigger
-          key="bottom"
-          placement="bottom"
-          overlay={
-            <Tooltip id="tooltip-bottom">
-              In order to claim rewards, you need to unstake your token.
-            </Tooltip>
-          }
-        >
-          <Button variant="dark" className="question-small">
-            ?
-          </Button>
-        </OverlayTrigger>
-        <h6>:</h6>
-        <div className="amount">
-          <NumberFormat
-            className="number"
-            value={availableReward}
-            displayType="text"
-            thousandSeparator
-            prefix=""
-            decimalScale={4}
-          />
-          <CtxIcon />
-        </div>
-        <div className="claim-button">
-          <ClaimButton />
+        <div className="rewards-total-claim">
+          <div className="amount">
+            <NumberFormat
+              className="number"
+              value={availableReward}
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              decimalScale={4}
+            />
+            <CtxIcon />
+          </div>
+          <div className="claim-button">
+            <ClaimButton />
+          </div>
         </div>
       </div>
     </div>
@@ -411,18 +456,7 @@ const Rewards = ({
             trigger={["hover", "click"]}
             overlay={
               <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
-                approved in order to be staked. <br />
-                <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked or
-                deposited. <br />
-                <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be stake
-                to earn rewards. <br />
-                <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
-                rewards. <br />
-                <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
-                rewards because the price is out of your position range. <br />
-                <span className={StakeStatus.out_range}>Expired</span>: LP token is staked on an
-                incentive that already ended.
+                <StatusToolTip />
               </Tooltip>
             }
           >
@@ -439,8 +473,7 @@ const Rewards = ({
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                    Amount of CTX that it's been earn while the LP token is staked. You must unstake
-                    the LP token in order to claim the reward.
+                    <CurrentRewardToolTip />
                   </Tooltip>
                 }
               >
@@ -547,19 +580,20 @@ const Rewards = ({
     <div className="positions-mobile">
       {ethTcapPositions.sort(sortPositions).map((position, index) => (
         <Card key={index} className="position">
-          <Card.Body>
+          <Card.Header>
             <div className="description">
               <div className="icons">
                 <WETHIcon className="weth" />
                 <TcapIcon className="tcap" />
               </div>
               <div className="title">
-                <span className="tokens">TCAP/WETH Pool</span>
-                <small>Uniswap</small>
+                <span className="tokens">TCAP/WETH Position</span>
               </div>
             </div>
+          </Card.Header>
+          <Card.Body>
             <div className="position-title">
-              <h6>Position</h6>
+              <h6>Range</h6>
             </div>
             <div className="box ranges">
               <div className="min-range">
@@ -573,12 +607,40 @@ const Rewards = ({
             <div className="box status">
               <div className="title">
                 <h6>Status:</h6>
+                <OverlayTrigger
+                  key="top"
+                  placement="auto"
+                  trigger={["hover", "click"]}
+                  overlay={
+                    <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                      <StatusToolTip />
+                    </Tooltip>
+                  }
+                >
+                  <Button variant="dark" className="question-small">
+                    ?
+                  </Button>
+                </OverlayTrigger>
               </div>
               <div className="value">{RenderStatusLabel(position)}</div>
             </div>
             <div className="box reward">
               <div className="title">
                 <h6>Reward:</h6>
+                <OverlayTrigger
+                  key="top"
+                  placement="auto"
+                  trigger={["hover", "click"]}
+                  overlay={
+                    <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                      <CurrentRewardToolTip />
+                    </Tooltip>
+                  }
+                >
+                  <Button variant="dark" className="question-small">
+                    ?
+                  </Button>
+                </OverlayTrigger>
               </div>
               <div className="value">
                 <NumberFormat
@@ -643,10 +705,10 @@ const Rewards = ({
   );
 
   return (
-    <Card className="diamond mb-2 univ3">
+    <Card className="mb-2 univ3">
       {!isMobile ? (
         <>
-          <Card.Header>
+          <Card.Header className="univ3-header">
             <h2>Uniswap V3 Liquidity Rewards</h2>
             {availableReward > 0.001 && ethTcapPositions.length === 0 && (
               <div className="rewards-total">
@@ -668,7 +730,7 @@ const Rewards = ({
               </div>
             )}
           </Card.Header>
-          <Card.Body>
+          <Card.Body className="univ3-body">
             {ownerAddress !== "" ? (
               <>
                 {loading && firstLoad ? (
@@ -684,7 +746,11 @@ const Rewards = ({
         </>
       ) : (
         <>
-          <RenderHeader />
+          <Card className="rewards-mobile">
+            <Card.Body>
+              <RenderHeader />
+            </Card.Body>
+          </Card>
           <RenderRewardsMobile />
         </>
       )}

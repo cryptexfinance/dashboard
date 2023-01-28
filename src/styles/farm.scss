@@ -4,6 +4,7 @@
 .farm {
   padding: 3rem 3rem;
   padding-bottom: 2rem;
+  background-color: $background;
 
   // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
@@ -207,7 +208,7 @@
           }
         }
       }
-      &.diamond {
+      &.univ3, &.liquidity {
         padding-bottom: 1rem;
         width: 100%;
         p {
@@ -297,16 +298,16 @@
             }
           }
         }
-        &.univ3 {
-          .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding-left: 0rem;            
-          }
-          .card-body {
-            padding: 1rem 0rem;
-          }
+
+        .univ3-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          padding-left: 0rem;            
+        }
+
+        .univ3-body {
+          padding: 1rem 0rem;
           thead {
             .btn {
               margin-top: 0rem;
@@ -405,6 +406,16 @@
               display: flex;
               flex-direction: row;
               align-items: center;
+              &-heading {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+              }
+              &-claim {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+              }
               .btn {
                 margin-left: 0rem;
               }
@@ -454,22 +465,7 @@
                 }
               }
             }
-          }
-          .unstaked {
-            text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
-          }
-          .deposited {
-            text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
-          }
-          .staked {
-            text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
-          }
-          .not_approved {
-            text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
-          }
-          .out_range {
-            text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
-          }
+          }          
           .empty-lp{
             display: flex;
             flex-direction: column;
@@ -544,6 +540,26 @@
               margin-left: -10px;
             }
           }
+        }
+
+        .unstaked {
+          text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+        }
+
+        .deposited {
+          text-shadow: 0 0 4px #167226, 0 0 10px #61c4b3, 0 0 20px #167226, 0 -10px 40px #167226;
+        }
+
+        .staked {
+          text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+        }
+
+        .not_approved {
+          text-shadow: 0 0 4px #eeb173, 0 0 10px rgb(236, 97, 97), 0 0 20px #eeb173, 0 -10px 40px #c33;
+        }
+
+        .out_range {
+          text-shadow: 0 0 4px rgb(233, 42, 42), 0 0 10px rgb(236, 97, 97), 0 0 20px rgb(233, 42, 42), 0 -10px 40px #c33;
         }
       }
       th {
@@ -656,13 +672,19 @@
   @media (max-width: 450px) {
     margin-top: 2rem;
     padding: 1rem;    
-    background-color: transparent;
+
     .card-wrapper {
       margin: 0rem;
       .card {
         background-color: transparent;
         padding: 0rem;
         overflow-x: unset;
+
+        &-header {
+          h3 {
+            font-size: 1.2rem;
+          }
+        }        
       }
     }
     
@@ -670,12 +692,90 @@
       display: none;
     }
 
+    .rewards-mobile {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      background-color: $darker !important;
+    }
+
+    .box {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.75rem 0rem;
+      border: 0.5px solid $highlight;
+      border-radius: 5px;
+
+      .title {
+        display: flex;
+        width: 45%;
+        padding: 0.5rem;
+        background-color: $darkest;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+
+        &-price {
+          font-size: 0.85rem;
+        }
+      }
+
+      .value {
+        display: flex;
+        justify-content: flex-end;
+        width: 55%;
+        padding: 0.5rem;
+      }
+    }
+
     .rewards {
       display: flex;
       flex-direction: column;
-      padding: 0.5rem;
-      background-color: $darker;
-    }
+
+      &-tier {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      &-item {
+        .title { 
+          width: 55%;
+        }
+        .value {
+          width: 45%;
+        }
+      }
+
+      &-total {
+        margin-top: 1.5rem;
+        &-heading {
+          display: flex;
+          flex-direction: row;
+        }
+        &-claim {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-top: 0.5rem;
+          border: 0.5px solid $highlight;
+          border-radius: 5px;
+          .amount {
+            display: flex;
+            align-items: center;
+            width: 55%;
+            height: 100%;
+            padding-left: 0.7rem; 
+          }
+          .claim-button {
+            width: 45%;
+            .btn {
+              height: 3rem;
+              width: 100% !important;
+              margin: 0rem !important;
+              border-top-right-radius: 5px;
+              border-bottom-right-radius: 5px;
+            }
+          }
+        }
+      }
+    }    
 
     .positions-mobile {
       svg {
@@ -684,6 +784,14 @@
       .position {
         padding: 1rem !important;
         background-color: $darker;
+
+        .card-header {
+          padding: 0rem;
+        }
+        .card-body {
+          padding: 0rem;
+          padding-top: 1rem;
+        }
         .description {
           display: flex;
           flex-direction: row;
@@ -703,35 +811,20 @@
         }
         .title {
           display: flex;
+          align-items: center;
         }
 
         .ranges {
+          align-items: center;
           padding: 0.5rem;
           border: 0.5px solid $highlight;
-          border-radius: 5px;
-        }
-        .box {
-          display: flex;
-          justify-content: space-between;
-          margin: 0.5rem 0rem;
-          border: 0.5px solid $highlight;
-          border-radius: 5px;
-          .title {
-            width: 45%;
-            padding: 0.5rem;
-            background-color: $darkest;
-            border-top-left-radius: 5px;
-            border-bottom-left-radius: 5px;
-          }
-          .value {
-            display: flex;
-            justify-content: flex-end;
-            width: 55%;
-            padding: 0.5rem;            
-          }
-        }
+          border-radius: 5px;          
+        }        
         .status {
-          display: flex;
+          .value {          
+            display: flex;
+            font-family: "Nineteen Ninety Seven";
+          }
         }
 
         &-actions {

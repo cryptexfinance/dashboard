@@ -8,6 +8,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { ethers } from "ethers";
 import { useTranslation } from "react-i18next";
 import NumberFormat from "react-number-format";
+import { useMediaQuery } from "react-responsive";
 import {
   governanceContext,
   networkContext,
@@ -29,6 +30,7 @@ const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
 const Farm = () => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const tokens = useContext(tokensContext);
@@ -397,13 +399,17 @@ const Farm = () => {
   return (
     <div className="farm">
       <div>
-        <h3>
-          <>{t("farming.farming")}</>
-        </h3>{" "}
+        {!isMobile ? (
+          <h3>
+            <>{t("farming.farming")}</>
+          </h3>
+        ) : (
+          <h5>Uniswap V3 Liquidity Rewards</h5>
+        )}
         <Row className="card-wrapper">
           <UniV3Rewards signer={signer} />
           {currentNetwork.chainId === NETWORKS.mainnet.chainId && (
-            <Card className="diamond mt-4 liquidity">
+            <Card className="mt-4 liquidity">
               <h2>
                 <>{t("farming.liquidity")}</>
               </h2>
@@ -711,15 +717,6 @@ const Farm = () => {
           )}
         </Row>
       </div>
-      {/* <Stake
-        pool={selectedPool}
-        poolTitle={selectedPoolTitle}
-        poolToken={selectedPoolToken}
-        balance={stakeBalance}
-        show={stakeShow}
-        onHide={() => setStakeShow(false)}
-        refresh={() => refresh()}
-                          /> */}
     </div>
   );
 };
