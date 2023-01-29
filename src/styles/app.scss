@@ -39,7 +39,7 @@ h6, p {
 }
 
 body {
-  background-color: $primary;
+  background-color: $background;
 }
 
 .avatar {
@@ -403,7 +403,7 @@ textarea.neon-green:focus {
   overflow: overlay;
 }
 .wrapper::before {
-  background-color: black;
+  background-color: $background;
   opacity: 0.3;
   position: absolute;
   z-index: -1;

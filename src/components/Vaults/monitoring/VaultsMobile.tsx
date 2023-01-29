@@ -7,7 +7,7 @@ import Liquidate from "./Liquidate";
 import { capitalize, TokenIcon, VAULT_STATUS } from "../common";
 import { VaultsPropsType, VaultsType } from "../types";
 import { TOKENS_SYMBOLS } from "../../../utils/constants";
-import { isArbitrum, isInLayer1 } from "../../../utils/utils";
+import { isArbitrum } from "../../../utils/utils";
 
 export const VaultsMobile = ({
   currentAddress,
@@ -40,6 +40,7 @@ export const VaultsMobile = ({
       isHardVault: v.isHardVault,
     };
     const vStatus = v.status === VAULT_STATUS.liquidation ? "active" : v.status;
+    console.log(setVaults);
     return (
       <Button className={vStatus} onClick={() => setVaultToUpdate(vtu)}>
         <span className={vStatus}>Go to Vault</span>
@@ -50,17 +51,6 @@ export const VaultsMobile = ({
   const loadMore = () => {
     const n = vaultsShown + pagination.itemsPerPage;
     setVaultsShown(n);
-  };
-
-  const newVault = () => {
-    const initData = {
-      vaultId: "0",
-      assetSymbol: !isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.TCAP : TOKENS_SYMBOLS.JPEGz,
-      collateralSymbol: TOKENS_SYMBOLS.ETH,
-      isHardVault: isInLayer1(currentNetwork.chainId),
-    };
-    setVaultToUpdate(initData);
-    console.log(setVaults);
   };
 
   const IndexIcon = () => {
@@ -192,9 +182,7 @@ export const VaultsMobile = ({
         <div className="no-vaults-box">
           <p>
             No Vaults yet. Please
-            <Button className="btn-create-vault" onClick={() => newVault()}>
-              CREATE
-            </Button>
+            <span className="neon-pink">{" CREATE "}</span>
             your first vault.
           </p>
         </div>

@@ -21,7 +21,7 @@ const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
 const LiquidityRewards = () => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const signer = useContext(signerContext);
   const tokens = useContext(tokensContext);
   const oracles = useContext(oraclesContext);

@@ -11,7 +11,7 @@ import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
 import { useQuery, gql } from "@apollo/client";
-import { FaArrowsAltH } from "react-icons/fa";
+import { FaArrowsAltH, FaExternalLinkAlt } from "react-icons/fa";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
@@ -59,7 +59,7 @@ const Rewards = ({
   const tokens = useContext(tokensContext);
   const currentNetwork = useContext(networkContext);
   const disableActions = isOptimism(currentNetwork.chainId);
-  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
   const [cumulativePrice, setCumulativePrice] = useState(0);
@@ -588,15 +588,15 @@ const Rewards = ({
               </div>
               <div className="title">
                 <span className="tokens">TCAP/WETH Position</span>
+                <a href={lpUrl()} className="position-link" target="_blank" rel="noreferrer">
+                  Uniswap <FaExternalLinkAlt size={14} />
+                </a>
               </div>
             </div>
           </Card.Header>
           <Card.Body>
             <div className="position-title">
               <h6>Range</h6>
-              <a href={lpUrl()} className="position-link" target="_blank" rel="noreferrer">
-                (Check on Uniswap)
-              </a>
             </div>
             <div className="box ranges">
               <div className="min-range">

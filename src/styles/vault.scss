@@ -1,10 +1,7 @@
 @import "./colors";
 @import "./fonts";
 
-.wrapper::before {
-  background-image: none;
-  background-color: black;
-}
+
 
 .vault {
   display: flex;
