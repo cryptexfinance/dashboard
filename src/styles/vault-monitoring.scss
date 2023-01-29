@@ -461,7 +461,7 @@ span {
     }
   }
 
-  @media (min-width: 451px) {
+  @media (min-width: 601px) {
     .accordion {
       &-button:after {
         display: none;
@@ -469,7 +469,9 @@ span {
     }
   }
 
-  @media (max-width: 450px) {
+
+
+  @media (max-width: 600px) {
     margin-top: 1rem;
     margin-left: 0rem;
     padding: 1rem;
@@ -500,14 +502,7 @@ span {
         }
       }
     }
-    .no-vaults-box {
-      padding: 2rem;
-      border: 1px solid $neon-highlight;
-      border-radius: 5px;
-      .btn-create-vault {
-        padding-left: 0rem;
-      }
-    }
+    
     .btn-create-vault {
       background-color: $highlight;
       margin-top: 3rem;
@@ -683,6 +678,13 @@ span {
         }
       }
     } */
+    }
+
+    .no-vaults-box {
+      padding: 2rem;
+      border: 1px solid $neon-highlight;
+      border-radius: 5px;
+      margin-top: 1.8rem;
     }
   }
 }

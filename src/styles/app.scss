@@ -29,13 +29,17 @@ h6 {
   color: $white;
 }
 
+span {
+  color: $white;
+}
+
 h6, p {
   margin-bottom: 0rem;
   color: $off-white
 }
 
 body {
-  background-color: $primary;
+  background-color: $background;
 }
 
 .avatar {
@@ -350,6 +354,7 @@ textarea.neon-green:focus {
 .card, .accordion {
   background-color: $darker;
 }
+
 .accordion {
   border-radius: 5px;
 
@@ -398,7 +403,7 @@ textarea.neon-green:focus {
   overflow: overlay;
 }
 .wrapper::before {
-  background-color: black;
+  background-color: $background;
   opacity: 0.3;
   position: absolute;
   z-index: -1;
@@ -416,6 +421,9 @@ html,
   height: 100%;
 }
 
+.tooltip > .tooltip-inner {
+  text-align: left;
+}
 
 .farm-tooltip > .tooltip-inner {
   max-width: 300px;
@@ -441,16 +449,19 @@ html,
     text-shadow: 0 0 4px #c33,0 0 10px rgb(236, 97, 97),0 0 20px #c33,0 -10px 40px #c33;
   }
 }
+
 .vaults-tooltip > .tooltip-inner {
   width: auto;
   text-align: right;
   padding: 0.9rem;
 }
+
 .ttip-hard-vault > .tooltip-inner {
   max-width: 390px;
   width: 390px;
   text-align: left;
 }
+
 .ttip-features > .tooltip-inner {
   max-width: 550px;
   width: 550px;
@@ -488,6 +499,11 @@ html,
   }
   .out_range {
     text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
+  }
+
+  @media (max-width: 450px) {
+    width: 360px;
+    min-width: 360px;
   }
 }
 
@@ -687,6 +703,12 @@ form {
   }
   .alert {
     margin-top: 4rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .number {
+    font-size: 0.9rem;
   }
 }
 

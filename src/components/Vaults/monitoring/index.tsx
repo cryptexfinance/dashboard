@@ -74,7 +74,7 @@ const showAllVaults = true;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 450px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const vaults = useContext(vaultsContext);
@@ -914,6 +914,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
             className="btn-create-vault"
             onClick={() => newVault()}
             disabled={currentAddress === ""}
+            variant="secondary"
           >
             New Vault
           </Button>

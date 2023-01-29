@@ -4,6 +4,7 @@
 .farm {
   padding: 3rem 3rem;
   padding-bottom: 2rem;
+  background-color: $background;
 
   // Small devices (landscape phones, 576px and up)
   @media (min-width: 576px) {
@@ -207,7 +208,7 @@
           }
         }
       }
-      &.diamond {
+      &.univ3, &.liquidity {
         padding-bottom: 1rem;
         width: 100%;
         p {
@@ -297,16 +298,16 @@
             }
           }
         }
-        &.univ3 {
-          .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding-left: 0rem;            
-          }
-          .card-body {
-            padding: 1rem 0rem;
-          }
+
+        .univ3-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          padding-left: 0rem;            
+        }
+
+        .univ3-body {
+          padding: 1rem 0rem;
           thead {
             .btn {
               margin-top: 0rem;
@@ -337,7 +338,7 @@
           .btn.small {
             width: 5rem;
             @media (max-width: 1550px) { 
-              width: 7rem !important;
+              width: 7rem;
             }
           }
           .btn.claim {
@@ -405,6 +406,16 @@
               display: flex;
               flex-direction: row;
               align-items: center;
+              &-heading {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+              }
+              &-claim {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+              }
               .btn {
                 margin-left: 0rem;
               }
@@ -431,15 +442,7 @@
             .tokens {
               font-size: 0.9rem;
               color: $purple ;
-            }
-            .status {
-              font-size: 0.6rem;
-              font-family: "Space Mono";
-              background-color: #281e31;
-              padding: 0.2rem;
-              border-radius: 5px;
-              border: 1px solid #38d6b2;
-            }
+            }            
             .ranges {
               display: flex;
               width: 100%;
@@ -462,96 +465,116 @@
                 }
               }
             }
+          }          
+        }
+
+        .empty-lp {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .lp-box {
+            border: 1px solid $light;
+            border-radius: 5px;
+            background-color: #281e31a3;
           }
-          .unstaked {
-            text-shadow: 0 0 4px #7940f2,0 0 10px #fcdf49,0 0 20px #f28040,0 -10px 40px #c33;
-          }
-          .deposited {
-            text-shadow: 0 0 4px #167226,0 0 10px #61c4b3,0 0 20px #167226,0 -10px 40px #167226;
-          }
-          .staked {
-            text-shadow: 0 0 4px #e440f2,0 0 10px #e98ff1,0 0 20px #e440f2,0 -10px 40px #b626c4;
-          }
-          .not_approved {
-            text-shadow: 0 0 4px #eeb173,0 0 10px rgb(236, 97, 97),0 0 20px #eeb173,0 -10px 40px #c33;
-          }
-          .out_range {
-            text-shadow: 0 0 4px rgb(233, 42, 42),0 0 10px rgb(236, 97, 97),0 0 20px rgb(233, 42, 42),0 -10px 40px #c33;
-          }
-          .empty-lp{
+
+          .lp-info {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            .lp-box {
-              border: 1px solid $light;
-              border-radius: 5px;
-              background-color: #281e31a3;
-            }
-            .lp-info {
+            padding: 15px;
+
+            .row1 {
               display: flex;
-              flex-direction: column;
-              padding: 15px;
-              .row1 {
-                display: flex;
-                flex-direction: row;
-              }
-              .row2 {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                margin-top: 0.6rem;
-                h6 {
-                  font-size: 0.9rem;
-                  margin: 0rem;
-                }
-                .number {
-                  font-size: 0.85rem;
-                  margin-left: 0.3rem;                  
-                }
-                .neon-pink {
-                  margin-left: 0.3rem;
-                  font-size: 0.9rem;                  
-                  text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
-                }
-              }
+              flex-direction: row;
             }
-            .icons {
+
+            .row2 {
               display: flex;
+              flex-direction: row;
+              justify-content: center;
               align-items: center;
-              padding: 5px;
-              padding-top: 0px;
-            }
-            .description {
-              margin-left: 10px;
-              padding: 5px;
-            }
-            .uni {
-              margin-left: -10px;
-              filter: drop-shadow(0 0 5px #a440f2);
-            }
-            .btn-box {
-              width: 100%;
-            }
-            .btn {
-              font-size: 0.9rem;
-              height: 2.5rem;
-              width: 100%;
-              border: 0px;
-              border-top: 0.8px solid $light;
-              background-color: #281e31;
-              margin: 0px;
-              padding-top: 8px;
-              border-bottom-left-radius: 5px;
-              border-bottom-right-radius: 5px;
-            }
-            .btn:hover {
-              color: $white;
-            }
-            small {
-              margin-left: -10px;
+              margin-top: 0.6rem;
+
+              h6 {
+                font-size: 0.9rem;
+                margin: 0rem;
+              }
+
+              .number {
+                font-size: 0.85rem;
+                margin-left: 0.3rem;
+              }
+
+              .neon-pink {
+                margin-left: 0.3rem;
+                font-size: 0.9rem;
+                text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+              }
             }
           }
+
+          .icons {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            padding-top: 0px;
+          }
+
+          .description {
+            margin-left: 10px;
+            padding: 5px;
+          }
+
+          .uni {
+            margin-left: -10px;
+            filter: drop-shadow(0 0 5px #a440f2);
+          }
+
+          .btn-box {
+            width: 100%;
+          }
+
+          .btn {
+            font-size: 0.9rem;
+            height: 2.5rem;
+            width: 100%;
+            border: 0px;
+            border-top: 0.8px solid $light;
+            background-color: #281e31;
+            margin: 0px;
+            padding-top: 8px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+          }
+
+          .btn:hover {
+            color: $white;
+          }
+
+          small {
+            margin-left: -10px;
+          }
+        }
+
+        .unstaked {
+          text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+        }
+
+        .deposited {
+          text-shadow: 0 0 4px #167226, 0 0 10px #61c4b3, 0 0 20px #167226, 0 -10px 40px #167226;
+        }
+
+        .staked {
+          text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+        }
+
+        .not_approved {
+          text-shadow: 0 0 4px #eeb173, 0 0 10px rgb(236, 97, 97), 0 0 20px #eeb173, 0 -10px 40px #c33;
+        }
+
+        .out_range {
+          text-shadow: 0 0 4px rgb(233, 42, 42), 0 0 10px rgb(236, 97, 97), 0 0 20px rgb(233, 42, 42), 0 -10px 40px #c33;
         }
       }
       th {
@@ -660,4 +683,235 @@
       }
     }
   }
+
+  @media (max-width: 600px) {
+    margin-top: 2rem;
+    padding: 1rem;    
+
+    .card-wrapper {
+      margin: 0rem;
+      .card {
+        background-color: transparent;
+        padding: 0rem;
+        overflow-x: unset;
+
+        &-header {
+          h3 {
+            font-size: 1.2rem;
+          }
+        }        
+      }
+    }
+    
+    .rewards-mobile {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      background-color: $darker !important;
+    }
+
+    .box {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.75rem 0rem;
+      border: 0.5px solid $highlight;
+      border-radius: 5px;
+
+      .title {
+        display: flex;
+        width: 45%;
+        padding: 0.5rem;
+        background-color: $darkest;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+
+        &-price {
+          font-size: 0.85rem;
+        }
+      }
+
+      .value {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 55%;
+        padding: 0.5rem;
+      }
+    }
+
+    .rewards {
+      display: flex;
+      flex-direction: column;
+
+      &-tier {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      &-item {
+        .title { 
+          width: 55%;
+        }
+        .value {
+          width: 45%;
+        }
+      }
+
+      &-total {
+        margin-top: 1.5rem;
+        &-heading {
+          display: flex;
+          flex-direction: row;
+        }
+        &-claim {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-top: 0.5rem;
+          border: 0.5px solid $highlight;
+          border-radius: 5px;
+          .amount {
+            display: flex;
+            align-items: center;
+            width: 55%;
+            height: 100%;
+            padding-left: 0.7rem; 
+          }
+          .claim-button {
+            width: 45%;
+            .btn {
+              height: 3rem;
+              width: 100% !important;
+              margin: 0rem !important;
+              border-top-right-radius: 5px;
+              border-bottom-right-radius: 5px;
+            }
+          }
+        }
+      }
+    }    
+
+    .empty-lp {
+      margin-top: 2rem;
+      
+      .lp-box {
+        width: 95%;
+      }
+      .lp-info {
+        padding-bottom: 1.6rem !important;
+      }
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 3rem !important;
+      }
+    }
+
+    .positions-mobile {
+      svg {
+        color: white;
+      }
+      .position {
+        padding: 1rem !important;
+        background-color: $darker;
+
+        .card-header {
+          padding: 0rem;
+        }
+        .card-body {
+          padding: 0rem;
+          padding-top: 1rem;
+        }
+        &-title {
+          display: flex;
+          align-items: center;          
+        }
+        
+        .title {
+          display: flex;
+          align-items: center;
+        }
+        .description {
+          display: flex;
+          flex-direction: row;
+          margin-bottom: 1rem;
+          svg {
+            color: $highlight;
+          }
+          .title {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+          }
+        }
+        .icons {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-right: 1rem;
+
+          svg {
+            margin-top: 0rem;
+          }
+
+          .weth {
+            margin-right: 0.5rem;
+          }
+        }
+        .ranges {
+          align-items: center;
+          padding: 0.5rem;
+          border: 0.5px solid $highlight;
+          border-radius: 5px;          
+        }        
+        .status {
+          .value {          
+            display: flex;
+            font-family: "Nineteen Ninety Seven";
+          }
+        }
+
+        &-actions {
+          display: grid;
+          grid-template-columns: 50% 50%;
+          gap: 0.5rem;
+          padding: 1rem 0rem;
+          .btn {
+            height: 3rem;
+            width: 95% !important;
+            margin: 0rem !important;
+          }
+        }
+      }
+    }
+
+    .liquidity {
+      margin-top: 4rem !important;
+
+      &-reward {
+        background-color: $darker !important;
+        margin-bottom: 1.5rem;
+
+        &-header {
+          display: flex;
+          align-items: center;
+          .icons {
+            margin-right: 1rem;
+          }
+        }
+        &-actions {
+          display: grid;
+          grid-template-columns: 50% 50%;
+          gap: 0.5rem;
+
+          .btn {
+            height: 3rem !important;
+            width: 95% !important;
+            margin: 0rem !important;
+          }
+        }
+      }
+    }
+  }
+
+
 }

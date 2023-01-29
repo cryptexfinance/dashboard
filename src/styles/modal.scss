@@ -284,4 +284,15 @@
       overflow-x: scroll;
     }
   }
+
+  @media (max-width: 1000px) {
+    padding: 0.5rem;
+
+    .modal-body {
+      padding: 0rem 0.5rem;
+    }
+    .modal-footer {
+      padding: 0.5rem;
+    }
+  }
 }
