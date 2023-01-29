@@ -466,79 +466,94 @@
               }
             }
           }          
-          .empty-lp{
+        }
+
+        .empty-lp {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .lp-box {
+            border: 1px solid $light;
+            border-radius: 5px;
+            background-color: #281e31a3;
+          }
+
+          .lp-info {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            .lp-box {
-              border: 1px solid $light;
-              border-radius: 5px;
-              background-color: #281e31a3;
-            }
-            .lp-info {
+            padding: 15px;
+
+            .row1 {
               display: flex;
-              flex-direction: column;
-              padding: 15px;
-              .row1 {
-                display: flex;
-                flex-direction: row;
-              }
-              .row2 {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                margin-top: 0.6rem;
-                h6 {
-                  font-size: 0.9rem;
-                  margin: 0rem;
-                }
-                .number {
-                  font-size: 0.85rem;
-                  margin-left: 0.3rem;                  
-                }
-                .neon-pink {
-                  margin-left: 0.3rem;
-                  font-size: 0.9rem;                  
-                  text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
-                }
-              }
+              flex-direction: row;
             }
-            .icons {
+
+            .row2 {
               display: flex;
+              flex-direction: row;
+              justify-content: center;
               align-items: center;
-              padding: 5px;
-              padding-top: 0px;
+              margin-top: 0.6rem;
+
+              h6 {
+                font-size: 0.9rem;
+                margin: 0rem;
+              }
+
+              .number {
+                font-size: 0.85rem;
+                margin-left: 0.3rem;
+              }
+
+              .neon-pink {
+                margin-left: 0.3rem;
+                font-size: 0.9rem;
+                text-shadow: 0 0 4px #f195f9, 0 0 10px #fff, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+              }
             }
-            .description {
-              margin-left: 10px;
-              padding: 5px;
-            }
-            .uni {
-              margin-left: -10px;
-              filter: drop-shadow(0 0 5px #a440f2);
-            }
-            .btn-box {
-              width: 100%;
-            }
-            .btn {
-              font-size: 0.9rem;
-              height: 2.5rem;
-              width: 100%;
-              border: 0px;
-              border-top: 0.8px solid $light;
-              background-color: #281e31;
-              margin: 0px;
-              padding-top: 8px;
-              border-bottom-left-radius: 5px;
-              border-bottom-right-radius: 5px;
-            }
-            .btn:hover {
-              color: $white;
-            }
-            small {
-              margin-left: -10px;
-            }
+          }
+
+          .icons {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            padding-top: 0px;
+          }
+
+          .description {
+            margin-left: 10px;
+            padding: 5px;
+          }
+
+          .uni {
+            margin-left: -10px;
+            filter: drop-shadow(0 0 5px #a440f2);
+          }
+
+          .btn-box {
+            width: 100%;
+          }
+
+          .btn {
+            font-size: 0.9rem;
+            height: 2.5rem;
+            width: 100%;
+            border: 0px;
+            border-top: 0.8px solid $light;
+            background-color: #281e31;
+            margin: 0px;
+            padding-top: 8px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+          }
+
+          .btn:hover {
+            color: $white;
+          }
+
+          small {
+            margin-left: -10px;
           }
         }
 
@@ -688,10 +703,6 @@
       }
     }
     
-    .liquidity {
-      display: none;
-    }
-
     .rewards-mobile {
       margin-top: 1.5rem;
       margin-bottom: 1rem;
@@ -721,6 +732,7 @@
       .value {
         display: flex;
         justify-content: flex-end;
+        align-items: center;
         width: 55%;
         padding: 0.5rem;
       }
@@ -777,6 +789,23 @@
       }
     }    
 
+    .empty-lp {
+      margin-top: 2rem;
+      
+      .lp-box {
+        width: 95%;
+      }
+      .lp-info {
+        padding-bottom: 1.6rem !important;
+      }
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 3rem !important;
+      }
+    }
+
     .positions-mobile {
       svg {
         color: white;
@@ -791,6 +820,13 @@
         .card-body {
           padding: 0rem;
           padding-top: 1rem;
+        }
+        &-title {
+          display: flex;
+          align-items: center;          
+        }
+        &-link {
+          margin-left: 0.5rem;
         }
         .description {
           display: flex;
@@ -831,9 +867,37 @@
           display: grid;
           grid-template-columns: 50% 50%;
           gap: 0.5rem;
-          padding: 0rem;
+          padding: 1rem 0rem;
           .btn {
             height: 3rem;
+            width: 95% !important;
+            margin: 0rem !important;
+          }
+        }
+      }
+    }
+
+    .liquidity {
+      margin-top: 4rem !important;
+
+      &-reward {
+        background-color: $darker !important;
+        margin-bottom: 1.5rem;
+
+        &-header {
+          display: flex;
+          align-items: center;
+          .icons {
+            margin-right: 1rem;
+          }
+        }
+        &-actions {
+          display: grid;
+          grid-template-columns: 50% 50%;
+          gap: 0.5rem;
+
+          .btn {
+            height: 3rem !important;
             width: 95% !important;
             margin: 0rem !important;
           }

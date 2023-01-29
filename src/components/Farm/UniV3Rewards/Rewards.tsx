@@ -594,6 +594,9 @@ const Rewards = ({
           <Card.Body>
             <div className="position-title">
               <h6>Range</h6>
+              <a href={lpUrl()} className="position-link" target="_blank" rel="noreferrer">
+                (Check on Uniswap)
+              </a>
             </div>
             <div className="box ranges">
               <div className="min-range">
@@ -704,6 +707,17 @@ const Rewards = ({
     </div>
   );
 
+  const RenderMobile = () => (
+    <>
+      <Card className="rewards-mobile">
+        <Card.Body>
+          <RenderHeader />
+        </Card.Body>
+      </Card>
+      <RenderRewardsMobile />
+    </>
+  );
+
   return (
     <Card className="mb-2 univ3">
       {!isMobile ? (
@@ -746,12 +760,17 @@ const Rewards = ({
         </>
       ) : (
         <>
-          <Card className="rewards-mobile">
-            <Card.Body>
-              <RenderHeader />
-            </Card.Body>
-          </Card>
-          <RenderRewardsMobile />
+          {ownerAddress !== "" ? (
+            <>
+              {loading && firstLoad ? (
+                <Spinner variant="danger" className="spinner" animation="border" />
+              ) : (
+                <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderMobile()}</>
+              )}
+            </>
+          ) : (
+            <RenderEmptyLP />
+          )}
         </>
       )}
       <ClaimReward
