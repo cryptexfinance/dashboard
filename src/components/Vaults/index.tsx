@@ -41,11 +41,13 @@ const Vaults = () => {
 
   if (isMinting) {
     return (
-      <Vault
-        currentAddress={currentAddress}
-        vaultInitData={currrentVault}
-        goBack={() => setMinting(false)}
-      />
+      <>
+        <Vault
+          currentAddress={currentAddress}
+          vaultInitData={currrentVault}
+          goBack={() => setMinting(false)}
+        />
+      </>
     );
   }
 
