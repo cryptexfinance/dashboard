@@ -531,9 +531,6 @@
           color: $lighter;
           font-size: 0.8rem;
           margin-right: 0.5rem;
-          // background-color: $darkest;
-          // border-top-left-radius: 5px;
-          // border-bottom-left-radius: 5px;
         }
 
         .token-value {
@@ -541,7 +538,7 @@
           flex-direction: row;
           align-items: center;
           margin-bottom: 0.2rem;
-          svg {
+          svg, .jpegz {
             width: 17px;
             height: 17px;
             margin-right: 5px;
