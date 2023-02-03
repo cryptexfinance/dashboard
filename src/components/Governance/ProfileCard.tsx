@@ -16,7 +16,8 @@ import { governanceContext, signerContext } from "../../state";
 import { VoteBadge, ProfileImage } from "./common";
 import { ReactComponent as CtxIcon } from "../../assets/images/ctx-coin.svg";
 import { infoType } from "./data";
-import { API_ENDPOINT, FEATURES } from "../../utils/constants";
+import { API_ENDPOINT } from "../../api/constants";
+import { FEATURES } from "../../utils/constants";
 
 type props = {
   delegator: {
@@ -164,7 +165,7 @@ const ProfileCard = ({
         <ProfileImage
           address={delegator.delegatee}
           image={
-            FEATURES.KEEPERS_API ? `${API_ENDPOINT}/${info?.image}` : "images/".concat(info?.image)
+            FEATURES.KEEPERS_API ? `${API_ENDPOINT}${info?.image}` : "images/".concat(info?.image)
           }
           size={25}
         />

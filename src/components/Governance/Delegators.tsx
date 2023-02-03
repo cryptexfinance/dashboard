@@ -9,7 +9,7 @@ import Delegate from "./Delegate";
 import Withdraw from "./Withdraw";
 import StakerStats from "./StakerStats";
 import { governanceContext, networkContext, signerContext } from "../../state";
-import { API_ENDPOINT } from "../../utils/constants";
+import { KEEPER_ALL_ENDPOINT } from "../../api";
 import { isInLayer1 } from "../../utils/utils";
 
 type props = {
@@ -130,7 +130,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
   useEffect(() => {
     const loadData = async () => {
       const loadKeepersFromDB = async (currentDelegators: any) => {
-        await fetch(`${API_ENDPOINT}/cryptkeeper/all`, {
+        await fetch(KEEPER_ALL_ENDPOINT, {
           method: "GET",
         })
           .then((response) => response.json())
