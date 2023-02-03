@@ -1099,7 +1099,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const RenderIndexBalance = (isCollateral: boolean) => {
     const aBalance = isCollateral ? collateralBalance : indexBalance;
     const aBalanceUSD = isCollateral ? collateralBalanceUSD : indexBalanceUSD;
-
+    const iconSymbol = isCollateral ? vaultData.collateralSymbol : vaultData.assetSymbol;
     return (
       <div className="asset-box-balance">
         <span className="asset-box-balance-title">Wallet Balance:</span>
@@ -1107,24 +1107,26 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           {isLoading ? (
             <Spinner className="spinner xsmall spinner-gray" animation="border" />
           ) : (
-            <OverlayTrigger
-              key="top"
-              placement="right"
-              trigger={["hover", "click"]}
-              overlay={
-                <Tooltip id="ttip-balance" className="ttip-balance">
-                  ${parseFloat(aBalanceUSD).toFixed(2)}
-                </Tooltip>
-              }
-            >
+            <>
+              <div className="token-value">
+                <TokenIcon name={iconSymbol} />
+                <NumberFormat
+                  className="number neon-green"
+                  value={aBalance}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={2}
+                />
+              </div>
               <NumberFormat
-                className="number"
-                value={aBalance}
+                className="number usd-balance"
+                value={aBalanceUSD}
                 displayType="text"
                 thousandSeparator
                 decimalScale={2}
+                prefix="$"
               />
-            </OverlayTrigger>
+            </>
           )}
         </span>
       </div>
@@ -1138,24 +1140,26 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         {isLoading ? (
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
-          <OverlayTrigger
-            key="top"
-            placement="right"
-            trigger={["hover", "click"]}
-            overlay={
-              <Tooltip id="ttip-balance" className="ttip-balance">
-                ${parseFloat(vaultCollateralUSD).toFixed(2)}
-              </Tooltip>
-            }
-          >
+          <>
+            <div className="token-value">
+              <TokenIcon name={vaultData.collateralSymbol} />
+              <NumberFormat
+                className="number neon-green"
+                value={vaultCollateral}
+                displayType="text"
+                thousandSeparator
+                decimalScale={tokenBalanceDecimals}
+              />
+            </div>
             <NumberFormat
-              className="number"
-              value={vaultCollateral}
+              className="number usd-balance"
+              value={vaultCollateralUSD}
               displayType="text"
               thousandSeparator
               decimalScale={tokenBalanceDecimals}
+              prefix="$"
             />
-          </OverlayTrigger>
+          </>
         )}
       </span>
     </div>
@@ -1168,24 +1172,26 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         {isLoading ? (
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
-          <OverlayTrigger
-            key="top"
-            placement="right"
-            trigger={["hover", "click"]}
-            overlay={
-              <Tooltip id="ttip-balance" className="ttip-balance">
-                ${parseFloat(vaultDebtUSD).toFixed(2)}
-              </Tooltip>
-            }
-          >
+          <>
+            <div className="token-value">
+              <TokenIcon name={vaultData.assetSymbol} />
+              <NumberFormat
+                className="number neon-green"
+                value={vaultDebt}
+                displayType="text"
+                thousandSeparator
+                decimalScale={tokenBalanceDecimals}
+              />
+            </div>
             <NumberFormat
-              className="number"
-              value={vaultDebt}
+              className="number usd-balance"
+              value={vaultDebtUSD}
               displayType="text"
               thousandSeparator
               decimalScale={tokenBalanceDecimals}
+              prefix="$"
             />
-          </OverlayTrigger>
+          </>
         )}
       </span>
     </div>
@@ -1429,11 +1435,11 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                               displayType="text"
                               thousandSeparator
                               decimalScale={tokenBalanceDecimals}
-                              suffix="% -"
+                              suffix="%"
                             />
                           </h4>
                         </div>
-                        <span>-</span>
+                        <span className="separator">-</span>
                         <p className="number">
                           <span className={`number ratio-status ${vaultStatus}`}>
                             {vaultStatus.toLocaleUpperCase()}

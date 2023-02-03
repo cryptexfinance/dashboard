@@ -127,6 +127,10 @@ body {
   background-color: $pink;
 }
 
+.btn-success {
+  border-color: $bright-green;
+}
+
 .input-group .btn.neon-orange {
   border: 1px solid $orange;
   box-sizing: border-box;
@@ -140,17 +144,35 @@ body {
 }
 
 .btn.neon-green {
-  border: 1px solid $green;
+  border: 1px solid $bright-green;
   border-radius: 2px;
   box-sizing: border-box;
   box-shadow: 0px 0px 4px rgba(63, 217, 180, 0.3), 0px 4px 14px rgba(112, 235, 183, 0.2);
 }
+
+/* .btn.neon-green {
+  border: 1px solid $green;
+  border-radius: 2px;
+  box-sizing: border-box;
+  box-shadow: 0px 0px 4px rgba(63, 217, 180, 0.3), 0px 4px 14px rgba(112, 235, 183, 0.2);
+} */
 
 .btn.neon-pink {
   border: 1px solid $pink;
   box-sizing: border-box;
   box-shadow: 0px 6px 39px -6px rgba(241, 36, 255, 0.4);
 }
+
+.btn.neon-brightgreen {
+  border: 1.5px solid $bright-green;
+  box-sizing: border-box;
+  box-shadow: 0px 6px 39px -6px #4cd70c77;
+}
+
+.btn.neon-brightgreen {
+  background-color: $bright-green;
+}
+
 
 .dropdown {
   border-radius: 5px;
@@ -236,7 +258,7 @@ body {
 }
 
 .number.neon-green {
-  text-shadow: 0px 4px 13px $green;
+  text-shadow: 0px 4px 13px $bright-green;
 }
 
 .number.neon-yellow,
@@ -306,8 +328,8 @@ input[type="file"] {
 
 input[type="text"].neon-green:focus,
 input[type="number"].neon-green:focus {
-  border-color: $green !important;
-  box-shadow: -1px 0px 15px -6px $green;
+  border-color: $bright-green !important;
+  box-shadow: -1px 0px 15px -6px $bright-green;
   background: no-repeat;
   color: $white;
 }

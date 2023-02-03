@@ -135,7 +135,7 @@ const Delegate = ({
           <Form.Group className="" controlId="">
             {isApproved ? (
               <>
-                <p>{t("governance.stake-info")}</p>
+                <p className="delegate-description">{t("governance.stake-info")}</p>
                 <Form.Label>{t("governance.amount-stake")}</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>

@@ -221,11 +221,11 @@
     .btn-max {
       display: flex;
       padding: 0.4rem 0.8rem;
-      border: 1px solid $green;
+      border: 1px solid $bright-green;
       border-radius: 5px;
       background-color: $darkest;
       font-size: 0.9rem;
-      color: $green;
+      color: $bright-green;
 
       &.orange {
         border: 1px solid $orange;
@@ -440,16 +440,19 @@
       justify-content: space-between;
       padding: 0rem 1rem;
     }
+
     .asset-box {
       width: 100%;
       &.right {
         align-items: flex-end;
       }
     }
+
     .vault-form {
       margin-top: 3.5rem;
       padding: 0rem 1rem;
     }
+
     .assets-balance {
       display: flex;
       flex-direction: row;
@@ -516,19 +519,50 @@
       .asset-box-balance {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 94%;
-        padding: 0.2rem 0.2rem;
+        border: 0.5px solid $dark;
+        border-radius: 5px;
+        margin-bottom: 0.7rem;
 
         &-title {
+          padding: 0.5rem;
+         width: 50%;
           color: $lighter;
           font-size: 0.8rem;
           margin-right: 0.5rem;
+          // background-color: $darkest;
+          // border-top-left-radius: 5px;
+          // border-bottom-left-radius: 5px;
+        }
+
+        .token-value {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-bottom: 0.2rem;
+          svg {
+            width: 17px;
+            height: 17px;
+            margin-right: 5px;
+          }
+
         }
 
         &-value {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: space-around;
+          padding: 0.2rem 0.5rem;
+          width: 50%;
           font-size: 0.75rem;
           color: $white;
-          text-shadow: 0px 4px 13px rgba(223, 33, 254, 0.8);
+          text-shadow: 0px 4px 13px rgba(225, 33, 254, 0.661);          
+        }
+
+        .usd-balance {
+          font-size: 0.6rem;
         }
 
         &-value:hover {
@@ -567,6 +601,9 @@
         .number {
           font-size: 0.95rem;
           margin-bottom: 0rem;
+        }
+        .separator {
+          margin: 0rem 0.5rem;
         }
         .ratio-status {
           font-size: 0.95rem;

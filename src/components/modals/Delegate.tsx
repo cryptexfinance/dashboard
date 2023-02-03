@@ -55,7 +55,7 @@ export const Delegate = ({ show, onHide, refresh }: props) => {
         <Modal.Title id="contained-modal-title-vcenter">Delegate CTX</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Delegate your CTX tokens to an Adress so it can vote for you.</p>
+        <p className="delegate-description">Delegate your CTX tokens to an Adress so it can vote for you.</p>
         <Form>
           <Form.Group>
             <Form.Label>Address</Form.Label>
