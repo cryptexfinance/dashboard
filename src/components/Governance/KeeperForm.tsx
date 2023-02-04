@@ -223,8 +223,9 @@ const KeeperForm = ({
       setImageError(t("errors.invalid-file-type"));
       return false;
     }
-    if (value.size > 180000) {
-      setImageError(t("errors.invalid-image-size", { size: Math.round(value.size / 1000) }));
+    const maxSize = 250000;
+    if (value.size > maxSize) {
+      setImageError(t("errors.invalid-image-size", { size: Math.round(maxSize / 1000) }));
       setImageUrl("");
       return false;
     }
