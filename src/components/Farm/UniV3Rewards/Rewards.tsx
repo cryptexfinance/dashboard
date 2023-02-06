@@ -5,19 +5,18 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Table from "react-bootstrap/esm/Table";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
+import { useMediaQuery } from "react-responsive";
 import { useTranslation } from "react-i18next";
 import { BigNumber, ethers } from "ethers";
 import NumberFormat from "react-number-format";
 import { Contract } from "ethers-multicall";
 import { useQuery, gql } from "@apollo/client";
-import { FaArrowsAltH } from "react-icons/fa";
+import { FaArrowsAltH, FaExternalLinkAlt } from "react-icons/fa";
 import { ReactComponent as TcapIcon } from "../../../assets/images/tcap-coin.svg";
 import { ReactComponent as CtxIcon } from "../../../assets/images/ctx-coin.svg";
 import { ReactComponent as WETHIcon } from "../../../assets/images/graph/weth.svg";
 import { ReactComponent as UNIIconSmall } from "../../../assets/images/vault/uni.svg";
-import NetworkContext from "../../../state/NetworkContext";
-import { SignerContext } from "../../../state/SignerContext";
-import TokensContext from "../../../state/TokensContext";
+import { ISignerContext, networkContext, tokensContext } from "../../../state";
 import { NETWORKS } from "../../../utils/constants";
 import { UNIV3, computeIncentiveId } from "../../../utils/univ3";
 import {
@@ -26,6 +25,7 @@ import {
   errorNotification,
   notifyUser,
   numberFormatStr,
+  isOptimism,
 } from "../../../utils/utils";
 import { IncentiveType, PositionType, positionDefaultValues, StakeStatus } from "./types";
 import ClaimReward from "./ClaimReward";
@@ -34,7 +34,7 @@ import Apr from "./Apr";
 
 type props = {
   ownerAddress: string;
-  signer: SignerContext;
+  signer: ISignerContext;
   stakerContract: ethers.Contract | undefined;
   stakerContractRead: Contract | undefined;
   nfpmContract: ethers.Contract | undefined;
@@ -56,8 +56,10 @@ const Rewards = ({
   poolContractRead,
 }: props) => {
   const { t } = useTranslation();
-  const tokens = useContext(TokensContext);
-  const currentNetwork = useContext(NetworkContext);
+  const tokens = useContext(tokensContext);
+  const currentNetwork = useContext(networkContext);
+  const disableActions = isOptimism(currentNetwork.chainId);
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const [ethTcapIncentive, setEthTcapIncentive] = useState<Array<IncentiveType>>([]);
   const [ethTcapPositions, setEthTcapPositions] = useState<Array<PositionType>>([]);
   const [cumulativePrice, setCumulativePrice] = useState(0);
@@ -88,8 +90,8 @@ const Rewards = ({
   const confIncetive = (): any => {
     let ethTcapPool = UNIV3.mainnet.tcapPool;
     switch (currentNetwork.chainId) {
-      case NETWORKS.rinkeby.chainId:
-        ethTcapPool = UNIV3.rinkeby.tcapPool;
+      case NETWORKS.goerli.chainId:
+        ethTcapPool = UNIV3.goerli.tcapPool;
         break;
       default:
         ethTcapPool = UNIV3.mainnet.tcapPool;
@@ -201,18 +203,20 @@ const Rewards = ({
     });
   };
 
-  const { loading, data, error, refetch } = useQuery(OWNER_POSITIONS, {
+  const { loading, refetch } = useQuery(OWNER_POSITIONS, {
     fetchPolicy: "no-cache",
     pollInterval: 90000,
     notifyOnNetworkStatusChange: true,
     variables: { owner: ownerAddress.toLowerCase() },
-    onError: () => {
+    onError: (error) => {
       console.log(error);
     },
-    onCompleted: () => {
+    onCompleted: (data: any) => {
       if (signer.signer && ownerAddress !== "") {
-        loadData(data);
-        setFirstLoad(false);
+        if (!disableActions) {
+          loadData(data);
+          setFirstLoad(false);
+        }
       } else {
         confIncetive();
       }
@@ -228,11 +232,14 @@ const Rewards = ({
   };
 
   const lpUrl = () => {
+    if (disableActions) {
+      return "https://app.uniswap.org/";
+    }
     const tcapAddress = tokens.tcapToken?.address;
     let { feeTier } = UNIV3.mainnet.tcapPool;
     let wethAddress = NETWORKS.mainnet.eth;
-    if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
-      feeTier = UNIV3.rinkeby.tcapPool.feeTier;
+    if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
+      feeTier = UNIV3.goerli.tcapPool.feeTier;
       wethAddress = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
     }
 
@@ -271,7 +278,7 @@ const Rewards = ({
         className=" ml-4 claim"
         disabled={btnDisabled}
       >
-        {t("claim")}
+        <>{t("claim")}</>
       </Button>
     );
   };
@@ -299,41 +306,100 @@ const Rewards = ({
 
   const sortPositions = (p1: PositionType, p2: PositionType) => p1.lpTokenId - p2.lpTokenId;
 
+  const AprOverlayTrigger = (): React.ReactElement => (
+    <OverlayTrigger
+      key="bottom"
+      placement="bottom"
+      overlay={
+        <Tooltip id="tooltip-bottom">
+          Incentive ends on <span className="neon-pink">{incentiveEndDate()}</span>
+        </Tooltip>
+      }
+    >
+      <Button variant="dark" className="question-small">
+        ?
+      </Button>
+    </OverlayTrigger>
+  );
+
+  const StatusToolTip = (): React.ReactElement => (
+    <>
+      <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be approved in
+      order to be staked. <br />
+      <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked or deposited.{" "}
+      <br />
+      <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be stake to earn
+      rewards. <br />
+      <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning rewards.{" "}
+      <br />
+      <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning rewards
+      because the price is out of your position range. <br />
+      <span className={StakeStatus.out_range}>Expired</span>: LP token is staked on an incentive
+      that already ended.
+    </>
+  );
+
+  const CurrentRewardToolTip = (): React.ReactElement => (
+    <>
+      Amount of CTX that it's been earn while the LP token is staked. You must unstake the LP token
+      in order to claim the reward.s
+    </>
+  );
+
   const RenderHeader = (): React.ReactElement => (
     <div className="rewards">
       <div className="rewards-tier">
-        <div className="rewards-item">
-          <h6>Fee tier:</h6>
-          <NumberFormat
-            className="number"
-            value="0.3"
-            displayType="text"
-            thousandSeparator
-            prefix=""
-            suffix="%"
-            decimalScale={4}
-          />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6>Fee tier:</h6>
+          </div>
+          <div className="value">
+            <NumberFormat
+              className="number"
+              value="0.3"
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              suffix="%"
+              decimalScale={4}
+            />
+          </div>
         </div>
-        <div className="rewards-item">
-          <h6>TCAP/WETH Price: </h6>
-          <NumberFormat
-            className="number"
-            value={cumulativePrice}
-            displayType="text"
-            thousandSeparator
-            suffix=""
-            decimalScale={4}
-          />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6 className="title-price">TCAP/WETH Price: </h6>
+          </div>
+          <div className="value">
+            <NumberFormat
+              className="number"
+              value={cumulativePrice}
+              displayType="text"
+              thousandSeparator
+              suffix=""
+              decimalScale={4}
+            />
+          </div>
         </div>
-        <div className="rewards-item">
-          <h6>APR:</h6>
-          <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+        <div className="rewards-item box">
+          <div className="title">
+            <h6>APR:</h6>
+            {isMobile && <AprOverlayTrigger />}
+          </div>
+          <div className="value">
+            <Apr incentive={ethTcapIncentive[0]} stakerContractRead={stakerContractRead} />
+            {!isMobile && <AprOverlayTrigger />}
+          </div>
+        </div>
+      </div>
+      <div className="rewards-total">
+        <div className="rewards-total-heading">
+          <h6>Available to Claim</h6>
           <OverlayTrigger
             key="bottom"
             placement="bottom"
             overlay={
               <Tooltip id="tooltip-bottom">
-                Incentive ends on <span className="neon-pink">{incentiveEndDate()}</span>
+                In order to claim rewards, you need to unstake your token.
               </Tooltip>
             }
           >
@@ -341,37 +407,23 @@ const Rewards = ({
               ?
             </Button>
           </OverlayTrigger>
+          <h6>:</h6>
         </div>
-      </div>
-      <div className="rewards-total">
-        <h6>Available to Claim</h6>
-        <OverlayTrigger
-          key="bottom"
-          placement="bottom"
-          overlay={
-            <Tooltip id="tooltip-bottom">
-              In order to claim rewards, you need to unstake your token.
-            </Tooltip>
-          }
-        >
-          <Button variant="dark" className="question-small">
-            ?
-          </Button>
-        </OverlayTrigger>
-        <h6>:</h6>
-        <div className="amount">
-          <NumberFormat
-            className="number"
-            value={availableReward}
-            displayType="text"
-            thousandSeparator
-            prefix=""
-            decimalScale={4}
-          />
-          <CtxIcon />
-        </div>
-        <div className="claim-button">
-          <ClaimButton />
+        <div className="rewards-total-claim">
+          <div className="amount">
+            <NumberFormat
+              className="number"
+              value={availableReward}
+              displayType="text"
+              thousandSeparator
+              prefix=""
+              decimalScale={4}
+            />
+            <CtxIcon />
+          </div>
+          <div className="claim-button">
+            <ClaimButton />
+          </div>
         </div>
       </div>
     </div>
@@ -404,18 +456,7 @@ const Rewards = ({
             trigger={["hover", "click"]}
             overlay={
               <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                <span className={StakeStatus.not_approved}>Pending</span>: LP token needs to be
-                approved in order to be staked. <br />
-                <span className={StakeStatus.empty}>Unstaked</span>: LP token hasn't been staked or
-                deposited. <br />
-                <span className={StakeStatus.deposited}>Deposited</span>: LP token needs to be stake
-                to earn rewards. <br />
-                <span className={StakeStatus.staked}>Staked</span>: LP token is staked and earning
-                rewards. <br />
-                <span className={StakeStatus.out_range}>Out of range</span>: You aren't earning
-                rewards because the price is out of your position range. <br />
-                <span className={StakeStatus.out_range}>Expired</span>: LP token is staked on an
-                incentive that already ended.
+                <StatusToolTip />
               </Tooltip>
             }
           >
@@ -432,8 +473,7 @@ const Rewards = ({
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="univ3-status-tooltip">
-                    Amount of CTX that it's been earn while the LP token is staked. You must unstake
-                    the LP token in order to claim the reward.
+                    <CurrentRewardToolTip />
                   </Tooltip>
                 }
               >
@@ -536,6 +576,104 @@ const Rewards = ({
     </>
   );
 
+  const RenderRewardsMobile = () => (
+    <div className="positions-mobile">
+      {ethTcapPositions.sort(sortPositions).map((position, index) => (
+        <Card key={index} className="position">
+          <Card.Header>
+            <div className="description">
+              <div className="icons">
+                <WETHIcon className="weth" />
+                <TcapIcon className="tcap" />
+              </div>
+              <div className="title">
+                <span className="tokens">TCAP/WETH Position</span>
+                <a href={lpUrl()} className="position-link" target="_blank" rel="noreferrer">
+                  Uniswap <FaExternalLinkAlt size={14} />
+                </a>
+              </div>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            <div className="position-title">
+              <h6>Range</h6>
+            </div>
+            <div className="box ranges">
+              <div className="min-range">
+                <span>Min: {numberFormatStr(position.tickUpperPrice1.toString(), 4, 4)}</span>
+              </div>
+              <FaArrowsAltH />
+              <div className="max-range">
+                <span>Max: {numberFormatStr(position.tickLowerPrice1.toString(), 4, 4)}</span>
+              </div>
+            </div>
+            <div className="box status">
+              <div className="title">
+                <h6>Status:</h6>
+                <OverlayTrigger
+                  key="top"
+                  placement="auto"
+                  trigger={["hover", "click"]}
+                  overlay={
+                    <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                      <StatusToolTip />
+                    </Tooltip>
+                  }
+                >
+                  <Button variant="dark" className="question-small">
+                    ?
+                  </Button>
+                </OverlayTrigger>
+              </div>
+              <div className="value">{RenderStatusLabel(position)}</div>
+            </div>
+            <div className="box reward">
+              <div className="title">
+                <h6>Reward:</h6>
+                <OverlayTrigger
+                  key="top"
+                  placement="auto"
+                  trigger={["hover", "click"]}
+                  overlay={
+                    <Tooltip id="ttip-status" className="univ3-status-tooltip">
+                      <CurrentRewardToolTip />
+                    </Tooltip>
+                  }
+                >
+                  <Button variant="dark" className="question-small">
+                    ?
+                  </Button>
+                </OverlayTrigger>
+              </div>
+              <div className="value">
+                <NumberFormat
+                  className="number"
+                  value={position.reward}
+                  displayType="text"
+                  thousandSeparator
+                  prefix=""
+                  suffix="CTX"
+                  decimalScale={2}
+                />
+              </div>
+            </div>
+          </Card.Body>
+          <Card.Footer className="position-actions">
+            <Stake
+              ownerAddress={ownerAddress}
+              position={position}
+              incentive={ethTcapIncentive[position.incentiveIndex]}
+              nfpmContract={nfpmContract}
+              stakerContract={stakerContract}
+              refresh={() => refresh()}
+            />
+            <WithdrawButton position={position} />
+          </Card.Footer>
+        </Card>
+      ))}
+    </div>
+  );
+
   const RenderEmptyLP = () => (
     <div className="empty-lp">
       <div className="lp-box">
@@ -569,43 +707,72 @@ const Rewards = ({
     </div>
   );
 
+  const RenderMobile = () => (
+    <>
+      <Card className="rewards-mobile">
+        <Card.Body>
+          <RenderHeader />
+        </Card.Body>
+      </Card>
+      <RenderRewardsMobile />
+    </>
+  );
+
   return (
-    <Card className="diamond mb-2 univ3">
-      <Card.Header>
-        <h2>Uniswap V3 Liquidity Rewards</h2>
-        {availableReward > 0.001 && ethTcapPositions.length === 0 && (
-          <div className="rewards-total">
-            <h6>Unclaimed Reward:</h6>
-            <div className="amount">
-              <NumberFormat
-                className="number"
-                value={availableReward}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={4}
-              />
-              <CtxIcon />
-            </div>
-            <div className="claim-button2">
-              <ClaimButton />
-            </div>
-          </div>
-        )}
-      </Card.Header>
-      <Card.Body>
-        {ownerAddress !== "" ? (
-          <>
-            {loading && firstLoad ? (
-              <Spinner variant="danger" className="spinner" animation="border" />
-            ) : (
-              <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>
+    <Card className="mb-2 univ3">
+      {!isMobile ? (
+        <>
+          <Card.Header className="univ3-header">
+            <h2>Uniswap V3 Liquidity Rewards</h2>
+            {availableReward > 0.001 && ethTcapPositions.length === 0 && (
+              <div className="rewards-total">
+                <h6>Unclaimed Reward:</h6>
+                <div className="amount">
+                  <NumberFormat
+                    className="number"
+                    value={availableReward}
+                    displayType="text"
+                    thousandSeparator
+                    prefix=""
+                    decimalScale={4}
+                  />
+                  <CtxIcon />
+                </div>
+                <div className="claim-button2">
+                  <ClaimButton />
+                </div>
+              </div>
             )}
-          </>
-        ) : (
-          <RenderEmptyLP />
-        )}
-      </Card.Body>
+          </Card.Header>
+          <Card.Body className="univ3-body">
+            {ownerAddress !== "" ? (
+              <>
+                {loading && firstLoad ? (
+                  <Spinner variant="danger" className="spinner" animation="border" />
+                ) : (
+                  <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderRewards()}</>
+                )}
+              </>
+            ) : (
+              <RenderEmptyLP />
+            )}
+          </Card.Body>
+        </>
+      ) : (
+        <>
+          {ownerAddress !== "" ? (
+            <>
+              {loading && firstLoad ? (
+                <Spinner variant="danger" className="spinner" animation="border" />
+              ) : (
+                <>{ethTcapPositions.length === 0 ? RenderEmptyLP() : RenderMobile()}</>
+              )}
+            </>
+          ) : (
+            <RenderEmptyLP />
+          )}
+        </>
+      )}
       <ClaimReward
         show={showClaim}
         ownerAddress={ownerAddress}

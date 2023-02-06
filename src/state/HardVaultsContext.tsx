@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface HardVaultsContext {
+export interface IHardVaultsContext {
   wethVault?: ethers.Contract;
   setCurrentWETHVault: (currentVault: ethers.Contract) => void;
   daiVault?: ethers.Contract;
@@ -32,6 +32,4 @@ export const HARD_VAULTS_DEFAULT_VALUE = {
   setCurrentWBTCVaultRead: () => {},
 };
 
-const hardVaultsContext = React.createContext<HardVaultsContext>(HARD_VAULTS_DEFAULT_VALUE);
-
-export default hardVaultsContext;
+export const hardVaultsContext = React.createContext<IHardVaultsContext>(HARD_VAULTS_DEFAULT_VALUE);

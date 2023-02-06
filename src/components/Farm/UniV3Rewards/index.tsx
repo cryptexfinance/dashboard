@@ -5,11 +5,10 @@ import { Contract } from "ethers-multicall";
 import UniswapV3Staker from "../../../contracts/UniswapV3Staker.json";
 import NonfungiblePositionManager from "../../../contracts/NonfungiblePositionManager.json";
 import UniV3Pool from "../../../contracts/UniV3Pool.json";
-import NetworkContext from "../../../state/NetworkContext";
-import { SignerContext } from "../../../state/SignerContext";
+import { networkContext, ISignerContext } from "../../../state";
 import { NETWORKS } from "../../../utils/constants";
 import { GRAPHQL_UNIV3_ENDPOINT, UNIV3 } from "../../../utils/univ3";
-import { toFragment } from "../../../utils/utils";
+import { isOptimism, toFragment } from "../../../utils/utils";
 
 import Rewards from "./Rewards";
 
@@ -20,11 +19,11 @@ const clientOracle = (graphqlEndpoint: string) =>
   });
 
 type props = {
-  signer: SignerContext;
+  signer: ISignerContext;
 };
 
 const UniV3Rewards = ({ signer }: props) => {
-  const currentNetwork = useContext(NetworkContext);
+  const currentNetwork = useContext(networkContext);
   const [ownerAddress, setOwnerAddress] = useState("");
   const [stakerContract, setStakerContract] = useState<ethers.Contract | undefined>();
   const [stakerContractRead, setStakerContractRead] = useState<Contract | undefined>();
@@ -35,7 +34,7 @@ const UniV3Rewards = ({ signer }: props) => {
     clientOracle(
       process.env.REACT_APP_NETWORK_ID === "1"
         ? GRAPHQL_UNIV3_ENDPOINT.mainnet
-        : GRAPHQL_UNIV3_ENDPOINT.rinkeby
+        : GRAPHQL_UNIV3_ENDPOINT.goerli
     )
   );
 
@@ -45,14 +44,14 @@ const UniV3Rewards = ({ signer }: props) => {
         case NETWORKS.mainnet.chainId:
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
           break;
-        case NETWORKS.rinkeby.chainId:
-          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.rinkeby));
+        case NETWORKS.goerli.chainId:
+          setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.goerli));
           break;
         default:
           setApolloClient(clientOracle(GRAPHQL_UNIV3_ENDPOINT.mainnet));
           break;
       }
-      if (signer) {
+      if (signer && !isOptimism(currentNetwork.chainId)) {
         const stakerRead = new Contract(UNIV3.stakerAddress, UniswapV3Staker);
         const staker = new ethers.Contract(UNIV3.stakerAddress, UniswapV3Staker, signer.signer);
         const nfpmRead = new Contract(
@@ -65,8 +64,8 @@ const UniV3Rewards = ({ signer }: props) => {
           signer.signer
         );
         let poolRead = new Contract(UNIV3.mainnet.tcapPool.id, toFragment(UniV3Pool));
-        if (currentNetwork.chainId === NETWORKS.rinkeby.chainId) {
-          poolRead = new Contract(UNIV3.rinkeby.tcapPool.id, toFragment(UniV3Pool));
+        if (currentNetwork.chainId === NETWORKS.goerli.chainId) {
+          poolRead = new Contract(UNIV3.goerli.tcapPool.id, toFragment(UniV3Pool));
         }
 
         setStakerContractRead(stakerRead);

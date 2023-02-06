@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface GovernanceContext {
+export interface IGovernanceContext {
   governorAlpha?: ethers.Contract;
   setCurrentGovernorAlpha: (currentGovernorAlpha: ethers.Contract) => void;
   timelock?: ethers.Contract;
@@ -26,6 +26,4 @@ export const GOVERNANCE_DEFAULT_VALUE = {
   setCurrentDelegatorFactoryRead: () => {},
 };
 
-const governanceContext = React.createContext<GovernanceContext>(GOVERNANCE_DEFAULT_VALUE);
-
-export default governanceContext;
+export const governanceContext = React.createContext<IGovernanceContext>(GOVERNANCE_DEFAULT_VALUE);

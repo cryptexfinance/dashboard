@@ -23,7 +23,7 @@ const etherscanUrl = () => {
 };
 
 export const VoteBadge = ({ address, amount, label }: badgeProps) => (
-  <Badge pill variant="highlight">
+  <Badge pill bg="light">
     <img src={ethereumImg} className="ethereum" alt="ethereum logo" />
     <a href={`${etherscanUrl()}/address/${address}`} target="_blank" rel="noreferrer">
       {amount} {label}

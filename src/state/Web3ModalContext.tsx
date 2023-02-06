@@ -3,7 +3,7 @@ import React from "react";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
-import okxImage from "../assets/images/okx.jpg";
+import okxImage from "../assets/images/okx.png";
 
 let network = "mainnet";
 

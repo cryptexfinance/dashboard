@@ -12,6 +12,9 @@ export const NETWORKS = {
     daiPool: "",
     ctxPool: "0x2a93167ed63a31f35ca4788e2eb9fbd9fa6089d0",
     lpUrl: "https://app.sushi.com",
+    alchemyUrl: "https://eth-mainnet.g.alchemy.com/v2/".concat(
+      process.env.REACT_APP_ALCHEMY_KEY || ""
+    ),
     infuraRpcUrl: "https://mainnet.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://mainnet.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
@@ -21,29 +24,33 @@ export const NETWORKS = {
     chainId: 5,
     hexChainId: "0x5",
     name: "goerli",
-    eth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
-    weth: "0x7f86C79c1D458B03c14e5a6C658100283a1c3cc1",
+    dai: "0x6c913fa678C81c567A11EdF19E06bE758DBeFe2D",
+    eth: "0xFfb99f4A02712C909d8F7cC44e67C87Ea1E71E83",
+    weth: "0xAEb34d4C107BDa831C0B50d68eb13F2469FB21f5",
     mushroomNft: "0x209c23db16298504354112fa4210d368e1d564da",
+    alchemyUrl: "https://eth-goerli.g.alchemy.com/v2/".concat(
+      process.env.REACT_APP_ALCHEMY_KEY_GOERLI || ""
+    ),
     infuraRpcUrl: "https://goerli.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
     infuraFortmaticRpcUrl: "https://goerli.infura.io/v3/".concat(
       process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
     ),
   },
-  rinkeby: {
-    chainId: 4,
-    hexChainId: "0x4",
-    name: "rinkeby",
-    eth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
-    weth: "0x5D3E425A099c2863224d6D63b330Df0F22B299b9",
-    dai: "0x118a4238E4086FAE2621D0336C0E6cdC1257BE82",
-    ethPool: "0x7d7db1ba4bc85f7d4ea43bad63acece407364aff",
-    ethUniPool: "0x3436d87664964df8a1825f826f127dec13117b0b",
-    daiPool: "0xb9625c0ec3dd89b00d20d1e3ea03d5b4072f03b4",
-    ctxPool: "0x9c4438470b1593cf4efe0f85108e7416c3b582f8",
-    infuraRpcUrl: "https://rinkeby.infura.io/v3/".concat(process.env.REACT_APP_INFURA_ID || ""),
-    infuraFortmaticRpcUrl: "https://rinkeby.infura.io/v3/".concat(
-      process.env.REACT_APP_FORTMATIC_INFURA_ID || ""
-    ),
+  arbitrum: {
+    chainId: 42161,
+    hexChainId: "0xA4B1",
+    name: "Arbitrum One",
+    eth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    weth: "0x85f85C12FADEec638c63850117203f098386e6b9",
+    dai: "0x17aC26AB292660126d2baF16e5304DcbEc54340C",
+  },
+  arbitrum_goerli: {
+    chainId: 421613,
+    hexChainId: "0x66EED",
+    name: "Arbitrum Goerli",
+    eth: "0xfe46F29B9fC3d83d09336dDe9195553aDb812A16",
+    weth: "0xfe46F29B9fC3d83d09336dDe9195553aDb812A16",
+    dai: "0x630c6B571ba97081215a10690364eF352AA98d20",
   },
   optimism: {
     chainId: 10,
@@ -86,11 +93,13 @@ export const NETWORKS = {
   },
 };
 
-export const API_ENDPOINT = "https://api.cryptex.finance";
+export const API_ENDPOINT = "https://test-api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
-  rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-goerli-demo",
+  arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
+  arbitrum_goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",
   polygon: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-polygon",
@@ -98,14 +107,28 @@ export const GRAPHQL_ENDPOINT = {
 };
 
 export const OS_API_URL = {
-  // mainnet: "https://testnets-api.opensea.io/api/v1/assets",
   mainnet: "https://deep-index.moralis.io/api/v2",
   goerli: "https://deep-index.moralis.io/api/v2",
 };
 
 export const FEATURES = {
-  KEEPERS_API: false,
+  KEEPERS_API: true,
   NEW_VAULTS: true,
   OPTIMISM: true,
   POLYGON: false,
+};
+
+export const TOKENS_SYMBOLS = {
+  AAVE: "AAVE",
+  DAI: "DAI",
+  ETH: "ETH",
+  JPEGz: "JPEGz",
+  LINK: "LINK",
+  MATIC: "MATIC",
+  SNX: "SNX",
+  TCAP: "TCAP",
+  UNI: "UNI",
+  USDC: "USDC",
+  WETH: "WETH",
+  WBTC: "WBTC",
 };

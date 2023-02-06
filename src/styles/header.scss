@@ -58,7 +58,6 @@
         border-right: 0.5em solid transparent;
         border-bottom: 0;
         border-left: 0.5em solid transparent;
-        margin-top: -17px;
         margin-left: 155px;
     }
 
@@ -66,7 +65,7 @@
       height: 3.2rem;
       width: 10.5rem;
       border-radius: 0.3rem;
-
+      border: 1px solid $highlight;
       svg {
         height: 2rem;
       }
@@ -116,6 +115,15 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
+    
+    &-address {
+      display: flex;
+      flex-direction: row;
+      background-color: $darker;
+      border: 0.5px solid $highlight;;
+      padding: 0.5rem;
+      border-radius: 5px;
+    }
   }
 
   .btn-network-container{
@@ -155,6 +163,14 @@
   .address {
     color: white;
     margin-top:-5px;
+  }
+
+  .logout {
+    border: 0.5px solid $highlight;
+    width: auto;
+    height: 2.7rem;
+    border-radius: 5px;
+    margin-left: 10px;
   }
 
   @media (max-width: 769px) {
@@ -236,6 +252,9 @@
     }
   }
   @media (max-width: 530px) {
+    .btn-connect {
+      width: 90%;
+    }
     .network-container {
       margin-bottom: 1rem;
       .dropdown-toggle::after {
@@ -244,6 +263,32 @@
     }
     .btn-language {
       display: none;
+    }
+  }
+  @media (max-width: 450px) {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    .network-container {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding-left: 0rem;
+      .dropdown {
+        width: 100%;
+        border: 0.5px solid $highlight;
+      }
+      .dropdown-toggle {
+        border: 0.5px solid $highlight;
+      }
+      .dropdown-toggle::after {
+        margin-left: 87%;
+      }
+    }
+    .info {
+      width: 100%;
+      &-address {        
+        width: 100%;
+      }
     }
   }
 }

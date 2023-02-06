@@ -3,8 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { ethers, BigNumber } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
 import "../../styles/modal.scss";
-import SignerContext from "../../state/SignerContext";
-import TokensContext from "../../state/TokensContext";
+import { tokensContext, signerContext } from "../../state";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
 type props = {
@@ -26,8 +25,8 @@ const Delegate = ({
   refresh,
   t,
 }: props) => {
-  const tokens = useContext(TokensContext);
-  const signer = useContext(SignerContext);
+  const tokens = useContext(tokensContext);
+  const signer = useContext(signerContext);
   const [stakeText, setStakeText] = useState("");
   const [ctxBalance, setCtxBalance] = useState("");
   const [isApproved, setIsApproved] = useState(false);
@@ -136,7 +135,7 @@ const Delegate = ({
           <Form.Group className="" controlId="">
             {isApproved ? (
               <>
-                <p>{t("governance.stake-info")}</p>
+                <p className="delegate-description">{t("governance.stake-info")}</p>
                 <Form.Label>{t("governance.amount-stake")}</Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { TokensContext } from "../state/TokensContext";
+import { ITokensContext } from "../state";
 
-export const useTokens = (): TokensContext => {
+export const useTokens = (): ITokensContext => {
   const [wethToken, setETHToken] = useState<ethers.Contract>();
   const [daiToken, setDAIToken] = useState<ethers.Contract>();
   const [wbtcToken, setWBTCToken] = useState<ethers.Contract>();
+  const [jpegzToken, setJPEGZToken] = useState<ethers.Contract>();
   const [tcapToken, setTCAPToken] = useState<ethers.Contract>();
   const [ctxToken, setCtxToken] = useState<ethers.Contract>();
   const [aaveToken, setAAVEToken] = useState<ethers.Contract>();
@@ -22,6 +23,7 @@ export const useTokens = (): TokensContext => {
   const [wethTokenRead, setETHTokenRead] = useState<Contract>();
   const [daiTokenRead, setDAITokenRead] = useState<Contract>();
   const [wbtcTokenRead, setWBTCTokenRead] = useState<Contract>();
+  const [jpegzTokenRead, setJPEGZTokenRead] = useState<Contract>();
   const [tcapTokenRead, setTCAPTokenRead] = useState<Contract>();
   const [ctxTokenRead, setCtxTokenRead] = useState<Contract>();
   const [aaveTokenRead, setAAVETokenRead] = useState<Contract>();
@@ -43,6 +45,9 @@ export const useTokens = (): TokensContext => {
   }, []);
   const setCurrentWBTCToken = React.useCallback((currentWBTCToken: ethers.Contract): void => {
     setWBTCToken(currentWBTCToken);
+  }, []);
+  const setCurrentJPEGZToken = React.useCallback((currentJPEGZToken: ethers.Contract): void => {
+    setJPEGZToken(currentJPEGZToken);
   }, []);
   const setCurrentTCAPToken = React.useCallback((currentTCAPToken: ethers.Contract): void => {
     setTCAPToken(currentTCAPToken);
@@ -94,6 +99,9 @@ export const useTokens = (): TokensContext => {
   }, []);
   const setCurrentWBTCTokenRead = React.useCallback((currentWBTCTokenRead: Contract): void => {
     setWBTCTokenRead(currentWBTCTokenRead);
+  }, []);
+  const setCurrentJPEGZTokenRead = React.useCallback((currentJPEGZTokenRead: Contract): void => {
+    setJPEGZTokenRead(currentJPEGZTokenRead);
   }, []);
   const setCurrentTCAPTokenRead = React.useCallback((currentTCAPTokenRead: Contract): void => {
     setTCAPTokenRead(currentTCAPTokenRead);
@@ -151,6 +159,8 @@ export const useTokens = (): TokensContext => {
     setCurrentDAIToken,
     wbtcToken,
     setCurrentWBTCToken,
+    jpegzToken,
+    setCurrentJPEGZToken,
     tcapToken,
     setCurrentTCAPToken,
     ctxToken,
@@ -181,6 +191,8 @@ export const useTokens = (): TokensContext => {
     setCurrentDAITokenRead,
     wbtcTokenRead,
     setCurrentWBTCTokenRead,
+    jpegzTokenRead,
+    setCurrentJPEGZTokenRead,
     tcapTokenRead,
     setCurrentTCAPTokenRead,
     ctxTokenRead,

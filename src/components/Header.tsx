@@ -6,18 +6,21 @@ import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
-import { ethers } from "ethers";
 import Davatar from "@davatar/react";
-import NumberFormat from "react-number-format";
-import SignerContext from "../state/SignerContext";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import TokensContext from "../state/TokensContext";
-import NetworkContext from "../state/NetworkContext";
-import { makeShortAddress, getENS, isInLayer1, isOptimism, isPolygon } from "../utils/utils";
+import { networkContext, signerContext, Web3ModalContext } from "../state";
+import {
+  makeShortAddress,
+  getENS,
+  isInLayer1,
+  isOptimism,
+  isPolygon,
+  isArbitrum,
+} from "../utils/utils";
 import { NETWORKS, FEATURES } from "../utils/constants";
-import { ReactComponent as TcapIcon } from "../assets/images/tcap-coin.svg";
+import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
+import { ReactComponent as ARBITRUMIcon } from "../assets/images/arbitrum.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
 type props = {
@@ -31,12 +34,10 @@ type props = {
 const Header = ({ signerAddress, isMobile }: props) => {
   const { t } = useTranslation();
   const web3Modal = useContext(Web3ModalContext);
-  const signer = useContext(SignerContext);
-  const tokens = useContext(TokensContext);
-  const currentNetwork = useContext(NetworkContext);
+  const signer = useContext(signerContext);
+  const currentNetwork = useContext(networkContext);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [addressField, setAddressField] = useState("");
-  const [tokenBalance, setTokenBalance] = useState("0.0");
   // const [language, setLanguage] = useState("EN");
   const [loading, setLoading] = useState(false);
 
@@ -64,6 +65,13 @@ const Header = ({ signerAddress, isMobile }: props) => {
     let rpcUrl = "https://mainnet.optimism.io/";
     let blockExplorerUrl = "https://optimistic.etherscan.io";
 
+    if (newChainId === NETWORKS.arbitrum_goerli.hexChainId) {
+      chainName = "Arbitrum Goerli";
+      currency = "GoerliETH";
+      symbol = "AGOR";
+      rpcUrl = "https://goerli-rollup.arbitrum.io/rpc";
+      blockExplorerUrl = "https://goerli.arbiscan.io/";
+    }
     if (newChainId === NETWORKS.okovan.hexChainId) {
       chainName = "Optimistic Ethereum (Kovan)";
       rpcUrl = "https://kovan.optimism.io";
@@ -119,6 +127,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
           error.code === 4902 &&
           (newChainId === NETWORKS.optimism.hexChainId ||
             newChainId === NETWORKS.okovan.hexChainId ||
+            newChainId === NETWORKS.arbitrum_goerli.hexChainId ||
             newChainId === NETWORKS.polygon.hexChainId)
         ) {
           addNetwork(newChainId);
@@ -130,28 +139,14 @@ const Header = ({ signerAddress, isMobile }: props) => {
   useEffect(() => {
     const loadAddress = async () => {
       setLoading(true);
-      if (signerAddress !== "" && signer.signer && tokens.tcapToken) {
-        const filterMint = tokens.tcapToken.filters.Transfer(null, signerAddress);
-        const filterBurn = tokens.tcapToken.filters.Transfer(signerAddress, null);
-        tokens.tcapToken.on(filterMint, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
-          setTokenBalance(ethers.utils.formatEther(currentBalance));
-        });
-
-        tokens.tcapToken.on(filterBurn, async () => {
-          const currentBalance = await tokens.tcapToken?.balanceOf(signerAddress);
-          setTokenBalance(ethers.utils.formatEther(currentBalance));
-        });
+      if (signerAddress !== "" && signer.signer) {
         const ens = await getENS(signerAddress);
         if (ens) {
           setAddressField(ens);
         } else {
           setAddressField(makeShortAddress(signerAddress));
         }
-
         setAddress(signerAddress);
-        const currentTcapBalance = await tokens.tcapToken.balanceOf(signerAddress);
-        setTokenBalance(ethers.utils.formatEther(currentTcapBalance));
         setLoading(false);
       }
       /* let lng = localStorage.getItem("language");
@@ -165,51 +160,42 @@ const Header = ({ signerAddress, isMobile }: props) => {
     // eslint-disable-next-line
   }, [signerAddress, currentNetwork.chainId]);
 
-  /* const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setLanguage(lng.toUpperCase());
-    localStorage.setItem("language", lng);
-  }; */
-
-  /* const handleOnSelect = (eventKey: any, event: Object) => {
-    console.log(event);
-    changeLanguage(eventKey);
-  }; */
-
-  /* const LangDropDown = ({ className }: propsDD) => (
-    <Dropdown onSelect={handleOnSelect} className={className}>
-      <Dropdown.Toggle variant="success" id="dropdown-basic">
-        {language}
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Item eventKey="en">English</Dropdown.Item>
-        <Dropdown.Item eventKey="fr">French</Dropdown.Item>
-        <Dropdown.Item eventKey="zh">繁體中文</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  ); */
-
   const showDropdown = (): boolean => !isMobile || (isMobile && !loading);
+
+  const ArbitrumToggle = () => (
+    <>
+      <ARBITRUMIcon className="eth" />
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "A. Goerli"}</h6>
+    </>
+  );
+
+  const ArbitrumOpt = () => (
+    <Dropdown.Item
+      key={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.arbitrum.chainId
+          : NETWORKS.arbitrum_goerli.chainId
+      }
+      eventKey={
+        process.env.REACT_APP_NETWORK_ID === "1"
+          ? NETWORKS.arbitrum.hexChainId
+          : NETWORKS.arbitrum_goerli.hexChainId
+      }
+    >
+      <>{ArbitrumToggle()}</>
+    </Dropdown.Item>
+  );
 
   const EthereumToggle = () => (
     <>
       <ETHIcon className="eth" />
-      {process.env.REACT_APP_NETWORK_ID === "5" ? (
-        <h6>Goerli</h6>
-      ) : (
-        <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Rinkeby"}</h6>
-      )}
+      <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Ethereum" : "Goerli"}</h6>
     </>
   );
 
   const EthereumOpt = () => {
     let { chainId } = NETWORKS.mainnet;
     let { hexChainId } = NETWORKS.mainnet;
-    if (process.env.REACT_APP_NETWORK_ID === "4") {
-      chainId = NETWORKS.rinkeby.chainId;
-      hexChainId = NETWORKS.rinkeby.hexChainId;
-    }
     if (process.env.REACT_APP_NETWORK_ID === "5") {
       chainId = NETWORKS.goerli.chainId;
       hexChainId = NETWORKS.goerli.hexChainId;
@@ -274,7 +260,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
     <Nav className="header">
       {signer.signer ? (
         <>
-          {!window.location.pathname.includes("/governance") && showDropdown() && (
+          {showDropdown() && (
             <div className="network-container">
               <Dropdown onSelect={(eventKey) => onNetworkChange(eventKey)}>
                 <Dropdown.Toggle
@@ -284,43 +270,48 @@ const Header = ({ signerAddress, isMobile }: props) => {
                   style={{ width: 200 }}
                 >
                   <div className="network-toggle">
-                    {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
-                    {isOptimism(currentNetwork.chainId) && OptimismToggle()}
-                    {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                    <>
+                      {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
+                      {isOptimism(currentNetwork.chainId) && OptimismToggle()}
+                      {isPolygon(currentNetwork.chainId) && PolygonToggle()}
+                      {isArbitrum(currentNetwork.chainId) && ArbitrumToggle()}
+                    </>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {EthereumOpt()}
                   {OptimismOpt()}
+                  {ArbitrumOpt()}
                   {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>
             </div>
           )}
           <div className="info">
-            <TcapIcon className="tcap-neon" />
-            <h5>
-              <NumberFormat
-                className="number mx-2 neon-pink"
-                value={tokenBalance}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={2}
-              />
-            </h5>
-            <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
-            <h5 className="ml-2">
-              <OverlayTrigger
-                key="bottom"
-                placement="bottom"
-                overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
-              >
-                <a href="/" onClick={copyCodeToClipboard} className="address">
-                  {addressField}
-                </a>
-              </OverlayTrigger>
-            </h5>
+            <div className="info-address">
+              <Davatar size={25} address={address} generatedAvatarType="jazzicon" />
+              <h5 className="ml-2">
+                <OverlayTrigger
+                  key="bottom"
+                  placement="bottom"
+                  overlay={<Tooltip id="tooltip-bottom">Click to Copy</Tooltip>}
+                >
+                  <a href="/" onClick={copyCodeToClipboard} className="address">
+                    {addressField}
+                  </a>
+                </OverlayTrigger>
+              </h5>
+            </div>
+            <Button
+              className="logout"
+              onClick={(event) => {
+                event.preventDefault();
+                web3Modal.clearCachedProvider();
+                window.location.reload();
+              }}
+            >
+              <LogoutIcon className="logout-icon" />
+            </Button>
             {/* <LangDropDown className="btn-language small" /> */}
           </div>
         </>
@@ -333,7 +324,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
               web3Modal.toggleModal();
             }}
           >
-            {t("connect")}
+            <>{t("connect")}</>
           </Button>
           {/* <LangDropDown className="btn-language" /> */}
         </>

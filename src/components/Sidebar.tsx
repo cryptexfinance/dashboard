@@ -1,17 +1,14 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "react-bootstrap/esm/Nav";
 import { GiSpottedMushroom } from "react-icons/gi";
 import "../styles/sidebar.scss";
 import { Link, useLocation } from "react-router-dom";
-import { Web3ModalContext } from "../state/Web3ModalContext";
-import NetworkContext from "../state/NetworkContext";
-import { isInLayer1 } from "../utils/utils";
+// import { Web3ModalContext } from "../state/Web3ModalContext";
 import { ReactComponent as Logo } from "../assets/images/favicon.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 import { ReactComponent as DashboardIcon } from "../assets/images/welcome/dashboard.svg";
 import { ReactComponent as VaultIcon } from "../assets/images/welcome/vault.svg";
-import { ReactComponent as VaultMonitoringIcon } from "../assets/images/welcome/vault-monitoring.svg";
-import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
+// import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as StakeIcon } from "../assets/images/welcome/stake.svg";
 import { ReactComponent as FarmIcon } from "../assets/images/welcome/farm.svg";
 
@@ -22,7 +19,6 @@ type props = {
 };
 
 const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
-  const currentNetwork = useContext(NetworkContext);
   const location = useLocation();
   let activeVal = "dashboard";
   switch (location.pathname) {
@@ -55,12 +51,27 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
       break;
   }
   const [active, setActive] = useState(activeVal);
-  const web3Modal = useContext(Web3ModalContext);
+  // const web3Modal = useContext(Web3ModalContext);
+
+  useEffect(
+    () => {
+      const path = window.location.pathname.replace("/", "");
+      if (path !== "") {
+        setActive(path);
+      } else {
+        setActive(activeVal);
+      }
+    },
+    // eslint-disable-next-line
+    [window.location.pathname]
+  );
+
   const sidebarClass = () => {
     if (!isMobile) return "sidebar";
     if (showSidebar) return "sidebar mobile slide-out";
     return "sidebar mobile slide-in";
   };
+
   const sideBarLogo = () => {
     if (isMobile) return <MenuLogo className="menu" onClick={() => setShowSidebar(true)} />;
     return <Logo />;
@@ -84,28 +95,14 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
         </Nav.Item>
         <Nav.Item>
           <Link
-            to="/vault"
-            className={active === "vault" ? "active" : ""}
+            to="/vaults"
+            className={active === "vaults" ? "active" : ""}
             onClick={() => {
-              setActive("vault");
+              setActive("vaults");
             }}
           >
             <VaultIcon />
-            <span className={active === "vault" ? "title active" : "title"}>Mint</span>
-          </Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Link
-            to="/vault-monitoring"
-            className={active === "vault-monitoring" ? "active" : ""}
-            onClick={() => {
-              setActive("vault-monitoring");
-            }}
-          >
-            <VaultMonitoringIcon />
-            <span className={active === "vault-monitoring" ? "title active" : "title"}>
-              Monitor
-            </span>
+            <span className={active === "vaults" ? "title active" : "title"}>Vaults</span>
           </Link>
         </Nav.Item>
         <Nav.Item>
@@ -120,37 +117,33 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <span className={active === "farm" ? "title active" : "title"}>Farm</span>
           </Link>
         </Nav.Item>
-        {isInLayer1(currentNetwork.chainId) && (
-          <>
-            <Nav.Item>
-              <Link
-                to="/governance"
-                className={active === "governance" ? "active" : ""}
-                onClick={() => {
-                  setActive("governance");
-                }}
-              >
-                <StakeIcon className="governance" />
-                <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
-              </Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Link
-                to="/sewagefruitz"
-                className={active === "sewagefruit" ? "active" : ""}
-                onClick={() => {
-                  setActive("sewagefruitz");
-                }}
-              >
-                <GiSpottedMushroom size={28} className="sewagefruit" />
-                <span className={active === "sewagefruitz" ? "title active" : "title"}>
-                  Sewagefruitz
-                </span>
-              </Link>
-            </Nav.Item>
-          </>
-        )}
         <Nav.Item>
+          <Link
+            to="/governance"
+            className={active === "governance" ? "active" : ""}
+            onClick={() => {
+              setActive("governance");
+            }}
+          >
+            <StakeIcon className="governance" />
+            <span className={active === "governance" ? "title active" : "title"}>Delegate</span>
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link
+            to="/sewagefruitz"
+            className={active === "sewagefruit" ? "active" : ""}
+            onClick={() => {
+              setActive("sewagefruitz");
+            }}
+          >
+            <GiSpottedMushroom size={28} className="sewagefruit" />
+            <span className={active === "sewagefruitz" ? "title active" : "title"}>
+              Sewagefruitz
+            </span>
+          </Link>
+        </Nav.Item>
+        {/* <Nav.Item>
           <Link
             to=""
             onClick={(event) => {
@@ -162,7 +155,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, isMobile }: props) => {
             <LogoutIcon className="logout-icon" />
             <span className="title">Disconnect</span>
           </Link>
-        </Nav.Item>
+        </Nav.Item> */}
       </Nav>
     </>
   );

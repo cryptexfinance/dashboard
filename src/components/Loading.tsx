@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/images/tcap-logo.svg";
+import logo from "../assets/images/logo.svg";
 import "../styles/loading.scss";
 
 type props = {
