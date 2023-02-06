@@ -20,6 +20,7 @@ import { NETWORKS, FEATURES } from "../utils/constants";
 import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as ETHIcon } from "../assets/images/graph/weth.svg";
 import { ReactComponent as OPTIMISMIcon } from "../assets/images/graph/optimism.svg";
+import { ReactComponent as ARBITRUMIcon } from "../assets/images/arbitrum.svg";
 import { ReactComponent as POLYGONIcon } from "../assets/images/polygon2.svg";
 
 type props = {
@@ -163,6 +164,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
 
   const ArbitrumToggle = () => (
     <>
+      <ARBITRUMIcon className="eth" />
       <h6>{process.env.REACT_APP_NETWORK_ID === "1" ? "Arbitrum" : "A. Goerli"}</h6>
     </>
   );
