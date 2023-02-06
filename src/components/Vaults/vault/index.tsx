@@ -361,12 +361,15 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const refresh = async () => {
     try {
+      const updateAction = isApproved;
       await loadVault();
-      if (activeAction === "add") {
-        setActiveAction("mint");
-      }
-      if (activeAction === "burn") {
-        setActiveAction("remove");
+      if (updateAction) {
+        if (activeAction === "add") {
+          setActiveAction("mint");
+        }
+        if (activeAction === "burn") {
+          setActiveAction("remove");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -1204,7 +1207,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   );
 
   const creatOrApprovee = async () => {
-    // currentCollateral?.mint();
     if (currentVaultId === "0") {
       setBtnDisabled(true);
       try {

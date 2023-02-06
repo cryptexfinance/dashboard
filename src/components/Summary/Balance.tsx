@@ -10,7 +10,7 @@ import { BalancesType, OraclePricesType } from "../../hooks/types";
 import { ethereumContext } from "../../state";
 import { getPriceInUSDFromPair, isArbitrum, isInLayer1 } from "../../utils/utils";
 import { NETWORKS, TOKENS_SYMBOLS } from "../../utils/constants";
-import { VaultsWarning } from "./warnings/index";
+// import { VaultsWarning } from "./warnings/index";
 
 type props = {
   currentChainId: number;
@@ -188,9 +188,11 @@ const Balance = ({ currentChainId, ethCallProvider, signerAddress, balances, pri
               </>
             )}
           </div>
+          {/*  
           <div className="warnings">
             <VaultsWarning ownerAddress={signerAddress} prices={prices} />
-          </div>
+            </div>
+          */}
         </>
       )}
     </div>

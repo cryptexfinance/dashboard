@@ -4,10 +4,11 @@ import { oraclesContext, networkContext, signerContext } from "../state/index";
 import { isArbitrum, isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
 import { OraclePricesType } from "./types";
 
-export const usePrices = (): OraclePricesType => {
+export const usePrices = (): [OraclePricesType, boolean] => {
   const currentNetwork = useContext(networkContext);
   const oracles = useContext(oraclesContext);
   const signer = useContext(signerContext);
+  const [loadingPrices, setLoadingPrices] = useState(true);
   const [oraclePrices, setOraclePrices] = useState<OraclePricesType>({
     jpegzOraclePrice: "0",
     jpegzMarketCap: "0",
@@ -129,16 +130,19 @@ export const usePrices = (): OraclePricesType => {
         wbtcOraclePrice: ethers.utils.formatEther(wbtcOraclePrice.mul(10000000000)),
         usdcOraclePrice: ethers.utils.formatEther(usdcOraclePrice.mul(10000000000)),
       });
+      setLoadingPrices(false);
     }
   };
 
   useEffect(
     () => {
-      loadPrices();
+      if (signer.ethcallProvider) {
+        loadPrices();
+      }
     },
     // eslint-disable-next-line
-    []
+    [signer.ethcallProvider]
   );
 
-  return oraclePrices;
+  return [oraclePrices, loadingPrices];
 };

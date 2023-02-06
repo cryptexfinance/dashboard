@@ -79,7 +79,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const signer = useContext(signerContext);
   const vaults = useContext(vaultsContext);
   const hardVaults = useContext(hardVaultsContext);
-  const prices = usePrices();
+  const [prices, loadingPrices] = usePrices();
   const ratios = useRatios();
   const vaultsOwnerFilter = [
     { name: t("all-vaults"), value: "0" },
@@ -99,7 +99,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
   const [currentMinRatio, setCurrentMinRatio] = useState("0%");
-  const [currentMaxRatio, setCurrentMaxRatio] = useState("2500%");
+  const [currentMaxRatio, setCurrentMaxRatio] = useState("5000%");
   const [renderTable, setRenderTable] = useState(false);
   const ratioRangeDropdown = useRef(null);
   const minRatioInput = useRef(null);
@@ -227,7 +227,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         return parseFloat(maxRatio);
       }
     }
-    return 3000;
+    return 5000;
   };
 
   const calculateNetRewardUsd = async (
@@ -397,6 +397,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       if (!showAllVaults) {
         addVault = v.tokenSymbol === TOKENS_SYMBOLS.WETH || v.tokenSymbol === TOKENS_SYMBOLS.DAI;
       }
+
       if (addVault && v.tokenSymbol !== TOKENS_SYMBOLS.WBTC) {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
@@ -481,7 +482,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     () => {
       const load = async () => {
         if (signer && signer.signer) {
-          if (!vaultsUpdated) {
+          if (!vaultsUpdated && !loadingPrices) {
             const address = await signer.signer.getAddress();
             setCurrentAddress(address);
             setOwnerAddress(currentOwnerFilter.value === "1" ? address : "");
@@ -496,7 +497,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       load();
     },
     // eslint-disable-next-line
-    [signer, prices.daiOraclePrice]
+    [signer, loadingPrices, prices.daiOraclePrice]
   );
 
   const tokensSymbols = (): Array<DropdownItemType> => {
@@ -786,7 +787,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                   type="number"
                   placeholder=""
                   className="neon-green"
-                  defaultValue="2500"
+                  defaultValue="5000"
                   ref={maxRatioInput}
                 />
               </div>

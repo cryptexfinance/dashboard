@@ -100,7 +100,7 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
                   value={marketCap}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={2}
+                  decimalScale={0}
                   prefix="$"
                 />
               </h5>
