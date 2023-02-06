@@ -7,6 +7,7 @@ import Modal from "react-bootstrap/esm/Modal";
 import NumberFormat from "react-number-format";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
+import { useMediaQuery } from "react-responsive";
 import { useTranslation } from "react-i18next";
 import "../../../styles/modal.scss";
 import { networkContext, oraclesContext, signerContext } from "../../../state";
@@ -15,6 +16,7 @@ import { useVault } from "../../../hooks";
 import { TOKENS_SYMBOLS } from "../../../utils/constants";
 import {
   errorNotification,
+  isArbitrum,
   isPolygon,
   notifyUser,
   numberFormatStr,
@@ -31,9 +33,11 @@ type props = {
 
 const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const oracles = useContext(oraclesContext);
+  const indexName = isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
   const [
     {
       currentVault,
@@ -43,7 +47,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
       currentAssetOracleRead,
     },
   ] = useVault(
-    "TCAP",
+    indexName,
     liqVault ? liqVault?.collateralSymbol : TOKENS_SYMBOLS.WETH,
     liqVault ? liqVault.isHardVault : true
   );
@@ -189,8 +193,8 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
 
   const getTokeSymbol = () => {
     if (liqVault !== null) {
-      if (liqVault.collateralSymbol === "WETH") {
-        return "ETH";
+      if (liqVault.collateralSymbol === TOKENS_SYMBOLS.WETH) {
+        return TOKENS_SYMBOLS.ETH;
       }
       return liqVault.collateralSymbol;
     }
@@ -205,7 +209,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
 
   const tcapAmountHelp = () => (
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
-      <>{t("monitoring.tcap-amount-info")}</>
+      <>{t("monitoring.tcap-amount-info", { indexName })}</>
     </Tooltip>
   );
 
@@ -213,12 +217,13 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     <Tooltip id="ttip-position" className="univ3-status-tooltip">
       <>
         {t("monitoring.net-reward-info1")}: <br />
-        {t("monitoring.net-reward-info2")}
+        {t("monitoring.net-reward-info2", { indexName })}
       </>
     </Tooltip>
   );
 
   const helpToolTip = (column: number) => {
+    const className = isMobile ? "question-small" : "";
     let help = rewardHelp();
     if (column === 1) {
       help = tcapAmountHelp();
@@ -227,7 +232,9 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     }
     return (
       <OverlayTrigger key="top" placement="auto" trigger={["hover", "click"]} overlay={help}>
-        <Button variant="dark">?</Button>
+        <Button variant="dark" className={className}>
+          ?
+        </Button>
       </OverlayTrigger>
     );
   };
@@ -254,9 +261,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Form>
           <Form.Group className="" controlId="">
             <>
-              <Form.Label>
-                <>{t("amount-tcap")}</>
-              </Form.Label>
+              <Form.Label>{isMobile ? "Amount" : <>{t("amount-tcap")}</>}</Form.Label>
               <Form.Label className="max">
                 <a href="/" className="number" onClick={minTcap}>
                   MIN REQUIRED
@@ -312,29 +317,61 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
             </>
           </Form.Group>
         </Form>
-        <Table hover className="mt-2 liq-info">
-          <thead>
-            <th>
-              <>{t("monitoring.reward")}</>
-              {helpToolTip(0)}
-            </th>
-            <th>
-              <>{t("required-tcap")}</>
-              {helpToolTip(1)}
-            </th>
-            <th>Burn Fee</th>
-            <th>
-              <>{t("monitoring.net-reward")}</>
-              {helpToolTip(3)}
-            </th>
-          </thead>
-          <tbody>
-            <td>${numberFormatStr(rewardUSD, 2, 2)}</td>
-            <td>${numberFormatStr(maxTcapUSD, 2, 2)}</td>
-            <td>${numberFormatStr(burnFeeUsd, 2, 2)}</td>
-            <td className="net-reward">${numberFormatStr(netReward.toFixed(2), 2, 2)}</td>
-          </tbody>
-        </Table>
+        {!isMobile ? (
+          <Table hover className="mt-2 liq-info">
+            <thead>
+              <th>
+                <>{t("monitoring.reward")}</>
+                {helpToolTip(0)}
+              </th>
+              <th>
+                <>{t("required-tcap", { indexName })}</>
+                {helpToolTip(1)}
+              </th>
+              <th>Burn Fee</th>
+              <th>
+                <>{t("monitoring.net-reward", { indexName })}</>
+                {helpToolTip(3)}
+              </th>
+            </thead>
+            <tbody>
+              <td>${numberFormatStr(rewardUSD, 2, 2)}</td>
+              <td>${numberFormatStr(maxTcapUSD, 2, 2)}</td>
+              <td>${numberFormatStr(burnFeeUsd, 2, 2)}</td>
+              <td className="net-reward">${numberFormatStr(netReward.toFixed(2), 2, 2)}</td>
+            </tbody>
+          </Table>
+        ) : (
+          <div className="liq-info mobile">
+            <div className="box">
+              <div className="title">
+                <>{t("monitoring.reward")}</>
+                {helpToolTip(0)}
+              </div>
+              <div className="value">${numberFormatStr(rewardUSD, 2, 2)}</div>
+            </div>
+            <div className="box">
+              <div className="title">
+                <>{t("required-tcap", { indexName })}</>
+                {helpToolTip(1)}
+              </div>
+              <div className="value">${numberFormatStr(maxTcapUSD, 2, 2)}</div>
+            </div>
+            <div className="box">
+              <div className="title">Burn Fee</div>
+              <div className="value">${numberFormatStr(burnFeeUsd, 2, 2)}</div>
+            </div>
+            <div className="box">
+              <div className="title">
+                <>{t("monitoring.net-reward")}</>
+                {helpToolTip(3)}
+              </div>
+              <div className="value">
+                <span className="net-reward">${numberFormatStr(netReward.toFixed(2), 2, 2)}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button

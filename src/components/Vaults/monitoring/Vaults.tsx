@@ -41,6 +41,7 @@ export const Vaults = ({
 }: VaultsPropsType) => {
   const { t } = useTranslation();
   const currentNetwork = useContext(networkContext);
+  const indexName = isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
   const [showLiquidate, setShowLiquidate] = useState(false);
   const [vaultIndex, setVaultIndex] = useState(-1);
   const [liqVault, setLiqVault] = useState<VaultsType | null>(null);
@@ -207,8 +208,10 @@ export const Vaults = ({
                   <Tooltip id="ttip-status" className="vaults-status-tooltip">
                     <>
                       <span className="empty">Empty</span>: {t("monitoring.empty-info")} <br />
-                      <span className="ready">Ready</span>: {t("monitoring.ready-info")} <br />
-                      <span className="active">Active</span>: {t("monitoring.active-info")} <br />
+                      <span className="ready">Ready</span>:{" "}
+                      {t("monitoring.ready-info", { indexName })} <br />
+                      <span className="active">Active</span>:{" "}
+                      {t("monitoring.active-info", { indexName })} <br />
                       <span className="liquidation">Liquidation</span>:{" "}
                       {t("monitoring.liquidation-info")} <br />
                     </>
@@ -269,7 +272,7 @@ export const Vaults = ({
                 <td>
                   <div className="status">
                     {statusTag(index, v)}
-                    {v.isHardVault && <span className="mode">Hard mode</span>}
+                    {v.isHardVault && <span className="mode">H Mode</span>}
                   </div>
                 </td>
                 <td>

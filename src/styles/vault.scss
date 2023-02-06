@@ -627,9 +627,8 @@
     }
   }
 
-  @media (max-width: 600px) {
-    margin-left: 0rem;
-    
+  @media (max-width: 700px) {
+    margin-left: 1rem;
     .vault {
       &-container {
         width: 95%;
@@ -715,5 +714,9 @@
         }        
       }      
     }    
+  }
+
+  @media (max-width: 600px) {
+    margin-left: 0rem;
   }
 }

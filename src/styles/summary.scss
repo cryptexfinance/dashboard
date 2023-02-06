@@ -237,7 +237,7 @@
       width: 1rem;
     }
     
-    @media (min-width: 1149px) and (max-width: 1320px) {
+    @media (min-width: 1151px) and (max-width: 1320px) {
       h6 {
         font-size: 0.9rem;
       }
@@ -245,7 +245,8 @@
 
     @media (min-width: 760px) and (max-width: 1150px) {
       .detail {
-        grid-template-columns: auto;
+        display: flex;
+        flex-direction: column;
       }
     }
   }

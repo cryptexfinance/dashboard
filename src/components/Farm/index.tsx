@@ -10,7 +10,7 @@ import { NETWORKS } from "../../utils/constants";
 
 const Farm = () => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
 

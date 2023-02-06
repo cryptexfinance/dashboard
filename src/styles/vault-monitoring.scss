@@ -29,7 +29,7 @@ span {
 
 .vault-monitoring {
   margin-top: 2rem;
-  margin-left: 1.5rem;
+  margin-left: 1rem;
   padding: 1rem 2rem;
 
   .btn:active {
@@ -392,7 +392,9 @@ span {
     .total-box {
       display: flex;
       flex-direction: column-reverse;
-
+      h6 {
+        color: $off-white;
+      }
       .debt {
         display: flex;
         flex-direction: row;    
@@ -449,7 +451,12 @@ span {
     }
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1360px) {
+    width: 105%;
+  }
+
+  @media (max-width: 1300px) {
+    width: 110%;
     .row {
       display: flex;
       margin-top: 1rem;
@@ -461,7 +468,34 @@ span {
     }
   }
 
-  @media (min-width: 601px) {
+  @media (max-width: 1210px) {
+    width: 115%;
+  }
+
+  @media (max-width: 1150px) {
+    width: 130%;
+
+    .card {
+      .actions {
+        .items-view {          
+          .dd-container {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1050px) {
+    width: 140%;
+  }
+
+  @media (max-width: 1000px) {
+    width: 165%;
+  }
+
+  @media (min-width: 851px) {
     .accordion {
       &-button:after {
         display: none;
@@ -469,7 +503,46 @@ span {
     }
   }
 
+  @media (max-width: 850px) {
+    width: 100%;
+    .accordion.totals {
+      .totals-container {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+      .total-box {
+        max-width: 100%;
+      }
+    }
 
+    .accordion.actions {
+      margin-top: 2rem;
+      .accordion-body {
+        margin: 3rem 0rem;
+
+        .dd-container {
+          margin-bottom: 2rem;
+      
+          .titles {
+            margin-bottom: 0.5rem;
+          }
+
+          .btn-create-vault {
+            display: none;
+          }
+        }
+      }
+    } 
+
+    .btn-create-vault {
+      background-color: $highlight;
+      margin-top: 3rem;
+      width: 100%;
+      height: 3rem;
+    }
+  }
 
   @media (max-width: 600px) {
     margin-top: 1rem;
@@ -478,6 +551,7 @@ span {
     
     .accordion.totals {
       .totals-container {
+        display: flex;
         flex-direction: column;
       }
       .total-box {
@@ -486,6 +560,7 @@ span {
         margin: 0.7rem 0rem;
       }
     }
+
     .accordion.actions {
       margin-top: 1rem;
       .accordion-body {
@@ -496,19 +571,9 @@ span {
           .titles {
             margin-bottom: 0.3rem;
           }
-        }
-        .btn-create-vault {
-          display: none;
-        }
+        }        
       }
-    }
-    
-    .btn-create-vault {
-      background-color: $highlight;
-      margin-top: 3rem;
-      width: 100%;
-      height: 3rem;
-    }
+    } 
   }  
 
   .btn-load-more {

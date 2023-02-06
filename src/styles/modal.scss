@@ -238,6 +238,47 @@
     }
   }
 
+  .liq-info.mobile {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+
+    .box {
+      display: flex;
+      flex-direction: row;
+      border: 0.5px solid $off-white;
+      border-radius: 5px;
+      margin-top: 1rem;
+
+      .title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem;
+        width: 50%;
+        background-color: $darkest;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        font-size: 0.8rem;
+        color: white;
+      }
+      .value {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0.5rem;
+        width: 50%;
+        font-size: 0.8rem;
+        color: white;
+      }
+      .net-reward {
+        font-size: 0.9rem;
+        text-shadow: 0 0 4px #e440f2, 0 0 10px #e98ff1, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+      }
+    }
+  }
+
   .progress {
     height: 2rem;
 

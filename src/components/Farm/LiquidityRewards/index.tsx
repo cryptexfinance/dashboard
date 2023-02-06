@@ -21,7 +21,7 @@ const ctxClaimVestShowDate = new Date(1634511235 * 1000);
 
 const LiquidityRewards = () => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const signer = useContext(signerContext);
   const tokens = useContext(tokensContext);
   const oracles = useContext(oraclesContext);
@@ -224,11 +224,7 @@ const LiquidityRewards = () => {
 
     loadAddress();
     // eslint-disable-next-line
-  }, [updateData]);
-
-  if (isLoading) {
-    return <Loading title={t("loading")} message={t("wait")} />;
-  }
+  }, [updateData]);  
 
   const showCtxClaimVest = (): boolean => {
     const today = new Date();
@@ -623,6 +619,14 @@ const LiquidityRewards = () => {
       </Card>
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <Card className="mt-4 liquidity">
+        <Loading title={t("loading")} message={t("wait")} />
+      </Card>
+    );
+  }
 
   return (
     <Card className="mt-4 liquidity">

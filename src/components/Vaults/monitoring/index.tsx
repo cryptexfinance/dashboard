@@ -74,7 +74,7 @@ const showAllVaults = true;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const vaults = useContext(vaultsContext);

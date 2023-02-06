@@ -63,7 +63,7 @@
 
   .card-wrapper {
     margin-top: 2rem;
-    margin-left: 1rem;
+    margin-left: 0rem;
     h2 {
       font-size: 1.375rem;
       margin-bottom: 1.5625rem;
@@ -649,6 +649,30 @@
     }
   }
 
+  @media (max-width: 1370px) {
+    width: 115%;
+  }
+
+  @media (max-width: 1280px) {
+    width: 125%;
+  }
+
+  @media (max-width: 1200px) {
+    width: 138%;
+  }
+
+  @media (max-width: 1070px) {
+    width: 155%;
+  }
+
+  @media (max-width: 1000px) {
+    width: 170%;
+  }
+
+  @media (max-width: 930px) {
+    width: 180%;
+  }
+
   @media (max-width: 1050px) {
     .card-wrapper {
       .card {
@@ -669,8 +693,10 @@
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 850px) {
+    width: 100%;
     padding-top: 4rem;
+    margin-left: 2rem;
 
     #connect {
       width: 12rem;
@@ -683,7 +709,7 @@
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 850px) {
     margin-top: 2rem;
     padding: 1rem;    
 
@@ -912,5 +938,7 @@
     }
   }
 
-
+  @media (max-width: 600px) {
+    margin-left: 0rem;
+  }
 }
