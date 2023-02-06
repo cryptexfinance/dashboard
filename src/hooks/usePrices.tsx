@@ -115,7 +115,7 @@ export const usePrices = (): OraclePricesType => {
       }
 
       setOraclePrices({
-        jpegzOraclePrice: ethers.utils.formatEther(jpegzOraclePrice),
+        jpegzOraclePrice: ethers.utils.formatEther(jpegzOraclePrice.mul(10)),
         jpegzMarketCap: ethers.utils.formatEther(jpegzOraclePrice.mul(10000000000)),
         tcapOraclePrice: ethers.utils.formatEther(tcapOraclePrice),
         tcapMarketCap: ethers.utils.formatEther(tcapOraclePrice.mul(10000000000)),

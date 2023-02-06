@@ -4,7 +4,7 @@ import { Provider } from "ethers-multicall";
 import { Card, Dropdown } from "react-bootstrap/esm";
 import "../../styles/summary.scss";
 import SummaryOptions from "./SummaryOptions";
-import { NETWORKS } from "../../utils/constants";
+import { NETWORKS, TOKENS_SYMBOLS } from "../../utils/constants";
 import { getDefaultProvider, isArbitrum } from "../../utils/utils";
 
 type props = {
@@ -13,7 +13,7 @@ type props = {
 };
 
 const Summary = ({ signerAddress, signerChainId }: props) => {
-  const indexName = isArbitrum(signerChainId) ? "JPEGz" : "TCAP";
+  const indexName = isArbitrum(signerChainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
   const [options, setOptions] = useState([
     { id: "0", name: "My Balance" },
     { id: "1", name: indexName.concat(" Summary") },
@@ -59,13 +59,16 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
   const [currentEthProvider, setCurrentEthProvider] = useState<Provider | undefined>();
 
   useEffect(() => {
-    setUpdatingChain(true);
-    const provider = getDefaultProvider(currentChain.id);
-    const randomSigner = ethers.Wallet.createRandom().connect(provider);
-    const ethcallProvider = new Provider(randomSigner.provider);
-    ethcallProvider.init();
-    setCurrentEthProvider(ethcallProvider);
-    setUpdatingChain(false);
+    const loadProvider = async () => {
+      setUpdatingChain(true);
+      const provider = getDefaultProvider(currentChain.id);
+      const randomSigner = ethers.Wallet.createRandom().connect(provider);
+      const ethcallProvider = new Provider(randomSigner.provider);
+      await ethcallProvider.init();
+      setCurrentEthProvider(ethcallProvider);
+      setUpdatingChain(false);
+    };
+    loadProvider();
   }, [currentChain.id]);
 
   const handleOptionChange = (eventKey: string) => {
@@ -80,11 +83,7 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
 
     const ops = [...options];
     if (c) {
-      if (!isArbitrum(c.id)) {
-        ops[1].name = "TCAP Summary";
-      } else {
-        ops[1].name = "JPEGz Summary";
-      }
+      ops[1].name = indexName.concat(" Summary");
     }
     if (currentOption.id === "1") {
       const cOpt = currentOption;

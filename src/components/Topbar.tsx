@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-// import { Button, OverlayTrigger, Tooltip } from "react-bootstrap/esm";
 import Nav from "react-bootstrap/esm/Nav";
 import { AiOutlineSetting } from "react-icons/ai";
 // import Davatar from "@davatar/react";
 import "../styles/topbar.scss";
-// import { ReactComponent as LogoutIcon } from "../assets/images/welcome/logout.svg";
 import { ReactComponent as Logo } from "../assets/images/logo.svg";
 import { ReactComponent as MenuLogo } from "../assets/images/menu.svg";
 

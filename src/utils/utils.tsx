@@ -19,6 +19,7 @@ export const makeShortAddress = (address: string) => {
 export const isUndefined = (value: any): boolean => typeof value === "undefined";
 
 export const getENS = async (address: string) => {
+  console.log(" getENS ---");
   const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
     infura: process.env.REACT_APP_INFURA_ID,
     alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -31,6 +32,7 @@ export const getENS = async (address: string) => {
 };
 
 export const getAddressFromENS = async (ens: string) => {
+  console.log(" ENS ---");
   const provider = ethers.getDefaultProvider();
   const address = await provider.resolveName(ens);
   if (address) {
@@ -40,11 +42,13 @@ export const getAddressFromENS = async (ens: string) => {
 };
 
 export const getENSAvatar = async (resolver: ethers.providers.Resolver) => {
+  console.log(" ENS Avatar ---");
   const avatar = await resolver.getText("avatar");
   return avatar;
 };
 
 export const isValidAddress = async (address: string) => {
+  console.log(" isValidAddress ---");
   try {
     const currentAddress = ethers.utils.getAddress(address);
     return currentAddress;
@@ -269,7 +273,7 @@ export function toFragment(abi: JsonFragment[]): Fragment[] {
 }
 
 export const isValidNetwork = (chainId: number) => {
-  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  const name = process.env.REACT_APP_NETWORK_NAME || "goerli";
   if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
@@ -323,7 +327,11 @@ export const isGoerli = (chainId: number | undefined) => {
 
 export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
-  if (chainId === NETWORKS.arbitrum_goerli.chainId) {
+  if (chainId === NETWORKS.arbitrum.chainId) {
+    provider = new ethers.providers.InfuraProvider("arbitrum", {
+      infura: process.env.REACT_APP_INFURA_ID,
+    });
+  } else if (chainId === NETWORKS.arbitrum_goerli.chainId) {
     provider = new ethers.providers.InfuraProvider("arbitrum-goerli", {
       infura: process.env.REACT_APP_INFURA_ID,
     });
@@ -416,6 +424,7 @@ export const validOracles = (chainId: number, oracles: any): boolean => {
       valid &&
       !isUndefined(oracles.tcapOracleRead) &&
       !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.daiOracleRead) &&
       !isUndefined(oracles.linkOracleRead) &&
       !isUndefined(oracles.snxOracleRead) &&
       !isUndefined(oracles.uniOracleRead);

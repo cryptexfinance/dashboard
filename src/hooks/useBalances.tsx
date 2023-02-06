@@ -23,7 +23,6 @@ export const useBalances = (
   });
 
   const loadBalanceArbitrum = async () => {
-    console.log("Load Arbitrum ");
     const jpegzBalanceCall = await arbitrumContracts.jpegzTokenRead?.balanceOf(address);
     const jpegzSupplyCall = await arbitrumContracts.jpegzTokenRead?.totalSupply();
     // @ts-ignore
@@ -41,7 +40,6 @@ export const useBalances = (
   };
 
   const loadBalanceEthereum = async () => {
-    console.log("Load Ethereum ");
     const tcapBalanceCall = await ethereumContracts.tcapTokenRead?.balanceOf(address);
     const tcapSupplyCall = await ethereumContracts.tcapTokenRead?.totalSupply();
     const ctxBalanceCall = await ethereumContracts.ctxTokenRead?.balanceOf(address);
@@ -63,21 +61,23 @@ export const useBalances = (
   };
 
   const loadBalanceOptimism = async () => {
-    const tcapBalanceCall = await optimismContracts.tcapTokenRead?.balanceOf(address);
-    const tcapSupplyBalanceCall = await ethereumContracts.tcapTokenRead?.totalSupply();
+    if (optimismContracts.tcapTokenRead) {
+      const tcapBalanceCall = await optimismContracts.tcapTokenRead?.balanceOf(address);
+      const tcapSupplyBalanceCall = await optimismContracts.tcapTokenRead?.totalSupply();
 
-    // @ts-ignore
-    const [tcapBalance, tcapSupply] = await ethcallProvider?.all([
-      tcapBalanceCall,
-      tcapSupplyBalanceCall,
-    ]);
-    setBalances({
-      tcapBalance: ethers.utils.formatEther(tcapBalance),
-      jpegzBalance: "0",
-      ctxBalance: "0",
-      tcapSupplly: ethers.utils.formatEther(tcapSupply),
-      jpegzSupplly: "0",
-    });
+      // @ts-ignore
+      const [tcapBalance, tcapSupply] = await ethcallProvider?.all([
+        tcapBalanceCall,
+        tcapSupplyBalanceCall,
+      ]);
+      setBalances({
+        tcapBalance: ethers.utils.formatEther(tcapBalance),
+        jpegzBalance: "0",
+        ctxBalance: "0",
+        tcapSupplly: ethers.utils.formatEther(tcapSupply),
+        jpegzSupplly: "0",
+      });
+    }
   };
 
   const loadBalance = async () => {

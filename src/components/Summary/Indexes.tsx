@@ -7,6 +7,7 @@ import jpegzIcon from "../../assets/images/jpegz-coin.png";
 import { BalancesType, OraclePricesType } from "../../hooks/types";
 import { ReactComponent as TcapIcon } from "../../assets/images/tcap-coin.svg";
 import { isArbitrum } from "../../utils/utils";
+import { TOKENS_SYMBOLS } from "../../utils/constants";
 
 type props = {
   currentChainId: number;
@@ -17,7 +18,7 @@ type props = {
 
 const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) => {
   const { t } = useTranslation();
-  const currentIndexName = isArbitrum(currentChainId) ? "JPEGz" : "TCAP";
+  const currentIndexName = isArbitrum(currentChainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
   const [loading, setLoading] = useState(true);
   const [marketCap, setMarketCap] = useState("0.0");
   const [indexOraclePrice, setIndexOraclePrice] = useState("0.0");
@@ -43,19 +44,23 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
       precision: 10,
     });
 
-    const reponse = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
-      {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    if (!isArbitrum(currentChainId)) {
+      const reponse = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const resp = await reponse.json();
+      if (resp) {
+        setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
       }
-    );
-    const resp = await reponse.json();
-    if (resp) {
-      setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
+    } else {
+      setIndexMarketPrice("0");
     }
   };
 
@@ -116,21 +121,23 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
               </h5>
             </div>
           </div>
-          <div className="totals">
-            <IndexIcon />
-            <div className="staked">
-              <h6>{currentIndexName} Market Price</h6>
-              <h5 className="number neon-blue">
-                <NumberFormat
-                  value={indexMarketPrice}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                  prefix="$"
-                />
-              </h5>
+          {!isArbitrum(currentChainId) && (
+            <div className="totals">
+              <IndexIcon />
+              <div className="staked">
+                <h6>{currentIndexName} Market Price</h6>
+                <h5 className="number neon-blue">
+                  <NumberFormat
+                    value={indexMarketPrice}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={2}
+                    prefix="$"
+                  />
+                </h5>
+              </div>
             </div>
-          </div>
+          )}
           <div className="asset">
             <IndexIcon />
             <div className="staked">

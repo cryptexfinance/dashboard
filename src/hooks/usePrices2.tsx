@@ -30,7 +30,6 @@ export const usePrices2 = (
   });
 
   const loadPricesArbitrum = async () => {
-    console.log("Load Arbitrum PRICES ");
     const jpegzPriceCall = await arbitrumContracts.jpegzOracleRead?.getLatestAnswer();
     const wethOraclePriceCall = await arbitrumContracts.wethOracleRead?.getLatestAnswer();
     const daiOraclePriceCall = await arbitrumContracts.daiOracleRead?.getLatestAnswer();
@@ -46,12 +45,8 @@ export const usePrices2 = (
       daiOraclePriceCall,
     ]);
     const marketCap = jpegzOraclePrice.mul(10000000000);
-
-    console.log("jpegz price: ", ethers.utils.formatEther(jpegzOraclePrice));
-    console.log("jpegz market cap: ", ethers.utils.formatEther(marketCap));
-
     const p = oraclePrices;
-    p.jpegzOraclePrice = ethers.utils.formatEther(jpegzOraclePrice);
+    p.jpegzOraclePrice = ethers.utils.formatEther(jpegzOraclePrice.mul(10));
     p.jpegzMarketCap = ethers.utils.formatEther(marketCap);
     p.wethOraclePrice = ethers.utils.formatEther(wethOraclePrice.mul(10000000000));
     p.daiOraclePrice = ethers.utils.formatEther(daiOraclePrice.mul(10000000000));
@@ -59,7 +54,6 @@ export const usePrices2 = (
   };
 
   const loadPricesEthereum = async () => {
-    console.log("Load Ethereum PRICES ");
     const tcapPriceCall = await ethereumContracts.tcapOracleRead?.getLatestAnswer();
     const wethOraclePriceCall = await ethereumContracts.wethOracleRead?.getLatestAnswer();
     const daiOraclePriceCall = await ethereumContracts.daiOracleRead?.getLatestAnswer();
@@ -95,9 +89,6 @@ export const usePrices2 = (
       usdcOraclePriceCall,
     ]);
     const marketCap = tcapOraclePrice.mul(10000000000);
-
-    console.log("tcap price: ", ethers.utils.formatEther(tcapOraclePrice));
-    console.log("tcap market cap: ", ethers.utils.formatEther(marketCap));
 
     setOraclePrices({
       jpegzOraclePrice: "0",

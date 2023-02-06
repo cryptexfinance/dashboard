@@ -82,6 +82,7 @@ const App = () => {
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
+  setMulticallAddress(NETWORKS.arbitrum.chainId, "0x842eC2c7D803033Edf55E478F461FC547Bc54EB2");
   setMulticallAddress(
     NETWORKS.arbitrum_goerli.chainId,
     "0x108B25170319f38DbED14cA9716C54E5D1FF4623"
@@ -892,7 +893,7 @@ const App = () => {
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
     const isNftFruit =
-      window.location.toString().includes("sewagefruit") && isGoerli(network.chainId);
+      window.location.toString().includes("sewagefruitz") && isGoerli(network.chainId);
 
     if (!isValidNetwork(network.chainId) && !isNftFruit) {
       setInvalidNetwork(true);

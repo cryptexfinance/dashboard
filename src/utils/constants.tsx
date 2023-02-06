@@ -40,9 +40,9 @@ export const NETWORKS = {
     chainId: 42161,
     hexChainId: "0xA4B1",
     name: "Arbitrum One",
-    eth: "0x85f85C12FADEec638c63850117203f098386e6b9",
-    weth: "0x85f85C12FADEec638c63850117203f098386e6b9",
-    dai: "0x17aC26AB292660126d2baF16e5304DcbEc54340C",
+    eth: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    weth: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    dai: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
   },
   arbitrum_goerli: {
     chainId: 421613,
@@ -98,7 +98,7 @@ export const API_ENDPOINT = "https://test-api.cryptex.finance";
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
   goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-goerli-demo",
-  arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
+  arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-arbitrum-demo",
   arbitrum_goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",

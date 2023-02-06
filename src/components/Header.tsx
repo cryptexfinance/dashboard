@@ -280,8 +280,8 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {EthereumOpt()}
-                  {OptimismOpt()}
                   {ArbitrumOpt()}
+                  {OptimismOpt()}
                   {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>

@@ -110,14 +110,14 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
     }
   };
 
-  const { loading, data, error } = useQuery(TVL, {
+  const { loading } = useQuery(TVL, {
     fetchPolicy: "no-cache",
     pollInterval: 400000,
     notifyOnNetworkStatusChange: true,
-    onError: () => {
+    onError: (error) => {
       console.log(error);
     },
-    onCompleted: () => {
+    onCompleted: (data: any) => {
       if (signer) {
         calculateApr(data);
       }

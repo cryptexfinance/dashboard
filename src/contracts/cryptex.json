@@ -79609,7 +79609,7 @@
       "chainId": "42161",
       "contracts": {
         "DAI": {
-          "address": "0x7E574b5F8B61B71A6A1DA6127A9383F656d1a800",
+          "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
           "abi": [
             {
               "inputs": [],
@@ -79925,7 +79925,7 @@
           ]    
         },
         "DAIOracle": {
-          "address": "0x435D960a2Dcfb04f9099F13A6B5d09AD8849AD6A",
+          "address": "0x2fE5Bfd6051f45Df35167855e34335ed047bC8cC",
           "abi": [
             {
               "inputs": [
@@ -80166,7 +80166,7 @@
           ]
         },
         "DAIVaultHandler": {
-          "address": "0xCEcB53DDa8C14796966a3797351E62cC72a98beE",
+          "address": "0x76fD6b835d21E1e411F5927950Ec9A0146cDB54B",
           "abi": [
             {
               "inputs": [
@@ -80188,6 +80188,11 @@
                 {
                   "internalType": "uint256",
                   "name": "_burnFee",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_mintFee",
                   "type": "uint256"
                 },
                 {
@@ -80364,6 +80369,25 @@
                 }
               ],
               "name": "NewMinimumTCAP",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "_owner",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "NewMintFee",
               "type": "event"
             },
             {
@@ -80853,7 +80877,26 @@
                   "type": "uint256"
                 }
               ],
-              "name": "getFee",
+              "name": "getBurnFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "fee",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getMintFee",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -81132,7 +81175,20 @@
               ],
               "name": "mint",
               "outputs": [],
-              "stateMutability": "nonpayable",
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "mintFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -81349,6 +81405,19 @@
               "inputs": [
                 {
                   "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "setMintFee",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
                   "name": "_ratio",
                   "type": "uint256"
                 }
@@ -81510,7 +81579,7 @@
           ]
         },
         "JPEGZ": {
-          "address": "0xB091FCDE940d3303f7174C41e184AEDe3dd7AdBf",
+          "address": "0xD5536c80191c624F6bFD5590A45b9E93B16DEA97",
           "abi": [
             {
               "inputs": [
@@ -82091,7 +82160,7 @@
           ]
         },
         "JPEGZOracle": {
-          "address": "0xB67AD4cd26B33Ec60EbA6718626FF76a41CC676F",
+          "address": "0xAcd157D7D20a758FfA37830b873bA428a785D66d",
           "abi": [
             {
               "inputs": [
@@ -83154,7 +83223,7 @@
           ]
         },
         "WETH": {
-          "address": "0x85f85C12FADEec638c63850117203f098386e6b9",
+          "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
           "abi": [
             {
               "anonymous": false,
@@ -83439,7 +83508,7 @@
           ]    
         },
         "WETHOracle": {
-          "address": "0x7E398fD108f81D7074c8512bd307270F936b19d3",
+          "address": "0x437964C8094C368d831a636C6b903fd207901756",
           "abi": [
             {
               "inputs": [
@@ -83680,7 +83749,7 @@
           ]
         },
         "WETHVaultHandler": {
-          "address": "0x94BD0Ea4f4497F877aFeeDb7b1242b286f94D621",
+          "address": "0xe30C148Ca3cCe47341aB9bEbD7A8db031aB207D0",
           "abi": [
             {
               "inputs": [
@@ -83702,6 +83771,11 @@
                 {
                   "internalType": "uint256",
                   "name": "_burnFee",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_mintFee",
                   "type": "uint256"
                 },
                 {
@@ -83878,6 +83952,25 @@
                 }
               ],
               "name": "NewMinimumTCAP",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "_owner",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "NewMintFee",
               "type": "event"
             },
             {
@@ -84374,7 +84467,26 @@
                   "type": "uint256"
                 }
               ],
-              "name": "getFee",
+              "name": "getBurnFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "fee",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getMintFee",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -84653,7 +84765,20 @@
               ],
               "name": "mint",
               "outputs": [],
-              "stateMutability": "nonpayable",
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "mintFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -84875,6 +85000,19 @@
                 }
               ],
               "name": "setMinimumTCAP",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_mintFee",
+                  "type": "uint256"
+                }
+              ],
+              "name": "setMintFee",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"

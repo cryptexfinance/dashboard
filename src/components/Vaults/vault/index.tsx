@@ -30,6 +30,7 @@ import {
   isOptimism,
   notifyUser,
   toUSD,
+  isInLayer1,
 } from "../../../utils/utils";
 
 type VaultInitType = {
@@ -338,7 +339,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
     // @ts-ignore
     const [currentAssetPrice] = await signer.ethcallProvider?.all([currentAssetPriceCall]);
-    return currentAssetPrice;
+    let cAssetPrice = currentAssetPrice;
+    if (isArbitrum(currentNetwork.chainId)) {
+      cAssetPrice = currentAssetPrice.mul(10);
+    }
+
+    return cAssetPrice;
   };
 
   const collateralPrice = async () => {
@@ -1330,7 +1336,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         <div className="vault-header">
           <div className="header-col1">
             <div className="icon-container">
-              {!isArbitrum(currentNetwork.chainId) ? (
+              {isInLayer1(currentNetwork.chainId) ? (
                 <>
                   <ButtonGroup className="mb-2">
                     {radios.map((radio, idx) => (
