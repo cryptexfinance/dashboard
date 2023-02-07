@@ -23,12 +23,12 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
 
   const TVL = gql`
     query aprs {
-      apr(id: "1") {
+      apr(id: "2") {
         id
         totalAmount0
         totalAmount1
       }
-      positions(where: { staked: true, stakedBlockNumber_gt: 15361736 }) {
+      positions(where: { staked: true, stakedBlockNumber_gt: 15998870 }) {
         id
       }
     }

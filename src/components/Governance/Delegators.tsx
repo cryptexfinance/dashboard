@@ -172,7 +172,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
           {FEATURES.KEEPERS_API && (
             <div className="create">
               <Button variant="pink" className="mt-3 mb-4 w-100" onClick={() => showCreateKeeper()}>
-                {t("governance.new")}
+                <>{t("governance.new")}</>
               </Button>
             </div>
           )}

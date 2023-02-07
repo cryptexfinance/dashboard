@@ -138,7 +138,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
                 displayType="text"
                 thousandSeparator
                 prefix=""
-                decimalScale={2}
+                decimalScale={4}
               />{" "}
               CTX
             </td>
