@@ -57,6 +57,15 @@
     }
   }
 
+  .info {
+    a {
+      margin-left: 10px;
+    }
+    .link-blog {
+      margin-left: 0px;
+    }
+  }
+
   .mint {
     background-color: rgba(33, 33, 56, 0.7);
     p {
@@ -66,6 +75,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+
+
     }
   }
 

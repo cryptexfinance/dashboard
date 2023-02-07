@@ -39,7 +39,6 @@ const SewageFruitz = () => {
   const [minting, setMinting] = useState(false);
   const [loadingFruit, setLoadingFruit] = useState(false);
   const [merkleProof, setMerkleProof] = useState<any>();
-  const [mintPeriodEnd, setMintPeriodEnd] = useState(new Date());
   const [publicMint, setPublicMint] = useState(false);
   const [maxSupplyReached, setMaxSupplyReached] = useState(false);
   const [userStatus, setUserStatus] = useState<UserStatusType>({
@@ -164,7 +163,6 @@ const SewageFruitz = () => {
     const today = new Date();
     const endDateMS = mintPeriod.toNumber() * 1000;
 
-    setMintPeriodEnd(new Date(endDateMS));
     setPublicMint(today.getTime() > endDateMS);
     setMaxSupplyReached(currentTokenId.toNumber() + 1 > maxSupply.toNumber());
 
@@ -329,34 +327,36 @@ const SewageFruitz = () => {
           <Card.Body>
             <p>
               Sewage Fruitz are a collection of 2,500 upgradable NFTs created from the depths of the
-              Ethereum Blockchain and are a reward to all members of the Cryptex Finance community.
-              A fungus, grown out of dark substances in the yard of Mushroom Man as he spreads his
-              spores worldwide.
+              Ethereum Blockchain and were a reward to all members of the Cryptex Finance community.
             </p>
+            <br />
             <p>
-              Holding a Sewage Fruitz PFP unlocks user ability to go on quests within the Cryptex
-              Finance ecosystem, completing tasks that will be unlocked inside the DAO. Sewage
-              Fruitz holders can earn upgrades, badges and burn them in the future based on their
-              achievements to earn CTX, Cryptex Finance protocol governance token available
-              worldwide on Coinbase, Gemini, Huobi and many others.
+              Keep an eye out for upcoming quests within the Cryptex Finance ecosystem. By going on
+              quests, Sewage Fruitz holders can earn upgrades, badges and burn them in the future
+              based on their achievements to earn CTX.
             </p>
+            <br />
             <p>
-              Read more in our most recent blog post:{" "}
+              Read more in the announcement blog post:{" "}
               <a
                 href="https://cryptex.finance/blog/2022-10-22-introducing-sewage-fruitz/"
                 target="_blank"
                 rel="noreferrer"
+                className="link-blog"
               >
-                Introducing Sewage Fruitz
+                https://cryptex.finance/blog/2022-10-22-introducing-sewage-fruitz/
               </a>
             </p>
-            <br />
-            {signerAddress === "" && (
-              <p>
-                Connect your wallet to see if you are eligible to mint a Sewage Fruit. If you aren’t
-                eligible, public mint will be available on {mintPeriodEnd.toLocaleDateString()}.
-              </p>
-            )}
+            <p>
+              Check out the collection:
+              <a
+                href="https://opensea.io/collection/sewage-fruitz"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://opensea.io/collection/sewage-fruitz
+              </a>
+            </p>
           </Card.Body>
         </Card>
       </div>

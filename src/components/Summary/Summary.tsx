@@ -83,7 +83,8 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
 
     const ops = [...options];
     if (c) {
-      ops[1].name = indexName.concat(" Summary");
+      const indName = isArbitrum(c.id) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP;
+      ops[1].name = indName.concat(" Summary");
     }
     if (currentOption.id === "1") {
       const cOpt = currentOption;

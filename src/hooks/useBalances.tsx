@@ -95,11 +95,39 @@ export const useBalances = (
     setLoadingBalances(false);
   };
 
+  const loadIndexSupply = async () => {
+    if (ethcallProvider) {
+      let indexTokenRead = ethereumContracts.tcapTokenRead;
+      if (isArbitrum(chainId)) {
+        indexTokenRead = arbitrumContracts.jpegzTokenRead;
+      }
+      if (isOptimism(chainId)) {
+        indexTokenRead = optimismContracts.tcapTokenRead;
+      }
+
+      if (indexTokenRead) {
+        const indexSupplyCall = await indexTokenRead?.totalSupply();
+        // @ts-ignore
+        const [indexSupply] = await ethcallProvider?.all([indexSupplyCall]);
+        const indexSupplyVal = ethers.utils.formatEther(indexSupply);
+
+        setBalances({
+          tcapBalance: "0",
+          jpegzBalance: "0",
+          ctxBalance: "0",
+          tcapSupplly: !isArbitrum(chainId) ? indexSupplyVal : "0",
+          jpegzSupplly: isArbitrum(chainId) ? indexSupplyVal : "0",
+        });
+      }
+    }
+  };
+
   useEffect(
     () => {
       if (ethcallProvider && address !== "") {
         loadBalance();
       } else {
+        loadIndexSupply();
         setLoadingBalances(false);
       }
     },

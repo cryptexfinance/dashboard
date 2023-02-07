@@ -172,6 +172,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     let currentVaultData: any;
     // @ts-ignore
     const vaultID = await currentVault.userToVault(currentAddress);
+    console.log("vaultID: ", vaultID.toString());
+    console.log("vaultData: ", vaultData.collateralSymbol);
+    console.log("currentVault: ", currentVault?.address);
     setCurrentVaultId(vaultID.toString());
     if (vaultID.toString() !== "0") {
       // @ts-ignore
@@ -320,11 +323,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       setTokenBalanceDecimals(2);
     }
     setCollateralBalance(currentBalance);
-    setIsLoading(false);
+
     const iUsdBalance = toUSD(currentIndexPrice, iBalance);
     const cUsdBalance = toUSD(currentCollateralPrice, currentBalance);
     setIndexBalanceUSD(iUsdBalance.toString());
     setCollateralBalanceUSD(cUsdBalance.toString());
+    setIsLoading(false);
   }
 
   useEffect(
@@ -343,7 +347,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       load();
     },
     // eslint-disable-next-line
-    [currentAddress, currentVault, refreshVault]
+    [currentAddress, currentVault?.address, refreshVault]
   );
 
   const assetPrice = async () => {
@@ -1418,7 +1422,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 )}
               </div>
             </div>
-            {isLoading ? (
+            {isLoading || loadingVault ? (
               <Spinner className="spinner" animation="border" />
             ) : (
               <div className="vault-form">

@@ -167,6 +167,8 @@ export const useVault = (
         validVaults(currentNetwork.chainId || NETWORKS.mainnet.chainId, vaults) &&
         validHardVaults(currentNetwork.chainId || NETWORKS.mainnet.chainId, hardVaults)
       ) {
+        console.log("loadingVault: ", loadingVault);
+        setLoadingVault(true);
         await loadContracts();
         setLoadingVault(false);
       }
