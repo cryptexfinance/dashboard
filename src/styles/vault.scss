@@ -82,8 +82,9 @@
         position: absolute;
         text-align: left;
         font-size: .9rem;
-        margin-top: -1.7rem;
+        margin-top: 2.4rem;
         padding-left: 1rem;
+        z-index: 1;
       }
 
       .form-group {
@@ -609,9 +610,15 @@
     }
   }
 
-  @media (max-width: 1400px) {
+  @media (max-width: 1500px) {
     .vault-container {
       width: 43%;
+    }
+  }
+
+  @media (max-width: 1400px) {
+    .vault-container {
+      width: 51%;
     }
   }
 
@@ -708,10 +715,7 @@
             width: 6.2rem;
             font-size: 0.9rem;
           }
-        }
-        .text-muted {
-          position: relative;
-        }        
+        }       
       }      
     }    
   }

@@ -172,9 +172,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     let currentVaultData: any;
     // @ts-ignore
     const vaultID = await currentVault.userToVault(currentAddress);
-    console.log("vaultID: ", vaultID.toString());
-    console.log("vaultData: ", vaultData.collateralSymbol);
-    console.log("currentVault: ", currentVault?.address);
     setCurrentVaultId(vaultID.toString());
     if (vaultID.toString() !== "0") {
       // @ts-ignore
@@ -919,6 +916,16 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const AddCollateral = () => (
     <Form.Group className="form-group add">
+      <Form.Text className="text-muted">
+        <NumberFormat
+          className="number"
+          value={addCollateralUSD}
+          displayType="text"
+          thousandSeparator
+          prefix="$"
+          decimalScale={2}
+        />
+      </Form.Text>
       <InputGroup>
         <Form.Control
           type="number"
@@ -933,21 +940,21 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <>{t("add")}</>
         </Button>
       </InputGroup>
+    </Form.Group>
+  );
+
+  const RemoveCollateral = () => (
+    <Form.Group className="form-group remove">
       <Form.Text className="text-muted">
         <NumberFormat
           className="number"
-          value={addCollateralUSD}
+          value={removeCollateralUSD}
           displayType="text"
           thousandSeparator
           prefix="$"
           decimalScale={2}
         />
       </Form.Text>
-    </Form.Group>
-  );
-
-  const RemoveCollateral = () => (
-    <Form.Group className="form-group remove">
       <InputGroup>
         <Form.Control
           type="number"
@@ -962,16 +969,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <>{t("remove")}</>
         </Button>
       </InputGroup>
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={removeCollateralUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
     </Form.Group>
   );
 
@@ -1009,6 +1006,16 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const MintAsset = () => (
     <Form.Group className="form-group mint">
+      <Form.Text className="text-muted">
+        <NumberFormat
+          className="number"
+          value={mintUSD}
+          displayType="text"
+          thousandSeparator
+          prefix="$"
+          decimalScale={2}
+        />
+      </Form.Text>
       <InputGroup>
         <Form.Control
           type="number"
@@ -1028,22 +1035,22 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <>{t("mint")}</>
         </Button>
       </InputGroup>
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={mintUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       {BurnFeeLabel("burn-fee2", false)}
     </Form.Group>
   );
 
   const BurnAsset = () => (
     <Form.Group className="form-group remove">
+      <Form.Text className="text-muted">
+        <NumberFormat
+          className="number"
+          value={burnUSD}
+          displayType="text"
+          thousandSeparator
+          prefix="$"
+          decimalScale={2}
+        />
+      </Form.Text>
       <InputGroup>
         <Form.Control
           type="number"
@@ -1058,16 +1065,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <>{t("burn")}</>
         </Button>
       </InputGroup>
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={burnUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       {BurnFeeLabel("burn-fee2", true)}
     </Form.Group>
   );
