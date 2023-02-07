@@ -236,7 +236,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         currentIndexPriceCall,
         currentCollateralPriceCall,
       ]);
-      currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+
+      if (!isArbitrum(currentNetwork.chainId)) {
+        currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+      } else {
+        currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal.mul(10));
+      }
+
       currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
 
       iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
@@ -291,7 +297,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           currentIndexPriceCall,
         ]);
       currentCollateralPrice = ethers.utils.formatEther(currentCollateralPriceVal.mul(10000000000));
-      currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+
+      if (!isArbitrum(currentNetwork.chainId)) {
+        currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal);
+      } else {
+        currentIndexPrice = ethers.utils.formatEther(currentIndexPriceVal.mul(10));
+      }
+
       iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
       setIndexBalance(iBalance);
 
