@@ -60,6 +60,7 @@
   "warning": "This project is in beta. Use at your own risk.",
   "welcome": {
     "tcap": "Total Cryptocurrency Market Capitalization",
+    "jpegz": "Total NFT Market Cap.",
     "tcap-token": "Total Cryptocurrency Market Capitalization Token",
     "tcap-info": "Total Crypto Market Capitalization is updated on-chain on every 1% movement",
     "title1": "My Total Balance",
