@@ -916,16 +916,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const AddCollateral = () => (
     <Form.Group className="form-group add">
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={addCollateralUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       <InputGroup>
         <Form.Control
           type="number"
@@ -936,6 +926,16 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           onFocus={onFocusAddCollateral}
           onBlur={onBlurAddCollateral}
         />
+        <Form.Text className="text-muted">
+          <NumberFormat
+            className="number"
+            value={addCollateralUSD}
+            displayType="text"
+            thousandSeparator
+            prefix="$"
+            decimalScale={2}
+          />
+        </Form.Text>
         <Button className="neon-green" onClick={addCollateral} disabled={btnDisabled}>
           <>{t("add")}</>
         </Button>
@@ -945,17 +945,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const RemoveCollateral = () => (
     <Form.Group className="form-group remove">
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={removeCollateralUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       <InputGroup>
+        <Form.Text className="text-muted">
+          <NumberFormat
+            className="number"
+            value={removeCollateralUSD}
+            displayType="text"
+            thousandSeparator
+            prefix="$"
+            decimalScale={2}
+          />
+        </Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1006,17 +1006,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const MintAsset = () => (
     <Form.Group className="form-group mint">
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={mintUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       <InputGroup>
+        <Form.Text className="text-muted">
+          <NumberFormat
+            className="number"
+            value={mintUSD}
+            displayType="text"
+            thousandSeparator
+            prefix="$"
+            decimalScale={2}
+          />
+        </Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1041,17 +1041,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const BurnAsset = () => (
     <Form.Group className="form-group remove">
-      <Form.Text className="text-muted">
-        <NumberFormat
-          className="number"
-          value={burnUSD}
-          displayType="text"
-          thousandSeparator
-          prefix="$"
-          decimalScale={2}
-        />
-      </Form.Text>
       <InputGroup>
+        <Form.Text className="text-muted">
+          <NumberFormat
+            className="number"
+            value={burnUSD}
+            displayType="text"
+            thousandSeparator
+            prefix="$"
+            decimalScale={2}
+          />
+        </Form.Text>
         <Form.Control
           type="number"
           placeholder=""
