@@ -80,14 +80,16 @@ const ClaimReward = ({
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t("farming.univ3.claim-reward")}
+          <>{t("farming.univ3.claim-reward")}</>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            <Form.Label>{t("farming.univ3.amount-claim")}</Form.Label>
+            <Form.Label>
+              <>{t("farming.univ3.amount-claim")}</>
+            </Form.Label>
             <Form.Label className="max">
               <a href="/" className="number" onClick={maxReward}>
                 MAX
@@ -105,7 +107,7 @@ const ClaimReward = ({
       </Modal.Body>
       <Modal.Footer>
         <Button variant="pink" className="mt-3 mb-4 w-100" onClick={claim} disabled={!canClaim}>
-          {canClaim ? t("farming.univ3.claim-reward") : t("claiming")}
+          <>{canClaim ? t("farming.univ3.claim-reward") : t("claiming")}</>
         </Button>
       </Modal.Footer>
     </Modal>

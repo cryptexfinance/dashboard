@@ -15,33 +15,26 @@ import Container from "react-bootstrap/esm/Container";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
-import WelcomeWrapper from "./components/Welcome/index";
-import Graph from "./components/Graph";
-import { Vault, Monitoring } from "./components/Vault";
+import SummaryPage from "./components/Summary/index";
+import Vaults from "./components/Vaults";
 import Delegators from "./components/Governance/Delegators";
-import MushroomNft from "./components/MushroomNft";
+import MushroomNft from "./components/SewageFruitz";
 import Loading from "./components/Loading";
 import Farm from "./components/Farm";
-import Warnings from "./components/Warnings";
-import { useSigner } from "./hooks/useSigner";
-import { useNetworks } from "./hooks/useNetworks";
-import { useVaults } from "./hooks/useVaults";
-import { useHardVaults } from "./hooks/useHardVaults";
-import { useTokens } from "./hooks/useTokens";
-import { useOracles } from "./hooks/useOracles";
-import { useGovernance } from "./hooks/useGovernance";
-import { useRewards } from "./hooks/useRewards";
-import { useMushroomNft } from "./hooks/useMushroomNft";
-import signerContext from "./state/SignerContext";
-import NetworkContext from "./state/NetworkContext";
-import vaultsContext from "./state/VaultsContext";
-import hardVaultsContext from "./state/HardVaultsContext";
-import tokensContext from "./state/TokensContext";
-import oraclesContext from "./state/OraclesContext";
-import governanceContext from "./state/GovernanceContext";
-import rewardsContext from "./state/RewardsContext";
-import mushroomNftContext from "./state/MushroomNftContext";
-import { Web3ModalContext } from "./state/Web3ModalContext";
+import { Warnings } from "./components/Warnings/index";
+import * as hooks from "./hooks";
+import {
+  governanceContext,
+  hardVaultsContext,
+  mushroomNftContext,
+  networkContext,
+  oraclesContext,
+  rewardsContext,
+  signerContext,
+  tokensContext,
+  vaultsContext,
+  Web3ModalContext,
+} from "./state";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
 import WETH from "./contracts/WETH.json";
@@ -53,6 +46,7 @@ import {
   isValidNetwork,
   getDefaultProvider,
   toFragment,
+  isArbitrum,
   isOptimism,
   isGoerli,
 } from "./utils/utils";
@@ -65,7 +59,7 @@ const clientOracle = (graphqlEndpoint: string) =>
   });
 
 const App = () => {
-  const signer = useSigner();
+  const signer = hooks.useSigner();
   const web3Modal = useContext(Web3ModalContext);
   const [isLoadingContracts, setLoadingContracts] = useState(false);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
@@ -73,21 +67,26 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [apolloClient, setApolloClient] = useState(
     clientOracle(
-      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.rinkeby
+      process.env.REACT_APP_NETWORK_ID === "1" ? GRAPHQL_ENDPOINT.mainnet : GRAPHQL_ENDPOINT.goerli
     )
   );
-  const networks = useNetworks();
+  const networks = hooks.useNetworks();
   const [currentSignerAddress, setCurrentSignerAddress] = useState("");
-  const vaults = useVaults();
-  const hardVaults = useHardVaults();
-  const tokens = useTokens();
-  const oracles = useOracles();
-  const governance = useGovernance();
-  const rewards = useRewards();
-  const mushroomNft = useMushroomNft();
+  const vaults = hooks.useVaults();
+  const hardVaults = hooks.useHardVaults();
+  const tokens = hooks.useTokens();
+  const oracles = hooks.useOracles();
+  const governance = hooks.useGovernance();
+  const rewards = hooks.useRewards();
+  const mushroomNft = hooks.useMushroomNft();
   const match = useRouteMatch();
   setMulticallAddress(NETWORKS.optimism.chainId, "0xD0E99f15B24F265074747B2A1444eB02b9E30422");
   setMulticallAddress(NETWORKS.okovan.chainId, "0x4EFBb8983D5C18A8b6B5084D936B7D12A0BEe2c9");
+  setMulticallAddress(NETWORKS.arbitrum.chainId, "0x842eC2c7D803033Edf55E478F461FC547Bc54EB2");
+  setMulticallAddress(
+    NETWORKS.arbitrum_goerli.chainId,
+    "0x108B25170319f38DbED14cA9716C54E5D1FF4623"
+  );
 
   const setCurrentNetwork = (networkId: number, walletName: string, isBrowserWallet: boolean) => {
     let cNetwork;
@@ -96,15 +95,23 @@ const App = () => {
         cNetwork = NETWORKS.mainnet;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.mainnet));
         break;
-      case NETWORKS.rinkeby.chainId:
-        cNetwork = NETWORKS.rinkeby;
-        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.rinkeby));
+      case NETWORKS.goerli.chainId:
+        cNetwork = NETWORKS.goerli;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.goerli));
         break;
-      case 10:
+      case NETWORKS.arbitrum.chainId:
+        cNetwork = NETWORKS.arbitrum;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum));
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        cNetwork = NETWORKS.arbitrum_goerli;
+        setApolloClient(clientOracle(GRAPHQL_ENDPOINT.arbitrum_goerli));
+        break;
+      case NETWORKS.optimism.chainId:
         cNetwork = NETWORKS.optimism;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.optimism));
         break;
-      case 69:
+      case NETWORKS.okovan.chainId:
         cNetwork = NETWORKS.okovan;
         setApolloClient(clientOracle(GRAPHQL_ENDPOINT.okovan));
         break;
@@ -128,24 +135,25 @@ const App = () => {
     if (walletName !== "") networks.setCurrentWallet(walletName);
   };
 
-  const setMushroomContracts = async (currentSigner: ethers.Signer) => {
+  const setMushroomContracts = async (chainId: number, currentSigner: ethers.Signer) => {
+    let mushroomNftAddress = NETWORKS.mainnet.mushroomNft;
+    if (isGoerli(chainId)) {
+      mushroomNftAddress = NETWORKS.goerli.mushroomNft;
+    }
+
     // Set Mushroom contracts
-    const currentMushroomNft = new ethers.Contract(
-      NETWORKS.mainnet.mushroomNft,
-      Mushroom.abi,
-      currentSigner
-    );
+    const currentMushroomNft = new ethers.Contract(mushroomNftAddress, Mushroom.abi, currentSigner);
     mushroomNft.setCurrentMushroomNft(currentMushroomNft);
 
-    const currentMushroomNftRead = new Contract(NETWORKS.mainnet.mushroomNft, Mushroom.abi);
+    const currentMushroomNftRead = new Contract(mushroomNftAddress, Mushroom.abi);
     mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
   };
 
   const setEthereumContracts = async (chainId: number, currentSigner: ethers.Signer) => {
     let contracts;
-    let ethPoolAddress = NETWORKS.rinkeby.ethPool;
-    let daiPoolAddress = NETWORKS.rinkeby.daiPool;
-    let ctxPoolAddress = NETWORKS.rinkeby.ctxPool;
+    let ethPoolAddress;
+    let daiPoolAddress;
+    let ctxPoolAddress;
     switch (chainId) {
       case 1:
         contracts = cryptexJson[1].mainnet.contracts;
@@ -153,11 +161,11 @@ const App = () => {
         daiPoolAddress = NETWORKS.mainnet.daiPool;
         ctxPoolAddress = NETWORKS.mainnet.ctxPool;
         break;
-      case 4:
-        contracts = cryptexJson[4].rinkeby.contracts;
+      case 5:
+        contracts = cryptexJson[5].goerli.contracts;
         break;
       default:
-        contracts = cryptexJson[4].rinkeby.contracts;
+        contracts = cryptexJson[5].goerli.contracts;
         break;
     }
 
@@ -429,9 +437,115 @@ const App = () => {
       toFragment(contracts.Timelock.abi)
     );
     governance.setCurrentTimelockRead(currentTimelockRead);
-    if (chainId === 1) {
-      await setMushroomContracts(currentSigner);
+    await setMushroomContracts(chainId, currentSigner);
+  };
+
+  const setArbitrumContracts = async (
+    chainId: number,
+    currentSigner: ethers.Signer,
+    ethcallProvider: Provider
+  ) => {
+    await ethcallProvider.init();
+    signer.setCurrentEthcallProvider(ethcallProvider);
+    let contracts;
+    let wethAddress;
+    let daiAddress;
+
+    switch (chainId) {
+      case NETWORKS.arbitrum.chainId:
+        contracts = cryptexJson[42161].arbitrum.contracts;
+        wethAddress = NETWORKS.arbitrum.weth;
+        daiAddress = NETWORKS.arbitrum.dai;
+        break;
+      case NETWORKS.arbitrum_goerli.chainId:
+        contracts = cryptexJson[421613].arbitrum_goerli.contracts;
+        wethAddress = NETWORKS.arbitrum_goerli.weth;
+        daiAddress = NETWORKS.arbitrum_goerli.dai;
+        break;
+      default:
+        contracts = cryptexJson[42161].arbitrum.contracts;
+        wethAddress = NETWORKS.arbitrum.weth;
+        daiAddress = NETWORKS.arbitrum.dai;
+        break;
     }
+
+    // Set Vaults
+    const currentWETHVault = new ethers.Contract(
+      contracts.WETHVaultHandler.address,
+      contracts.WETHVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentWETHVault(currentWETHVault);
+    const currentDAIVault = new ethers.Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi,
+      currentSigner
+    );
+    vaults.setCurrentDAIVault(currentDAIVault);
+
+    const currentWETHVaultRead = new Contract(
+      contracts.WETHVaultHandler.address,
+      toFragment(contracts.WETHVaultHandler.abi)
+    );
+    vaults.setCurrentWETHVaultRead(currentWETHVaultRead);
+    const currentDAIVaultRead = new Contract(
+      contracts.DAIVaultHandler.address,
+      contracts.DAIVaultHandler.abi
+    );
+    vaults.setCurrentDAIVaultRead(currentDAIVaultRead);
+
+    // Set Tokens
+    const currentWETHToken = new ethers.Contract(wethAddress, ERC20.abi, currentSigner);
+    tokens.setCurrentWETHToken(currentWETHToken);
+    const currentDAIToken = new ethers.Contract(daiAddress, WETH.abi, currentSigner);
+    tokens.setCurrentDAIToken(currentDAIToken);
+    const currentJPEGZToken = new ethers.Contract(
+      contracts.JPEGZ.address,
+      contracts.JPEGZ.abi,
+      currentSigner
+    );
+    tokens.setCurrentJPEGZToken(currentJPEGZToken);
+
+    const currentWETHTokenRead = new Contract(wethAddress, ERC20.abi);
+    tokens.setCurrentWETHTokenRead(currentWETHTokenRead);
+    const currentDAITokenRead = new Contract(daiAddress, WETH.abi);
+    tokens.setCurrentDAITokenRead(currentDAITokenRead);
+    const currentJPEGZTokenRead = new Contract(contracts.JPEGZ.address, contracts.JPEGZ.abi);
+    tokens.setCurrentJPEGZTokenRead(currentJPEGZTokenRead);
+
+    // Set Oracles
+    const currentWETHOracle = new ethers.Contract(
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentWETHOracle(currentWETHOracle);
+    const currentDAIOracle = new ethers.Contract(
+      contracts.DAIOracle.address,
+      contracts.DAIOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentDAIOracle(currentDAIOracle);
+
+    const currentJPEGZOracle = new ethers.Contract(
+      contracts.JPEGZOracle.address,
+      contracts.JPEGZOracle.abi,
+      currentSigner
+    );
+    oracles.setCurrentJPEGZOracle(currentJPEGZOracle);
+
+    const currentWETHOracleRead = new Contract(
+      contracts.WETHOracle.address,
+      contracts.WETHOracle.abi
+    );
+    oracles.setCurrentWETHOracleRead(currentWETHOracleRead);
+    const currentDAIOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
+    oracles.setCurrentDAIOracleRead(currentDAIOracleRead);
+    const currentJPEGZOracleRead = new Contract(
+      contracts.JPEGZOracle.address,
+      contracts.JPEGZOracle.abi
+    );
+    oracles.setCurrentJPEGZOracleRead(currentJPEGZOracleRead);
   };
 
   const setOptimismContracts = async (currentSigner: ethers.Signer) => {
@@ -619,22 +733,6 @@ const App = () => {
     oracles.setCurrentWBTCOracleRead(currentWBTCOracleRead);
   };
 
-  const setGoerliContracts = async (currentSigner: ethers.Signer, ethcallProvider: Provider) => {
-    await ethcallProvider.init();
-    signer.setCurrentEthcallProvider(ethcallProvider);
-
-    // Set Mushroom contracts
-    const currentMushroomNft = new ethers.Contract(
-      NETWORKS.goerli.mushroomNft,
-      Mushroom.abi,
-      currentSigner
-    );
-    mushroomNft.setCurrentMushroomNft(currentMushroomNft);
-
-    const currentMushroomNftRead = new Contract(NETWORKS.goerli.mushroomNft, Mushroom.abi);
-    mushroomNft.setCurrentMushroomNftRead(currentMushroomNftRead);
-  };
-
   const setContracts = async (
     currentSigner: ethers.Signer,
     ethcallProvider: Provider,
@@ -653,13 +751,13 @@ const App = () => {
         daiAddress = NETWORKS.mainnet.dai;
         linkAddress = contracts.LINK.address;
         break;
-      case NETWORKS.rinkeby.chainId:
-        contracts = cryptexJson[4].rinkeby.contracts;
-        wethAddress = NETWORKS.rinkeby.weth;
-        daiAddress = NETWORKS.rinkeby.dai;
+      case NETWORKS.goerli.chainId:
+        contracts = cryptexJson[5].goerli.contracts;
+        wethAddress = NETWORKS.goerli.weth;
+        daiAddress = NETWORKS.goerli.dai;
         linkAddress = contracts.LINK.address;
         break;
-      case 10:
+      case NETWORKS.optimism.chainId:
         contracts = cryptexJson[10].optimism.contracts;
         wethAddress = NETWORKS.optimism.weth;
         daiAddress = NETWORKS.optimism.dai;
@@ -672,9 +770,9 @@ const App = () => {
         linkAddress = "";
         break;
       default:
-        contracts = cryptexJson[4].rinkeby.contracts;
-        wethAddress = NETWORKS.rinkeby.weth;
-        daiAddress = NETWORKS.rinkeby.dai;
+        contracts = cryptexJson[5].goerli.contracts;
+        wethAddress = NETWORKS.goerli.weth;
+        daiAddress = NETWORKS.goerli.dai;
         linkAddress = contracts.LINK.address;
         break;
     }
@@ -790,49 +888,53 @@ const App = () => {
     }
   };
 
-  web3Modal.on(
-    "connect",
-    async (
-      networkProvider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc
-    ) => {
-      setLoadingContracts(true);
-      const currentProvider = new ethers.providers.Web3Provider(networkProvider);
-      const network = await currentProvider.getNetwork();
-      const isNftFruit =
-        window.location.toString().includes("sewagefruit") && isGoerli(network.chainId);
+  web3Modal.on("connect", async (networkProvider) => {
+    setLoadingContracts(true);
+    const currentProvider = new ethers.providers.Web3Provider(networkProvider);
+    const network = await currentProvider.getNetwork();
+    const isNftFruit =
+      window.location.toString().includes("sewagefruitz") && isGoerli(network.chainId);
 
-      if (!isValidNetwork(network.chainId) && !isNftFruit) {
-        setInvalidNetwork(true);
-      }
-      const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
-      const currentSigner = currentProvider.getSigner();
-      signer.setCurrentSigner(currentSigner);
-      const ethcallProvider = new Provider(currentProvider);
-
-      if (isPolygon(network.chainId)) {
-        await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
-      } else if (isGoerli(network.chainId)) {
-        await setGoerliContracts(currentSigner, ethcallProvider);
-      } else {
-        await setContracts(currentSigner, ethcallProvider, network.chainId || 4);
-      }
-      // @ts-ignore
-      const isBrowserWallet =
-        networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
-      const cAddress = await currentSigner.getAddress();
-      setCurrentSignerAddress(cAddress);
-      setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
-
-      // @ts-ignore
-      networkProvider.on("chainChanged", (chainId: number) => {
-        if (chainId !== network.chainId) {
-          setCurrentNetwork(chainId, "", isBrowserWallet);
-          window.location.reload();
-        }
-      });
-      setLoadingContracts(false);
+    if (!isValidNetwork(network.chainId) && !isNftFruit) {
+      setInvalidNetwork(true);
     }
-  );
+    const walletName = currentProvider.provider.isMetaMask ? "metamask" : "other";
+    const currentSigner = currentProvider.getSigner();
+    signer.setCurrentSigner(currentSigner);
+    const ethcallProvider = new Provider(currentProvider);
+    if (isArbitrum(network.chainId)) {
+      await setArbitrumContracts(network.chainId, currentSigner, ethcallProvider);
+    } else if (isPolygon(network.chainId)) {
+      await setPolygonContracts(network.chainId, currentSigner, ethcallProvider);
+    } else {
+      await setContracts(currentSigner, ethcallProvider, network.chainId || 5);
+    }
+
+    const isBrowserWallet =
+      networkProvider.isMetaMask || getProviderInfo(networkProvider.id === "walletlink");
+    const cAddress = await currentSigner.getAddress();
+    setCurrentSignerAddress(cAddress);
+    setCurrentNetwork(network.chainId, walletName, isBrowserWallet);
+
+    // @ts-ignore
+    networkProvider.on("chainChanged", (chainId: number) => {
+      if (chainId !== network.chainId) {
+        setCurrentNetwork(chainId, "", isBrowserWallet);
+        window.location.reload();
+      }
+    });
+    if (networkProvider.isFortmatic) {
+      // @ts-ignore
+      networkProvider.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          web3Modal.clearCachedProvider();
+        }
+        window.location.reload();
+      });
+    }
+
+    setLoadingContracts(false);
+  });
 
   useEffect(() => {
     async function loadProvider() {
@@ -842,21 +944,14 @@ const App = () => {
         }
       } else {
         setLoadingContracts(true);
-        const chainId = process.env.REACT_APP_NETWORK_ID || "4";
-        let networkName = NETWORKS.mainnet.name;
-        if (isGoerli(parseInt(chainId))) {
-          networkName = NETWORKS.goerli.name;
-        }
-        if (chainId === "4") {
-          networkName = NETWORKS.rinkeby.name;
-        }
-        const provider = getDefaultProvider(parseInt(chainId), networkName);
+        const chainId = process.env.REACT_APP_NETWORK_ID || "5";
+        const provider = getDefaultProvider(parseInt(chainId));
         const randomSigner = ethers.Wallet.createRandom().connect(provider);
         const ethcallProvider = new Provider(randomSigner.provider);
-        if (isPolygon(parseInt(chainId))) {
+        if (isArbitrum(parseInt(chainId))) {
+          setArbitrumContracts(parseInt(chainId), randomSigner, ethcallProvider);
+        } else if (isPolygon(parseInt(chainId))) {
           setPolygonContracts(parseInt(chainId), randomSigner, ethcallProvider);
-        } else if (isGoerli(parseInt(chainId))) {
-          setGoerliContracts(randomSigner, ethcallProvider);
         } else {
           setContracts(randomSigner, ethcallProvider, parseInt(chainId));
         }
@@ -867,7 +962,7 @@ const App = () => {
     // Execute the created function directly
     loadProvider();
     // eslint-disable-next-line
-  }, [web3Modal]);
+  }, []);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setShowSidebar(true),
@@ -906,7 +1001,7 @@ const App = () => {
 
   return (
     <signerContext.Provider value={signer}>
-      <NetworkContext.Provider value={networks}>
+      <networkContext.Provider value={networks}>
         <tokensContext.Provider value={tokens}>
           <oraclesContext.Provider value={oracles}>
             <vaultsContext.Provider value={vaults}>
@@ -931,23 +1026,14 @@ const App = () => {
                           <ToastContainer />
                           <Switch>
                             <Route path={`${match.url}/`}>
-                              <WelcomeWrapper
-                                signerAddress={currentSignerAddress}
-                                loadingContracts={isLoadingContracts}
-                              />
+                              <SummaryPage />
                             </Route>
                             <Route path={`${match.url}farm`}>
                               <Farm />
                             </Route>
                             <ApolloProvider client={apolloClient}>
-                              <Route path={`${match.url}graph`}>
-                                <Graph />
-                              </Route>
-                              <Route path={`${match.url}vault`}>
-                                <Vault />
-                              </Route>
-                              <Route path={`${match.url}vault-monitoring`}>
-                                <Monitoring />
+                              <Route path={`${match.url}vaults`}>
+                                <Vaults key={Math.random()} />
                               </Route>
                               <Route path={`${match.url}governance`}>
                                 <Delegators currentSignerAddress={currentSignerAddress} />
@@ -966,7 +1052,7 @@ const App = () => {
             </vaultsContext.Provider>
           </oraclesContext.Provider>
         </tokensContext.Provider>
-      </NetworkContext.Provider>
+      </networkContext.Provider>
     </signerContext.Provider>
   );
 };

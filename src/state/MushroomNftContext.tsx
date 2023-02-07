@@ -14,6 +14,4 @@ export const MUSHROOM_VALUE = {
   setCurrentMushroomNftRead: () => {},
 };
 
-const mushroomNftContext = React.createContext<IMushroomNftContext>(MUSHROOM_VALUE);
-
-export default mushroomNftContext;
+export const mushroomNftContext = React.createContext<IMushroomNftContext>(MUSHROOM_VALUE);

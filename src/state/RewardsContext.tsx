@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface RewardsContext {
+export interface IRewardsContext {
   wethReward?: ethers.Contract;
   setCurrentWETHReward: (currentReward: ethers.Contract) => void;
   daiReward?: ethers.Contract;
@@ -50,6 +50,4 @@ export const REWARDS_DEFAULT_VALUE = {
   setCurrentCTXPoolRewardRead: () => {},
 };
 
-const rewardsContext = React.createContext<RewardsContext>(REWARDS_DEFAULT_VALUE);
-
-export default rewardsContext;
+export const rewardsContext = React.createContext<IRewardsContext>(REWARDS_DEFAULT_VALUE);

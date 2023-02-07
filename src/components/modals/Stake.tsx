@@ -4,7 +4,7 @@ import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
 import { ethers, BigNumber } from "ethers";
 import { useTranslation } from "react-i18next";
-import SignerContext from "../../state/SignerContext";
+import { signerContext } from "../../state";
 import "../../styles/modal.scss";
 
 import { errorNotification, notifyUser } from "../../utils/utils";
@@ -23,7 +23,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
   const { t } = useTranslation();
   const [stakeText, setStakeText] = useState("");
   const [isApproved, setIsApproved] = useState(false);
-  const signer = useContext(SignerContext);
+  const signer = useContext(signerContext);
 
   // Infinite Approval
   const infiniteApproveValue = BigNumber.from("1157920892373161954235709850086879078532699");
@@ -106,18 +106,24 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t("stake")} {poolTitle}
+          <>
+            {t("stake")} {poolTitle}
+          </>  
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>
-          {t("balance2")}: <b>{balance}</b>
+          <>
+            {t("balance2")}: <b>{balance}</b>
+          </>  
         </p>
         <Form>
           <Form.Group>
             {isApproved ? (
               <>
-                <Form.Label>{t("stake2")}</Form.Label>
+                <Form.Label>
+                  <>{t("stake2")}</>
+                </Form.Label>
                 <Form.Label className="max">
                   <a href="/" className="number" onClick={maxStake}>
                     MAX
@@ -141,17 +147,19 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         {isApproved ? (
           <>
             <Button variant="primary" className="neon-highlight" onClick={stakeTokens}>
-              {t("stake")} {t("tokens")}
+              <>
+                {t("stake")} {t("tokens")}
+              </>  
             </Button>
           </>
         ) : (
           <>
             <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
-              {t("infinite-approve")}
+              <>{t("infinite-approve")}</>
             </Button>
           </>
         )}{" "}
-        {t("tokens")}
+        <>{t("tokens")}</>
       </Modal.Footer>
     </Modal>
   );

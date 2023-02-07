@@ -3,9 +3,8 @@ import Modal from "react-bootstrap/esm/Modal";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/esm/Form";
 import "../../styles/modal.scss";
-import governanceContext from "../../state/GovernanceContext";
+import { governanceContext, tokensContext } from "../../state";
 import { isValidAddress, errorNotification, notifyUser } from "../../utils/utils";
-import tokensContext from "../../state/TokensContext";
 
 type props = {
   show: boolean;
@@ -56,7 +55,7 @@ export const Delegate = ({ show, onHide, refresh }: props) => {
         <Modal.Title id="contained-modal-title-vcenter">Delegate CTX</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Delegate your CTX tokens to an Adress so it can vote for you.</p>
+        <p className="delegate-description">Delegate your CTX tokens to an Adress so it can vote for you.</p>
         <Form>
           <Form.Group>
             <Form.Label>Address</Form.Label>

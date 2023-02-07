@@ -32,7 +32,7 @@ export const UNIV3 = {
       ],
     },
   },
-  rinkeby: {
+  goerli: {
     tcapPool: {
       id: "0xfb7BDD5B703f57BC7807b9D731503050EdC8c722",
       feeTier: 3000,
@@ -51,7 +51,7 @@ export const UNIV3 = {
 
 export const GRAPHQL_UNIV3_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-univ3",
-  rinkeby: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
+  goerli: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-rinkeby-two",
 };
 
 export const encodeIncentive = (dataMap: any): string => {

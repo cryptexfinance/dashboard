@@ -88,7 +88,7 @@ const Withdraw = ({
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            <p>{t("governance.withdraw-info")}</p>
+            <p className="delegate-description">{t("governance.withdraw-info")}</p>
             <Form.Label>{t("governance.amount-remove")}</Form.Label>
             <Form.Label className="max">
               <a href="/" className="number orange" onClick={maxWithdraw}>

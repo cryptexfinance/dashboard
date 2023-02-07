@@ -2,7 +2,7 @@ import React from "react";
 import { Provider } from "ethers-multicall";
 import { ethers } from "ethers";
 
-export interface SignerContext {
+export interface ISignerContext {
   signer?: ethers.Signer;
   setCurrentSigner: (currentSigner: ethers.Signer) => void;
   ethcallProvider?: Provider;
@@ -14,6 +14,4 @@ export const SIGNER_DEFAULT_VALUE = {
   setCurrentEthcallProvider: () => {},
 };
 
-const signerContext = React.createContext<SignerContext>(SIGNER_DEFAULT_VALUE);
-
-export default signerContext;
+export const signerContext = React.createContext<ISignerContext>(SIGNER_DEFAULT_VALUE);

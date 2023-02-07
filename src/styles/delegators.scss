@@ -18,9 +18,7 @@
   }
 
   .create {
-    position: relative;
     width: 15rem;
-    margin-top: -4rem;
   }
 
   .grid {
@@ -87,6 +85,7 @@
         }
         .btn:focus {
           border: none;
+          box-shadow: none;
         }
         .btn:hover {
           background-color: transparent;
@@ -172,7 +171,7 @@
     }
   }
 
-  .badge-highlight {
+  .badge.bg-light {
     //border: 1px solid $highlight;
     border-radius: 25px;
     height: 30px;
@@ -369,6 +368,41 @@
       }
       @media (max-width: 450px) {
         padding: 2rem 1rem;
+      }
+    }
+  }
+
+  .keepers-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $darker;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    .sort-box {
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown {
+      margin-left: 0.5rem;
+      .dropdown-toggle {
+        min-height: 2.5rem;
+        height: 2.5rem;
+
+        span {
+          font-size: 0.8rem;
+        }
+      }
+      .sort-by-toggle {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .create {
+      .btn {
+        min-height: 2.7rem;
       }
     }
   }

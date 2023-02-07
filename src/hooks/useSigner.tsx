@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Provider } from "ethers-multicall";
 
-import { SignerContext } from "../state/SignerContext";
+import { ISignerContext } from "../state";
 
-export const useSigner = (): SignerContext => {
+export const useSigner = (): ISignerContext => {
   const [signer, setSigner] = useState<ethers.Signer>();
   const [ethcallProvider, setEthcallProvider] = useState<Provider>();
   const setCurrentSigner = React.useCallback((currentSigner: ethers.Signer): void => {

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { OraclesContext } from "../state/OraclesContext";
+import { IOraclesContext } from "../state";
 
-export const useOracles = (): OraclesContext => {
+export const useOracles = (): IOraclesContext => {
   const [wethOracle, setETHOracle] = useState<ethers.Contract>();
   const [daiOracle, setDAIOracle] = useState<ethers.Contract>();
   const [wbtcOracle, setWBTCOracle] = useState<ethers.Contract>();
+  const [jpegzOracle, setJPEGZOracle] = useState<ethers.Contract>();
   const [tcapOracle, setTCAPOracle] = useState<ethers.Contract>();
   const [aaveOracle, setAAVEOracle] = useState<ethers.Contract>();
   const [linkOracle, setLINKOracle] = useState<ethers.Contract>();
@@ -17,6 +18,7 @@ export const useOracles = (): OraclesContext => {
   const [wethOracleRead, setETHOracleRead] = useState<Contract>();
   const [daiOracleRead, setDAIOracleRead] = useState<Contract>();
   const [wbtcOracleRead, setWBTCOracleRead] = useState<Contract>();
+  const [jpegzOracleRead, setJPEGZOracleRead] = useState<Contract>();
   const [tcapOracleRead, setTCAPOracleRead] = useState<Contract>();
   const [aaveOracleRead, setAAVEOracleRead] = useState<Contract>();
   const [linkOracleRead, setLINKOracleRead] = useState<Contract>();
@@ -33,6 +35,9 @@ export const useOracles = (): OraclesContext => {
   }, []);
   const setCurrentWBTCOracle = React.useCallback((currentWBTCOracle: ethers.Contract): void => {
     setWBTCOracle(currentWBTCOracle);
+  }, []);
+  const setCurrentJPEGZOracle = React.useCallback((currentJPEGZOracle: ethers.Contract): void => {
+    setJPEGZOracle(currentJPEGZOracle);
   }, []);
   const setCurrentTCAPOracle = React.useCallback((currentTCAPOracle: ethers.Contract): void => {
     setTCAPOracle(currentTCAPOracle);
@@ -64,6 +69,9 @@ export const useOracles = (): OraclesContext => {
   const setCurrentWBTCOracleRead = React.useCallback((currentWBTCOracleRead: Contract): void => {
     setWBTCOracleRead(currentWBTCOracleRead);
   }, []);
+  const setCurrentJPEGZOracleRead = React.useCallback((currentJPEGZOracleRead: Contract): void => {
+    setJPEGZOracleRead(currentJPEGZOracleRead);
+  }, []);
   const setCurrentTCAPOracleRead = React.useCallback((currentTCAPOracleRead: Contract): void => {
     setTCAPOracleRead(currentTCAPOracleRead);
   }, []);
@@ -92,6 +100,8 @@ export const useOracles = (): OraclesContext => {
     setCurrentDAIOracle,
     wbtcOracle,
     setCurrentWBTCOracle,
+    jpegzOracle,
+    setCurrentJPEGZOracle,
     tcapOracle,
     setCurrentTCAPOracle,
     aaveOracle,
@@ -112,6 +122,8 @@ export const useOracles = (): OraclesContext => {
     setCurrentDAIOracleRead,
     wbtcOracleRead,
     setCurrentWBTCOracleRead,
+    jpegzOracleRead,
+    setCurrentJPEGZOracleRead,
     tcapOracleRead,
     setCurrentTCAPOracleRead,
     aaveOracleRead,

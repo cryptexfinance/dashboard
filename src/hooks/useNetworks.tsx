@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { NetworkContext } from "../state/NetworkContext";
+import { INetworkContext } from "../state";
 
-export const useNetworks = (): NetworkContext => {
+export const useNetworks = (): INetworkContext => {
   const [chainId, setChainId] = useState<number>();
   const [name, setName] = useState<string>();
   const [wethAddress, setWETHAddress] = useState<string>("");
