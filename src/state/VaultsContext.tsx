@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface VaultsContext {
+export interface IVaultsContext {
   wethVault?: ethers.Contract;
   setCurrentWETHVault: (currentVault: ethers.Contract) => void;
   daiVault?: ethers.Contract;
@@ -56,6 +56,4 @@ export const VAULTS_DEFAULT_VALUE = {
   setCurrentMaticVaultRead: () => {},
 };
 
-const vaultsContext = React.createContext<VaultsContext>(VAULTS_DEFAULT_VALUE);
-
-export default vaultsContext;
+export const vaultsContext = React.createContext<IVaultsContext>(VAULTS_DEFAULT_VALUE);

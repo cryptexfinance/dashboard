@@ -3,9 +3,8 @@ import { Button } from "react-bootstrap";
 import { ethers } from "ethers";
 import Table from "react-bootstrap/esm/Table";
 import NumberFormat from "react-number-format";
-import GovernanceContext from "../../state/GovernanceContext";
-import SignerContext from "../../state/SignerContext";
-import { errorNotification, notifyUser } from "../../utils/utils";
+import { governanceContext, networkContext, signerContext } from "../../state";
+import { errorNotification, isInLayer1, notifyUser } from "../../utils/utils";
 
 const sixMonthCtxRewardAmount = 12654;
 const apyShowDate = new Date(1633654800 * 1000);
@@ -18,8 +17,9 @@ type props = {
 };
 
 const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: props) => {
-  const signer = useContext(SignerContext);
-  const governance = useContext(GovernanceContext);
+  const currentNetwork = useContext(networkContext);
+  const signer = useContext(signerContext);
+  const governance = useContext(governanceContext);
   const [totalStaked, setTotalStaked] = useState("0.0");
   const [stake, setStake] = useState("0.0");
   const [rewards, setRewards] = useState("0.0");
@@ -30,7 +30,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
   useEffect(() => {
     async function load() {
       let currentWT = waitTime;
-      if (signer.signer && governance.delegatorFactoryRead) {
+      if (signer.signer && isInLayer1(currentNetwork.chainId) && governance.delegatorFactoryRead) {
         const currentSignerAddress = await signer.signer.getAddress();
         const totalSupplyCall = await governance.delegatorFactoryRead?.totalSupply();
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
@@ -109,7 +109,9 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
           <tr>
             <th>{t("staked")}</th>
             <th>
-              {t("last")} {t("staked")}
+              <>
+                {t("last")} {t("staked")}
+              </>
             </th>
             <th>{t("governance.staked-reward")}</th>
             <th>APR</th>
@@ -153,6 +155,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
                 onClick={() => {
                   claimRewards();
                 }}
+                disabled={!signer.signer || !isInLayer1(currentNetwork.chainId)}
               >
                 {t("claim")}
               </Button>

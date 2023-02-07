@@ -3,7 +3,7 @@ import React from "react";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
-import okxImage from "../assets/images/okx.jpg";
+import okxImage from "../assets/images/okx.png";
 
 let network = "mainnet";
 
@@ -31,6 +31,12 @@ switch (process.env.REACT_APP_NETWORK_ID) {
 }
 
 const providerOptions = {
+  injected: {
+    package: null,
+    options: {
+      infuraId: process.env.REACT_APP_INFURA_ID,
+    },
+  },
   walletlink: {
     package: WalletLink, // Required
     options: {
@@ -54,10 +60,6 @@ const providerOptions = {
     options: {
       infuraId: process.env.REACT_APP_INFURA_ID, // required
     },
-    // connector: async (ProviderPackage: new (arg0: any) => any, options: any) => {
-    //     const provider = WalletConnectProvider;
-    //     return provider;
-    //   }
   },
 };
 

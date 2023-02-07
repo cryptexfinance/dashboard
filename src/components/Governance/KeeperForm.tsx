@@ -6,7 +6,12 @@ import { ethers } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
 import { ProfileImage } from "./common";
 import "../../styles/modal.scss";
-import { API_ENDPOINT } from "../../utils/constants";
+import {
+  API_ENDPOINT,
+  KEEPER_CREATE_ENDPOINT,
+  KEEPER_UPDATE_ENDPOINT,
+  getAccessToken,
+} from "../../api";
 import {
   errorNotification,
   getAddressFromENS,
@@ -76,7 +81,7 @@ const KeeperForm = ({
       setDiscord(keeperInfo.discord);
       setExpertise(keeperInfo.expertise);
       setWhy(keeperInfo.why);
-      setImageUrl(`${API_ENDPOINT}/${keeperInfo.image}`);
+      setImageUrl(`${API_ENDPOINT}${keeperInfo.image}`);
     } else {
       setDelegatee("");
       setAddress("");
@@ -218,8 +223,9 @@ const KeeperForm = ({
       setImageError(t("errors.invalid-file-type"));
       return false;
     }
-    if (value.size > 100000) {
-      setImageError(t("errors.invalid-image-size", { size: Math.round(value.size / 1000) }));
+    const maxSize = 250000;
+    if (value.size > maxSize) {
+      setImageError(t("errors.invalid-image-size", { size: Math.round(maxSize / 1000) }));
       setImageUrl("");
       return false;
     }
@@ -290,12 +296,13 @@ const KeeperForm = ({
     formData.append("twitter", twitter);
     // @ts-ignore
     formData.append("file", image);
-    await fetch(`${API_ENDPOINT}/cryptkeeper/create`, {
+    await fetch(KEEPER_CREATE_ENDPOINT, {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((responseJson) => {
+        console.log(responseJson.errors);
         if (responseJson.status === "error") {
           console.log(responseJson.errors);
         }
@@ -341,31 +348,38 @@ const KeeperForm = ({
       formData.append("twitter", twitter);
       // @ts-ignore
       formData.append("file", image);
-
-      await fetch(`${API_ENDPOINT}/cryptkeeper/update`, {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((responseJson) => {
-          if (responseJson.status === "success") {
-            refresh();
-            sendNotification(
-              t("governance.success.title"),
-              t("governance.success.message"),
-              3000,
-              onHide(),
-              1000,
-              "success"
-            );
-          } else {
-            console.log(responseJson.errors);
-          }
+      const accessTokenResp = await getAccessToken();
+      if (accessTokenResp.success) {
+        await fetch(KEEPER_UPDATE_ENDPOINT, {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer ".concat(accessTokenResp.accessToken),
+          },
+          body: formData,
         })
-        .catch((error) => {
-          errorNotification(t("errors.unexpected"));
-          console.error(error);
-        });
+          .then((response) => response.json())
+          .then((responseJson) => {
+            if (responseJson.status === "success") {
+              refresh();
+              sendNotification(
+                t("governance.success.title"),
+                t("governance.success.message"),
+                3000,
+                onHide(),
+                1000,
+                "success"
+              );
+            } else {
+              console.log(responseJson.errors);
+            }
+          })
+          .catch((error) => {
+            errorNotification(t("errors.unexpected"));
+            console.error(error);
+          });
+      } else {
+        errorNotification("Couldn't retrieve API access token.");
+      }
     }
     setSaving(false);
   };
@@ -398,13 +412,11 @@ const KeeperForm = ({
                   size={120}
                 />
               )}
-              <Form.File
+              <Form.Control
                 type="file"
                 id="custom-file"
                 onChange={onChangeImage}
-                className={imageError === "" ? "neon-green" : "neon-orange"}
-                label="Select your image"
-                custom
+                className={imageError === "" ? "neon-green custom-file" : "neon-orange custom-file"}
               />
               <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>

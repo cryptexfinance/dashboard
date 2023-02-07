@@ -2,13 +2,15 @@ import React from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
 
-export interface OraclesContext {
+export interface IOraclesContext {
   wethOracle?: ethers.Contract;
   setCurrentWETHOracle: (currentOracle: ethers.Contract) => void;
   daiOracle?: ethers.Contract;
   setCurrentDAIOracle: (currentOracle: ethers.Contract) => void;
   wbtcOracle?: ethers.Contract;
   setCurrentWBTCOracle: (currentOracle: ethers.Contract) => void;
+  jpegzOracle?: ethers.Contract;
+  setCurrentJPEGZOracle: (currentOracle: ethers.Contract) => void;
   tcapOracle?: ethers.Contract;
   setCurrentTCAPOracle: (currentOracle: ethers.Contract) => void;
   aaveOracle?: ethers.Contract;
@@ -29,6 +31,8 @@ export interface OraclesContext {
   setCurrentDAIOracleRead: (currentOracle: Contract) => void;
   wbtcOracleRead?: Contract;
   setCurrentWBTCOracleRead: (currentOracle: Contract) => void;
+  jpegzOracleRead?: Contract;
+  setCurrentJPEGZOracleRead: (currentOracle: Contract) => void;
   tcapOracleRead?: Contract;
   setCurrentTCAPOracleRead: (currentOracle: Contract) => void;
   aaveOracleRead?: Contract;
@@ -49,6 +53,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentWETHOracle: () => {},
   setCurrentDAIOracle: () => {},
   setCurrentWBTCOracle: () => {},
+  setCurrentJPEGZOracle: () => {},
   setCurrentTCAPOracle: () => {},
   setCurrentAAVEOracle: () => {},
   setCurrentLINKOracle: () => {},
@@ -59,6 +64,7 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentWETHOracleRead: () => {},
   setCurrentDAIOracleRead: () => {},
   setCurrentWBTCOracleRead: () => {},
+  setCurrentJPEGZOracleRead: () => {},
   setCurrentTCAPOracleRead: () => {},
   setCurrentAAVEOracleRead: () => {},
   setCurrentLINKOracleRead: () => {},
@@ -68,6 +74,4 @@ export const ORACLES_DEFAULT_VALUE = {
   setCurrentUSDCOracleRead: () => {},
 };
 
-const oraclesContext = React.createContext<OraclesContext>(ORACLES_DEFAULT_VALUE);
-
-export default oraclesContext;
+export const oraclesContext = React.createContext<IOraclesContext>(ORACLES_DEFAULT_VALUE);

@@ -2,13 +2,15 @@ import React from "react";
 import { Contract } from "ethers-multicall";
 import { ethers } from "ethers";
 
-export interface TokensContext {
+export interface ITokensContext {
   wethToken?: ethers.Contract;
   setCurrentWETHToken: (currentToken: ethers.Contract) => void;
   daiToken?: ethers.Contract;
   setCurrentDAIToken: (currentToken: ethers.Contract) => void;
   wbtcToken?: ethers.Contract;
   setCurrentWBTCToken: (currentToken: ethers.Contract) => void;
+  jpegzToken?: ethers.Contract;
+  setCurrentJPEGZToken: (currentToken: ethers.Contract) => void;
   tcapToken?: ethers.Contract;
   setCurrentTCAPToken: (currentToken: ethers.Contract) => void;
   ctxToken?: ethers.Contract;
@@ -39,6 +41,8 @@ export interface TokensContext {
   setCurrentDAITokenRead: (currentTokenRead: Contract) => void;
   wbtcTokenRead?: Contract;
   setCurrentWBTCTokenRead: (currentTokenRead: Contract) => void;
+  jpegzTokenRead?: Contract;
+  setCurrentJPEGZTokenRead: (currentTokenRead: Contract) => void;
   tcapTokenRead?: Contract;
   setCurrentTCAPTokenRead: (currentTokenRead: Contract) => void;
   ctxTokenRead?: Contract;
@@ -69,6 +73,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHToken: () => {},
   setCurrentDAIToken: () => {},
   setCurrentWBTCToken: () => {},
+  setCurrentJPEGZToken: () => {},
   setCurrentTCAPToken: () => {},
   setCurrentCtxToken: () => {},
   setCurrentAAVEToken: () => {},
@@ -84,6 +89,7 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHTokenRead: () => {},
   setCurrentDAITokenRead: () => {},
   setCurrentWBTCTokenRead: () => {},
+  setCurrentJPEGZTokenRead: () => {},
   setCurrentTCAPTokenRead: () => {},
   setCurrentCtxTokenRead: () => {},
   setCurrentAAVETokenRead: () => {},
@@ -98,6 +104,4 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentCTXPoolTokenRead: () => {},
 };
 
-const tokensContext = React.createContext<TokensContext>(TOKENS_DEFAULT_VALUE);
-
-export default tokensContext;
+export const tokensContext = React.createContext<ITokensContext>(TOKENS_DEFAULT_VALUE);

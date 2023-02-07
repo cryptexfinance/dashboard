@@ -69,7 +69,7 @@ export const delegatorsInfo = [
     image: "indigo.png",
     expertise: ["Development", "Operations"],
     why: "I'm a security expert who specializes in smart contract and operational security auditing.\n\nI will vote for incentivized liquidity and staking, expansion to new projects/networks, and supporting operations that will drive adoption of TCAP.",
-    discord: " Indigo#3132",
+    discord: "Indigo#3132",
     twitter: "",
   },
   {
