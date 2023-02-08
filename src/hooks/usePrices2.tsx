@@ -39,7 +39,7 @@ export const usePrices2 = (
     let daiOraclePrice = BigNumber.from(0);
 
     // @ts-ignore
-    [jpegzOraclePrice, daiOraclePrice, wethOraclePrice] = await ethcallProvider?.all([
+    [jpegzOraclePrice, wethOraclePrice, daiOraclePrice] = await ethcallProvider?.all([
       jpegzPriceCall,
       wethOraclePriceCall,
       daiOraclePriceCall,

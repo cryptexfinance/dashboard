@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Button } from "react-bootstrap";
+import { Accordion, Button } from "react-bootstrap";
 import { ethers } from "ethers";
 import Table from "react-bootstrap/esm/Table";
 import NumberFormat from "react-number-format";
+import { useMediaQuery } from "react-responsive";
 import { governanceContext, networkContext, signerContext } from "../../state";
 import { errorNotification, isInLayer1, notifyUser } from "../../utils/utils";
 
@@ -17,6 +18,7 @@ type props = {
 };
 
 const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: props) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const currentNetwork = useContext(networkContext);
   const signer = useContext(signerContext);
   const governance = useContext(governanceContext);
@@ -101,68 +103,139 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
     return "-";
   };
 
+  const StakedValue = () => (
+    <>
+      <NumberFormat
+        className="number"
+        value={stake}
+        displayType="text"
+        thousandSeparator
+        suffix=" CTX"
+        decimalScale={2}
+      />
+    </>
+  );
+
+  const LastStakeDate = () => (
+    <>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</>
+  );
+
+  const StakeReward = () => (
+    <NumberFormat
+      className="number"
+      value={rewards}
+      displayType="text"
+      thousandSeparator
+      suffix=" CTX"
+      decimalScale={4}
+    />
+  );
+
+  const ClaimButton = () => (
+    <Button
+      variant="success"
+      className="ml-4"
+      onClick={() => {
+        claimRewards();
+      }}
+      disabled={!signer.signer || !isInLayer1(currentNetwork.chainId)}
+    >
+      {t("claim")}
+    </Button>
+  );
+
+  const RenderMobile = () => (
+    <Accordion className="stake-reward-mobile" defaultActiveKey={isMobile ? "1" : "0"}>
+      <Accordion.Item eventKey="0">
+        <Accordion.Header>
+          <h2>{t("governance.stake-reward")}</h2>
+        </Accordion.Header>
+        <Accordion.Body>
+          <div className="box">
+            <div className="title">{t("staked")}</div>
+            <div className="value">
+              <StakedValue />
+            </div>
+          </div>
+          <div className="box">
+            <div className="title">
+              {t("last")} {t("staked")}
+            </div>
+            <div className="value">
+              <h6>
+                <LastStakeDate />
+              </h6>
+            </div>
+          </div>
+          <div className="box">
+            <div className="title">{t("governance.staked-reward")}</div>
+            <div className="value">
+              <StakeReward />
+            </div>
+          </div>
+          <div className="box">
+            <div className="title">APR</div>
+            <div className="value">
+              <b className="fire">{apy()}</b>
+            </div>
+          </div>
+          <div className="box">
+            <div className="title">End Date</div>
+            <div className="value">
+              <h6>{periodEnds.toLocaleDateString()}</h6>
+            </div>
+          </div>
+          <ClaimButton />
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
+  );
+
   return (
     <div className="mb-2 staker">
-      <h2>{t("governance.stake-reward")}</h2>
-      <Table hover className="mt-2">
-        <thead>
-          <tr>
-            <th>{t("staked")}</th>
-            <th>
-              <>
-                {t("last")} {t("staked")}
-              </>
-            </th>
-            <th>{t("governance.staked-reward")}</th>
-            <th>APR</th>
-            <th className="end-date">End Date</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="number">
-              <NumberFormat
-                className="number"
-                value={stake}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={2}
-              />{" "}
-              CTX
-            </td>
-            <td>{lastStakeDate != null ? lastStakeDate?.toLocaleDateString() : "-"}</td>
-            <td className="number">
-              <NumberFormat
-                className="number"
-                value={rewards}
-                displayType="text"
-                thousandSeparator
-                prefix=""
-                decimalScale={4}
-              />{" "}
-              CTX
-            </td>
-            <td>
-              <b className="fire">{apy()}</b>
-            </td>
-            <td className="end-date">{periodEnds.toLocaleDateString()}</td>
-            <td align="right">
-              <Button
-                variant="success"
-                className="ml-4"
-                onClick={() => {
-                  claimRewards();
-                }}
-                disabled={!signer.signer || !isInLayer1(currentNetwork.chainId)}
-              >
-                {t("claim")}
-              </Button>
-            </td>
-          </tr>
-        </tbody>
-      </Table>
+      {isMobile ? (
+        <RenderMobile />
+      ) : (
+        <>
+          <h2>{t("governance.stake-reward")}</h2>
+          <Table hover className="mt-2">
+            <thead>
+              <tr>
+                <th>{t("staked")}</th>
+                <th>
+                  <>
+                    {t("last")} {t("staked")}
+                  </>
+                </th>
+                <th>{t("governance.staked-reward")}</th>
+                <th>APR</th>
+                <th className="end-date">End Date</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="number">
+                  <StakedValue />
+                </td>
+                <td>
+                  <LastStakeDate />
+                </td>
+                <td className="number">
+                  <StakeReward />
+                </td>
+                <td>
+                  <b className="fire">{apy()}</b>
+                </td>
+                <td className="end-date">{periodEnds.toLocaleDateString()}</td>
+                <td align="right">
+                  <ClaimButton />
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+        </>
+      )}
     </div>
   );
 };

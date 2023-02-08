@@ -406,6 +406,57 @@
       }
     }
   }
+
+  @media (max-width: 850px) {
+    .staker-wrapper {
+      .staker {
+        width: 95%;
+      }
+    }
+
+    .stake-reward-mobile {
+      h2 {
+        margin-bottom: 0rem;
+      }
+      .btn {
+        width: 100%;
+        margin-left: 0rem !important;
+        margin-top: 1rem;
+      }
+      .accordion-button::after {
+        margin-top: 0.2rem;
+      }
+      .accordion-body {
+        margin-top: 2rem;
+      }
+    }
+
+    .keepers-options {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .search-box {
+        width: 100%;
+        margin-bottom: 1.5rem;
+
+        .sort-box {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+        }
+        .titles {
+          width: 35%;
+        }
+        .dropdown {
+          width: 80%;
+        }
+      }
+
+      .create {
+        width: 100%;
+      }      
+    }
+  }
 }
 
 .cryptkeeper-form {

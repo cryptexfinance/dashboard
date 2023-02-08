@@ -405,15 +405,15 @@ textarea.neon-green:focus {
   &-button:after {
     content: "";
     color: $white;
-    border-top: .3em solid;
-    border-right: .25em solid transparent;
+    border-top: .4em solid;
+    border-right: .3em solid transparent;
     border-bottom: 0;
-    border-left: .25em solid transparent;
+    border-left: .3em solid transparent;
     margin-top: -5px;
   }
   .accordion-button:not(.collapsed):after {
     border-top: 0;
-    border-bottom: .3em solid;
+    border-bottom: .4em solid;
   }
 }
 
@@ -728,6 +728,34 @@ form {
   }
 }
 
+@media (max-width: 850px) {
+  .box {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.75rem 0rem;
+    border: 0.5px solid $highlight;
+    border-radius: 5px;
+
+    .title {
+      display: flex;
+      width: 45%;
+      padding: 0.5rem;
+      background-color: $darkest;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      color: $white;
+    }
+
+    .value {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 55%;
+      padding: 0.5rem;
+    }
+  }
+}
+
 @media (max-width: 600px) {
   .wrapper {
     padding-left: 0rem;
@@ -737,8 +765,9 @@ form {
     margin-top: 4rem;
     padding-right: 0.7rem;
     .btn-close {
+      background-size: contain;
       height: 20px;
-      width: 45px;
+      width: 25px;
     }
   }
 }

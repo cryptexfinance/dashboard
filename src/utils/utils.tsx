@@ -31,7 +31,10 @@ export const getENS = async (address: string) => {
 };
 
 export const getAddressFromENS = async (ens: string) => {
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const address = await provider.resolveName(ens);
   if (address) {
     return address;
