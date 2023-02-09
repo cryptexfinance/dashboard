@@ -30,7 +30,7 @@
     @media (min-width: 1700px) {
       grid-template-columns: auto auto auto;
     }
-    @media (max-width: 450px) {
+    @media (max-width: 900px) {
       grid-template-columns: auto;
     }
   }
@@ -407,11 +407,39 @@
     }
   }
 
-  @media (max-width: 850px) {
+  @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     .staker-wrapper {
+      width: 90%;
+      padding-left: 0rem;
+    }
+    .keepers-options {
+      width: 90%;
+    }
+    .grid {
+      justify-items: center;
+    }
+    .card {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .card {
+      width: 100%;
+    }
+    
+    .staker-wrapper {
+      width: 100%;
       .staker {
-        width: 95%;
+        width: 100%;
       }
+    }
+
+    .keepers-options {
+      width: 100%;
     }
 
     .stake-reward-mobile {
@@ -471,6 +499,20 @@
       border-radius: 50%;
       width: 120px;
       height: 120px;
+    }
+  }
+
+  @media (max-width: 600px) { 
+    .image-group {
+      margin-bottom: 2rem !important;
+
+      .keeper-names {
+        width: 30rem;        
+      }
+      
+      a {
+        margin-left: 0rem !important;
+      }
     }
   }
 }
