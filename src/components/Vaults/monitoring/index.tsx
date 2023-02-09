@@ -71,6 +71,7 @@ type props = {
 };
 
 const showAllVaults = true;
+const MAX_RANGE_LIMIT = 100000000;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
@@ -99,7 +100,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
   const [currentMinRatio, setCurrentMinRatio] = useState("0%");
-  const [currentMaxRatio, setCurrentMaxRatio] = useState("5000%");
+  const [currentMaxRatio, setCurrentMaxRatio] = useState("MAX");
   const [renderTable, setRenderTable] = useState(false);
   const ratioRangeDropdown = useRef(null);
   const minRatioInput = useRef(null);
@@ -226,8 +227,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       if (isValidRatio(maxRatio)) {
         return parseFloat(maxRatio);
       }
+      return MAX_RANGE_LIMIT;
     }
-    return 5000;
+    return MAX_RANGE_LIMIT;
   };
 
   const calculateNetRewardUsd = async (
@@ -773,7 +775,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                 </span>
               </div>
             </Dropdown.Toggle>
-            <Dropdown.Menu className="ratio-range-menu">
+            <Dropdown.Menu className="ratio-range-menu" rootCloseEvent="click">
               <div className="range-container">
                 <Form.Control
                   type="number"
@@ -787,7 +789,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                   type="number"
                   placeholder=""
                   className="neon-green"
-                  defaultValue="5000"
+                  defaultValue=""
                   ref={maxRatioInput}
                 />
               </div>
