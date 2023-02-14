@@ -114,7 +114,7 @@ export const OS_API_URL = {
 export const FEATURES = {
   KEEPERS_API: true,
   NEW_VAULTS: true,
-  OPTIMISM: true,
+  OPTIMISM: false,
   POLYGON: false,
 };
 
