@@ -87,8 +87,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [currentVaultId, setCurrentVaultId] = useState("0");
   const [isApproved, setIsApproved] = useState(false);
   const [vaultDebt, setVaultDebt] = useState("0");
+  const [vaultDebtRaw, setVaultDebtRaw] = useState(BigNumber.from("0"));
   const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
   const [vaultCollateral, setVaultCollateral] = useState("0");
+  const [vaultCollateralRaw, setVaultCollateralRaw] = useState(BigNumber.from("0"));
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [tempRatio, setTempRatio] = useState("");
@@ -198,6 +200,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       decimals = 6;
     }
 
+    setVaultDebtRaw(BigNumber.from("0"));
     if (currentVaultData) {
       const { collateral, debt } = currentVaultData;
       // @ts-ignore
@@ -265,11 +268,13 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           setVaultStatus("danger");
         }
 
+        setVaultCollateralRaw(collateral);
         const parsedCollateral = ethers.utils.formatUnits(collateral, decimals);
         setVaultCollateral(parsedCollateral);
         const usdCollateral = toUSD(currentCollateralPrice, parsedCollateral);
         setVaultCollateralUSD(usdCollateral.toString());
 
+        setVaultDebtRaw(debt);
         const parsedDebt = ethers.utils.formatEther(debt);
         setVaultDebt(parsedDebt);
         const usdIndex = toUSD(currentIndexPrice, parsedDebt);
@@ -947,7 +952,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
     return (
       <OverlayTrigger
-        key="top"
+        key="top-usd"
         placement="right"
         trigger={["hover", "click"]}
         overlay={
@@ -1010,7 +1015,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const BurnFeeLabel = (className: string, isBurning: boolean) => (
     <OverlayTrigger
-      key="top"
+      key="ttop-burn-fee"
       placement="top"
       trigger={["hover", "click"]}
       overlay={
@@ -1043,7 +1048,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const RenderMintIndex = () => (
     <Form.Group className="form-group mint">
       <InputGroup>
-        <Form.Text className="text-muted">{RenderUsdValue(mintUSD, 16)}</Form.Text>
+        <Form.Text className="text-muted">{RenderUsdValue(mintUSD, 18)}</Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1149,12 +1154,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           ) : (
             <>
               <OverlayTrigger
-                key="top"
+                key="ttip-index-balance"
                 placement="auto"
                 trigger={["hover", "click"]}
                 overlay={
                   <Tooltip id="ttip-status" className="ttip-hard-vault">
-                    ${parseFloat(aBalance).toFixed(18)}
+                    {parseFloat(aBalance).toFixed(18)}
                   </Tooltip>
                 }
               >
@@ -1169,7 +1174,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   />
                 </div>
               </OverlayTrigger>
-              {RenderUsdValue(aBalanceUSD)}
+              {RenderUsdValue(aBalanceUSD, 4)}
             </>
           )}
         </span>
@@ -1186,12 +1191,12 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         ) : (
           <>
             <OverlayTrigger
-              key="top"
+              key="ttip-col-amount"
               placement="auto"
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-status" className="ttip-hard-vault">
-                  ${parseFloat(vaultCollateral).toFixed(18)}
+                  {ethers.utils.formatUnits(vaultCollateralRaw, selectedVaultDecimals)}
                 </Tooltip>
               }
             >
@@ -1206,7 +1211,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 />
               </div>
             </OverlayTrigger>
-            {RenderUsdValue(vaultCollateralUSD)}
+            {RenderUsdValue(vaultCollateralUSD, 4)}
           </>
         )}
       </span>
@@ -1227,7 +1232,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-status" className="ttip-hard-vault">
-                  ${parseFloat(vaultDebt).toFixed(18)}
+                  {ethers.utils.formatEther(vaultDebtRaw, 18)}
                 </Tooltip>
               }
             >
@@ -1242,7 +1247,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 />
               </div>
             </OverlayTrigger>
-            {RenderUsdValue(vaultDebtUSD)}
+            {RenderUsdValue(vaultDebtUSD, 4)}
           </>
         )}
       </span>
