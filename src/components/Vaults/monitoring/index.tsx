@@ -71,7 +71,7 @@ type props = {
 };
 
 const showAllVaults = true;
-const MAX_RANGE_LIMIT = 100000000;
+const MAX_RANGE_LIMIT = Number.MAX_VALUE;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();

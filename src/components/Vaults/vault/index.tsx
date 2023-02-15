@@ -432,6 +432,15 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     }
   };
 
+  const isValidTokenValue = (value: string): boolean => {
+    try {
+      ethers.utils.parseEther(value);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   // Mint, Burn fees
   const calculateMintFee = async (amount: string) => {
     const currentMintFee = await currentVault?.getMintFee(ethers.utils.parseEther(amount));
@@ -469,26 +478,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const onChangeAddCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddCollateralTxt(event.target.value);
-    if (event.target.value !== "") {
-      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
-      const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
-      let usd = toUSD(currentPrice, event.target.value);
-      if (!usd) {
-        usd = 0;
+    if (isValidTokenValue(event.target.value) || event.target.value === "") {
+      setAddCollateralTxt(event.target.value);
+      if (event.target.value !== "") {
+        const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+        const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
+        let usd = toUSD(currentPrice, event.target.value);
+        if (!usd) {
+          usd = 0;
+        }
+        const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
+        const r = await getRatio(
+          newCollateral.toString(),
+          currentPrice,
+          vaultDebt,
+          currentAssetPrice
+        );
+        changeVault(r);
+        setAddCollateralUSD(usd.toString());
+      } else {
+        changeVault(0, false);
+        setAddCollateralUSD("0");
       }
-      const newCollateral = parseFloat(event.target.value) + parseFloat(vaultCollateral);
-      const r = await getRatio(
-        newCollateral.toString(),
-        currentPrice,
-        vaultDebt,
-        currentAssetPrice
-      );
-      changeVault(r);
-      setAddCollateralUSD(usd.toString());
-    } else {
-      changeVault(0, false);
-      setAddCollateralUSD("0");
     }
   };
 
@@ -505,26 +516,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const onChangeRemoveCollateral = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoveCollateralTxt(event.target.value);
-    if (event.target.value !== "") {
-      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
-      const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
-      let usd = toUSD(currentPrice, event.target.value);
-      if (!usd) {
-        usd = 0;
+    if (isValidTokenValue(event.target.value) || event.target.value === "") {
+      setRemoveCollateralTxt(event.target.value);
+      if (event.target.value !== "") {
+        const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+        const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
+        let usd = toUSD(currentPrice, event.target.value);
+        if (!usd) {
+          usd = 0;
+        }
+        const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
+        const r = await getRatio(
+          newCollateral.toString(),
+          currentPrice,
+          vaultDebt,
+          currentAssetPrice
+        );
+        changeVault(r);
+        setRemoveCollateralUSD(usd.toString());
+      } else {
+        changeVault(0, false);
+        setRemoveCollateralUSD("0");
       }
-      const newCollateral = parseFloat(vaultCollateral) - parseFloat(event.target.value);
-      const r = await getRatio(
-        newCollateral.toString(),
-        currentPrice,
-        vaultDebt,
-        currentAssetPrice
-      );
-      changeVault(r);
-      setRemoveCollateralUSD(usd.toString());
-    } else {
-      changeVault(0, false);
-      setRemoveCollateralUSD("0");
     }
   };
 
@@ -541,32 +554,34 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const onChangeMint = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMintTxt(event.target.value);
-    if (event.target.value !== "") {
-      const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
-      const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
-      let usd = toUSD(currentAssetPrice, event.target.value);
-      if (!usd) {
-        usd = 0;
-      }
-      const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
-      const r = await getRatio(
-        vaultCollateral,
-        currentPrice,
-        newDebt.toString(),
-        currentAssetPrice
-      );
-      changeVault(r);
-      setMintUSD(usd.toString());
+    if (isValidTokenValue(event.target.value) || event.target.value === "") {
+      setMintTxt(event.target.value);
+      if (event.target.value !== "") {
+        const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+        const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
+        let usd = toUSD(currentAssetPrice, event.target.value);
+        if (!usd) {
+          usd = 0;
+        }
+        const newDebt = parseFloat(event.target.value) + parseFloat(vaultDebt);
+        const r = await getRatio(
+          vaultCollateral,
+          currentPrice,
+          newDebt.toString(),
+          currentAssetPrice
+        );
+        changeVault(r);
+        setMintUSD(usd.toFixed(14));
 
-      if (isArbitrum(currentNetwork.chainId)) {
-        const increasedFee = await calculateMintFee(event.target.value);
-        const ethFee = ethers.utils.formatEther(increasedFee);
-        setMintFee(ethFee.toString());
+        if (isArbitrum(currentNetwork.chainId)) {
+          const increasedFee = await calculateMintFee(event.target.value);
+          const ethFee = ethers.utils.formatEther(increasedFee);
+          setMintFee(ethFee.toString());
+        }
+      } else {
+        changeVault(0, false);
+        setMintUSD("0");
       }
-    } else {
-      changeVault(0, false);
-      setMintUSD("0");
     }
   };
 
@@ -583,38 +598,39 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   const onChangeBurn = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setBurnTxt(event.target.value);
-      if (event.target.value !== "") {
-        const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
-        const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
-        let usd = toUSD(currentAssetPrice, event.target.value);
-        if (!usd) {
-          usd = 0;
-        }
-        const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
-        const r = await getRatio(
-          vaultCollateral,
-          currentPrice,
-          newDebt.toString(),
-          currentAssetPrice
-        );
-        changeVault(r);
-        setBurnUSD(usd.toString());
+    if (isValidTokenValue(event.target.value) || event.target.value === "") {
+      try {
+        setBurnTxt(event.target.value);
+        if (event.target.value !== "") {
+          const currentPrice = ethers.utils.formatEther((await collateralPrice()).mul(10000000000));
+          const currentAssetPrice = ethers.utils.formatEther(await assetPrice());
+          let usd = toUSD(currentAssetPrice, event.target.value);
+          if (!usd) {
+            usd = 0;
+          }
+          const newDebt = parseFloat(vaultDebt) - parseFloat(event.target.value);
+          const r = await getRatio(
+            vaultCollateral,
+            currentPrice,
+            newDebt.toString(),
+            currentAssetPrice
+          );
+          changeVault(r);
+          setBurnUSD(usd.toString());
 
-        const increasedFee = await calculateBurnFee(event.target.value);
-        const ethFee = ethers.utils.formatEther(increasedFee);
-        setBurnFee(ethFee.toString());
-      } else {
-        changeVault(0, false);
+          const increasedFee = await calculateBurnFee(event.target.value);
+          const ethFee = ethers.utils.formatEther(increasedFee);
+          setBurnFee(ethFee.toString());
+        } else {
+          changeVault(0, false);
+          setBurnUSD("0");
+          setBurnFee("0");
+        }
+      } catch (error) {
+        changeVault(0, true);
         setBurnUSD("0");
         setBurnFee("0");
       }
-    } catch (error) {
-      console.error(error);
-      changeVault(0, true);
-      setBurnUSD("0");
-      setBurnFee("0");
     }
   };
 
@@ -773,7 +789,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           }
         } catch (error) {
           console.error(error);
-          console.error("Code: ", error.code);
           if (error.code === 4001) {
             errorNotification(t("errors.tran-rejected"));
           } else {
@@ -914,9 +929,49 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Dropdown>
   );
 
-  const AddCollateral = () => (
+  const RenderUsdValue = (amount: string, maxDecimals = 6) => {
+    const numberAmount = parseFloat(amount);
+    let newAmount = amount;
+    let decimals = 2;
+
+    if (numberAmount < 0.0001) {
+      decimals = maxDecimals;
+      newAmount = numberAmount.toFixed(decimals);
+    } else if (numberAmount < 0.01) {
+      decimals = 4;
+    }
+    if (numberAmount === 0) {
+      decimals = 2;
+      newAmount = numberAmount.toFixed(decimals);
+    }
+
+    return (
+      <OverlayTrigger
+        key="top"
+        placement="right"
+        trigger={["hover", "click"]}
+        overlay={
+          <Tooltip id="ttip-status" className="ttip-hard-vault">
+            ${numberAmount.toFixed(20)}
+          </Tooltip>
+        }
+      >
+        <NumberFormat
+          className="number"
+          value={newAmount}
+          displayType="text"
+          thousandSeparator
+          prefix="$"
+          decimalScale={decimals}
+        />
+      </OverlayTrigger>
+    );
+  };
+
+  const RenderAddCollateral = () => (
     <Form.Group className="form-group add">
       <InputGroup>
+        <Form.Text className="text-muted">{RenderUsdValue(addCollateralUSD, 10)}</Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -926,16 +981,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           onFocus={onFocusAddCollateral}
           onBlur={onBlurAddCollateral}
         />
-        <Form.Text className="text-muted">
-          <NumberFormat
-            className="number"
-            value={addCollateralUSD}
-            displayType="text"
-            thousandSeparator
-            prefix="$"
-            decimalScale={2}
-          />
-        </Form.Text>
         <Button className="neon-green" onClick={addCollateral} disabled={btnDisabled}>
           <>{t("add")}</>
         </Button>
@@ -943,19 +988,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Form.Group>
   );
 
-  const RemoveCollateral = () => (
+  const RenderRemoveCollateral = () => (
     <Form.Group className="form-group remove">
       <InputGroup>
-        <Form.Text className="text-muted">
-          <NumberFormat
-            className="number"
-            value={removeCollateralUSD}
-            displayType="text"
-            thousandSeparator
-            prefix="$"
-            decimalScale={2}
-          />
-        </Form.Text>
+        <Form.Text className="text-muted">{RenderUsdValue(removeCollateralUSD, 12)}</Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1004,19 +1040,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </OverlayTrigger>
   );
 
-  const MintAsset = () => (
+  const RenderMintIndex = () => (
     <Form.Group className="form-group mint">
       <InputGroup>
-        <Form.Text className="text-muted">
-          <NumberFormat
-            className="number"
-            value={mintUSD}
-            displayType="text"
-            thousandSeparator
-            prefix="$"
-            decimalScale={2}
-          />
-        </Form.Text>
+        <Form.Text className="text-muted">{RenderUsdValue(mintUSD, 16)}</Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1039,19 +1066,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Form.Group>
   );
 
-  const BurnAsset = () => (
+  const RenderBurnIndex = () => (
     <Form.Group className="form-group remove">
       <InputGroup>
-        <Form.Text className="text-muted">
-          <NumberFormat
-            className="number"
-            value={burnUSD}
-            displayType="text"
-            thousandSeparator
-            prefix="$"
-            decimalScale={2}
-          />
-        </Form.Text>
+        <Form.Text className="text-muted">{RenderUsdValue(burnUSD, 18)}</Form.Text>
         <Form.Control
           type="number"
           placeholder=""
@@ -1071,15 +1089,15 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
   const ActionControls = () => {
     if (activeAction === "add") {
-      return AddCollateral();
+      return RenderAddCollateral();
     }
     if (activeAction === "remove") {
-      return RemoveCollateral();
+      return RenderRemoveCollateral();
     }
     if (activeAction === "mint") {
-      return MintAsset();
+      return RenderMintIndex();
     }
-    return BurnAsset();
+    return RenderBurnIndex();
   };
 
   const MaxButton = () => {
@@ -1130,24 +1148,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
             <Spinner className="spinner xsmall spinner-gray" animation="border" />
           ) : (
             <>
-              <div className="token-value">
-                <TokenIcon name={iconSymbol} />
-                <NumberFormat
-                  className="number neon-green"
-                  value={aBalance}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={2}
-                />
-              </div>
-              <NumberFormat
-                className="number usd-balance"
-                value={aBalanceUSD}
-                displayType="text"
-                thousandSeparator
-                decimalScale={2}
-                prefix="$"
-              />
+              <OverlayTrigger
+                key="top"
+                placement="auto"
+                trigger={["hover", "click"]}
+                overlay={
+                  <Tooltip id="ttip-status" className="ttip-hard-vault">
+                    ${parseFloat(aBalance).toFixed(18)}
+                  </Tooltip>
+                }
+              >
+                <div className="token-value">
+                  <TokenIcon name={iconSymbol} />
+                  <NumberFormat
+                    className="number neon-green"
+                    value={aBalance}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={4}
+                  />
+                </div>
+              </OverlayTrigger>
+              {RenderUsdValue(aBalanceUSD)}
             </>
           )}
         </span>
@@ -1163,24 +1185,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
           <>
-            <div className="token-value">
-              <TokenIcon name={vaultData.collateralSymbol} />
-              <NumberFormat
-                className="number neon-green"
-                value={vaultCollateral}
-                displayType="text"
-                thousandSeparator
-                decimalScale={tokenBalanceDecimals}
-              />
-            </div>
-            <NumberFormat
-              className="number usd-balance"
-              value={vaultCollateralUSD}
-              displayType="text"
-              thousandSeparator
-              decimalScale={tokenBalanceDecimals}
-              prefix="$"
-            />
+            <OverlayTrigger
+              key="top"
+              placement="auto"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-status" className="ttip-hard-vault">
+                  ${parseFloat(vaultCollateral).toFixed(18)}
+                </Tooltip>
+              }
+            >
+              <div className="token-value">
+                <TokenIcon name={vaultData.collateralSymbol} />
+                <NumberFormat
+                  className="number neon-green"
+                  value={vaultCollateral}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={tokenBalanceDecimals}
+                />
+              </div>
+            </OverlayTrigger>
+            {RenderUsdValue(vaultCollateralUSD)}
           </>
         )}
       </span>
@@ -1195,24 +1221,28 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <Spinner className="spinner xsmall spinner-gray" animation="border" />
         ) : (
           <>
-            <div className="token-value">
-              <TokenIcon name={vaultData.assetSymbol} />
-              <NumberFormat
-                className="number neon-green"
-                value={vaultDebt}
-                displayType="text"
-                thousandSeparator
-                decimalScale={tokenBalanceDecimals}
-              />
-            </div>
-            <NumberFormat
-              className="number usd-balance"
-              value={vaultDebtUSD}
-              displayType="text"
-              thousandSeparator
-              decimalScale={tokenBalanceDecimals}
-              prefix="$"
-            />
+            <OverlayTrigger
+              key="top"
+              placement="auto"
+              trigger={["hover", "click"]}
+              overlay={
+                <Tooltip id="ttip-status" className="ttip-hard-vault">
+                  ${parseFloat(vaultDebt).toFixed(18)}
+                </Tooltip>
+              }
+            >
+              <div className="token-value">
+                <TokenIcon name={vaultData.assetSymbol} />
+                <NumberFormat
+                  className="number neon-green"
+                  value={vaultDebt}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={tokenBalanceDecimals}
+                />
+              </div>
+            </OverlayTrigger>
+            {RenderUsdValue(vaultDebtUSD)}
           </>
         )}
       </span>
@@ -1450,14 +1480,20 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                       <div className="values">
                         <div className="amount">
                           <h4 className=" ml-2 number neon-highlight">
-                            <NumberFormat
-                              className={`number ratio ${vaultStatus}`}
-                              value={vaultRatio}
-                              displayType="text"
-                              thousandSeparator
-                              decimalScale={tokenBalanceDecimals}
-                              suffix="%"
-                            />
+                            {parseFloat(vaultRatio) <= 1000000 ? (
+                              <NumberFormat
+                                className={`number ratio ${vaultStatus}`}
+                                value={vaultRatio}
+                                displayType="text"
+                                thousandSeparator
+                                decimalScale={tokenBalanceDecimals}
+                                suffix="%"
+                              />
+                            ) : (
+                              <span className={`number ratio ${vaultStatus}`}>
+                                {parseFloat(vaultRatio).toExponential(2)}%
+                              </span>
+                            )}
                           </h4>
                         </div>
                         <span className="separator">-</span>

@@ -332,7 +332,7 @@ export const Vaults = ({
                       }
                     >
                       <span className={v.status}>
-                        {v.ratio.toFixed(0)}
+                        {v.ratio < 1000000 ? v.ratio.toFixed(0) : v.ratio.toExponential(1)}
                         {v.ratio === 0 ? "" : "%"}
                       </span>
                     </OverlayTrigger>
