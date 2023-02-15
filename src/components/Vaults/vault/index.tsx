@@ -1232,7 +1232,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
               trigger={["hover", "click"]}
               overlay={
                 <Tooltip id="ttip-status" className="ttip-hard-vault">
-                  {ethers.utils.formatEther(vaultDebtRaw, 18)}
+                  {ethers.utils.formatEther(vaultDebtRaw)}
                 </Tooltip>
               }
             >
