@@ -22,13 +22,11 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
   let chains = [
     { id: NETWORKS.mainnet.chainId, name: "Mainnet" },
     { id: NETWORKS.arbitrum.chainId, name: "Arbitrum" },
-    { id: NETWORKS.optimism.chainId, name: "Optimism" },
   ];
   if (process.env.REACT_APP_NETWORK_ID !== "1") {
     chains = [
       { id: NETWORKS.goerli.chainId, name: "Goerli" },
       { id: NETWORKS.arbitrum_goerli.chainId, name: "Arbitrum Goerli" },
-      { id: NETWORKS.okovan.chainId, name: "OKovan" },
     ];
   }
   const [updatingChain, setUpdatingChain] = useState(false);

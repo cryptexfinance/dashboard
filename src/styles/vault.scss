@@ -89,7 +89,7 @@
         background-color: #281e31;
         border: 1px solid $dark;
         border-radius: 5px;
-
+        
         .text-muted {
           position: absolute;
           text-align: left;
@@ -110,6 +110,7 @@
           border-color: transparent;
           color: $white;
           height: 4.1rem;
+          z-index: 2;
         }
 
         .btn {
