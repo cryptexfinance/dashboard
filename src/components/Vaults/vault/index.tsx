@@ -1211,6 +1211,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
+                  prefix={parseFloat(vaultCollateral) < 0.0001 ? "~" : ""}
                 />
               </div>
             </OverlayTrigger>
@@ -1247,6 +1248,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
+                  prefix={parseFloat(vaultDebt) < 0.0001 ? "~" : ""}
                 />
               </div>
             </OverlayTrigger>
