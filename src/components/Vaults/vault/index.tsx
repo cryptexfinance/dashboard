@@ -934,14 +934,17 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     </Dropdown>
   );
 
-  const RenderUsdValue = (amount: string, maxDecimals = 6) => {
+  const RenderUsdValue = (amount: string, maxDecimals = 6, symbol = false) => {
     const numberAmount = parseFloat(amount);
     let newAmount = amount;
     let decimals = 2;
-
+    let prefix = "$";
     if (numberAmount < 0.0001) {
       decimals = maxDecimals;
       newAmount = numberAmount.toFixed(decimals);
+      if (symbol) {
+        prefix = "~$";
+      }
     } else if (numberAmount < 0.01) {
       decimals = 4;
     }
@@ -966,7 +969,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           value={newAmount}
           displayType="text"
           thousandSeparator
-          prefix="$"
+          prefix={prefix}
           decimalScale={decimals}
         />
       </OverlayTrigger>
@@ -1174,7 +1177,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   />
                 </div>
               </OverlayTrigger>
-              {RenderUsdValue(aBalanceUSD, 4)}
+              {RenderUsdValue(aBalanceUSD, 4, true)}
             </>
           )}
         </span>
@@ -1211,7 +1214,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 />
               </div>
             </OverlayTrigger>
-            {RenderUsdValue(vaultCollateralUSD, 4)}
+            {RenderUsdValue(vaultCollateralUSD, 4, true)}
           </>
         )}
       </span>
@@ -1247,7 +1250,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                 />
               </div>
             </OverlayTrigger>
-            {RenderUsdValue(vaultDebtUSD, 4)}
+            {RenderUsdValue(vaultDebtUSD, 4, true)}
           </>
         )}
       </span>
