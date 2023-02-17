@@ -80,6 +80,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [activeAction, setActiveAction] = useState("add");
   const [refreshVault, setRefreshVault] = useState(false);
+  const [rerender, setRerender] = useState(false);
 
   // Vault Data
   const [assetOptions, setAssetOptions] = useState<Array<string>>([]);
@@ -167,7 +168,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   async function loadVault() {
-    setIsLoading(true);
     let cBalance;
     let iBalance;
     let currentIndexPrice = "0";
@@ -336,6 +336,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setIndexBalanceUSD(iUsdBalance.toString());
     setCollateralBalanceUSD(cUsdBalance.toString());
     setIsLoading(false);
+    setRerender(!rerender);
   }
 
   useEffect(
@@ -348,6 +349,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           currentAssetRead !== null &&
           !loadingVault
         ) {
+          setIsLoading(true);
           await loadVault();
         }
       };
@@ -409,6 +411,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setMintUSD("0");
     setBurnUSD("0");
     setBurnTxt("0");
+    setIndexBalanceRaw(BIG_NUMBER_ZERO);
+    setVaultDebtRaw(BIG_NUMBER_ZERO);
+    setVaultCollateralRaw(BIG_NUMBER_ZERO);
   };
 
   const changeVault = async (newRatio: number, reset = false) => {
@@ -1336,17 +1341,18 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     ) {
       keepVaultId = value === TOKENS_SYMBOLS.ETH || value === TOKENS_SYMBOLS.WETH;
     }
-    resetFields();
+
     setVaultData({
       vaultId: !keepVaultId ? "0" : vaultData.vaultId,
       assetSymbol: vaultData.assetSymbol,
       collateralSymbol: value,
       isHardVault: vaultData.isHardVault,
     });
+    resetFields();
     setRefreshVault(!refreshVault);
   };
 
-  const AssetDropdown = () => (
+  const IndexDropdown = () => (
     <div className="dd-collateral">
       <h6 className="titles">Index</h6>
       <Dropdown>
@@ -1516,7 +1522,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <div className="vault-assets-box">
             <div className="assets-box-options">
               <div className="asset-box">
-                <AssetDropdown />
+                <IndexDropdown />
                 {!isLoading && (
                   <>
                     {RenderIndexBalance(false)}
