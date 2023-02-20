@@ -1548,9 +1548,11 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   <RenderCreateVault />
                 ) : (
                   <>
-                    {vaultDebtRaw.lte(BigNumber.from("1000")) &&
+                    {!vaultDebtRaw.eq(BIG_NUMBER_ZERO) &&
+                      vaultDebtRaw.lte(BigNumber.from("1000")) &&
                       indexBalanceRaw.lt(vaultDebtRaw) && <DebtWarning />}
                     {vaultDebtRaw.lte(BigNumber.from("1000")) &&
+                      !vaultDebtRaw.eq(BIG_NUMBER_ZERO) &&
                       !indexBalanceRaw.lt(vaultDebtRaw) && <DebtWarning2 />}
                     <div className="vault-actions">
                       <div className="actions-options">
