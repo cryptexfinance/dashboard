@@ -959,6 +959,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       decimals = 4;
     }
     if (numberAmount === 0) {
+      prefix = "$";
       decimals = 2;
       newAmount = numberAmount.toFixed(decimals);
     }
@@ -1221,7 +1222,11 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
-                  prefix={parseFloat(vaultCollateral) < 0.0001 ? "~" : ""}
+                  prefix={
+                    parseFloat(vaultCollateral) > 0 && parseFloat(vaultCollateral) < 0.0001
+                      ? "~"
+                      : ""
+                  }
                 />
               </div>
             </OverlayTrigger>
@@ -1258,7 +1263,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
-                  prefix={parseFloat(vaultDebt) < 0.0001 ? "~" : ""}
+                  prefix={parseFloat(vaultDebt) > 0 && parseFloat(vaultDebt) < 0.0001 ? "~" : ""}
                 />
               </div>
             </OverlayTrigger>
