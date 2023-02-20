@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { ethers, BigNumber } from "ethers";
 import {
+  Alert,
   Button,
   ButtonGroup,
   Dropdown,
@@ -18,7 +19,7 @@ import "../../../styles/vault.scss";
 import { useVault } from "../../../hooks";
 import { networkContext, signerContext } from "../../../state";
 import { capitalize, TokenIcon } from "../common";
-import { NETWORKS, TOKENS_SYMBOLS } from "../../../utils/constants";
+import { NETWORKS, TOKENS_SYMBOLS, BIG_NUMBER_ZERO } from "../../../utils/constants";
 import {
   errorNotification,
   getDefaultProvider,
@@ -79,6 +80,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [activeAction, setActiveAction] = useState("add");
   const [refreshVault, setRefreshVault] = useState(false);
+  const [rerender, setRerender] = useState(false);
 
   // Vault Data
   const [assetOptions, setAssetOptions] = useState<Array<string>>([]);
@@ -87,10 +89,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   const [currentVaultId, setCurrentVaultId] = useState("0");
   const [isApproved, setIsApproved] = useState(false);
   const [vaultDebt, setVaultDebt] = useState("0");
-  const [vaultDebtRaw, setVaultDebtRaw] = useState(BigNumber.from("0"));
+  const [vaultDebtRaw, setVaultDebtRaw] = useState(BIG_NUMBER_ZERO);
   const [vaultDebtUSD, setVaultDebtUSD] = useState("0");
   const [vaultCollateral, setVaultCollateral] = useState("0");
-  const [vaultCollateralRaw, setVaultCollateralRaw] = useState(BigNumber.from("0"));
+  const [vaultCollateralRaw, setVaultCollateralRaw] = useState(BIG_NUMBER_ZERO);
   const [vaultCollateralUSD, setVaultCollateralUSD] = useState("0");
   const [vaultRatio, setVaultRatio] = useState("0");
   const [tempRatio, setTempRatio] = useState("");
@@ -100,6 +102,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   // General Data
   const isHardMode = () => vaultMode === "hard";
   const [indexBalance, setIndexBalance] = useState("0");
+  const [indexBalanceRaw, setIndexBalanceRaw] = useState(BIG_NUMBER_ZERO);
   const [indexBalanceUSD, setIndexBalanceUSD] = useState("0");
   const [collateralBalance, setCollateralBalance] = useState("0");
   const [collateralBalanceUSD, setCollateralBalanceUSD] = useState("0");
@@ -165,7 +168,6 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
   };
 
   async function loadVault() {
-    setIsLoading(true);
     let cBalance;
     let iBalance;
     let currentIndexPrice = "0";
@@ -200,7 +202,8 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       decimals = 6;
     }
 
-    setVaultDebtRaw(BigNumber.from("0"));
+    setVaultDebtRaw(BIG_NUMBER_ZERO);
+    setIndexBalanceRaw(BIG_NUMBER_ZERO);
     if (currentVaultData) {
       const { collateral, debt } = currentVaultData;
       // @ts-ignore
@@ -250,6 +253,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
       iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
       setIndexBalance(iBalance);
+      setIndexBalanceRaw(currentIndexBalance);
 
       if (!allowance.isZero() || vaultData.collateralSymbol === TOKENS_SYMBOLS.ETH) {
         const safeValue = isHardMode() ? 20 : 50;
@@ -311,6 +315,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
 
       iBalance = ethers.utils.formatUnits(currentIndexBalance, 18);
       setIndexBalance(iBalance);
+      setIndexBalanceRaw(currentIndexBalance);
 
       setText(t("vault.create-text", { asset: "Index" }));
       setTitle(t("vault.create"));
@@ -331,6 +336,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setIndexBalanceUSD(iUsdBalance.toString());
     setCollateralBalanceUSD(cUsdBalance.toString());
     setIsLoading(false);
+    setRerender(!rerender);
   }
 
   useEffect(
@@ -343,6 +349,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           currentAssetRead !== null &&
           !loadingVault
         ) {
+          setIsLoading(true);
           await loadVault();
         }
       };
@@ -404,6 +411,9 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     setMintUSD("0");
     setBurnUSD("0");
     setBurnTxt("0");
+    setIndexBalanceRaw(BIG_NUMBER_ZERO);
+    setVaultDebtRaw(BIG_NUMBER_ZERO);
+    setVaultCollateralRaw(BIG_NUMBER_ZERO);
   };
 
   const changeVault = async (newRatio: number, reset = false) => {
@@ -1211,6 +1221,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
+                  prefix={parseFloat(vaultCollateral) < 0.0001 ? "~" : ""}
                 />
               </div>
             </OverlayTrigger>
@@ -1247,6 +1258,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   displayType="text"
                   thousandSeparator
                   decimalScale={tokenBalanceDecimals}
+                  prefix={parseFloat(vaultDebt) < 0.0001 ? "~" : ""}
                 />
               </div>
             </OverlayTrigger>
@@ -1329,17 +1341,18 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     ) {
       keepVaultId = value === TOKENS_SYMBOLS.ETH || value === TOKENS_SYMBOLS.WETH;
     }
-    resetFields();
+
     setVaultData({
       vaultId: !keepVaultId ? "0" : vaultData.vaultId,
       assetSymbol: vaultData.assetSymbol,
       collateralSymbol: value,
       isHardVault: vaultData.isHardVault,
     });
+    resetFields();
     setRefreshVault(!refreshVault);
   };
 
-  const AssetDropdown = () => (
+  const IndexDropdown = () => (
     <div className="dd-collateral">
       <h6 className="titles">Index</h6>
       <Dropdown>
@@ -1381,6 +1394,76 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         </Dropdown.Menu>
       </Dropdown>
     </div>
+  );
+
+  const DebtWarning = () => (
+    <Alert key="debt-alert" variant="warning" className="alert-inside">
+      <p>
+        Vault still has a
+        <OverlayTrigger
+          key="ttip-debt-alert"
+          placement="auto"
+          trigger={["hover", "click"]}
+          overlay={
+            <Tooltip id="ttip-status" className="ttip-hard-vault">
+              Debt: {ethers.utils.formatEther(vaultDebtRaw)} {vaultInitData.assetSymbol}
+            </Tooltip>
+          }
+        >
+          <span>
+            Small Debt
+            <Button variant="dark" className="question-small">
+              ?
+            </Button>
+          </span>
+        </OverlayTrigger>
+        but your
+        <OverlayTrigger
+          key="ttip-debt-alert"
+          placement="auto"
+          trigger={["hover", "click"]}
+          overlay={
+            <Tooltip id="ttip-status" className="ttip-hard-vault">
+              Wallet Balance: {ethers.utils.formatEther(indexBalanceRaw)}{" "}
+              {vaultInitData.assetSymbol}
+            </Tooltip>
+          }
+        >
+          <span>
+            Wallet Balance
+            <Button variant="dark" className="question-small">
+              ?
+            </Button>
+          </span>
+        </OverlayTrigger>
+        is less than the debt.
+      </p>
+    </Alert>
+  );
+
+  const DebtWarning2 = () => (
+    <Alert key="debt-alert" variant="warning" className="alert-inside">
+      <p>
+        Vault still has a
+        <OverlayTrigger
+          key="ttip-debt-alert"
+          placement="auto"
+          trigger={["hover", "click"]}
+          overlay={
+            <Tooltip id="ttip-status" className="ttip-hard-vault">
+              Debt: {ethers.utils.formatEther(vaultDebtRaw)} {vaultInitData.assetSymbol}
+            </Tooltip>
+          }
+        >
+          <span>
+            Small Debt.
+            <Button variant="dark" className="question-small">
+              ?
+            </Button>
+          </span>
+        </OverlayTrigger>
+      </p>
+    </Alert>
   );
 
   return (
@@ -1439,7 +1522,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           <div className="vault-assets-box">
             <div className="assets-box-options">
               <div className="asset-box">
-                <AssetDropdown />
+                <IndexDropdown />
                 {!isLoading && (
                   <>
                     {RenderIndexBalance(false)}
@@ -1465,6 +1548,10 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
                   <RenderCreateVault />
                 ) : (
                   <>
+                    {vaultDebtRaw.lte(BigNumber.from("1000")) &&
+                      indexBalanceRaw.lt(vaultDebtRaw) && <DebtWarning />}
+                    {vaultDebtRaw.lte(BigNumber.from("1000")) &&
+                      !indexBalanceRaw.lt(vaultDebtRaw) && <DebtWarning2 />}
                     <div className="vault-actions">
                       <div className="actions-options">
                         <div className="options-container">

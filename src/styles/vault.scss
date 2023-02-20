@@ -12,11 +12,28 @@
   margin-left: -1.5rem;
 
   .alert-warning {
+    flex-direction: row;
     margin-top: 0rem;
     margin-bottom: 0rem;
     padding: 0.2rem 1rem;
     height: 2rem;
     width: 70%;
+
+    span {
+      color: $highlight;
+      margin: 0px 10px;
+    }
+    span:hover {
+      cursor: pointer;
+    }
+    .question-small {
+      margin-top: -3px;
+    }
+  }
+
+  .alert-inside {
+    margin-top: -2rem;
+    margin-bottom: 2rem;
   }
 
   .btn-dark  {
@@ -30,7 +47,7 @@
   .vault-container {
     display: flex;
     flex-direction: column;
-    margin-top: 4rem;
+    margin-top: 3rem;
     width: 38%;
     background-color: $darker;
   }

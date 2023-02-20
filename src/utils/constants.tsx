@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export const NETWORKS = {
   mainnet: {
     chainId: 1,
@@ -132,3 +134,5 @@ export const TOKENS_SYMBOLS = {
   WETH: "WETH",
   WBTC: "WBTC",
 };
+
+export const BIG_NUMBER_ZERO = BigNumber.from("0");

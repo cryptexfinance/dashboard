@@ -127,7 +127,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   ];
 
   const buildFilters = () => {
-    const weiLimit = "100000000";
+    const weiLimit = "0";
     let filter = "";
     let ownerFilter = "";
     let vaultFilter = "";
@@ -339,9 +339,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     const ratio = getRatio2(collateralText, collateralPrice, debtText, indexPrice || "1");
 
     let status = VAULT_STATUS.liquidation;
-    if (parseFloat(collateralText) < 0.0000000001) {
+    if (parseFloat(collateralText) === 0) {
       status = VAULT_STATUS.empty;
-    } else if (parseFloat(collateralText) >= 0.0000000001 && parseFloat(debtText) < 0.0000000001) {
+    } else if (parseFloat(collateralText) > 0 && parseFloat(debtText) <= 0) {
       status = VAULT_STATUS.ready;
     } else if (ratio >= minRatio) {
       status = VAULT_STATUS.active;

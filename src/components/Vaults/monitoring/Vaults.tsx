@@ -275,14 +275,14 @@ export const Vaults = ({
                     {v.isHardVault && <span className="mode">H Mode</span>}
                   </div>
                 </td>
-                <td>
+                <td className="has-tooltip">
                   <OverlayTrigger
-                    key="top"
+                    key={"c-ttip-".concat(index.toString())}
                     placement="bottom"
                     trigger={["focus", "hover"]}
                     overlay={
                       <Tooltip id="ttip-collateral" className="vaults-tooltip">
-                        {numberFormatStr(v.collateralValue, 4, 12)}
+                        {v.collateralValue}
                       </Tooltip>
                     }
                   >
@@ -297,15 +297,15 @@ export const Vaults = ({
                     <span className="number">${numberFormatStr(v.collateralUsd, 2, 2)}</span>
                   </div>
                 </td>
-                <td>
+                <td className="has-tooltip">
                   <div className="debt">
                     <OverlayTrigger
-                      key="top"
+                      key={"debt-ttip-".concat(index.toString())}
                       placement="bottom"
                       trigger={["hover", "focus"]}
                       overlay={
                         <Tooltip id="ttip-debt" className="vaults-tooltip">
-                          {numberFormatStr(v.debt, 4, 12)}
+                          {v.debt}
                         </Tooltip>
                       }
                     >
