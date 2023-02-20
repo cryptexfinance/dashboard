@@ -400,7 +400,12 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         addVault = v.tokenSymbol === TOKENS_SYMBOLS.WETH || v.tokenSymbol === TOKENS_SYMBOLS.DAI;
       }
 
-      if (addVault && v.tokenSymbol !== TOKENS_SYMBOLS.WBTC) {
+      // show only wbtc hard vaults
+      if (v.tokenSymbol === TOKENS_SYMBOLS.WBTC) {
+        addVault = addVault && v.hardVault;
+      }
+
+      if (addVault) {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -512,6 +517,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
         symbols.push({ key: "usdc", name: TOKENS_SYMBOLS.USDC });
       }
+      symbols.push({ key: "wbtc", name: TOKENS_SYMBOLS.WBTC });
     } else if (isArbitrum(currentNetwork.chainId)) {
       symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
       symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
