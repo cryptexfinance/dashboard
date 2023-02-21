@@ -21,12 +21,12 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
 
   const TVL = gql`
     query aprs {
-      apr(id: "2") {
+      apr(id: "1") {
         id
         totalAmount0
         totalAmount1
       }
-      positions(where: { staked: true, stakedBlockNumber_gt: 15998870 }) {
+      positions(where: { staked: true, stakedBlockNumber_gt: 16678120 }) {
         id
       }
     }
@@ -35,7 +35,6 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
   const calculateClaimableRewards = async (stakedLpTokens: any) => {
     let claimableReward = ethers.BigNumber.from("0");
     const rewardCalls = new Array<any>();
-
     if (stakedLpTokens.length > 0) {
       for (let i = 0; i < stakedLpTokens.length; i += 1) {
         rewardCalls.push(await stakerContractRead?.getRewardInfo(incentive, stakedLpTokens[i].id));
@@ -118,8 +117,10 @@ const Apr = ({ incentive, stakerContractRead }: props) => {
       console.log(error);
     },
     onCompleted: (data: any) => {
-      if (signer) {
+      if (signer && data) {
         calculateApr(data);
+      } else {
+        setApr(10);
       }
     },
   });
