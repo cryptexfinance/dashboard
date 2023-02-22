@@ -248,7 +248,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       }
 
       switch (vaultType) {
-        case "DAI":
+        case TOKENS_SYMBOLS.DAI:
           if (isHardVault) {
             cVault = hardVaults.daiVault;
             cVaultRead = hardVaults.daiVaultRead;
@@ -257,31 +257,31 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
             cVaultRead = vaults.daiVaultRead;
           }
           break;
-        case "AAVE":
+        case TOKENS_SYMBOLS.AAVE:
           cVault = vaults.aaveVault;
           cVaultRead = vaults.aaveVaultRead;
           break;
-        case "LINK":
+        case TOKENS_SYMBOLS.LINK:
           cVault = vaults.linkVault;
           cVaultRead = vaults.linkVaultRead;
           break;
-        case "SNX":
+        case TOKENS_SYMBOLS.SNX:
           cVault = vaults.snxVault;
           cVaultRead = vaults.snxVaultRead;
           break;
-        case "UNI":
+        case TOKENS_SYMBOLS.UNI:
           cVault = vaults.uniVault;
           cVaultRead = vaults.uniVaultRead;
           break;
-        case "MATIC":
+        case TOKENS_SYMBOLS.MATIC:
           cVault = vaults.maticVault;
           cVaultRead = vaults.maticVaultRead;
           break;
-        case "WBTC":
+        case TOKENS_SYMBOLS.WBTC:
           cVault = vaults.wbtcVault;
           cVaultRead = vaults.wbtcVaultRead;
           break;
-        case "USDC":
+        case TOKENS_SYMBOLS.USDC:
           cVault = hardVaults.usdcVault;
           cVaultRead = hardVaults.usdcVaultRead;
           break;
@@ -303,7 +303,12 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
       const reqTcapText = ethers.utils.formatEther(reqTcap);
       const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
-      const currentLiqFee = await cVault?.getFee(reqTcap);
+      let currentLiqFee;
+      if (isArbitrum(currentNetwork.chainId)) {
+        currentLiqFee = await cVault?.getBurnFee(reqTcap);
+      } else {
+        currentLiqFee = await cVault?.getFee(reqTcap);
+      }
       const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
       const ethFee = ethers.utils.formatEther(increasedFee);
 
