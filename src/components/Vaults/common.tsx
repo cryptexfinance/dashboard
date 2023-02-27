@@ -54,6 +54,8 @@ export const OPTIMISM_COLLATERALS = [
   TOKENS_SYMBOLS.SNX,
 ];
 
+export const KEYWORD_ALL = "all";
+
 export const getMinRatio = (ratios: VaultsRatioType, symbol: string, isHardVault: boolean) => {
   let minRatio = 200;
   switch (symbol) {

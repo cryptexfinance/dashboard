@@ -4,21 +4,30 @@ import Spinner from "react-bootstrap/Spinner";
 import { FaArrowsAltH } from "react-icons/fa";
 import { ethers, BigNumber } from "ethers";
 import { useMediaQuery } from "react-responsive";
-import { useLazyQuery, gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import "../../../styles/vault-monitoring.scss";
 import { VaultPagination } from "./Pagination";
+import VaultsSummary from "./VaultsSummary";
 import { signerContext, hardVaultsContext, networkContext, vaultsContext } from "../../../state";
 import { Vaults } from "./Vaults";
 import { VaultsMobile } from "./VaultsMobile";
-import { usePrices, useRatios } from "../../../hooks";
+import {
+  VAULTS_ALL,
+  VAULTS_BY_COLLATERAL,
+  VAULTS_BY_STATUS,
+  VAULTS_BY_TOKEN_STATUS,
+  VAULTS_IN_LIQ,
+  VAULTS_IN_LIQ_BY_TOKEN,
+  VAULTS_BY_USER,
+} from "./GraphqlQueries";
+import { usePrices, useRatios, useVaultsSummary } from "../../../hooks";
 import {
   getRatio2,
   isArbitrum,
   isInLayer1,
   isOptimism,
   isUndefined,
-  numberFormatStr,
   toUSD,
 } from "../../../utils/utils";
 import { TOKENS_SYMBOLS } from "../../../utils/constants";
@@ -30,6 +39,7 @@ import {
   findNewArbitrumVaultCollateral,
   findNewMainnetVaultCollateral,
   findNewOptimismVaultCollateral,
+  KEYWORD_ALL,
   VAULT_STATUS,
 } from "../common";
 import {
@@ -69,13 +79,14 @@ type liqVaultsTempType = {
 };
 
 type props = {
+  currentAddress: string;
   setVaultToUpdate: (initData: VaultToUpdateType) => void;
 };
 
 const showAllVaults = true;
 const MAX_RANGE_LIMIT = Number.MAX_VALUE;
 
-const Monitoring = ({ setVaultToUpdate }: props) => {
+const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery({ query: "(max-width: 850px)" });
   const currentNetwork = useContext(networkContext);
@@ -84,6 +95,8 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const hardVaults = useContext(hardVaultsContext);
   const [prices, loadingPrices] = usePrices();
   const ratios = useRatios();
+  // eslint-disable-next-line
+  const [refetchSummary, vaultsSummary] = useVaultsSummary(prices, loadingPrices);
   const vaultsOwnerFilter = [
     { name: t("all-vaults"), value: "0" },
     { name: t("my-vaults"), value: "1" },
@@ -91,12 +104,15 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const [vaultsUpdated, setVaultsUpdated] = useState(false);
   const [vaultsTotals, setVaultsTotals] = useState<VaultsTotalsType>(totalsDefault);
   const [vaultList, setVaultList] = useState<Array<VaultsType>>([]);
-  const [vaultGraphList, setVaultGraphList] = useState<Array<any>>([]);
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
-  const [loadMore, setLoadMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [allVaultsFirstLoad, setAllVaultsFirstLoad] = useState(true);
+  const [byCollateralFirstLoad, setByCollateralFirstLoad] = useState(true);
+  const [byStatusFirstLoad, setByStatusFirstLoad] = useState(true);
+  const [byTSFirstLoad, setByTSFirstLoad] = useState(true);
+  const [byInLiqFirstLoad, setByInLiqFirstLoad] = useState(true);
+  const [byTokenInLiqFirstLoad, setByTokenInLiqFirstLoad] = useState(true);
   const [filteringRatios, setFilteringRatios] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState("");
-  const [ownerAddress, setOwnerAddress] = useState("");
   const [currentOwnerFilter, setCurrentOwnerFilter] = useState(vaultsOwnerFilter[1]);
   const [tokenSymbol, setTokenSymbol] = useState("all");
   const [currentStatus, setCurrentStatus] = useState("all");
@@ -116,92 +132,19 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     { key: "30", name: "30" },
   ];
   const statusList = [
-    { key: "all", name: "All" },
+    { key: KEYWORD_ALL, name: "All" },
     { key: VAULT_STATUS.empty, name: "Empty" },
     { key: VAULT_STATUS.ready, name: "Ready" },
     { key: VAULT_STATUS.active, name: "Active" },
     { key: VAULT_STATUS.liquidation, name: "Liquidation" },
   ];
   const modeList = [
-    { key: "all", name: "All" },
+    { key: KEYWORD_ALL, name: "All" },
     { key: "regular", name: "Regular" },
     { key: "hard", name: "Hard" },
   ];
 
-  const buildFilters = () => {
-    const weiLimit = "0";
-    let filter = "";
-    let ownerFilter = "";
-    let vaultFilter = "";
-    let statusFilter = "";
-    let modeFilter = "";
-
-    if (currentOwnerFilter.value === "1" && ownerAddress !== "") {
-      ownerFilter = `, owner: "${ownerAddress}"`;
-    }
-    if (tokenSymbol !== "all") {
-      vaultFilter = `tokenSymbol: "${tokenSymbol.toUpperCase()}"`;
-    }
-    if (currentStatus !== "all") {
-      if (currentStatus === "empty") {
-        statusFilter = `collateral: "${weiLimit}"`;
-      }
-      if (currentStatus === "ready") {
-        statusFilter = `collateral_gt: "${weiLimit}", debt: "${weiLimit}"`;
-      }
-      if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
-        statusFilter = `debt_gt: "${weiLimit}"`;
-      }
-    }
-    if (vaultMode !== "all") {
-      const isHard = vaultMode === "hard" ? "true" : "false";
-      modeFilter = "hardVault: ".concat(isHard);
-    }
-
-    filter = ownerFilter;
-    if (vaultFilter !== "") {
-      filter = filter.concat(`, ${vaultFilter}`);
-    }
-    if (statusFilter !== "") {
-      filter = filter.concat(`, ${statusFilter}`);
-    }
-    if (modeFilter !== "") {
-      filter = filter.concat(`, ${modeFilter}`);
-    }
-    if (filter !== "") {
-      if (loadMore) {
-        filter = `, where: { blockTS_gt: "${pagination.lastId}" ${filter} }`;
-      } else {
-        filter = `, where: { blockTS_gt: "0" ${filter} }`;
-      }
-    }
-
-    return filter;
-  };
-
-  const str =
-    "query allVaults {" +
-    `vaults(first: 1000, orderBy: blockTS ${buildFilters()}) {` +
-    "id " +
-    "vaultId " +
-    "owner " +
-    "collateral " +
-    "debt " +
-    "currentRatio " +
-    "tokenSymbol " +
-    "hardVault " +
-    "blockTS " +
-    "underlyingProtocol { " +
-    "underlyingToken { " +
-    "decimals " +
-    "} " +
-    "}" +
-    "} " +
-    "}";
-
-  const vaultsQuery = gql`
-    ${str}
-  `;
+  const isMyVaults = (): boolean => currentOwnerFilter.value === "1" && currentAddress !== "";
 
   const isValidRatio = (value: string) => {
     let valid = false;
@@ -305,12 +248,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
       const reqTcapText = ethers.utils.formatEther(reqTcap);
       const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
-      let currentLiqFee;
-      if (isArbitrum(currentNetwork.chainId)) {
-        currentLiqFee = await cVault?.getBurnFee(reqTcap);
-      } else {
-        currentLiqFee = await cVault?.getFee(reqTcap);
-      }
+      const currentLiqFee = await cVault?.getFee(reqTcap);
       const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
       const ethFee = ethers.utils.formatEther(increasedFee);
 
@@ -356,22 +294,24 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     return { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status };
   };
 
-  const confPagination = (vData: Array<VaultsType>, itemsPerPage: number) => {
+  const confPagination = (vData: Array<VaultsType>, itemsPerPage: number, vaultsAmount: number) => {
     if (vData.length > 0) {
       const lastVaultId = vData[vData.length - 1].blockTS;
       const itemsCount = vData.length;
       const pages = Math.ceil(itemsCount / itemsPerPage);
       const lastDataPage = Math.ceil(itemsCount / itemsPerPage);
+      const isOneFirstPage = !(loadingMore && currentStatus !== VAULT_STATUS.liquidation);
+
       const pag = {
         previous: 0,
-        current: 1,
-        next: 2,
+        current: isOneFirstPage ? 1 : pagination.pages + 1,
+        next: isOneFirstPage ? 2 : pagination.pages + 2,
         pages,
         lastDataPage,
         itemsPerPage,
         itemsCount,
-        totalItems: itemsCount,
-        totalPages: pages,
+        totalItems: vaultsAmount - 1,
+        totalPages: Math.ceil((vaultsAmount - 1) / itemsPerPage),
         lastId: lastVaultId,
       };
       setPagination(pag);
@@ -380,83 +320,154 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     }
   };
 
+  const loadTotals = () => {
+    let totalId = "";
+    let vaultsAmount = 0;
+    if (tokenSymbol !== "all" || currentStatus !== "all") {
+      if (tokenSymbol !== "all") {
+        totalId = tokenSymbol.toUpperCase();
+      }
+      if (currentStatus !== "all") {
+        if (totalId === "") {
+          totalId = currentStatus;
+        } else {
+          totalId = totalId.concat("_").concat(currentStatus);
+        }
+      }
+    } else {
+      totalId = "all";
+    }
+
+    const vs = vaultsSummary.find((item) => item.id === totalId);
+    if (vs) {
+      const indexPrice = !isArbitrum(currentNetwork.chainId)
+        ? prices.tcapOraclePrice
+        : prices.jpegzOraclePrice;
+
+      const tDebtUsd = parseFloat(vs.debt) * parseFloat(indexPrice);
+      setVaultsTotals({
+        vaults: vs.vaultsAmount,
+        collateral: vs.collateral,
+        collateralUSD: vs.collateralUsd,
+        debt: vs.debt,
+        debtUSD: tDebtUsd.toFixed(2),
+      });
+      vaultsAmount = vs.vaultsAmount;
+    }
+    return vaultsAmount;
+  };
+
+  const isValidCollateral = (symbol: string): boolean => {
+    if (tokenSymbol !== KEYWORD_ALL) {
+      return symbol === tokenSymbol;
+    }
+    return true;
+  };
+
+  const isValidStatus = (vStatus: string): boolean => {
+    if (currentStatus !== KEYWORD_ALL) {
+      return vStatus === currentStatus;
+    }
+    return true;
+  };
+
   const loadVaults = async (vaultsData: any, cStatus: string) => {
-    const vData = new Array<VaultsType>();
+    let vData = new Array<VaultsType>();
+    let totals = { ...totalsDefault };
+    let vaultsAmount = 0;
+    let currentLastBlockTS = pagination.lastId;
+    if (loadingMore) {
+      vData = vaultList;
+      totals = vaultsTotals;
+    }
+
     const vLiquidables = new Array<liqVaultsTempType>();
-    const totals = { ...totalsDefault };
     const minFilterRatio = getMinRangeRatio();
     const maxFilterRatio = getMaxRangeRatio();
 
-    setLoadMore(false);
     setFilteringRatios(true);
     // setLiqLoaded(currentStatus !== VAULT_STATUS.liquidation);
     // @ts-ignore
     vaultsData.vaults.forEach((v) => {
-      const cVaultDecimals = v.underlyingProtocol.underlyingToken.decimals;
-      const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
-        calculateVaultData(v.collateral, v.debt, v.tokenSymbol, v.hardVault, cVaultDecimals);
-
-      let addVault = true;
-      if (cStatus === VAULT_STATUS.active || cStatus === VAULT_STATUS.liquidation) {
-        addVault = cStatus === status;
-      }
-      // filter ratio
-      if (cStatus !== VAULT_STATUS.empty && cStatus !== VAULT_STATUS.ready) {
-        addVault = addVault && ratio >= minFilterRatio && ratio <= maxFilterRatio;
+      let validVault = true;
+      if (isMyVaults()) {
+        validVault = isValidCollateral(v.tokenSymbol) && isValidStatus(v.status);
       }
 
-      if (!showAllVaults) {
-        addVault = v.tokenSymbol === TOKENS_SYMBOLS.WETH || v.tokenSymbol === TOKENS_SYMBOLS.DAI;
-      }
+      if (validVault) {
+        const cVaultDecimals = v.underlyingProtocol.underlyingToken.decimals;
+        const { collateralText, collateralUSD, debtText, debtUSD, ratio, minRatio, status } =
+          calculateVaultData(v.collateral, v.debt, v.tokenSymbol, v.hardVault, cVaultDecimals);
 
-      // show only wbtc hard vaults
-      if (v.tokenSymbol === TOKENS_SYMBOLS.WBTC) {
-        addVault = addVault && v.hardVault;
-      }
-
-      if (addVault) {
-        let vaultUrl = "";
-        const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
-        if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
-          vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
-        }
+        let addVault = true;
         if (cStatus === VAULT_STATUS.liquidation) {
-          vLiquidables.push({
-            vaultId: v.vaultId,
-            vaultType: v.tokenSymbol,
-            decimals: cVaultDecimals,
-            hardVault: v.hardVault,
-          });
+          addVault = cStatus === status;
+        }
+        // filter ratio
+        if (cStatus !== VAULT_STATUS.empty && cStatus !== VAULT_STATUS.ready) {
+          addVault = addVault && ratio >= minFilterRatio && ratio <= maxFilterRatio;
         }
 
-        vData.push({
-          id: v.vaultId,
-          collateralSymbol: v.tokenSymbol,
-          collateralValue: collateralText,
-          collateralUsd: collateralUSD.toFixed(2),
-          debt: debtText,
-          debtUsd: debtUSD.toFixed(2),
-          ratio,
-          minRatio: minRatio.toString(),
-          decimals: cVaultDecimals,
-          isHardVault: v.hardVault,
-          netReward: 0,
-          status,
-          blockTS: v.blockTS,
-          url: vaultUrl,
-        });
+        // show only wbtc hard vaults
+        if (v.tokenSymbol === TOKENS_SYMBOLS.WBTC) {
+          addVault = addVault && v.hardVault;
+        }
 
-        totals.vaults += 1;
-        totals.collateral = (parseFloat(totals.collateral) + parseFloat(collateralText)).toFixed(4);
-        totals.collateralUSD = (parseFloat(totals.collateralUSD) + collateralUSD).toFixed(2);
-        totals.debt = (parseFloat(totals.debt) + parseFloat(debtText)).toFixed(4);
-        totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
+        if (addVault) {
+          let vaultUrl = "";
+          const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
+          if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
+            vaultUrl = window.location.origin.concat("/vault/").concat(symbol);
+          }
+          if (cStatus === VAULT_STATUS.liquidation) {
+            vLiquidables.push({
+              vaultId: v.vaultId,
+              vaultType: v.tokenSymbol,
+              decimals: cVaultDecimals,
+              hardVault: v.hardVault,
+            });
+          }
+
+          vData.push({
+            id: v.vaultId,
+            collateralSymbol: v.tokenSymbol,
+            collateralValue: collateralText,
+            collateralUsd: collateralUSD.toFixed(2),
+            debt: debtText,
+            debtUsd: debtUSD.toFixed(2),
+            ratio,
+            minRatio: minRatio.toString(),
+            decimals: cVaultDecimals,
+            isHardVault: v.hardVault,
+            netReward: 0,
+            status,
+            blockTS: v.blockTS,
+            url: vaultUrl,
+          });
+
+          if (isMyVaults() || cStatus === VAULT_STATUS.liquidation) {
+            totals.vaults += 1;
+            totals.collateral = (
+              parseFloat(totals.collateral) + parseFloat(collateralText)
+            ).toFixed(4);
+            totals.collateralUSD = (parseFloat(totals.collateralUSD) + collateralUSD).toFixed(2);
+            totals.debt = (parseFloat(totals.debt) + parseFloat(debtText)).toFixed(4);
+            totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
+          }
+        }
+
+        currentLastBlockTS = v.blockTS;
       }
     });
 
     if (currentStatus !== VAULT_STATUS.liquidation) {
       setVaultList(vData);
-      setVaultsTotals(totals);
+      if (isMyVaults()) {
+        setVaultsTotals(totals);
+        vaultsAmount = totals.vaults;
+      } else {
+        vaultsAmount = loadTotals();
+      }
     } else {
       const loadNetReward = async () => {
         vLiquidables.forEach((l, index) => {
@@ -471,23 +482,140 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         setVaultList(vData);
         setVaultsTotals(totals);
       });
+      vaultsAmount = totals.vaults;
     }
 
     // Set pagination data
-    confPagination(vData, pagination.itemsPerPage);
+    confPagination(vData, pagination.itemsPerPage, vaultsAmount);
     setFilteringRatios(false);
+    setLoadingMore(false);
+
+    if (cStatus === VAULT_STATUS.liquidation) {
+      if (vaultsData.vaults.length >= 1000) {
+        const lastVId = currentLastBlockTS;
+        setLoadingMore(true);
+        if (tokenSymbol !== KEYWORD_ALL) {
+          // eslint-disable-next-line no-use-before-define
+          refetchTokenInLiq({ lastBlockTS: lastVId, symbol: tokenSymbol });
+        } else {
+          // eslint-disable-next-line no-use-before-define
+          refetchInLiq({ lastBlockTS: lastVId });
+        }
+      }
+    }
   };
 
-  const [loadVaultData, { loading }] = useLazyQuery(vaultsQuery, {
+  // Graphql queries
+  const [loadVaultData, { loading, refetch: refetchVaults }] = useLazyQuery(VAULTS_ALL, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
-    // skip: skipQuery,
+    variables: { lastBlockTS: "0" },
     onError: (error) => {
       console.log(error);
     },
     onCompleted: (data: any) => {
       if (!isUndefined(data)) {
-        setVaultGraphList(data);
+        loadVaults(data, currentStatus);
+        setVaultsUpdated(true);
+      }
+    },
+  });
+
+  const [loadVaultByCollateral, { loading: loadingByCollateral, refetch: refetchByCollateral }] =
+    useLazyQuery(VAULTS_BY_COLLATERAL, {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      variables: { lastBlockTS: "0", symbol: tokenSymbol },
+      onError: (error) => {
+        console.log(error);
+      },
+      onCompleted: (data: any) => {
+        if (!isUndefined(data)) {
+          loadVaults(data, currentStatus);
+          setVaultsUpdated(true);
+        }
+      },
+    });
+
+  const [loadVaultByStatus, { loading: loadingByStatus, refetch: refetchByStatus }] = useLazyQuery(
+    VAULTS_BY_STATUS,
+    {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      variables: { lastBlockTS: "0", status: currentStatus },
+      onError: (error) => {
+        console.log(error);
+      },
+      onCompleted: (data: any) => {
+        if (!isUndefined(data)) {
+          loadVaults(data, currentStatus);
+          setVaultsUpdated(true);
+        }
+      },
+    }
+  );
+
+  const [loadVaultByTS, { loading: loadingByTS, refetch: refetchByTS }] = useLazyQuery(
+    VAULTS_BY_TOKEN_STATUS,
+    {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      variables: { lastBlockTS: "0", symbol: tokenSymbol, status: currentStatus },
+      onError: (error) => {
+        console.log(error);
+      },
+      onCompleted: (data: any) => {
+        if (!isUndefined(data)) {
+          loadVaults(data, currentStatus);
+          setVaultsUpdated(true);
+        }
+      },
+    }
+  );
+
+  const [loadVaultInLiq, { loading: loadingInLiq, refetch: refetchInLiq }] = useLazyQuery(
+    VAULTS_IN_LIQ,
+    {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      variables: { lastBlockTS: "0" },
+      onError: (error) => {
+        console.log(error);
+      },
+      onCompleted: (data: any) => {
+        if (!isUndefined(data)) {
+          loadVaults(data, currentStatus);
+          setVaultsUpdated(true);
+        }
+      },
+    }
+  );
+
+  const [loadVaultTokenInLiq, { loading: loadingTokenInLiq, refetch: refetchTokenInLiq }] =
+    useLazyQuery(VAULTS_IN_LIQ_BY_TOKEN, {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      variables: { lastBlockTS: "0", symbol: tokenSymbol },
+      onError: (error) => {
+        console.log(error);
+      },
+      onCompleted: (data: any) => {
+        if (!isUndefined(data)) {
+          loadVaults(data, currentStatus);
+          setVaultsUpdated(true);
+        }
+      },
+    });
+
+  const [loadVaulsByUser, { loading: loadingByUser }] = useLazyQuery(VAULTS_BY_USER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    variables: { ownerAddress: currentAddress },
+    onError: (error) => {
+      console.log(error);
+    },
+    onCompleted: (data: any) => {
+      if (!isUndefined(data)) {
         loadVaults(data, currentStatus);
         setVaultsUpdated(true);
       }
@@ -497,13 +625,13 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   useEffect(
     () => {
       const load = async () => {
-        if (signer && signer.signer) {
+        if (signer && currentAddress !== "") {
           if (!vaultsUpdated && !loadingPrices) {
-            const address = await signer.signer.getAddress();
-            setCurrentAddress(address);
-            setOwnerAddress(currentOwnerFilter.value === "1" ? address : "");
-
-            loadVaultData();
+            if (currentOwnerFilter.value === "1") {
+              loadVaulsByUser();
+            } else {
+              loadVaultData();
+            }
           }
         } else if (prices.daiOraclePrice !== "0") {
           setCurrentOwnerFilter(vaultsOwnerFilter[0]);
@@ -517,68 +645,121 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   );
 
   const tokensSymbols = (): Array<DropdownItemType> => {
-    const symbols = [{ key: "all", name: "All" }];
+    const symbols = [{ key: KEYWORD_ALL, name: "All" }];
     if (isInLayer1(currentNetwork.chainId)) {
-      symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
-      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
+      symbols.push({ key: TOKENS_SYMBOLS.WETH, name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: TOKENS_SYMBOLS.DAI, name: TOKENS_SYMBOLS.DAI });
       if (showAllVaults) {
-        symbols.push({ key: "aave", name: TOKENS_SYMBOLS.AAVE });
-        symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
-        symbols.push({ key: "usdc", name: TOKENS_SYMBOLS.USDC });
+        symbols.push({ key: TOKENS_SYMBOLS.AAVE, name: TOKENS_SYMBOLS.AAVE });
+        symbols.push({ key: TOKENS_SYMBOLS.LINK, name: TOKENS_SYMBOLS.LINK });
+        symbols.push({ key: TOKENS_SYMBOLS.USDC, name: TOKENS_SYMBOLS.USDC });
       }
-      symbols.push({ key: "wbtc", name: TOKENS_SYMBOLS.WBTC });
+      symbols.push({ key: TOKENS_SYMBOLS.WBTC, name: TOKENS_SYMBOLS.WBTC });
     } else if (isArbitrum(currentNetwork.chainId)) {
-      symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
-      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
+      symbols.push({ key: TOKENS_SYMBOLS.WETH, name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: TOKENS_SYMBOLS.DAI, name: TOKENS_SYMBOLS.DAI });
     } else if (isOptimism(currentNetwork.chainId)) {
-      symbols.push({ key: "eth", name: TOKENS_SYMBOLS.ETH });
-      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
+      symbols.push({ key: TOKENS_SYMBOLS.WETH, name: TOKENS_SYMBOLS.ETH });
+      symbols.push({ key: TOKENS_SYMBOLS.DAI, name: TOKENS_SYMBOLS.DAI });
       if (showAllVaults) {
-        symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
-        symbols.push({ key: "uni", name: TOKENS_SYMBOLS.UNI });
-        symbols.push({ key: "snx", name: TOKENS_SYMBOLS.SNX });
+        symbols.push({ key: TOKENS_SYMBOLS.LINK, name: TOKENS_SYMBOLS.LINK });
+        symbols.push({ key: TOKENS_SYMBOLS.UNI, name: TOKENS_SYMBOLS.UNI });
+        symbols.push({ key: TOKENS_SYMBOLS.SNX, name: TOKENS_SYMBOLS.SNX });
       }
     } else {
-      symbols.push({ key: "matic", name: TOKENS_SYMBOLS.MATIC });
-      symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
-      symbols.push({ key: "wbtc", name: TOKENS_SYMBOLS.WBTC });
+      symbols.push({ key: TOKENS_SYMBOLS.MATIC, name: TOKENS_SYMBOLS.MATIC });
+      symbols.push({ key: TOKENS_SYMBOLS.DAI, name: TOKENS_SYMBOLS.DAI });
+      symbols.push({ key: TOKENS_SYMBOLS.WBTC, name: TOKENS_SYMBOLS.WBTC });
     }
 
     return symbols;
   };
 
   const handleItemsViewChange = (number: string) => {
-    confPagination(vaultList, parseInt(number));
+    confPagination(vaultList, parseInt(number), vaultsTotals.vaults);
+  };
+
+  const handleFiltersChange = (newStatus: string, newToken: string) => {
+    if (newStatus === KEYWORD_ALL && newToken === KEYWORD_ALL) {
+      if (allVaultsFirstLoad) {
+        setAllVaultsFirstLoad(false);
+        loadVaultData();
+      } else {
+        refetchVaults({ lastBlockTS: "0" });
+      }
+    } else if (newStatus === VAULT_STATUS.liquidation) {
+      if (newToken !== KEYWORD_ALL) {
+        if (byTokenInLiqFirstLoad) {
+          setByTokenInLiqFirstLoad(false);
+          loadVaultTokenInLiq();
+        } else {
+          refetchTokenInLiq({ lastBlockTS: "0", symbol: newToken });
+        }
+      } else if (byInLiqFirstLoad) {
+        setByInLiqFirstLoad(false);
+        loadVaultInLiq();
+      } else {
+        refetchInLiq({ lastBlockTS: "0" });
+      }
+    } else if (newStatus !== KEYWORD_ALL && newToken !== KEYWORD_ALL) {
+      if (byTSFirstLoad) {
+        setByTSFirstLoad(false);
+        loadVaultByTS();
+      } else {
+        refetchByTS({ lastBlockTS: "0", symbol: newToken, status: newStatus });
+      }
+    } else if (newStatus !== KEYWORD_ALL) {
+      if (byStatusFirstLoad) {
+        setByStatusFirstLoad(false);
+        loadVaultByStatus();
+      } else {
+        refetchByStatus({ lastBlockTS: "0", status: newStatus });
+      }
+    } else if (newToken !== KEYWORD_ALL) {
+      if (byCollateralFirstLoad) {
+        setByCollateralFirstLoad(false);
+        loadVaultByCollateral();
+      } else {
+        refetchByCollateral({ lastBlockTS: "0", symbol: newToken });
+      }
+    }
   };
 
   const handleVaultOwnerFilterChange = (value: string) => {
     setCurrentOwnerFilter(vaultsOwnerFilter[parseInt(value)]);
     if (value === "0") {
-      setOwnerAddress("");
+      setPagination(pagDefault);
+      handleFiltersChange(currentStatus, tokenSymbol);
     } else {
-      setOwnerAddress(currentAddress);
+      loadVaulsByUser();
     }
   };
 
   const handleStatusChange = (newStatus: string) => {
-    if (newStatus === VAULT_STATUS.liquidation || newStatus === VAULT_STATUS.active) {
-      setCurrentStatus(newStatus);
-      if (currentStatus === "all") {
-        loadVaults(vaultGraphList, newStatus);
-      } else {
-        loadVaultData();
-      }
+    setCurrentStatus(newStatus);
+    if (isMyVaults()) {
+      loadVaulsByUser();
     } else {
-      setCurrentStatus(newStatus);
+      handleFiltersChange(newStatus, tokenSymbol);
     }
   };
 
   const handleTokenChange = (newToken: string) => {
     setTokenSymbol(newToken);
+    if (isMyVaults()) {
+      loadVaulsByUser();
+    } else {
+      handleFiltersChange(currentStatus, newToken);
+    }
   };
 
   const handleModeChange = (newMode: string) => {
     setVaultMode(newMode);
+    if (isMyVaults()) {
+      loadVaulsByUser();
+    } else {
+      refetchVaults({ lastBlockTS: "0" });
+    }
   };
 
   const onFilterRatioClick = () => {
@@ -591,7 +772,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         setCurrentMinRatio(minRatio.concat("%"));
         setCurrentMaxRatio(maxRatio.concat("%"));
         // @ts-ignore
-        loadVaults(vaultGraphList);
+        handleFiltersChange(currentStatus, tokenSymbol);
         if (ratioRangeDropdown !== null) {
           // @ts-ignore
           ratioRangeDropdown.current.click();
@@ -601,14 +782,35 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   };
 
   const onPageSelected = (pageNumber: number) => {
-    const nextPage = pageNumber === pagination.pages ? 0 : pageNumber + 1;
-    const newPagination = {
-      ...pagination,
-      previous: pageNumber === 1 ? 0 : pageNumber - 1,
-      current: pageNumber,
-      next: nextPage,
-    };
-    setPagination(newPagination);
+    let nextPage = pageNumber + 1;
+    if (pageNumber === pagination.pages && pagination.pages === pagination.totalPages) {
+      nextPage = 0;
+    }
+
+    if (pageNumber > pagination.lastDataPage) {
+      setLoadingMore(true);
+      if (tokenSymbol === KEYWORD_ALL && currentStatus === KEYWORD_ALL) {
+        refetchVaults({ lastBlockTS: pagination.lastId });
+      } else if (currentStatus === VAULT_STATUS.liquidation) {
+        if (tokenSymbol !== KEYWORD_ALL) {
+          refetchTokenInLiq({ lastBlockTS: pagination.lastId, symbol: tokenSymbol });
+        } else {
+          refetchInLiq({ lastBlockTS: pagination.lastId });
+        }
+      } else if (tokenSymbol !== KEYWORD_ALL) {
+        refetchByCollateral({ lastBlockTS: pagination.lastId, symbol: tokenSymbol });
+      } else if (currentStatus !== KEYWORD_ALL) {
+        refetchByStatus({ lastBlockTS: pagination.lastId, status: currentStatus });
+      }
+    } else {
+      const newPagination = {
+        ...pagination,
+        previous: pageNumber === 1 ? 0 : pageNumber - 1,
+        current: pageNumber,
+        next: nextPage,
+      };
+      setPagination(newPagination);
+    }
   };
 
   const updateLiquidatedVault = async (
@@ -680,13 +882,6 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     });
   };
 
-  const IndexIcon = () => {
-    if (!isArbitrum(currentNetwork.chainId)) {
-      return <TokenIcon name={TOKENS_SYMBOLS.TCAP} />;
-    }
-    return <TokenIcon name={TOKENS_SYMBOLS.JPEGz} />;
-  };
-
   const RenderFilters = () => (
     <>
       <div className="items-view">
@@ -717,7 +912,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
           </h6>
           <Dropdown
             className="dd-collateral"
-            onSelect={(eventKey) => handleTokenChange(eventKey || "ALL")}
+            onSelect={(eventKey) => handleTokenChange(eventKey || KEYWORD_ALL)}
           >
             <Dropdown.Toggle variant="secondary" id="dropdown-filters" className="text-left">
               <div className="collateral-toggle">
@@ -736,7 +931,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         </div>
         <div className="dd-container">
           <h6 className="titles">Status</h6>
-          <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || "ALL")}>
+          <Dropdown onSelect={(eventKey) => handleStatusChange(eventKey || KEYWORD_ALL)}>
             <Dropdown.Toggle id="dropdown-flags" variant="secondary" className="text-left">
               <div className="status-toggle">
                 <span>{capitalize(currentStatus)}</span>
@@ -847,55 +1042,26 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     </>
   );
 
+  const isLoadingVaults = () =>
+    loading ||
+    loadingByUser ||
+    loadingByCollateral ||
+    loadingByStatus ||
+    loadingByTS ||
+    loadingInLiq ||
+    loadingTokenInLiq ||
+    filteringRatios;
+
   return (
     <div className="vault-monitoring">
-      <Accordion defaultActiveKey={isMobile ? "1" : "0"} className="diamond mb-2 totals">
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>
-            <h5>
-              <>{t("totals")}</>
-            </h5>
-          </Accordion.Header>
-          <Accordion.Body>
-            <Col md={12} className="totals-container">
-              <Col md={3} className="total-box">
-                <h6>
-                  <>{t("vaults")}</>
-                </h6>
-                <span className="number">{vaultsTotals.vaults}</span>
-              </Col>
-              <Col md={3} className="total-box">
-                <h6>
-                  <>{t("collateral")} (USD)</>
-                </h6>
-                <span className="number">${numberFormatStr(vaultsTotals.collateralUSD, 2, 2)}</span>
-              </Col>
-              <Col md={3} className="total-box">
-                <div className="debt">
-                  <h6>
-                    <>{t("debt")}</>
-                  </h6>
-                  <IndexIcon />
-                </div>
-                <span className="number">{numberFormatStr(vaultsTotals.debt, 4, 4)}</span>
-              </Col>
-              <Col md={3} className="total-box">
-                <h6>
-                  <>{t("debt")} (USD)</>
-                </h6>
-                <span className="number">${numberFormatStr(vaultsTotals.debtUSD, 2, 2)}</span>
-              </Col>
-            </Col>
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
+      <VaultsSummary vaultsTotals={vaultsTotals} />
       {!isMobile ? (
         <Card className="diamond mb-2">
           <Col md={12} className="actions">
             <RenderFilters />
           </Col>
           <Card.Body>
-            {loading || filteringRatios ? (
+            {isLoadingVaults() ? (
               <Spinner variant="danger" className="spinner" animation="border" />
             ) : (
               <Vaults
@@ -910,7 +1076,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
               />
             )}
             <Col md={12} className="pag-container">
-              {pagination.pages > 0 && !loading && (
+              {pagination.pages > 0 && !isLoadingVaults() && (
                 <VaultPagination pagination={pagination} onPageSelected={onPageSelected} />
               )}
             </Col>
