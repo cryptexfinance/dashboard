@@ -106,6 +106,7 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
   const [vaultList, setVaultList] = useState<Array<VaultsType>>([]);
   const [pagination, setPagination] = useState<PaginationType>(pagDefault);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [allVaultsFirstLoad, setAllVaultsFirstLoad] = useState(true);
   const [byCollateralFirstLoad, setByCollateralFirstLoad] = useState(true);
   const [byStatusFirstLoad, setByStatusFirstLoad] = useState(true);
   const [byTSFirstLoad, setByTSFirstLoad] = useState(true);
@@ -299,10 +300,12 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
       const itemsCount = vData.length;
       const pages = Math.ceil(itemsCount / itemsPerPage);
       const lastDataPage = Math.ceil(itemsCount / itemsPerPage);
+      const isOneFirstPage = !(loadingMore && currentStatus !== VAULT_STATUS.liquidation);
+
       const pag = {
         previous: 0,
-        current: loadingMore ? pagination.pages + 1 : 1,
-        next: loadingMore ? pagination.pages + 2 : 2,
+        current: isOneFirstPage ? 1 : pagination.pages + 1,
+        next: isOneFirstPage ? 2 : pagination.pages + 2,
         pages,
         lastDataPage,
         itemsPerPage,
@@ -370,14 +373,15 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
 
   const loadVaults = async (vaultsData: any, cStatus: string) => {
     let vData = new Array<VaultsType>();
+    let totals = { ...totalsDefault };
     let vaultsAmount = 0;
-    console.log("vaultsData: ", vaultsData.vaults.length);
+    let currentLastBlockTS = pagination.lastId;
     if (loadingMore) {
       vData = vaultList;
+      totals = vaultsTotals;
     }
 
     const vLiquidables = new Array<liqVaultsTempType>();
-    const totals = { ...totalsDefault };
     const minFilterRatio = getMinRangeRatio();
     const maxFilterRatio = getMaxRangeRatio();
 
@@ -451,6 +455,8 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
             totals.debtUSD = (parseFloat(totals.debtUSD) + debtUSD).toFixed(2);
           }
         }
+
+        currentLastBlockTS = v.blockTS;
       }
     });
 
@@ -483,6 +489,20 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
     confPagination(vData, pagination.itemsPerPage, vaultsAmount);
     setFilteringRatios(false);
     setLoadingMore(false);
+
+    if (cStatus === VAULT_STATUS.liquidation) {
+      if (vaultsData.vaults.length >= 1000) {
+        const lastVId = currentLastBlockTS;
+        setLoadingMore(true);
+        if (tokenSymbol !== KEYWORD_ALL) {
+          // eslint-disable-next-line no-use-before-define
+          refetchTokenInLiq({ lastBlockTS: lastVId, symbol: tokenSymbol });
+        } else {
+          // eslint-disable-next-line no-use-before-define
+          refetchInLiq({ lastBlockTS: lastVId });
+        }
+      }
+    }
   };
 
   // Graphql queries
@@ -659,19 +679,14 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
     confPagination(vaultList, parseInt(number), vaultsTotals.vaults);
   };
 
-  const handleVaultOwnerFilterChange = (value: string) => {
-    setCurrentOwnerFilter(vaultsOwnerFilter[parseInt(value)]);
-    if (value === "0") {
-      setPagination(pagDefault);
-      loadVaultData();
-    } else {
-      loadVaulsByUser();
-    }
-  };
-
   const handleFiltersChange = (newStatus: string, newToken: string) => {
     if (newStatus === KEYWORD_ALL && newToken === KEYWORD_ALL) {
-      refetchVaults({ lastBlockTS: "0" });
+      if (allVaultsFirstLoad) {
+        setAllVaultsFirstLoad(false);
+        loadVaultData();
+      } else {
+        refetchVaults({ lastBlockTS: "0" });
+      }
     } else if (newStatus === VAULT_STATUS.liquidation) {
       if (newToken !== KEYWORD_ALL) {
         if (byTokenInLiqFirstLoad) {
@@ -710,6 +725,16 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
     }
   };
 
+  const handleVaultOwnerFilterChange = (value: string) => {
+    setCurrentOwnerFilter(vaultsOwnerFilter[parseInt(value)]);
+    if (value === "0") {
+      setPagination(pagDefault);
+      handleFiltersChange(currentStatus, tokenSymbol);
+    } else {
+      loadVaulsByUser();
+    }
+  };
+
   const handleStatusChange = (newStatus: string) => {
     setCurrentStatus(newStatus);
     if (isMyVaults()) {
@@ -722,10 +747,8 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
   const handleTokenChange = (newToken: string) => {
     setTokenSymbol(newToken);
     if (isMyVaults()) {
-      console.log("Entra aqui myyvaults ");
       loadVaulsByUser();
     } else {
-      console.log("Entra aqui: ", newToken);
       handleFiltersChange(currentStatus, newToken);
     }
   };
@@ -1053,7 +1076,7 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
               />
             )}
             <Col md={12} className="pag-container">
-              {pagination.pages > 0 && !loading && (
+              {pagination.pages > 0 && !isLoadingVaults() && (
                 <VaultPagination pagination={pagination} onPageSelected={onPageSelected} />
               )}
             </Col>

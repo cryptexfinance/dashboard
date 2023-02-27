@@ -118,11 +118,12 @@ export const VAULTS_BY_TOKEN_STATUS = gql`
 `;
 
 export const VAULTS_IN_LIQ = gql`
-  query VAULTS_BY_TS($lastBlockTS: String!) {
+  query VAULTS_IN_LIQ($lastBlockTS: String!) {
     vaults(
       first: 1000
       orderBy: blockTS
-      where: { blockTS_gt: $lastBlockTS, status: "active", debt_gt: 100000000 }
+      orderDirection: asc
+      where: { blockTS_gt: $lastBlockTS, status: "active", debt_gt: 1000000000000000 }
     ) {
       id
       vaultId
@@ -144,15 +145,16 @@ export const VAULTS_IN_LIQ = gql`
 `;
 
 export const VAULTS_IN_LIQ_BY_TOKEN = gql`
-  query VAULTS_BY_TS($lastBlockTS: String!, $symbol: String!) {
+  query VAULTS_IN_LIQ_BY_TOKEN($lastBlockTS: String!, $symbol: String!) {
     vaults(
       first: 1000
       orderBy: blockTS
+      orderDirection: asc
       where: {
         blockTS_gt: $lastBlockTS
         tokenSymbol: $symbol
         status: "active"
-        debt_gt: 100000000
+        debt_gt: 1000000000000000
       }
     ) {
       id
