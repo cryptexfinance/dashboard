@@ -8,6 +8,8 @@ export type PaginationType = {
   lastDataPage: number;
   itemsPerPage: number;
   itemsCount: number;
+  totalItems: number;
+  totalPages: number;
   lastId: string;
 };
 
