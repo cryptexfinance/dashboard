@@ -218,7 +218,6 @@ const Rewards = ({
             const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
             position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
           } else if (stakesEth.liquidity > BigNumber.from("0")) {
-            console.log("Entra incentive 0");
             position.status = StakeStatus.staked;
             const rewardInfoCall = await stakerContractRead?.getRewardInfo(
               ethTcapPool.incentives[0],
