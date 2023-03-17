@@ -131,9 +131,14 @@ const Rewards = ({
       if (p.poolAddress === ethTcapPool.id.toLowerCase()) {
         const position = { ...positionDefaultValues };
         const incentiveId = computeIncentiveId(ethTcapPool.incentives[0]);
+
         let incentiveIdBefore = "";
+        let incentiveIdBefore2 = "";
+        let incentiveIdBefore3 = "";
         if (ethTcapPool.incentives.length > 1) {
           incentiveIdBefore = computeIncentiveId(ethTcapPool.incentives[1]);
+          incentiveIdBefore2 = computeIncentiveId(ethTcapPool.incentives[2]);
+          incentiveIdBefore3 = computeIncentiveId(ethTcapPool.incentives[3]);
         }
         position.lpTokenId = p.id;
         position.poolId = p.poolAddress;
@@ -151,15 +156,26 @@ const Rewards = ({
         const lpDepositsCall = await stakerContractRead?.deposits(p.id);
         const lpStakesCall = await stakerContractRead?.stakes(p.id, incentiveId);
         const lpStakesCallBefore = await stakerContractRead?.stakes(p.id, incentiveIdBefore);
+        const lpStakesCallBefore2 = await stakerContractRead?.stakes(p.id, incentiveIdBefore2);
+        const lpStakesCallBefore3 = await stakerContractRead?.stakes(p.id, incentiveIdBefore3);
 
         // @ts-ignore
-        const [nfpAddress, depositsEth, stakesEth, stakesEthBefore] =
-          await signer.ethcallProvider?.all([
-            nfpCall,
-            lpDepositsCall,
-            lpStakesCall,
-            lpStakesCallBefore,
-          ]);
+        const [
+          nfpAddress,
+          depositsEth,
+          stakesEth,
+          stakesEthBefore,
+          stakesEthBefore2,
+          stakesEthBefore3,
+        ] = await signer.ethcallProvider?.all([
+          nfpCall,
+          lpDepositsCall,
+          lpStakesCall,
+          lpStakesCallBefore,
+          lpStakesCallBefore2,
+          lpStakesCallBefore3,
+        ]);
+
         if (
           depositsEth.owner === ownerAddress &&
           depositsEth.tickLower === position.tickLower &&
@@ -167,7 +183,31 @@ const Rewards = ({
         ) {
           position.status = StakeStatus.deposited;
           // Check if it is staked on the previous Incentive
-          if (stakesEthBefore.liquidity > BigNumber.from("0")) {
+          if (stakesEthBefore3.liquidity > BigNumber.from("0")) {
+            position.status = StakeStatus.staked;
+            position.incetiveId = incentiveIdBefore3;
+            position.incentiveIndex = 3;
+            const rewardInfoCall = await stakerContractRead?.getRewardInfo(
+              ethTcapPool.incentives[3],
+              p.id
+            );
+            // @ts-ignore
+            const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
+            position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
+          } else if (stakesEthBefore2.liquidity > BigNumber.from("0")) {
+            // Check if it is staked on the previous Incentive
+            position.status = StakeStatus.staked;
+            position.incetiveId = incentiveIdBefore2;
+            position.incentiveIndex = 2;
+            const rewardInfoCall = await stakerContractRead?.getRewardInfo(
+              ethTcapPool.incentives[2],
+              p.id
+            );
+            // @ts-ignore
+            const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
+            position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
+          } else if (stakesEthBefore.liquidity > BigNumber.from("0")) {
+            // Check if it is staked on the previous Incentive
             position.status = StakeStatus.staked;
             position.incetiveId = incentiveIdBefore;
             position.incentiveIndex = 1;
@@ -179,6 +219,7 @@ const Rewards = ({
             const [rewardInfo] = await signer.ethcallProvider?.all([rewardInfoCall]);
             position.reward = parseFloat(ethers.utils.formatEther(rewardInfo.reward));
           } else if (stakesEth.liquidity > BigNumber.from("0")) {
+            console.log("Entra incentive 0");
             position.status = StakeStatus.staked;
             const rewardInfoCall = await stakerContractRead?.getRewardInfo(
               ethTcapPool.incentives[0],
