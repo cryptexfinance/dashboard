@@ -97,7 +97,6 @@ const Rewards = ({
         ethTcapPool = UNIV3.mainnet.tcapPool;
         break;
     }
-    // console.log(computeIncentiveId(ethTcapPool.incentives[0]));
     setEthTcapIncentive(ethTcapPool.incentives);
 
     return ethTcapPool;
