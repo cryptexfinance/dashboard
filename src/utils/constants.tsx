@@ -95,7 +95,7 @@ export const NETWORKS = {
   },
 };
 
-export const API_ENDPOINT = "https://test-api.cryptex.finance";
+export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",

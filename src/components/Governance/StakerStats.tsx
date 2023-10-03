@@ -53,6 +53,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
             currentWaitTimeCall,
             currentPeriodEndsCall,
           ]);
+
         setTotalStaked(ethers.utils.formatEther(totalSupply));
         setStake(ethers.utils.formatEther(currentStake));
         setRewards(ethers.utils.formatEther(currentReward));
