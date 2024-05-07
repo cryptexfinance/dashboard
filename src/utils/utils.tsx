@@ -19,7 +19,6 @@ export const makeShortAddress = (address: string) => {
 export const isUndefined = (value: any): boolean => typeof value === "undefined";
 
 export const getENS = async (address: string) => {
-  console.log(" getENS ---");
   const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
     infura: process.env.REACT_APP_INFURA_ID,
     alchemy: process.env.REACT_APP_ALCHEMY_KEY,
@@ -32,8 +31,10 @@ export const getENS = async (address: string) => {
 };
 
 export const getAddressFromENS = async (ens: string) => {
-  console.log(" ENS ---");
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const address = await provider.resolveName(ens);
   if (address) {
     return address;
@@ -42,13 +43,11 @@ export const getAddressFromENS = async (ens: string) => {
 };
 
 export const getENSAvatar = async (resolver: ethers.providers.Resolver) => {
-  console.log(" ENS Avatar ---");
   const avatar = await resolver.getText("avatar");
   return avatar;
 };
 
 export const isValidAddress = async (address: string) => {
-  console.log(" isValidAddress ---");
   try {
     const currentAddress = ethers.utils.getAddress(address);
     return currentAddress;
@@ -338,7 +337,6 @@ export const getDefaultProvider = (chainId: number | undefined) => {
   } else if (chainId === NETWORKS.okovan.chainId) {
     provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
   } else if (chainId === NETWORKS.optimism.chainId) {
-    // provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OPTIMISM);
     provider = ethers.getDefaultProvider(NETWORKS.optimism.infuraRpcUrl);
   } else {
     let alchemyKey;

@@ -272,16 +272,16 @@ const Header = ({ signerAddress, isMobile }: props) => {
                   <div className="network-toggle">
                     <>
                       {isInLayer1(currentNetwork.chainId) && EthereumToggle()}
-                      {isOptimism(currentNetwork.chainId) && OptimismToggle()}
-                      {isPolygon(currentNetwork.chainId) && PolygonToggle()}
                       {isArbitrum(currentNetwork.chainId) && ArbitrumToggle()}
+                      {FEATURES.OPTIMISM && isOptimism(currentNetwork.chainId) && OptimismToggle()}
+                      {FEATURES.POLYGON && isPolygon(currentNetwork.chainId) && PolygonToggle()}
                     </>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {EthereumOpt()}
                   {ArbitrumOpt()}
-                  {OptimismOpt()}
+                  {FEATURES.OPTIMISM && OptimismOpt()}
                   {FEATURES.POLYGON && PolygonOpt()}
                 </Dropdown.Menu>
               </Dropdown>

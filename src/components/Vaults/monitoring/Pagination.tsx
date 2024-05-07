@@ -22,7 +22,11 @@ export const VaultPagination = ({ pagination, onPageSelected }: props) => {
 
     return (
       <>
-        <Pagination.Item activeLabel="" active={pagination.current === 1}>
+        <Pagination.Item
+          activeLabel=""
+          active={pagination.current === 1}
+          onClick={() => onPageSelected(1)}
+        >
           {1}
         </Pagination.Item>
         {pagination.current >= 3 && pagination.current < midPages[0] && <Pagination.Ellipsis />}
@@ -54,6 +58,9 @@ export const VaultPagination = ({ pagination, onPageSelected }: props) => {
         >
           {pagination.pages}
         </Pagination.Item>
+        {pagination.itemsCount < pagination.totalItems - 1 && (
+          <Pagination.Ellipsis onClick={() => onPageSelected(pagination.pages + 1)} />
+        )}
       </>
     );
   };
@@ -86,7 +93,11 @@ export const VaultPagination = ({ pagination, onPageSelected }: props) => {
       />
       {pagination.pages >= 10 && (
         <Pagination.Last
-          onClick={() => onPageSelected(pagination.pages)}
+          onClick={() =>
+            onPageSelected(
+              pagination.pages < pagination.totalPages ? pagination.pages + 1 : pagination.pages
+            )
+          }
           disabled={pagination.next === 0}
         />
       )}

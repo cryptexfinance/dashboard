@@ -12,11 +12,28 @@
   margin-left: -1.5rem;
 
   .alert-warning {
+    flex-direction: row;
     margin-top: 0rem;
     margin-bottom: 0rem;
     padding: 0.2rem 1rem;
     height: 2rem;
     width: 70%;
+
+    span {
+      color: $highlight;
+      margin: 0px 10px;
+    }
+    span:hover {
+      cursor: pointer;
+    }
+    .question-small {
+      margin-top: -3px;
+    }
+  }
+
+  .alert-inside {
+    margin-top: -2rem;
+    margin-bottom: 2rem;
   }
 
   .btn-dark  {
@@ -30,7 +47,7 @@
   .vault-container {
     display: flex;
     flex-direction: column;
-    margin-top: 4rem;
+    margin-top: 3rem;
     width: 38%;
     background-color: $darker;
   }
@@ -76,15 +93,7 @@
       label {
         font-family: "Nineteen Ninety Seven";
         color: $white;
-      }
-
-      .text-muted {
-        position: absolute;
-        text-align: left;
-        font-size: .9rem;
-        margin-top: -1.7rem;
-        padding-left: 1rem;
-      }
+      }      
 
       .form-group {
         .burn-fee2 {
@@ -93,9 +102,22 @@
       }
 
       .input-group {
+        position: relative;
         background-color: #281e31;
         border: 1px solid $dark;
         border-radius: 5px;
+        
+        .text-muted {
+          position: absolute;
+          text-align: left;
+          font-size: .9rem;
+          padding-left: 1rem;
+          z-index: 1;
+          height: 100%;
+          display: flex;
+          align-items: flex-end;
+          padding-bottom: 0.58rem;
+        }
 
         input[type="number"] {
           font-size: 1.3rem;
@@ -105,6 +127,7 @@
           border-color: transparent;
           color: $white;
           height: 4.1rem;
+          z-index: 2;
         }
 
         .btn {
@@ -609,9 +632,15 @@
     }
   }
 
-  @media (max-width: 1400px) {
+  @media (max-width: 1500px) {
     .vault-container {
       width: 43%;
+    }
+  }
+
+  @media (max-width: 1400px) {
+    .vault-container {
+      width: 51%;
     }
   }
 
@@ -708,10 +737,7 @@
             width: 6.2rem;
             font-size: 0.9rem;
           }
-        }
-        .text-muted {
-          position: relative;
-        }        
+        }       
       }      
     }    
   }

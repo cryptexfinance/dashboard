@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export const NETWORKS = {
   mainnet: {
     chainId: 1,
@@ -93,7 +95,7 @@ export const NETWORKS = {
   },
 };
 
-export const API_ENDPOINT = "https://test-api.cryptex.finance";
+export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
   mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
@@ -114,7 +116,7 @@ export const OS_API_URL = {
 export const FEATURES = {
   KEEPERS_API: true,
   NEW_VAULTS: true,
-  OPTIMISM: true,
+  OPTIMISM: false,
   POLYGON: false,
 };
 
@@ -132,3 +134,5 @@ export const TOKENS_SYMBOLS = {
   WETH: "WETH",
   WBTC: "WBTC",
 };
+
+export const BIG_NUMBER_ZERO = BigNumber.from("0");

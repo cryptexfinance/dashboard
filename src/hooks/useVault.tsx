@@ -114,8 +114,13 @@ export const useVault = (
         cOracleRead = oracles.maticOracleRead;
         break;
       case TOKENS_SYMBOLS.WBTC:
-        cVault = vaults.wbtcVault;
-        cVaultRead = vaults.wbtcVaultRead;
+        if (isHardVault) {
+          cVault = hardVaults.wbtcVault;
+          cVaultRead = hardVaults.wbtcVaultRead;
+        } else {
+          cVault = vaults.wbtcVault;
+          cVaultRead = vaults.wbtcVaultRead;
+        }
         cCollateral = tokens.wbtcToken;
         cCollateralRead = tokens.wbtcTokenRead;
         cOracleRead = oracles.wbtcOracleRead;
@@ -167,7 +172,6 @@ export const useVault = (
         validVaults(currentNetwork.chainId || NETWORKS.mainnet.chainId, vaults) &&
         validHardVaults(currentNetwork.chainId || NETWORKS.mainnet.chainId, hardVaults)
       ) {
-        console.log("loadingVault: ", loadingVault);
         setLoadingVault(true);
         await loadContracts();
         setLoadingVault(false);

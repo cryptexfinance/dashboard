@@ -146,13 +146,17 @@ export const VaultsMobile = ({
                 </div>
                 <div className="values status">
                   <h5 className="number empty">
-                    <NumberFormat
-                      value={v.ratio}
-                      displayType="text"
-                      thousandSeparator
-                      decimalScale={2}
-                      suffix="%"
-                    />
+                    {v.ratio < 1000000 ? (
+                      <NumberFormat
+                        value={v.ratio}
+                        displayType="text"
+                        thousandSeparator
+                        decimalScale={2}
+                        suffix="%"
+                      />
+                    ) : (
+                      <span>{v.ratio.toExponential(1)}%</span>
+                    )}
                   </h5>
                   <span className={v.status}>{capitalize(v.status)}</span>
                 </div>

@@ -284,6 +284,9 @@ span {
         td.go-to-vault {
           text-align: center;
         }
+        .has-tooltip {
+          cursor: pointer;  
+        }
         .collateral{
           display: flex;
           flex-direction: row;

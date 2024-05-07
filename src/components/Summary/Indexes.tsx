@@ -93,7 +93,7 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
             <IndexIcon />
             <div className="staked">
               <h6>
-                <>{t("welcome.tcap")}</>
+                {!isArbitrum(currentChainId) ? <>{t("welcome.tcap")}</> : <>{t("welcome.jpegz")}</>}
               </h6>
               <h5 className="number neon-blue">
                 <NumberFormat

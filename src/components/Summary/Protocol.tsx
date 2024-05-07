@@ -44,7 +44,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
   const [uniStake, setUNIStake] = useState("0");
   const [wbtcStake, setWBTCStake] = useState("0");
   const [usdcStake, setUSDCStake] = useState("0");
-  const [TotalStake, setTotalStake] = useState("0");
+  const [totalStake, setTotalStake] = useState("0");
 
   const VAULTS_STATE = gql`
     {
@@ -207,7 +207,6 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
         toUSD(prices.wbtcOraclePrice, formatWBTC) +
         toUSD(prices.usdcOraclePrice, formatUSDC);
       setTotalStake(totalUSD.toString());
-      // setTotalSupply(ethers.utils.formatEther(currentTotalSupply));
     }
   };
 
@@ -249,7 +248,7 @@ const Protocol = ({ currentChainId, ethCallProvider, prices }: props) => {
               </h6>
               <h5 className="number neon-blue">
                 <NumberFormat
-                  value={TotalStake}
+                  value={totalStake}
                   displayType="text"
                   thousandSeparator
                   decimalScale={2}

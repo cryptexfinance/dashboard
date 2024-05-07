@@ -215,17 +215,20 @@ const KeeperForm = ({
   const isImageValid = (value: File | null): boolean => {
     if (value === null) {
       if (isNew) {
-        setImageError(t("errors.empty"));
+        // setImageError(t("errors.empty"));
+        errorNotification(t("errors.empty"));
       }
       return !isNew;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
-      setImageError(t("errors.invalid-file-type"));
+      // setImageError(t("errors.invalid-file-type"));
+      errorNotification(t("errors.invalid-file-type"));
       return false;
     }
     const maxSize = 250000;
     if (value.size > maxSize) {
-      setImageError(t("errors.invalid-image-size", { size: Math.round(maxSize / 1000) }));
+      errorNotification(t("errors.invalid-image-size", { size: Math.round(maxSize / 1000) }));
+      // setImageError(t("errors.invalid-image-size", { size: Math.round(maxSize / 1000) }));
       setImageUrl("");
       return false;
     }
@@ -420,7 +423,7 @@ const KeeperForm = ({
               />
               <Form.Text className="field-error">{imageError}</Form.Text>
             </Col>
-            <Col sm={12} md={8} lg={8}>
+            <Col sm={12} md={8} lg={8} className="keeper-names">
               <Col sm={12} md={12} lg={12}>
                 <Form.Group className="" controlId="">
                   <Form.Control

@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import Monitoring from "./monitoring";
+import Monitoring from "./monitoring/index";
+import MonitoringArb from "./monitoring/index2";
 import Vault from "./vault/index";
-import { signerContext } from "../../state";
+import { signerContext, networkContext } from "../../state";
 import { VaultToUpdateType } from "./types";
+import { isArbitrum } from "../../utils/utils";
 
 const Vaults = () => {
   const signer = useContext(signerContext);
+  const currentNetwork = useContext(networkContext);
   const [currentAddress, setCurrentAddress] = useState("");
   const [isMinting, setMinting] = useState(false);
   const [currrentVault, setCurrentVault] = useState({
@@ -53,7 +56,11 @@ const Vaults = () => {
 
   return (
     <>
-      <Monitoring setVaultToUpdate={setVaultToUpdate} />
+      {!isArbitrum(currentNetwork.chainId) ? (
+        <Monitoring setVaultToUpdate={setVaultToUpdate} />
+      ) : (
+        <MonitoringArb setVaultToUpdate={setVaultToUpdate} currentAddress={currentAddress} />
+      )}
     </>
   );
 };

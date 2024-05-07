@@ -52,11 +52,11 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     liqVault ? liqVault.isHardVault : true
   );
 
-  const [assetBalance, setAssetBalance] = useState("0");
-  const [assetPrice, setAssetPrice] = useState("0");
-  const [requiredTcap, setRequiredTcap] = useState("0");
-  const [maxTcap, setMaxTcap] = useState("0");
-  const [maxTcapUSD, setMaxTcapUSD] = useState("0");
+  const [indexBalance, setIndexBalance] = useState("0");
+  const [indexPrice, setIndexPrice] = useState("0");
+  const [requiredIndex, setRequiredIndex] = useState("0");
+  const [maxIndex, setMaxIndex] = useState("0");
+  const [maxIndexUSD, setMaxIndexUSD] = useState("0");
   const [reward, setReward] = useState("0");
   const [rewardUSD, setRewardUSD] = useState("0");
   const [burnFee, setBurnFee] = useState("0");
@@ -97,22 +97,25 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               ]);
             const assetBalanceText = ethers.utils.formatEther(balance);
             const assetPriceText = ethers.utils.formatEther(assetOraclePrice);
-            const reqTcapText = ethers.utils.formatEther(reqTcap);
+            const reqIndexText = ethers.utils.formatEther(reqTcap);
             const liqRewardText = ethers.utils.formatUnits(liqReward, liqVault.decimals);
             const priceText = ethers.utils.formatEther(collateralPrice.mul(10000000000));
             const ethPriceText = ethers.utils.formatEther(ethPrice.mul(10000000000));
-            const currentLiqFee = await currentVault?.getFee(reqTcap);
+            let currentLiqFee;
+            if (isArbitrum(currentNetwork.chainId)) {
+              currentLiqFee = await currentVault?.getBurnFee(reqTcap);
+            } else {
+              currentLiqFee = await currentVault?.getFee(reqTcap);
+            }
+
             const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
             const ethFee = ethers.utils.formatEther(increasedFee);
 
-            console.log("ASSE: ", currentVaultRead);
-            console.log("REQ: ", reqTcapText);
-
-            setAssetBalance(assetBalanceText);
-            setAssetPrice(assetPriceText);
-            setRequiredTcap(reqTcapText);
-            setMaxTcap(reqTcapText);
-            setMaxTcapUSD(toUSD(reqTcapText, assetPriceText).toFixed(2));
+            setIndexBalance(assetBalanceText);
+            setIndexPrice(assetPriceText);
+            setRequiredIndex(reqIndexText);
+            setMaxIndex(reqIndexText);
+            setMaxIndexUSD(toUSD(reqIndexText, assetPriceText).toFixed(2));
             setReward(liqRewardText);
             setRewardUSD(toUSD(liqRewardText, priceText).toFixed(2));
             setBurnFee(ethFee);
@@ -132,14 +135,14 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
   }, [currentAddress, liqVault, currentVaultRead, currentAssetOracleRead]);
 
   const onChangeMaxTcap = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxTcap(event.target.value);
-    setMaxTcapUSD(toUSD(event.target.value, assetPrice).toFixed(2));
+    setMaxIndex(event.target.value);
+    setMaxIndexUSD(toUSD(event.target.value, indexPrice).toFixed(2));
   };
 
-  const minTcap = async (e: React.MouseEvent) => {
+  const minIndex = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setMaxTcap(requiredTcap);
-    setMaxTcapUSD(toUSD(requiredTcap, assetPrice).toFixed(2));
+    setMaxIndex(requiredIndex);
+    setMaxIndexUSD(toUSD(requiredIndex, indexPrice).toFixed(2));
   };
 
   const loadVaultData = async () => {
@@ -153,25 +156,30 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     event.preventDefault();
     if (currentAddress && liqVault !== null && canLiquidate && currentVault) {
       setCanLiquidate(false);
-      const maxAmountTcap = parseFloat(maxTcap);
-      if (maxTcap && maxAmountTcap > 0) {
-        if (maxAmountTcap >= parseFloat(requiredTcap)) {
-          if (maxAmountTcap <= parseFloat(assetBalance)) {
+      const maxAmountIndex = parseFloat(maxIndex);
+      if (maxIndex && maxAmountIndex > 0) {
+        if (maxAmountIndex >= parseFloat(requiredIndex)) {
+          if (maxAmountIndex <= parseFloat(indexBalance)) {
             try {
-              const currentLiqFee = await currentVault?.getFee(
-                ethers.utils.parseEther(requiredTcap)
-              );
+              let currentLiqFee;
+              if (isArbitrum(currentNetwork.chainId)) {
+                currentLiqFee = await currentVault?.getBurnFee(
+                  ethers.utils.parseEther(requiredIndex)
+                );
+              } else {
+                currentLiqFee = await currentVault?.getFee(ethers.utils.parseEther(requiredIndex));
+              }
               const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
               const ethFee = ethers.utils.formatEther(increasedFee);
               setBurnFee(ethFee);
               const tx = await currentVault.liquidateVault(
                 BigNumber.from(liqVault.id),
-                ethers.utils.parseEther(maxTcap),
+                ethers.utils.parseEther(maxIndex),
                 { value: increasedFee }
               );
               notifyUser(tx, loadVaultData);
               await loadVaultData();
-              setMaxTcap("");
+              setMaxIndex("");
               onHide();
             } catch (error) {
               errorNotification("Burn fee less than required.");
@@ -189,7 +197,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
     }
   };
 
-  const netReward = parseFloat(rewardUSD) - parseFloat(maxTcapUSD) - parseFloat(burnFeeUsd);
+  const netReward = parseFloat(rewardUSD) - parseFloat(maxIndexUSD) - parseFloat(burnFeeUsd);
 
   const getTokeSymbol = () => {
     if (liqVault !== null) {
@@ -246,8 +254,8 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
       aria-labelledby="contained-modal-title-vcenter"
       centered
       onHide={() => {
-        setMaxTcap("0");
-        setMaxTcapUSD("0");
+        setMaxIndex("0");
+        setMaxIndexUSD("0");
         onHide();
       }}
     >
@@ -261,9 +269,16 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
         <Form>
           <Form.Group className="" controlId="">
             <>
-              <Form.Label>{isMobile ? "Amount" : <>{t("amount-tcap")}</>}</Form.Label>
+              {isMobile ? (
+                <Form.Label>Amount</Form.Label>
+              ) : (
+                <Form.Label>
+                  Amount of{" "}
+                  {isArbitrum(currentNetwork.chainId) ? TOKENS_SYMBOLS.JPEGz : TOKENS_SYMBOLS.TCAP}
+                </Form.Label>
+              )}
               <Form.Label className="max">
-                <a href="/" className="number" onClick={minTcap}>
+                <a href="/" className="number" onClick={minIndex}>
                   MIN REQUIRED
                 </a>
               </Form.Label>
@@ -272,13 +287,13 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                   type="text"
                   placeholder="0"
                   className="neon-green"
-                  value={maxTcap}
+                  value={maxIndex}
                   onChange={onChangeMaxTcap}
                 />
                 <Form.Text className="text-muted">
                   <NumberFormat
                     className="number"
-                    value={maxTcapUSD}
+                    value={maxIndexUSD}
                     displayType="text"
                     thousandSeparator
                     prefix="$"
@@ -336,7 +351,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
             </thead>
             <tbody>
               <td>${numberFormatStr(rewardUSD, 2, 2)}</td>
-              <td>${numberFormatStr(maxTcapUSD, 2, 2)}</td>
+              <td>${numberFormatStr(maxIndexUSD, 2, 2)}</td>
               <td>${numberFormatStr(burnFeeUsd, 2, 2)}</td>
               <td className="net-reward">${numberFormatStr(netReward.toFixed(2), 2, 2)}</td>
             </tbody>
@@ -355,7 +370,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
                 <>{t("required-tcap", { indexName })}</>
                 {helpToolTip(1)}
               </div>
-              <div className="value">${numberFormatStr(maxTcapUSD, 2, 2)}</div>
+              <div className="value">${numberFormatStr(maxIndexUSD, 2, 2)}</div>
             </div>
             <div className="box">
               <div className="title">Burn Fee</div>

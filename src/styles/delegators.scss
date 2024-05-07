@@ -30,7 +30,7 @@
     @media (min-width: 1700px) {
       grid-template-columns: auto auto auto;
     }
-    @media (max-width: 450px) {
+    @media (max-width: 900px) {
       grid-template-columns: auto;
     }
   }
@@ -406,6 +406,85 @@
       }
     }
   }
+
+  @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .staker-wrapper {
+      width: 90%;
+      padding-left: 0rem;
+    }
+    .keepers-options {
+      width: 90%;
+    }
+    .grid {
+      justify-items: center;
+    }
+    .card {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .card {
+      width: 100%;
+    }
+    
+    .staker-wrapper {
+      width: 100%;
+      .staker {
+        width: 100%;
+      }
+    }
+
+    .keepers-options {
+      width: 100%;
+    }
+
+    .stake-reward-mobile {
+      h2 {
+        margin-bottom: 0rem;
+      }
+      .btn {
+        width: 100%;
+        margin-left: 0rem !important;
+        margin-top: 1rem;
+      }
+      .accordion-button::after {
+        margin-top: 0.2rem;
+      }
+      .accordion-body {
+        margin-top: 2rem;
+      }
+    }
+
+    .keepers-options {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .search-box {
+        width: 100%;
+        margin-bottom: 1.5rem;
+
+        .sort-box {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+        }
+        .titles {
+          width: 35%;
+        }
+        .dropdown {
+          width: 80%;
+        }
+      }
+
+      .create {
+        width: 100%;
+      }      
+    }
+  }
 }
 
 .cryptkeeper-form {
@@ -420,6 +499,20 @@
       border-radius: 50%;
       width: 120px;
       height: 120px;
+    }
+  }
+
+  @media (max-width: 600px) { 
+    .image-group {
+      margin-bottom: 2rem !important;
+
+      .keeper-names {
+        width: 30rem;        
+      }
+      
+      a {
+        margin-left: 0rem !important;
+      }
     }
   }
 }

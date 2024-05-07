@@ -48,6 +48,8 @@ const pagDefault = {
   lastDataPage: 0,
   itemsPerPage: 10,
   itemsCount: 0,
+  totalItems: 0,
+  totalPages: 0,
   lastId: "0",
 };
 
@@ -71,6 +73,7 @@ type props = {
 };
 
 const showAllVaults = true;
+const MAX_RANGE_LIMIT = Number.MAX_VALUE;
 
 const Monitoring = ({ setVaultToUpdate }: props) => {
   const { t } = useTranslation();
@@ -99,7 +102,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   const [currentStatus, setCurrentStatus] = useState("all");
   const [vaultMode, setVaultMode] = useState("all");
   const [currentMinRatio, setCurrentMinRatio] = useState("0%");
-  const [currentMaxRatio, setCurrentMaxRatio] = useState("5000%");
+  const [currentMaxRatio, setCurrentMaxRatio] = useState("MAX");
   const [renderTable, setRenderTable] = useState(false);
   const ratioRangeDropdown = useRef(null);
   const minRatioInput = useRef(null);
@@ -126,7 +129,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
   ];
 
   const buildFilters = () => {
-    const weiLimit = "100000000";
+    const weiLimit = "0";
     let filter = "";
     let ownerFilter = "";
     let vaultFilter = "";
@@ -141,10 +144,10 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     }
     if (currentStatus !== "all") {
       if (currentStatus === "empty") {
-        statusFilter = `collateral_lt: "${weiLimit}"`;
+        statusFilter = `collateral: "${weiLimit}"`;
       }
       if (currentStatus === "ready") {
-        statusFilter = `collateral_gte: "${weiLimit}", debt_lt: "${weiLimit}"`;
+        statusFilter = `collateral_gt: "${weiLimit}", debt: "${weiLimit}"`;
       }
       if (currentStatus === VAULT_STATUS.active || currentStatus === VAULT_STATUS.liquidation) {
         statusFilter = `debt_gt: "${weiLimit}"`;
@@ -226,8 +229,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       if (isValidRatio(maxRatio)) {
         return parseFloat(maxRatio);
       }
+      return MAX_RANGE_LIMIT;
     }
-    return 5000;
+    return MAX_RANGE_LIMIT;
   };
 
   const calculateNetRewardUsd = async (
@@ -246,7 +250,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
       }
 
       switch (vaultType) {
-        case "DAI":
+        case TOKENS_SYMBOLS.DAI:
           if (isHardVault) {
             cVault = hardVaults.daiVault;
             cVaultRead = hardVaults.daiVaultRead;
@@ -255,31 +259,31 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
             cVaultRead = vaults.daiVaultRead;
           }
           break;
-        case "AAVE":
+        case TOKENS_SYMBOLS.AAVE:
           cVault = vaults.aaveVault;
           cVaultRead = vaults.aaveVaultRead;
           break;
-        case "LINK":
+        case TOKENS_SYMBOLS.LINK:
           cVault = vaults.linkVault;
           cVaultRead = vaults.linkVaultRead;
           break;
-        case "SNX":
+        case TOKENS_SYMBOLS.SNX:
           cVault = vaults.snxVault;
           cVaultRead = vaults.snxVaultRead;
           break;
-        case "UNI":
+        case TOKENS_SYMBOLS.UNI:
           cVault = vaults.uniVault;
           cVaultRead = vaults.uniVaultRead;
           break;
-        case "MATIC":
+        case TOKENS_SYMBOLS.MATIC:
           cVault = vaults.maticVault;
           cVaultRead = vaults.maticVaultRead;
           break;
-        case "WBTC":
+        case TOKENS_SYMBOLS.WBTC:
           cVault = vaults.wbtcVault;
           cVaultRead = vaults.wbtcVaultRead;
           break;
-        case "USDC":
+        case TOKENS_SYMBOLS.USDC:
           cVault = hardVaults.usdcVault;
           cVaultRead = hardVaults.usdcVaultRead;
           break;
@@ -301,7 +305,12 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
 
       const reqTcapText = ethers.utils.formatEther(reqTcap);
       const liqRewardText = ethers.utils.formatUnits(liqReward, decimals);
-      const currentLiqFee = await cVault?.getFee(reqTcap);
+      let currentLiqFee;
+      if (isArbitrum(currentNetwork.chainId)) {
+        currentLiqFee = await cVault?.getBurnFee(reqTcap);
+      } else {
+        currentLiqFee = await cVault?.getFee(reqTcap);
+      }
       const increasedFee = currentLiqFee.add(currentLiqFee.div(100)).toString();
       const ethFee = ethers.utils.formatEther(increasedFee);
 
@@ -337,9 +346,9 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
     const ratio = getRatio2(collateralText, collateralPrice, debtText, indexPrice || "1");
 
     let status = VAULT_STATUS.liquidation;
-    if (parseFloat(collateralText) < 0.0000000001) {
+    if (parseFloat(collateralText) === 0) {
       status = VAULT_STATUS.empty;
-    } else if (parseFloat(collateralText) >= 0.0000000001 && parseFloat(debtText) < 0.0000000001) {
+    } else if (parseFloat(collateralText) > 0 && parseFloat(debtText) <= 0) {
       status = VAULT_STATUS.ready;
     } else if (ratio >= minRatio) {
       status = VAULT_STATUS.active;
@@ -361,6 +370,8 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         lastDataPage,
         itemsPerPage,
         itemsCount,
+        totalItems: itemsCount,
+        totalPages: pages,
         lastId: lastVaultId,
       };
       setPagination(pag);
@@ -398,7 +409,12 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         addVault = v.tokenSymbol === TOKENS_SYMBOLS.WETH || v.tokenSymbol === TOKENS_SYMBOLS.DAI;
       }
 
-      if (addVault && v.tokenSymbol !== TOKENS_SYMBOLS.WBTC) {
+      // show only wbtc hard vaults
+      if (v.tokenSymbol === TOKENS_SYMBOLS.WBTC) {
+        addVault = addVault && v.hardVault;
+      }
+
+      if (addVault) {
         let vaultUrl = "";
         const symbol = v.tokenSymbol === TOKENS_SYMBOLS.WETH ? TOKENS_SYMBOLS.ETH : v.tokenSymbol;
         if (v.owner.toLowerCase() === currentAddress.toLowerCase()) {
@@ -510,6 +526,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
         symbols.push({ key: "link", name: TOKENS_SYMBOLS.LINK });
         symbols.push({ key: "usdc", name: TOKENS_SYMBOLS.USDC });
       }
+      symbols.push({ key: "wbtc", name: TOKENS_SYMBOLS.WBTC });
     } else if (isArbitrum(currentNetwork.chainId)) {
       symbols.push({ key: "weth", name: TOKENS_SYMBOLS.ETH });
       symbols.push({ key: "dai", name: TOKENS_SYMBOLS.DAI });
@@ -773,7 +790,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                 </span>
               </div>
             </Dropdown.Toggle>
-            <Dropdown.Menu className="ratio-range-menu">
+            <Dropdown.Menu className="ratio-range-menu" rootCloseEvent="click">
               <div className="range-container">
                 <Form.Control
                   type="number"
@@ -787,7 +804,7 @@ const Monitoring = ({ setVaultToUpdate }: props) => {
                   type="number"
                   placeholder=""
                   className="neon-green"
-                  defaultValue="5000"
+                  defaultValue=""
                   ref={maxRatioInput}
                 />
               </div>
