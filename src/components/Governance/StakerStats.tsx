@@ -32,15 +32,25 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
   useEffect(() => {
     async function load() {
       let currentWT = waitTime;
-      if (signer.signer && isInLayer1(currentNetwork.chainId) && governance.delegatorFactoryRead) {
-        const currentSignerAddress = await signer.signer.getAddress();
+      if (
+        signer.ethcallProvider &&
+        isInLayer1(currentNetwork.chainId) &&
+        governance.delegatorFactoryRead
+      ) {
+        let currentSignerAddress = "0x0000000000000000000000000000000000000000";
+        if (signer.signer) {
+          currentSignerAddress = await signer.signer.getAddress();
+        }
+
         const totalSupplyCall = await governance.delegatorFactoryRead?.totalSupply();
+
         const currentStakeCall = await governance.delegatorFactoryRead?.balanceOf(
           currentSignerAddress
         );
         const currentRewardCall = await governance.delegatorFactoryRead?.earned(
           currentSignerAddress
         );
+
         const currentWaitTimeCall = await governance.delegatorFactoryRead?.waitTime();
         const currentPeriodEndsCall = await governance.delegatorFactoryRead?.periodFinish();
 
@@ -59,6 +69,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
         setRewards(ethers.utils.formatEther(currentReward));
         currentWT = parseInt(currentWaitTime.toString());
         setWaitTime(currentWT);
+
         setPeriodEnds(new Date(currentPeriodEnds.toNumber() * 1000));
       }
     }
