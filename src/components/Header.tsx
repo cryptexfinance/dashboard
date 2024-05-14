@@ -7,7 +7,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { useTranslation } from "react-i18next";
 import "../styles/header.scss";
 import Davatar from "@davatar/react";
-import { networkContext, signerContext, Web3ModalContext } from "../state";
+import { networkContext, signerContext } from "../state";
 import {
   makeShortAddress,
   getENS,
@@ -33,7 +33,6 @@ type props = {
 
 const Header = ({ signerAddress, isMobile }: props) => {
   const { t } = useTranslation();
-  const web3Modal = useContext(Web3ModalContext);
   const signer = useContext(signerContext);
   const currentNetwork = useContext(networkContext);
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
@@ -302,21 +301,12 @@ const Header = ({ signerAddress, isMobile }: props) => {
                 </OverlayTrigger>
               </h5>
             </div>
-            <Button
-              className="logout"
-              onClick={(event) => {
-                event.preventDefault();
-                web3Modal.clearCachedProvider();
-                window.location.reload();
-              }}
-            >
-              <LogoutIcon className="logout-icon" />
-            </Button>
-            {/* <LangDropDown className="btn-language small" /> */}
+            <w3m-button />
           </div>
         </>
       ) : (
         <>
+          {/* <w3m-button />
           <Button
             variant="pink"
             className="neon-pink btn-connect"
@@ -325,8 +315,7 @@ const Header = ({ signerAddress, isMobile }: props) => {
             }}
           >
             <>{t("connect")}</>
-          </Button>
-          {/* <LangDropDown className="btn-language" /> */}
+          </Button> */}
         </>
       )}
     </Nav>

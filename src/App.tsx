@@ -5,7 +5,8 @@ import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-import { getProviderInfo } from "web3modal";
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react'
+
 import "./i18n";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/toast.scss";
@@ -33,7 +34,6 @@ import {
   signerContext,
   tokensContext,
   vaultsContext,
-  Web3ModalContext,
 } from "./state";
 import cryptexJson from "./contracts/cryptex.json";
 import ERC20 from "./contracts/ERC20.json";
@@ -58,9 +58,48 @@ const clientOracle = (graphqlEndpoint: string) =>
     cache: new InMemoryCache(),
   });
 
+
+const projectId = process.env.REACT_APP_WALLET_CONNECT_ID || "";
+
+const mainnet = {
+  chainId: 1,
+  name: 'Ethereum',
+  currency: 'ETH',
+  explorerUrl: 'https://etherscan.io',
+  rpcUrl: 'https://cloudflare-eth.com'
+}
+
+const arbitrum = {
+  chainId: 42161,
+  name: 'Arbitrum One',
+  currency: 'ETH',
+  explorerUrl: 'https://arbiscan.io/',
+  rpcUrl: 'https://arb1.arbitrum.io/'
+}
+
+const metadata = {
+  name: 'Cryptex Finance V1',
+  description: 'Building innovative, open-source index tokens that empower the crypto and NFT community.',
+  url: 'https://cryptex.finance/', // origin must match your domain & subdomain
+  icons: ['https://avatars.mywebsite.com/']
+}
+
+/*
+const ethersConfig = defaultConfig({
+  metadata,
+  defaultChainId: 1, // used for the Coinbase SDK
+})
+
+createWeb3Modal({
+  ethersConfig,
+  chains: [mainnet, arbitrum],
+  projectId,
+  enableAnalytics: true // Optional - defaults to your Cloud configuration
+})  
+*/
+
 const App = () => {
   const signer = hooks.useSigner();
-  const web3Modal = useContext(Web3ModalContext);
   const [isLoadingContracts, setLoadingContracts] = useState(false);
   const [invalidNetwork, setInvalidNetwork] = useState(false);
   const isMobile = useMediaQuery("only screen and (max-width: 600px)");
@@ -888,7 +927,7 @@ const App = () => {
     }
   };
 
-  web3Modal.on("connect", async (networkProvider) => {
+  /* web3Modal.on("connect", async (networkProvider) => {
     setLoadingContracts(true);
     const currentProvider = new ethers.providers.Web3Provider(networkProvider);
     const network = await currentProvider.getNetwork();
@@ -934,13 +973,14 @@ const App = () => {
     }
 
     setLoadingContracts(false);
-  });
+  }); */
 
   useEffect(() => {
     async function loadProvider() {
-      if (web3Modal.cachedProvider && !signer.signer) {
+      // if (web3Modal.cachedProvider && !signer.signer) {
+      if (!signer.signer) {  
         if (!isLoadingContracts) {
-          await web3Modal.connect();
+          // await web3Modal.connect();
         }
       } else {
         setLoadingContracts(true);

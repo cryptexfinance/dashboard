@@ -21,5 +21,3 @@ export * from "./SignerContext";
 export * from "./TokensContext";
 
 export * from "./VaultsContext";
-
-export * from "./Web3ModalContext";
