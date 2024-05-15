@@ -121,7 +121,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
             setBurnFee(ethFee);
             setBurnFeeUsd(toUSD(ethFee, ethPriceText).toFixed(2));
             setValuesUpdated(!valuesUpdated);
-          } catch (error) {
+          } catch (error: any) {
             // Error happens when trying to calculate reward on a not liquidable vault
             if (error.code !== "UNPREDICTABLE_GAS_LIMIT") {
               console.log(error);
@@ -181,7 +181,7 @@ const Liquidate = ({ show, currentAddress, liqVault, onHide, refresh }: props) =
               await loadVaultData();
               setMaxIndex("");
               onHide();
-            } catch (error) {
+            } catch (error: any) {
               errorNotification("Burn fee less than required.");
             }
           } else {

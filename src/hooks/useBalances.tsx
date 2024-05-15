@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { Provider } from "ethers-multicall";
-import { arbitrumContext, ethereumContext, optimismContext } from "../state/index";
-import { isArbitrum, isInLayer1, isOptimism, validOracles } from "../utils/utils";
+import { arbitrumContext, ethereumContext } from "../state/index";
+import { isArbitrum, isInLayer1, validOracles } from "../utils/utils";
 import { BalancesType } from "./types";
 
 export const useBalances = (
@@ -12,7 +12,6 @@ export const useBalances = (
 ): [BalancesType, boolean] => {
   const arbitrumContracts = useContext(arbitrumContext);
   const ethereumContracts = useContext(ethereumContext);
-  const optimismContracts = useContext(optimismContext);
   const [loadingBalances, setLoadingBalances] = useState(true);
   const [balances, setBalances] = useState<BalancesType>({
     tcapBalance: "0",
@@ -60,65 +59,44 @@ export const useBalances = (
     });
   };
 
-  const loadBalanceOptimism = async () => {
-    if (optimismContracts.tcapTokenRead) {
-      const tcapBalanceCall = await optimismContracts.tcapTokenRead?.balanceOf(address);
-      const tcapSupplyBalanceCall = await optimismContracts.tcapTokenRead?.totalSupply();
-
-      // @ts-ignore
-      const [tcapBalance, tcapSupply] = await ethcallProvider?.all([
-        tcapBalanceCall,
-        tcapSupplyBalanceCall,
-      ]);
-      setBalances({
-        tcapBalance: ethers.utils.formatEther(tcapBalance),
-        jpegzBalance: "0",
-        ctxBalance: "0",
-        tcapSupplly: ethers.utils.formatEther(tcapSupply),
-        jpegzSupplly: "0",
-      });
-    }
-  };
-
   const loadBalance = async () => {
-    if (arbitrumContracts && ethereumContracts && optimismContracts) {
-      if (isArbitrum(chainId) && validOracles(chainId, arbitrumContracts)) {
-        await loadBalanceArbitrum();
+    try {
+      if (arbitrumContracts && ethereumContracts) {
+        if (isArbitrum(chainId) && validOracles(chainId, arbitrumContracts)) {
+          await loadBalanceArbitrum();
+        }
+        if (isInLayer1(chainId) && validOracles(chainId, ethereumContracts)) {
+          await loadBalanceEthereum();
+        }
       }
-      if (isInLayer1(chainId) && validOracles(chainId, ethereumContracts)) {
-        await loadBalanceEthereum();
-      }
-      if (isOptimism(chainId) && validOracles(chainId, optimismContracts)) {
-        await loadBalanceOptimism();
-      }
-    }
-    setLoadingBalances(false);
+      setLoadingBalances(false);
+    } catch (error: any) { }
   };
 
   const loadIndexSupply = async () => {
-    if (ethcallProvider) {
-      let indexTokenRead = ethereumContracts.tcapTokenRead;
-      if (isArbitrum(chainId)) {
-        indexTokenRead = arbitrumContracts.jpegzTokenRead;
-      }
-      if (isOptimism(chainId)) {
-        indexTokenRead = optimismContracts.tcapTokenRead;
-      }
+    try {
+      if (ethcallProvider) {
+        let indexTokenRead = ethereumContracts.tcapTokenRead;
+        if (isArbitrum(chainId)) {
+          indexTokenRead = arbitrumContracts.jpegzTokenRead;
+        }
 
-      if (indexTokenRead) {
-        const indexSupplyCall = await indexTokenRead?.totalSupply();
-        // @ts-ignore
-        const [indexSupply] = await ethcallProvider?.all([indexSupplyCall]);
-        const indexSupplyVal = ethers.utils.formatEther(indexSupply);
+        if (indexTokenRead) {
+          const indexSupplyCall = await indexTokenRead?.totalSupply();
+          const indexSupply = await ethcallProvider?.all([indexSupplyCall]);
+          const indexSupplyVal = ethers.utils.formatEther(indexSupply);
 
-        setBalances({
-          tcapBalance: "0",
-          jpegzBalance: "0",
-          ctxBalance: "0",
-          tcapSupplly: !isArbitrum(chainId) ? indexSupplyVal : "0",
-          jpegzSupplly: isArbitrum(chainId) ? indexSupplyVal : "0",
-        });
+          setBalances({
+            tcapBalance: "0",
+            jpegzBalance: "0",
+            ctxBalance: "0",
+            tcapSupplly: !isArbitrum(chainId) ? indexSupplyVal : "0",
+            jpegzSupplly: isArbitrum(chainId) ? indexSupplyVal : "0",
+          });
+        }
       }
+    } catch (error: any) {
+      
     }
   };
 
@@ -126,7 +104,7 @@ export const useBalances = (
     () => {
       if (ethcallProvider && address !== "") {
         loadBalance();
-      } else {
+      } else if (ethcallProvider) {
         loadIndexSupply();
         setLoadingBalances(false);
       }

@@ -31,7 +31,7 @@ export const Delegate = ({ show, onHide, refresh }: props) => {
           notifyUser(tx, refresh);
           setAddressText("");
           onHide();
-        } catch (error) {
+        } catch (error: any) {
           if (error.code === 4001 || error.code === -32603) {
             errorNotification("Transaction rejected");
           } else {

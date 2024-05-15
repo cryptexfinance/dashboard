@@ -61,7 +61,7 @@ const Stake = ({
       setBtnDisabled(true);
       const tx = await nfpmContract?.approve(UNIV3.stakerAddress, position.lpTokenId);
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       errorNotification(t("errors.tran-rejected"));
     }
@@ -78,7 +78,7 @@ const Stake = ({
         encodeIncentive(incentive)
       );
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       errorNotification(t("errors.tran-rejected"));
     }
@@ -90,7 +90,7 @@ const Stake = ({
       setBtnDisabled(true);
       const tx = await stakerContract?.stakeToken(incentive, position.lpTokenId);
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       errorNotification(t("errors.tran-rejected"));
     }
@@ -102,7 +102,7 @@ const Stake = ({
       setBtnDisabled(true);
       const tx = await stakerContract?.unstakeToken(incentive, position.lpTokenId);
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       errorNotification(t("errors.tran-rejected"));
     }

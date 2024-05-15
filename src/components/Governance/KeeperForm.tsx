@@ -279,8 +279,8 @@ const KeeperForm = ({
     }
   };
 
-  const isFormDataValid = (): boolean =>
-    isValidKeeper(delegatee) &&
+  const isFormDataValid = async (): Promise<boolean> =>
+    await isValidKeeper(delegatee) &&
     isNameValid(name) &&
     isExpertiseValid(expertise) &&
     isWhyValid(why) &&
@@ -319,7 +319,8 @@ const KeeperForm = ({
   const createKeeper = async (event: React.MouseEvent) => {
     event.preventDefault();
     setSaving(true);
-    if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
+    const isValid = await isFormDataValid();
+    if (delegatorFactory && isValid && currentAddress !== "") {
       if (address && delegatee) {
         try {
           const tx = await delegatorFactory.createDelegator(address);
@@ -328,7 +329,7 @@ const KeeperForm = ({
           await saveKeeper();
           refresh();
           onHide();
-        } catch (error) {
+        } catch (error: any) {
           console.log(error);
           errorNotification(t("governance.errors.creating-keeper"));
         }
@@ -341,7 +342,8 @@ const KeeperForm = ({
 
   const updateKeeper = async () => {
     setSaving(true);
-    if (isFormDataValid() && currentAddress !== "") {
+    const iValid = await isFormDataValid();
+    if (iValid && currentAddress !== "") {
       const formData = new FormData();
       formData.append("keeper_id", keeperInfo.id);
       formData.append("name", name);

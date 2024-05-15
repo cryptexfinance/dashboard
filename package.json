@@ -15,7 +15,7 @@
     "@types/jest": "^26.0.15",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
-    "@web3modal/ethers5": "^4.1.11",
+    "@web3modal/ethers5": "4.1.0",
     "bootstrap": "^4.5.3",
     "compressorjs": "1.1.1",
     "ethers": "5.7.2",
@@ -42,7 +42,6 @@
     "sass": "^1.58.3",
     "sass-loader": "^13.2.0",
     "sourcemap-codec": "^1.4.8",
-    "typescript": "4.0.5",
     "walletlink": "^2.4.2",
     "web-vitals": "^2.1.0"
   },
@@ -50,12 +49,11 @@
     "@babel/core": "7.12.3",
     "@babel/preset-env": "7.12.1",
     "@types/react-router-dom": "^5.1.6",
-    "@typescript-eslint/parser": "^4.5.0",
     "dotenv": "8.2.0",
     "postcss-normalize": "^10.0.1",
     "prettier": "^2.1.2",
     "pretty-quick": "3.1.0",
-    "ts-node": "9.0.0"
+    "typescript": "^5.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

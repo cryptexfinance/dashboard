@@ -63,7 +63,7 @@ const LiquidityRewards = () => {
   const refresh = async () => {
     try {
       setUpdateData(!updateData);
-    } catch (error) {
+    } catch (error: any) {
       // catch error in case the vault screen is changed
     }
   };
@@ -261,7 +261,7 @@ const LiquidityRewards = () => {
           break;
       }
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 4001) {
         errorNotification(t("errors.tran-rejected"));
       } else {
@@ -300,7 +300,7 @@ const LiquidityRewards = () => {
           break;
       }
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {
@@ -330,7 +330,7 @@ const LiquidityRewards = () => {
           break;
       }
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 4001 || error.code === -32603) {
         errorNotification("Transaction rejected");
       } else {

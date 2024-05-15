@@ -133,7 +133,7 @@ const SewageFruitz = () => {
       let tokenId = 0;
       try {
         tokenId = await getTokenId(currentAddress);
-      } catch (error) {
+      } catch (error: any) {
         console.log(error);
       }
       if (tokenId > 0) {
@@ -205,7 +205,7 @@ const SewageFruitz = () => {
       const tx = await mushroom.mushroomNft?.mint(signerAddress, merkleProof);
       notifyUser(tx, refresh);
       setMinting(false);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.message);
       errorNotification(t("errors.tran-rejected"));
       setMinting(false);
@@ -217,7 +217,7 @@ const SewageFruitz = () => {
     try {
       const tx = await mushroom.mushroomNft?.publicMint();
       notifyUser(tx, refresh);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.message);
       errorNotification(t("errors.tran-rejected"));
     }
