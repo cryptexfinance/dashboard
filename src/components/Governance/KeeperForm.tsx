@@ -175,7 +175,7 @@ const KeeperForm = ({
   };
 
   const isDiscordValid = (value: string): boolean => {
-    const re = /^.{3,32}#[0-9]{4}$/;
+    const re = /^.{3,35}$/;
     if (value.trim().length > 0) {
       if (!re.test(value.trim())) {
         setDiscordError(t("governance.errors.invalid-discord"));
