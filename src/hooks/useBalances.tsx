@@ -22,8 +22,8 @@ export const useBalances = (
   });
 
   const loadBalanceArbitrum = async () => {
-    const jpegzBalanceCall = await arbitrumContracts.jpegzTokenRead?.balanceOf(address);
-    const jpegzSupplyCall = await arbitrumContracts.jpegzTokenRead?.totalSupply();
+    const jpegzBalanceCall = arbitrumContracts.jpegzTokenRead?.balanceOf(address);
+    const jpegzSupplyCall = arbitrumContracts.jpegzTokenRead?.totalSupply();
     // @ts-ignore
     const [jpegzBalance, jpegzSupply] = await ethcallProvider?.all([
       jpegzBalanceCall,
@@ -39,50 +39,53 @@ export const useBalances = (
   };
 
   const loadBalanceEthereum = async () => {
-    const tcapBalanceCall = await ethereumContracts.tcapTokenRead?.balanceOf(address);
-    const tcapSupplyCall = await ethereumContracts.tcapTokenRead?.totalSupply();
-    const ctxBalanceCall = await ethereumContracts.ctxTokenRead?.balanceOf(address);
+    try {
+      const tcapBalanceCall = ethereumContracts.tcapTokenRead?.balanceOf(address);
+      const tcapSupplyCall = ethereumContracts.tcapTokenRead?.totalSupply();
+      const ctxBalanceCall = ethereumContracts.ctxTokenRead?.balanceOf(address);
 
-    // @ts-ignore
-    const [tcapBalance, tcapSupply, ctxBalance] = await ethcallProvider?.all([
-      tcapBalanceCall,
-      tcapSupplyCall,
-      ctxBalanceCall,
-    ]);
+      // @ts-ignore
+      const [tcapBalance, tcapSupply, ctxBalance] = await ethcallProvider?.all([
+        tcapBalanceCall,
+        tcapSupplyCall,
+        ctxBalanceCall,
+      ]);
 
-    setBalances({
-      tcapBalance: ethers.utils.formatEther(tcapBalance),
-      jpegzBalance: "0",
-      ctxBalance: ethers.utils.formatEther(ctxBalance),
-      tcapSupplly: ethers.utils.formatEther(tcapSupply),
-      jpegzSupplly: "0",
-    });
+      setBalances({
+        tcapBalance: ethers.utils.formatEther(tcapBalance),
+        jpegzBalance: "0",
+        ctxBalance: ethers.utils.formatEther(ctxBalance),
+        tcapSupplly: ethers.utils.formatEther(tcapSupply),
+        jpegzSupplly: "0",
+      });
+    } catch (error: any) {}
   };
 
   const loadBalance = async () => {
     try {
-      if (arbitrumContracts && ethereumContracts) {
+      if (arbitrumContracts && ethereumContracts && ethcallProvider) {
         if (isArbitrum(chainId) && validOracles(chainId, arbitrumContracts)) {
           await loadBalanceArbitrum();
         }
         if (isInLayer1(chainId) && validOracles(chainId, ethereumContracts)) {
           await loadBalanceEthereum();
         }
-      }
-      setLoadingBalances(false);
+      }      
     } catch (error: any) { }
+    setLoadingBalances(false);
   };
 
   const loadIndexSupply = async () => {
     try {
       if (ethcallProvider) {
         let indexTokenRead = ethereumContracts.tcapTokenRead;
+
         if (isArbitrum(chainId)) {
           indexTokenRead = arbitrumContracts.jpegzTokenRead;
         }
 
         if (indexTokenRead) {
-          const indexSupplyCall = await indexTokenRead?.totalSupply();
+          const indexSupplyCall = indexTokenRead?.totalSupply();
           const indexSupply = await ethcallProvider?.all([indexSupplyCall]);
           const indexSupplyVal = ethers.utils.formatEther(indexSupply);
 
@@ -95,9 +98,7 @@ export const useBalances = (
           });
         }
       }
-    } catch (error: any) {
-      
-    }
+    } catch (error: any) {}
   };
 
   useEffect(

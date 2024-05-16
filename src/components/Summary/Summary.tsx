@@ -42,15 +42,9 @@ const Summary = ({ signerAddress, signerChainId }: props) => {
       if (signerChainId === NETWORKS.arbitrum.chainId) {
         return chains[1];
       }
-      return chains[2];
-    }
-    if (signerChainId === NETWORKS.goerli.chainId) {
       return chains[0];
     }
-    if (signerChainId === NETWORKS.arbitrum_goerli.chainId) {
-      return chains[1];
-    }
-    return chains[2];
+    return chains[0];
   };
 
   const [currentChain, setCurrentChain] = useState(getDefaultChain());
