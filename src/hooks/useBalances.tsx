@@ -79,14 +79,13 @@ export const useBalances = (
     try {
       if (ethcallProvider) {
         let indexTokenRead = ethereumContracts.tcapTokenRead;
-
         if (isArbitrum(chainId)) {
           indexTokenRead = arbitrumContracts.jpegzTokenRead;
         }
 
         if (indexTokenRead) {
           const indexSupplyCall = indexTokenRead?.totalSupply();
-          const indexSupply = await ethcallProvider?.all([indexSupplyCall]);
+          const [indexSupply] = await ethcallProvider?.all([indexSupplyCall]);
           const indexSupplyVal = ethers.utils.formatEther(indexSupply);
 
           setBalances({

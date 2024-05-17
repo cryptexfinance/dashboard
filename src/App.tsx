@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { Provider, Contract, setMulticallAddress } from "ethers-multicall";
 import { ToastContainer } from "react-toastify";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
-import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react'
+import { createWeb3Modal } from '@web3modal/ethers5/react'
 import { useWeb3ModalProvider, useWeb3ModalAccount } from '@web3modal/ethers5/react'
 
 import "./i18n";
@@ -50,6 +50,7 @@ import {
   isGoerli,
 } from "./utils/utils";
 import { GRAPHQL_ENDPOINT, NETWORKS } from "./utils/constants";
+import { arbitrum, mainnet, walletIds, web3ModalEthersConfig } from "./utils/web3ModalConfig";
 
 const clientOracle = (graphqlEndpoint: string) =>
   new ApolloClient({
@@ -60,47 +61,12 @@ const clientOracle = (graphqlEndpoint: string) =>
 
 const projectId = process.env.REACT_APP_WALLET_CONNECT_ID || "";
 
-const mainnet = {
-  chainId: 1,
-  name: 'Ethereum',
-  currency: 'ETH',
-  explorerUrl: 'https://etherscan.io',
-  rpcUrl: 'https://cloudflare-eth.com'
-}
-
-const arbitrum = {
-  chainId: 42161,
-  name: 'Arbitrum One',
-  currency: 'ETH',
-  explorerUrl: 'https://arbiscan.io/',
-  rpcUrl: 'https://arb1.arbitrum.io/'
-}
-
-const metadata = {
-  name: 'Cryptex Finance V1',
-  description: 'Building innovative, open-source index tokens that empower the crypto and NFT community.',
-  url: 'https://cryptex.finance/', // origin must match your domain & subdomain
-  icons: ['https://avatars.mywebsite.com/']
-}
-
-
-const ethersConfig = defaultConfig({
-  metadata,
-  defaultChainId: 1, // used for the Coinbase SDK
-})
-
 createWeb3Modal({
-  ethersConfig,
+  ethersConfig: web3ModalEthersConfig,
   chains: [mainnet, arbitrum],
   projectId,
   themeMode: 'dark',
-  featuredWalletIds: [
-    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
-    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
-    'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
-    '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
-    '971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709'
-  ],
+  featuredWalletIds: walletIds,
   themeVariables: {
     '--w3m-font-family': "Nineteen Ninety Seven",
     '--w3m-accent': "#1d1d3c",
@@ -750,7 +716,6 @@ const App = () => {
 
   useEffect(() => {
     async function loadProvider() {
-      // if (web3Modal.cachedProvider && !signer.signer) {
       if (isConnected) {  
         if (!isLoadingContracts && walletProvider) {
           onConnectWallet();

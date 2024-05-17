@@ -330,21 +330,8 @@ export const getDefaultProvider = (chainId: number | undefined) => {
       infura: process.env.REACT_APP_INFURA_ID,
     });
   } else {
-    let alchemyKey;
-    switch (chainId) {
-      case NETWORKS.mainnet.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
-        break;
-      case NETWORKS.arbitrum.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_ARBITRUM;
-        break;
-      default:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
-        break;
-    }
-    provider = ethers.getDefaultProvider(chainId, {
+    provider = new ethers.providers.InfuraProvider("mainnet", {
       infura: process.env.REACT_APP_INFURA_ID,
-      alchemy: alchemyKey,
     });
   }
   return provider;
