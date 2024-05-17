@@ -70,6 +70,8 @@ createWeb3Modal({
   themeVariables: {
     '--w3m-font-family': "Nineteen Ninety Seven",
     '--w3m-accent': "#1d1d3c",
+    '--w3m-color-mix': "#212138",
+    '--w3m-color-mix-strength': 10,
     '--w3m-font-size-master': "11px",
     '--w3m-border-radius-master': "5",
   }
