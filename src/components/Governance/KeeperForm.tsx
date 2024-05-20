@@ -214,11 +214,11 @@ const KeeperForm = ({
 
   const isImageValid = (value: File | null): boolean => {
     if (value === null) {
-      if (isNew) {
+      /* if (isNew) {
         // setImageError(t("errors.empty"));
         errorNotification(t("errors.empty"));
-      }
-      return !isNew;
+      } */
+      return true;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
       // setImageError(t("errors.invalid-file-type"));
@@ -288,7 +288,7 @@ const KeeperForm = ({
     isDiscordValid(discord) &&
     isImageValid(image);
 
-  const saveKeeper = async () => {
+  const saveKeeper = async (accessToken: string) => {
     const formData = new FormData();
     formData.append("address", address);
     formData.append("name", name);
@@ -297,10 +297,15 @@ const KeeperForm = ({
     formData.append("why", why);
     formData.append("discord", discord);
     formData.append("twitter", twitter);
-    // @ts-ignore
-    formData.append("file", image);
+    if (image !== null) {
+      // @ts-ignore
+      formData.append("file", image);
+    }
     await fetch(KEEPER_CREATE_ENDPOINT, {
       method: "POST",
+      headers: {
+        Authorization: "Bearer ".concat(accessToken),
+      },
       body: formData,
     })
       .then((response) => response.json())
@@ -320,13 +325,15 @@ const KeeperForm = ({
     event.preventDefault();
     setSaving(true);
     const isValid = await isFormDataValid();
+    
     if (delegatorFactory && isValid && currentAddress !== "") {
-      if (address && delegatee) {
+      const accessTokenResp = await getAccessToken();
+      if (address && delegatee && accessTokenResp.success) {
         try {
           const tx = await delegatorFactory.createDelegator(address);
           notifyUser(tx, refresh);
           setDelegatee("");
-          await saveKeeper();
+          await saveKeeper(accessTokenResp.accessToken);
           refresh();
           onHide();
         } catch (error: any) {
@@ -351,8 +358,10 @@ const KeeperForm = ({
       formData.append("why", why);
       formData.append("discord", discord);
       formData.append("twitter", twitter);
-      // @ts-ignore
-      formData.append("file", image);
+      if (image !== null){
+        // @ts-ignore
+        formData.append("file", image);
+      }
       const accessTokenResp = await getAccessToken();
       if (accessTokenResp.success) {
         await fetch(KEEPER_UPDATE_ENDPOINT, {
