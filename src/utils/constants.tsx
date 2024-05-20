@@ -98,9 +98,9 @@ export const NETWORKS = {
 export const API_ENDPOINT = "https://api.cryptex.finance";
 
 export const GRAPHQL_ENDPOINT = {
-  mainnet: "https://api.thegraph.com/subgraphs/name/cryptexfinance/tcap-graph",
+  mainnet: "https://subgraph.satsuma-prod.com/0b9d5e79fdb9/cryptex/tcap-graph/api",
   goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-goerli-demo",
-  arbitrum: "https://api.thegraph.com/subgraphs/name/jdestephen/cryptex-arbitrum-demo",
+  arbitrum: "https://subgraph.satsuma-prod.com/0b9d5e79fdb9/cryptex/cryptex-arbitrum/api",
   arbitrum_goerli: "https://api.thegraph.com/subgraphs/name/jdestephen/arbitrum-goerli-demo",
   optimism: "https://api.thegraph.com/subgraphs/name/cryptexfinance/cryptex-optimism",
   okovan: "https://api.thegraph.com/subgraphs/name/jdestephen/tcap-demo",

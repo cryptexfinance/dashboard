@@ -214,11 +214,11 @@ const KeeperForm = ({
 
   const isImageValid = (value: File | null): boolean => {
     if (value === null) {
-      if (isNew) {
+      /* if (isNew) {
         // setImageError(t("errors.empty"));
         errorNotification(t("errors.empty"));
-      }
-      return !isNew;
+      } */
+      return true;
     }
     if (value.type !== "image/png" && value.type !== "image/jpg" && value.type !== "image/jpeg") {
       // setImageError(t("errors.invalid-file-type"));
@@ -279,8 +279,8 @@ const KeeperForm = ({
     }
   };
 
-  const isFormDataValid = (): boolean =>
-    isValidKeeper(delegatee) &&
+  const isFormDataValid = async (): Promise<boolean> =>
+    await isValidKeeper(delegatee) &&
     isNameValid(name) &&
     isExpertiseValid(expertise) &&
     isWhyValid(why) &&
@@ -288,7 +288,7 @@ const KeeperForm = ({
     isDiscordValid(discord) &&
     isImageValid(image);
 
-  const saveKeeper = async () => {
+  const saveKeeper = async (accessToken: string) => {
     const formData = new FormData();
     formData.append("address", address);
     formData.append("name", name);
@@ -297,10 +297,15 @@ const KeeperForm = ({
     formData.append("why", why);
     formData.append("discord", discord);
     formData.append("twitter", twitter);
-    // @ts-ignore
-    formData.append("file", image);
+    if (image !== null) {
+      // @ts-ignore
+      formData.append("file", image);
+    }
     await fetch(KEEPER_CREATE_ENDPOINT, {
       method: "POST",
+      headers: {
+        Authorization: "Bearer ".concat(accessToken),
+      },
       body: formData,
     })
       .then((response) => response.json())
@@ -319,16 +324,19 @@ const KeeperForm = ({
   const createKeeper = async (event: React.MouseEvent) => {
     event.preventDefault();
     setSaving(true);
-    if (delegatorFactory && isFormDataValid() && currentAddress !== "") {
-      if (address && delegatee) {
+    const isValid = await isFormDataValid();
+    
+    if (delegatorFactory && isValid && currentAddress !== "") {
+      const accessTokenResp = await getAccessToken();
+      if (address && delegatee && accessTokenResp.success) {
         try {
           const tx = await delegatorFactory.createDelegator(address);
           notifyUser(tx, refresh);
           setDelegatee("");
-          await saveKeeper();
+          await saveKeeper(accessTokenResp.accessToken);
           refresh();
           onHide();
-        } catch (error) {
+        } catch (error: any) {
           console.log(error);
           errorNotification(t("governance.errors.creating-keeper"));
         }
@@ -341,7 +349,8 @@ const KeeperForm = ({
 
   const updateKeeper = async () => {
     setSaving(true);
-    if (isFormDataValid() && currentAddress !== "") {
+    const iValid = await isFormDataValid();
+    if (iValid && currentAddress !== "") {
       const formData = new FormData();
       formData.append("keeper_id", keeperInfo.id);
       formData.append("name", name);
@@ -349,8 +358,10 @@ const KeeperForm = ({
       formData.append("why", why);
       formData.append("discord", discord);
       formData.append("twitter", twitter);
-      // @ts-ignore
-      formData.append("file", image);
+      if (image !== null){
+        // @ts-ignore
+        formData.append("file", image);
+      }
       const accessTokenResp = await getAccessToken();
       if (accessTokenResp.success) {
         await fetch(KEEPER_UPDATE_ENDPOINT, {

@@ -93,7 +93,7 @@ const StakerStats = ({ refresh, updateData, withdrawTimes, updateTimes, t }: pro
       try {
         const tx = await governance.delegatorFactory.getReward();
         notifyUser(tx, refresh);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {

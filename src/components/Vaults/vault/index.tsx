@@ -396,7 +396,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           setActiveAction("remove");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
     }
   };
@@ -451,7 +451,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
     try {
       ethers.utils.parseEther(value);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       return false;
     }
   };
@@ -641,7 +641,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           setBurnUSD("0");
           setBurnFee("0");
         }
-      } catch (error) {
+      } catch (error: any) {
         changeVault(0, true);
         setBurnUSD("0");
         setBurnFee("0");
@@ -683,7 +683,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           const tx = await currentVault?.addCollateral(amount);
           notifyUser(tx, refresh);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
@@ -741,7 +741,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
           const tx = await currentVault?.removeCollateral(amount);
           notifyUser(tx, refresh);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
@@ -802,7 +802,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
             const tx = await currentVault?.mint(amount, { value: BigNumber.from(increasedFee) });
             notifyUser(tx, refresh);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           if (error.code === 4001) {
             errorNotification(t("errors.tran-rejected"));
@@ -864,7 +864,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
         setBurnFee(ethFee.toString());
         const tx = await currentVault?.burn(amount, { value: BigNumber.from(increasedFee) });
         notifyUser(tx, refresh);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
@@ -1280,7 +1280,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       try {
         const tx = await currentVault?.createVault();
         notifyUser(tx, refresh);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001 || error.code === -32603) {
           errorNotification(t("errors.tran-rejected"));
         }
@@ -1291,7 +1291,7 @@ const Vault = ({ currentAddress, vaultInitData, goBack }: props) => {
       try {
         const tx = await currentCollateral?.approve(currentVault?.address, approveValue);
         notifyUser(tx, refresh);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001 || error.code === -32603) {
           errorNotification(t("errors.tran-rejected"));
         }

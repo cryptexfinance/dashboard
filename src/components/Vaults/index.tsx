@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useWeb3ModalAccount } from "@web3modal/ethers5/react";
 import Monitoring from "./monitoring/index";
 import MonitoringArb from "./monitoring/index2";
 import Vault from "./vault/index";
@@ -6,7 +7,9 @@ import { signerContext, networkContext } from "../../state";
 import { VaultToUpdateType } from "./types";
 import { isArbitrum } from "../../utils/utils";
 
+
 const Vaults = () => {
+  const { address: userAccount } = useWeb3ModalAccount()
   const signer = useContext(signerContext);
   const currentNetwork = useContext(networkContext);
   const [currentAddress, setCurrentAddress] = useState("");
@@ -31,15 +34,14 @@ const Vaults = () => {
   useEffect(
     () => {
       const load = async () => {
-        if (signer && signer.signer) {
-          const cAddress = await signer.signer.getAddress();
-          setCurrentAddress(cAddress);
+        if (signer && signer.signer && userAccount) {
+          setCurrentAddress(userAccount?.toString());
         }
       };
       load();
     },
     // eslint-disable-next-line
-    [signer.signer]
+    [signer.signer, userAccount]
   );
 
   if (isMinting) {

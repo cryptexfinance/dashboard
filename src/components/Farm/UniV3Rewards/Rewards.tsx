@@ -265,7 +265,7 @@ const Rewards = ({
   const refresh = async () => {
     try {
       await refetch();
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
     }
   };
@@ -299,7 +299,7 @@ const Rewards = ({
         const tx = await stakerContract.withdrawToken(lpTokenId, ownerAddress, "0x");
         notifyUser(tx, refresh);
         refresh();
-      } catch (error) {
+      } catch (error: any) {
         errorNotification("Transaction Rejected");
         console.log(error);
       }

@@ -29,6 +29,7 @@ export const useRatios = (): VaultsRatioType => {
     hardWethRatio: 125,
     hardDaiRatio: 125,
     hardUsdcRatio: 125,
+    hardWbtcRatio: 125,
   });
 
   const loadRatios = async () => {
@@ -87,6 +88,7 @@ export const useRatios = (): VaultsRatioType => {
       let hardEthRatio = 0;
       let hardDaiRatio = 0;
       let hardUsdcRatio = 0;
+      let hardWbtcRatio = 0;
       if (isInLayer1(currentNetwork.chainId)) {
         // @ts-ignore
         [daiRatio, ethRatio, aaveRatio, linkRatio, hardEthRatio, hardDaiRatio, hardUsdcRatio] =
@@ -117,6 +119,7 @@ export const useRatios = (): VaultsRatioType => {
         hardWethRatio: hardEthRatio,
         hardDaiRatio,
         hardUsdcRatio,
+        hardWbtcRatio,
       });
     }
   };

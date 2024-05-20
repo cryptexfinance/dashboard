@@ -52,7 +52,7 @@ const Withdraw = ({
             notifyUser(tx, refresh);
             setWithdrawText("");
             onHide();
-          } catch (error) {
+          } catch (error: any) {
             errorNotification(t("governance.errors.need-to-wait"));
           }
         } else {

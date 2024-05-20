@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { INetworkContext } from "../state";
 
 export const useNetworks = (): INetworkContext => {
-  const [chainId, setChainId] = useState<number>();
+  const [chainId, setChainId] = useState<number>(1);
   const [name, setName] = useState<string>();
   const [wethAddress, setWETHAddress] = useState<string>("");
   const [daiAddress, setDAIAddress] = useState<string>("");

@@ -82,7 +82,7 @@ const Delegate = ({
             setStakeText("");
             onHide();
             addTodayWithdrawTime();
-          } catch (error) {
+          } catch (error: any) {
             errorNotification(t("errors.not-ctx"));
           }
         } else {
@@ -103,7 +103,7 @@ const Delegate = ({
         notifyUser(tx, refresh);
         setStakeText("");
         setIsApproved(true);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {

@@ -54,7 +54,7 @@ const ClaimReward = ({
             notifyUser(tx, refresh);
             setRewardText("");
             onHide();
-          } catch (error) {
+          } catch (error: any) {
             errorNotification(t("errors.tran-rejected"));
           }
         } else {

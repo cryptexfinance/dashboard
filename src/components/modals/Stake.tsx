@@ -57,7 +57,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
           notifyUser(tx, refresh);
           setStakeText("");
           onHide();
-        } catch (error) {
+        } catch (error: any) {
           if (error.code === 4001) {
             errorNotification(t("errors.tran-rejected"));
           } else {
@@ -78,7 +78,7 @@ export const Stake = ({ show, poolTitle, poolToken, pool, balance, onHide, refre
         notifyUser(tx, refresh);
         setStakeText("");
         setIsApproved(true);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001) {
           errorNotification(t("errors.tran-rejected"));
         } else {

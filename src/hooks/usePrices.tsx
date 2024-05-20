@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { ethers, BigNumber } from "ethers";
 import { oraclesContext, networkContext, signerContext } from "../state/index";
-import { isArbitrum, isInLayer1, isOptimism, isPolygon, validOracles } from "../utils/utils";
+import { isArbitrum, isInLayer1, validOracles } from "../utils/utils";
 import { OraclePricesType } from "./types";
 
 export const usePrices = (): [OraclePricesType, boolean] => {
@@ -27,16 +27,16 @@ export const usePrices = (): [OraclePricesType, boolean] => {
 
   const loadPrices = async () => {
     if (signer && oracles && validOracles(currentNetwork.chainId || 1, oracles)) {
-      const daiOraclePriceCall = await oracles.daiOracleRead?.getLatestAnswer();
+      const daiOraclePriceCall = oracles.daiOracleRead?.getLatestAnswer();
 
       const ethcalls = [daiOraclePriceCall];
       if (isInLayer1(currentNetwork.chainId)) {
-        const tcapOraclePriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        const aaveOraclePriceCall = await oracles.aaveOracleRead?.getLatestAnswer();
-        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
-        const usdcOraclePriceCall = await oracles.usdcOracleRead?.getLatestAnswer();
-        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
+        const tcapOraclePriceCall = oracles.tcapOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
+        const aaveOraclePriceCall = oracles.aaveOracleRead?.getLatestAnswer();
+        const linkOraclePriceCall = oracles.linkOracleRead?.getLatestAnswer();
+        const usdcOraclePriceCall = oracles.usdcOracleRead?.getLatestAnswer();
+        const wbtcOraclePriceCall = oracles.wbtcOracleRead?.getLatestAnswer();
         ethcalls.push(tcapOraclePriceCall);
         ethcalls.push(wethOraclePriceCall);
         ethcalls.push(aaveOraclePriceCall);
@@ -44,29 +44,9 @@ export const usePrices = (): [OraclePricesType, boolean] => {
         ethcalls.push(usdcOraclePriceCall);
         ethcalls.push(wbtcOraclePriceCall);
       }
-      if (isOptimism(currentNetwork.chainId)) {
-        const tcapOraclePriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
-        const linkOraclePriceCall = await oracles.linkOracleRead?.getLatestAnswer();
-        const snxOraclePriceCall = await oracles.snxOracleRead?.getLatestAnswer();
-        const uniOraclePriceCall = await oracles.uniOracleRead?.getLatestAnswer();
-        ethcalls.push(tcapOraclePriceCall);
-        ethcalls.push(wethOraclePriceCall);
-        ethcalls.push(linkOraclePriceCall);
-        ethcalls.push(snxOraclePriceCall);
-        ethcalls.push(uniOraclePriceCall);
-      }
-      if (isPolygon(currentNetwork.chainId)) {
-        const tcapOraclePriceCall = await oracles.tcapOracleRead?.getLatestAnswer();
-        const maticOraclePriceCall = await oracles.maticOracleRead?.getLatestAnswer();
-        const wbtcOraclePriceCall = await oracles.wbtcOracleRead?.getLatestAnswer();
-        ethcalls.push(tcapOraclePriceCall);
-        ethcalls.push(maticOraclePriceCall);
-        ethcalls.push(wbtcOraclePriceCall);
-      }
       if (isArbitrum(currentNetwork.chainId)) {
-        const jpegzPriceCall = await oracles.jpegzOracleRead?.getLatestAnswer();
-        const wethOraclePriceCall = await oracles.wethOracleRead?.getLatestAnswer();
+        const jpegzPriceCall = oracles.jpegzOracleRead?.getLatestAnswer();
+        const wethOraclePriceCall = oracles.wethOracleRead?.getLatestAnswer();
         ethcalls.push(jpegzPriceCall);
         ethcalls.push(wethOraclePriceCall);
       }
@@ -94,20 +74,6 @@ export const usePrices = (): [OraclePricesType, boolean] => {
           usdcOraclePrice,
           wbtcOraclePrice,
         ] = await signer.ethcallProvider?.all(ethcalls);
-      } else if (isOptimism(currentNetwork.chainId)) {
-        // @ts-ignore
-        [
-          daiOraclePrice,
-          tcapOraclePrice,
-          wethOraclePrice,
-          linkOraclePrice,
-          snxOraclePrice,
-          uniOraclePrice,
-        ] = await signer.ethcallProvider?.all(ethcalls);
-      } else if (isPolygon(currentNetwork.chainId)) {
-        // @ts-ignore
-        [daiOraclePrice, tcapOraclePrice, maticOraclePrice, wbtcOraclePrice] =
-          await signer.ethcallProvider?.all(ethcalls);
       } else {
         // @ts-ignore
         [daiOraclePrice, jpegzOraclePrice, wethOraclePrice] = await signer.ethcallProvider?.all(

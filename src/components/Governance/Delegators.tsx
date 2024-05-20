@@ -135,6 +135,7 @@ const Delegators = ({ currentSignerAddress }: props) => {
         })
           .then((response) => response.json())
           .then((responseJson) => {
+            // console.log("responseJson: ", responseJson);
             buildKeeperInfo(responseJson, currentDelegators);
           })
           .catch((error) => {

@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-// import { Spinner } from "react-bootstrap/esm/";
 import { Contract } from "ethers-multicall";
 import "../../styles/summary.scss";
 import cryptexJson from "../../contracts/cryptex.json";
 import UniV2Pair from "../../contracts/UniswapV2Pair.json";
-import { arbitrumContext, ethereumContext, optimismContext, signerContext } from "../../state";
-import { useArbitrum, useEthereum, useOptimism } from "../../hooks";
+import { arbitrumContext, ethereumContext, signerContext } from "../../state";
+import { useArbitrum, useEthereum } from "../../hooks";
 import Features from "./Features";
 import Summary from "./Summary";
 import { NETWORKS } from "../../utils/constants";
@@ -14,7 +13,6 @@ const SummaryPage = () => {
   const signer = useContext(signerContext);
   const arbitrum = useArbitrum();
   const ethereum = useEthereum();
-  const optimism = useOptimism();
   const [loading, setLoading] = useState(true);
   const [signerAddress, setSignerAddress] = useState("");
   const [signerChainId, setSignerChainId] = useState(
@@ -98,39 +96,6 @@ const SummaryPage = () => {
     }
   };
 
-  const setOptimismContracts = () => {
-    let contracts;
-    if (process.env.REACT_APP_NETWORK_ID === "1") {
-      contracts = cryptexJson[10].optimism.contracts;
-    } else {
-      contracts = cryptexJson[69].okovan.contracts;
-    }
-
-    const currentTcapTokenRead = new Contract(contracts.TCAP.address, contracts.TCAP.abi);
-    optimism.setCurrentTcapTokenRead(currentTcapTokenRead);
-    const currentTcapOracleRead = new Contract(
-      contracts.TCAPOracle.address,
-      contracts.TCAPOracle.abi
-    );
-    optimism.setCurrentTcapOracleRead(currentTcapOracleRead);
-    const currentWethOracleRead = new Contract(
-      contracts.WETHOracle.address,
-      contracts.WETHOracle.abi
-    );
-    optimism.setCurrentWethOracleRead(currentWethOracleRead);
-    const currentDaiOracleRead = new Contract(contracts.DAIOracle.address, contracts.DAIOracle.abi);
-    optimism.setCurrentDaiOracleRead(currentDaiOracleRead);
-    const currentLinkOracleRead = new Contract(
-      contracts.LinkOracle.address,
-      contracts.LinkOracle.abi
-    );
-    optimism.setCurrentLinkOracleRead(currentLinkOracleRead);
-    const currentSnxOracleRead = new Contract(contracts.SNXOracle.address, contracts.SNXOracle.abi);
-    optimism.setCurrentSnxOracleRead(currentSnxOracleRead);
-    const currentUniOracleRead = new Contract(contracts.UNIOracle.address, contracts.UNIOracle.abi);
-    optimism.setCurrentUniOracleRead(currentUniOracleRead);
-  };
-
   useEffect(() => {
     const load = async () => {
       if (signer.signer) {
@@ -139,7 +104,6 @@ const SummaryPage = () => {
       }
       setArbitrumContracts();
       setEthereumContracts();
-      setOptimismContracts();
       setLoading(false);
     };
     load();
@@ -152,9 +116,7 @@ const SummaryPage = () => {
       {!loading && (
         <arbitrumContext.Provider value={arbitrum}>
           <ethereumContext.Provider value={ethereum}>
-            <optimismContext.Provider value={optimism}>
-              <Summary signerAddress={signerAddress} signerChainId={signerChainId} />
-            </optimismContext.Provider>
+            <Summary signerAddress={signerAddress} signerChainId={signerChainId} />
           </ethereumContext.Provider>
         </arbitrumContext.Provider>
       )}

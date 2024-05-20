@@ -257,7 +257,7 @@ const Monitoring = ({ currentAddress, setVaultToUpdate }: props) => {
         toUSD(reqTcapText, prices.tcapOraclePrice) -
         toUSD(ethFee, prices.wethOraclePrice)
       );
-    } catch (error) {
+    } catch (error: any) {
       if (error.code !== "UNPREDICTABLE_GAS_LIMIT") {
         console.log(error.code);
       }

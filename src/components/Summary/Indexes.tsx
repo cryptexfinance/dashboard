@@ -45,20 +45,22 @@ const Indexes = ({ currentChainId, ethCallProvider, balances, prices }: props) =
     });
 
     if (!isArbitrum(currentChainId)) {
-      const reponse = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
-        {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      try {
+        const reponse = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?".concat(urlParams.toString()),
+          {
+            method: "GET",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const resp = await reponse.json();
+        if (resp) {
+          setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
         }
-      );
-      const resp = await reponse.json();
-      if (resp) {
-        setIndexMarketPrice(resp["total-crypto-market-cap-token"].usd);
-      }
+      } catch (error) {}
     } else {
       setIndexMarketPrice("0");
     }

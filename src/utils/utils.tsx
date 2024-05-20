@@ -99,8 +99,7 @@ export const sendNotification = async (
     </div>
   );
   toast(toastConstant, {
-    // @ts-ignore
-    position: toast.POSITION.TOP_RIGHT,
+    position: "top-right",
     autoClose: duration,
     hideProgressBar: true,
     delay,
@@ -330,42 +329,9 @@ export const getDefaultProvider = (chainId: number | undefined) => {
     provider = new ethers.providers.InfuraProvider("arbitrum", {
       infura: process.env.REACT_APP_INFURA_ID,
     });
-  } else if (chainId === NETWORKS.arbitrum_goerli.chainId) {
-    provider = new ethers.providers.InfuraProvider("arbitrum-goerli", {
-      infura: process.env.REACT_APP_INFURA_ID,
-    });
-  } else if (chainId === NETWORKS.okovan.chainId) {
-    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
-  } else if (chainId === NETWORKS.optimism.chainId) {
-    provider = ethers.getDefaultProvider(NETWORKS.optimism.infuraRpcUrl);
   } else {
-    let alchemyKey;
-    switch (chainId) {
-      case NETWORKS.mainnet.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
-        break;
-      case NETWORKS.goerli.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_GOERLI;
-        break;
-      case NETWORKS.arbitrum.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_ARBITRUM;
-        break;
-      case NETWORKS.arbitrum_goerli.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_ARBITRUM_GOERLI;
-        break;
-      case NETWORKS.polygon.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_POLYGON;
-        break;
-      case NETWORKS.mumbai.chainId:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY_MUMBAI;
-        break;
-      default:
-        alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
-        break;
-    }
-    provider = ethers.getDefaultProvider(chainId, {
+    provider = new ethers.providers.InfuraProvider("mainnet", {
       infura: process.env.REACT_APP_INFURA_ID,
-      alchemy: alchemyKey,
     });
   }
   return provider;
@@ -415,21 +381,6 @@ export const validOracles = (chainId: number, oracles: any): boolean => {
       !isUndefined(oracles.linkOracleRead) &&
       !isUndefined(oracles.usdcOracleRead) &&
       !isUndefined(oracles.wbtcOracleRead);
-  }
-
-  if (isOptimism(chainId)) {
-    valid =
-      valid &&
-      !isUndefined(oracles.tcapOracleRead) &&
-      !isUndefined(oracles.wethOracleRead) &&
-      !isUndefined(oracles.daiOracleRead) &&
-      !isUndefined(oracles.linkOracleRead) &&
-      !isUndefined(oracles.snxOracleRead) &&
-      !isUndefined(oracles.uniOracleRead);
-  }
-
-  if (isPolygon(chainId)) {
-    valid = valid && !isUndefined(oracles.maticOracle) && !isUndefined(oracles.maticOracleRead);
   }
 
   if (isArbitrum(chainId)) {
