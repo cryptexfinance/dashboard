@@ -83,7 +83,8 @@ const Delegate = ({
             onHide();
             addTodayWithdrawTime();
           } catch (error: any) {
-            errorNotification(t("errors.not-ctx"));
+            console.error("Transaction error: ", error);
+            errorNotification("Transaction error.");
           }
         } else {
           errorNotification(t("errors.not-ctx"));
