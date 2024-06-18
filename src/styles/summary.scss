@@ -1,0 +1,378 @@
+@import "./colors";
+@import "./fonts";
+
+.dashboard {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding: 3rem 2rem;
+  padding-bottom: 2rem;
+  
+  .jpegz-icon {
+    width: 2.1rem;
+  }
+  .spinner-container {
+    padding-top: 3rem;
+    width: 100%;
+  }
+
+  h2 {
+    font-size: 1.375rem;
+    margin-bottom: 0rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0rem;
+  }
+  h4 {
+    font-size: 0.9rem;
+  }
+  h5 {
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  .btn {
+    background-color: $darker;
+    width: 7rem;
+    height: 2.7rem;
+    font-size: 0.8rem;
+
+    &.question {
+      border-radius: 2px;
+      width: 20px;
+      height: 20px;
+      margin-right: 0px;
+      font-size: 10px;
+      padding: 2px;
+      margin-left: 5px;
+    }
+  }
+  .btn:disabled {
+    color: $light;
+    opacity: 0.8;
+  }
+
+  .card { 
+    padding: 1.5rem;
+  
+    &-header {
+      padding: 0.5rem 1rem;
+    }
+    
+    .cls-1 {
+      fill: $darker;
+    }
+    b {
+      font-family: "Nineteen Ninety Seven";
+      color: $purple;
+    }
+    
+    .row {
+      margin-top: 0rem;
+    }
+
+    &.diamond {
+      padding-bottom: 0rem;
+      p {
+        width: 80%;
+      }
+      .btn {
+        width: 11.0625rem;
+        margin-bottom: 0.8rem;
+        margin-left: 0.8rem;
+        border-radius: 5px;
+
+        &.neon-green {
+          box-shadow: 0px 0px 39px -6px rgba(63, 217, 180, 0.4);
+        }
+        &.neon-blue {
+          box-shadow: 0px 0px 39px -6px rgba(15, 217, 255, 0.4);
+        }
+      }
+    }
+  }
+
+  .col-wrapper {
+    p {
+      font-size: 1rem;
+    }
+    div[class*="col-"] {
+      padding: 0rem;
+    }
+    .balance {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+    }
+  }
+
+  .features  {
+    flex: 1;
+    margin-right: 1rem;
+    &-title {
+      margin-bottom: 2rem;
+    }
+    .btn-feature {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: $darkest;
+      margin-bottom: 1.5rem;
+      padding: 0rem 2rem;
+      width: 100%;
+      height: 5rem;
+      border: 0.7px solid $highlight;
+    }
+    .feature-content {
+      display: flex;
+      align-items: center;
+      p {
+        text-align: left;
+      }
+
+      svg {
+        height: 25px;
+        margin-right: 1.5rem;
+        -webkit-filter: drop-shadow(3px 3px 2px $highlight);
+        filter: brightness(1118%) drop-shadow(0px 0px 12px $highlight);
+      }
+
+      .stake-icon {
+        height: 30px;
+      }
+    }
+  }
+
+  .summary { 
+    flex: 1;
+    margin-left: 1rem;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+    .dropdown {
+      margin-right: 1rem;
+      
+      .btn {
+        width: 100%;
+        background-color: $darkest;
+      }
+      .btn:after {
+        margin-top: 0.2rem;
+        margin-left: 0.6rem;
+        border-top: 0.5em solid;
+        border-right: 0.5em solid transparent;
+        border-left: 0.5em solid transparent;
+      }
+    }
+    .card-header {
+      display: flex;
+    } 
+  }
+
+  .protocol, .indexes, .balance-container {
+    width: 100%;
+
+    .detail {
+      display: grid;
+      grid-template-columns: 50% 50%;
+      gap: 1rem;
+      row-gap: 1.7rem;
+      height: fit-content;
+      width: 100%;
+    }
+
+    .totals {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      height: fit-content;
+      padding: 0.7rem;
+      background-color: #281e31;
+      border: 0.7px solid $highlight;
+      border-radius: 5px;
+    }
+
+    .market-cap, .total-supply {
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+
+    .asset {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: fit-content;
+      min-height: 4rem;
+      padding: 0.7rem;
+      background-color: #281e31;
+      border: 0.7px solid $highlight;
+      border-radius: 5px;
+
+      h5 {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .staked {
+      display: flex;
+      flex-direction: column-reverse;
+      margin-left: 1rem;
+
+      h6 {
+        margin-bottom: 0rem;
+        text-align: right;
+        color: $lighter;
+      }
+    }
+
+    svg {
+      width: 2.1rem;
+    }
+    .weth {
+      height: 2.1rem;
+      width: 1rem;
+    }
+    
+    @media (min-width: 1151px) and (max-width: 1320px) {
+      h6 {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (min-width: 760px) and (max-width: 1150px) {
+      .detail {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .balance-container {
+    .spinner {
+      margin: 3.7rem 50%;
+    }
+    .detail {
+      grid-template-columns: 50% 50%;
+      .staked {
+        .value {
+          display: flex;
+          flex-direction: column;
+
+          &-separator {
+            display: none;
+            margin: 0px 15px;
+          }
+        }
+        h6 {
+          margin-top: 0.35rem;
+        }
+        .number {
+          margin-bottom: 0rem;
+        }
+        .number.neon-green {
+          margin-bottom: 0.45rem;
+        }
+      }
+    }
+    .jpegz-icon {
+      width: 2.5rem;
+    }
+    svg {
+      width: 2.5rem;
+    }
+    .warnings {
+      padding: 1.5rem 0rem;
+      &-vaults {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.7rem 1rem;
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    
+    .features {      
+      margin-bottom: 2rem;
+      margin-right: 0rem;
+    }
+    .summary {
+      margin-left: 0rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 3rem 1rem;
+
+    .card {
+      padding: 1.5rem 0rem;
+      margin-bottom: 3rem;
+
+      &-header {
+        display: flex;
+        flex-direction: column;
+        .dropdown {
+          margin-bottom: 0.7rem;
+          .btn {
+            h6 {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+
+    .features {
+      margin-bottom: 1rem;
+      .btn-feature {
+        padding: 0rem 1rem;
+      }
+      .feature-content {        
+        p {
+          font-size: 0.8rem;
+        }
+        svg {
+          height: 45px;
+          margin-right: 0.7rem;
+        }
+        .farm-icon {
+          height: 17px;
+        }
+      }
+    }
+
+    .protocol,
+    .indexes,
+    .balance-container {
+      .detail {
+        display: flex;
+        flex-direction: column;
+
+        h6 {
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    .balance-container {
+      .value {
+        display: flex;
+        flex-direction: column;
+        .number {
+          margin-bottom: 0.5rem !important;
+        }
+      }
+      .value-separator {
+        display: none;
+      }
+    }
+  }
+}

@@ -2,23 +2,31 @@ import React from "react";
 import { Contract } from "ethers-multicall";
 import { ethers } from "ethers";
 
-export interface TokensContext {
+export interface ITokensContext {
   wethToken?: ethers.Contract;
   setCurrentWETHToken: (currentToken: ethers.Contract) => void;
   daiToken?: ethers.Contract;
   setCurrentDAIToken: (currentToken: ethers.Contract) => void;
   wbtcToken?: ethers.Contract;
   setCurrentWBTCToken: (currentToken: ethers.Contract) => void;
+  jpegzToken?: ethers.Contract;
+  setCurrentJPEGZToken: (currentToken: ethers.Contract) => void;
   tcapToken?: ethers.Contract;
   setCurrentTCAPToken: (currentToken: ethers.Contract) => void;
   ctxToken?: ethers.Contract;
   setCurrentCtxToken: (currentCtx: ethers.Contract) => void;
   aaveToken?: ethers.Contract;
-  setCurrentAAVEToken: (currentCtx: ethers.Contract) => void;
+  setCurrentAAVEToken: (currentAave: ethers.Contract) => void;
   linkToken?: ethers.Contract;
-  setCurrentLINKToken: (currentCtx: ethers.Contract) => void;
+  setCurrentLINKToken: (currentLink: ethers.Contract) => void;
+  snxToken?: ethers.Contract;
+  setCurrentSNXToken: (currentSnx: ethers.Contract) => void;
+  uniToken?: ethers.Contract;
+  setCurrentUNIToken: (currentUni: ethers.Contract) => void;
   maticToken?: ethers.Contract;
   setCurrentMATICToken: (currentMATIC: ethers.Contract) => void;
+  usdcToken?: ethers.Contract;
+  setCurrentUSDCToken: (currentUSDC: ethers.Contract) => void;
   wethPoolToken?: ethers.Contract;
   setCurrentWETHPoolToken: (currentPoolToken: ethers.Contract) => void;
   daiPoolToken?: ethers.Contract;
@@ -33,16 +41,24 @@ export interface TokensContext {
   setCurrentDAITokenRead: (currentTokenRead: Contract) => void;
   wbtcTokenRead?: Contract;
   setCurrentWBTCTokenRead: (currentTokenRead: Contract) => void;
+  jpegzTokenRead?: Contract;
+  setCurrentJPEGZTokenRead: (currentTokenRead: Contract) => void;
   tcapTokenRead?: Contract;
   setCurrentTCAPTokenRead: (currentTokenRead: Contract) => void;
   ctxTokenRead?: Contract;
   setCurrentCtxTokenRead: (currentCtx: Contract) => void;
   aaveTokenRead?: Contract;
-  setCurrentAAVETokenRead: (currentCtx: Contract) => void;
+  setCurrentAAVETokenRead: (currentAave: Contract) => void;
   linkTokenRead?: Contract;
-  setCurrentLINKTokenRead: (currentCtx: Contract) => void;
+  setCurrentLINKTokenRead: (currentLink: Contract) => void;
+  snxTokenRead?: Contract;
+  setCurrentSNXTokenRead: (currentSnx: Contract) => void;
+  uniTokenRead?: Contract;
+  setCurrentUNITokenRead: (currentUni: Contract) => void;
   maticTokenRead?: Contract;
   setCurrentMATICTokenRead: (currentMATIC: Contract) => void;
+  usdcTokenRead?: Contract;
+  setCurrentUSDCTokenRead: (currentUSDC: Contract) => void;
   wethPoolTokenRead?: Contract;
   setCurrentWETHPoolTokenRead: (currentPoolTokenRead: Contract) => void;
   daiPoolTokenRead?: Contract;
@@ -57,11 +73,15 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHToken: () => {},
   setCurrentDAIToken: () => {},
   setCurrentWBTCToken: () => {},
+  setCurrentJPEGZToken: () => {},
   setCurrentTCAPToken: () => {},
   setCurrentCtxToken: () => {},
   setCurrentAAVEToken: () => {},
   setCurrentLINKToken: () => {},
+  setCurrentSNXToken: () => {},
+  setCurrentUNIToken: () => {},
   setCurrentMATICToken: () => {},
+  setCurrentUSDCToken: () => {},
   setCurrentWETHPoolToken: () => {},
   setCurrentDAIPoolToken: () => {},
   setCurrentWBTCPoolToken: () => {},
@@ -69,17 +89,19 @@ export const TOKENS_DEFAULT_VALUE = {
   setCurrentWETHTokenRead: () => {},
   setCurrentDAITokenRead: () => {},
   setCurrentWBTCTokenRead: () => {},
+  setCurrentJPEGZTokenRead: () => {},
   setCurrentTCAPTokenRead: () => {},
   setCurrentCtxTokenRead: () => {},
   setCurrentAAVETokenRead: () => {},
   setCurrentLINKTokenRead: () => {},
+  setCurrentSNXTokenRead: () => {},
+  setCurrentUNITokenRead: () => {},
   setCurrentMATICTokenRead: () => {},
+  setCurrentUSDCTokenRead: () => {},
   setCurrentWETHPoolTokenRead: () => {},
   setCurrentDAIPoolTokenRead: () => {},
   setCurrentWBTCPoolTokenRead: () => {},
   setCurrentCTXPoolTokenRead: () => {},
 };
 
-const tokensContext = React.createContext<TokensContext>(TOKENS_DEFAULT_VALUE);
-
-export default tokensContext;
+export const tokensContext = React.createContext<ITokensContext>(TOKENS_DEFAULT_VALUE);

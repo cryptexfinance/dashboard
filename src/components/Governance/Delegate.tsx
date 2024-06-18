@@ -3,8 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { ethers, BigNumber } from "ethers";
 import Modal from "react-bootstrap/esm/Modal";
 import "../../styles/modal.scss";
-import SignerContext from "../../state/SignerContext";
-import TokensContext from "../../state/TokensContext";
+import { tokensContext, signerContext } from "../../state";
 import { errorNotification, notifyUser } from "../../utils/utils";
 
 type props = {
@@ -14,6 +13,7 @@ type props = {
   addTodayWithdrawTime: () => void;
   onHide: () => void;
   refresh: () => void;
+  t: any;
 };
 
 const Delegate = ({
@@ -23,47 +23,62 @@ const Delegate = ({
   addTodayWithdrawTime,
   onHide,
   refresh,
+  t,
 }: props) => {
-  const tokens = useContext(TokensContext);
-  const signer = useContext(SignerContext);
+  const tokens = useContext(tokensContext);
+  const signer = useContext(signerContext);
   const [stakeText, setStakeText] = useState("");
   const [ctxBalance, setCtxBalance] = useState("");
-  const [isApproved, setIsApproved] = useState(false);
   const [canDelegate, setCanDelegate] = useState(true);
+  const [allowance, setAllowance] = useState(0n);
+  const [ctxAmount, setCtxAmount] = useState(BigNumber.from("0"));
 
-  // Infinite Approval
-  const infiniteApproveValue = BigNumber.from("39614081250000000000000000000");
+  const loadData = async () => { 
+    if (signer.signer && tokens.ctxTokenRead && delegatorFactory && delegatorAddress) {
+      const currentAddress = await signer.signer.getAddress();
+      const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
+      const delegatorAllowanceCall = await tokens.ctxTokenRead?.allowance(
+        currentAddress,
+        delegatorFactory?.address
+      );
+
+      // @ts-ignore
+      const [currentCtxBalance, delegatorAllowance] = await signer.ethcallProvider?.all([
+        currentCtxBalanceCall,
+        delegatorAllowanceCall,
+      ]);
+
+      const ctxString = ethers.utils.formatEther(currentCtxBalance);
+      setCtxBalance(ctxString);
+      setAllowance(delegatorAllowance);
+      // setIsApproved(delegatorAllowance.toString() !== "0");
+    }
+  } 
 
   useEffect(() => {
-    async function load() {
-      if (signer.signer && tokens.ctxTokenRead && delegatorFactory && delegatorAddress) {
-        const currentAddress = await signer.signer.getAddress();
-        const currentCtxBalanceCall = await tokens.ctxTokenRead?.balanceOf(currentAddress);
-        const delegatorAllowanceCall = await tokens.ctxTokenRead?.allowance(
-          currentAddress,
-          delegatorFactory?.address
-        );
-        // @ts-ignore
-        const [currentCtxBalance, delegatorAllowance] = await signer.ethcallProvider?.all([
-          currentCtxBalanceCall,
-          delegatorAllowanceCall,
-        ]);
-        const ctxString = ethers.utils.formatEther(currentCtxBalance);
-        setCtxBalance(ctxString);
-        setIsApproved(delegatorAllowance.toString() !== "0");
-      }
-    }
-    load();
+    loadData();
     // eslint-disable-next-line
   }, [delegatorAddress]);
 
   const onChangeStake = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStakeText(event.target.value);
+    try {
+      const ctxAmount = ethers.utils.parseEther(event.target.value);
+      setCtxAmount(ctxAmount);
+    } catch (error) { 
+      setCtxAmount(BigNumber.from("0"));
+    }
   };
 
   const maxStake = async (e: React.MouseEvent) => {
     e.preventDefault();
     setStakeText(ctxBalance);
+    try {
+      const ctxAmount = ethers.utils.parseEther(ctxBalance);
+      setCtxAmount(ctxAmount);
+    } catch (error) { 
+      setCtxAmount(BigNumber.from("0"));
+    }
   };
 
   const stake = async (event: React.MouseEvent) => {
@@ -81,14 +96,15 @@ const Delegate = ({
             setStakeText("");
             onHide();
             addTodayWithdrawTime();
-          } catch (error) {
-            errorNotification("Not enough CTX balance.");
+          } catch (error: any) {
+            console.error("Transaction error: ", error);
+            errorNotification("Transaction error.");
           }
         } else {
-          errorNotification("Not enough CTX balance");
+          errorNotification(t("errors.not-ctx"));
         }
       } else {
-        errorNotification("Field can't be empty");
+        errorNotification(t("errors.empty"));
       }
       setCanDelegate(true);
     }
@@ -97,18 +113,19 @@ const Delegate = ({
   const infiniteApproveTokens = async (event: React.MouseEvent) => {
     event.preventDefault();
     if (tokens.ctxToken) {
+      setCanDelegate(false);
       try {
-        const tx = await tokens.ctxToken.approve(delegatorFactory?.address, infiniteApproveValue);
+        const tx = await tokens.ctxToken.approve(delegatorFactory?.address, ctxAmount.add(10000));
+        setTimeout(() => loadData(), 5000);
         notifyUser(tx, refresh);
-        setStakeText("");
-        setIsApproved(true);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 4001) {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         } else {
-          errorNotification("Transaction rejected");
+          errorNotification(t("errors.tran-rejected"));
         }
       }
+      setCanDelegate(true);
     }
   };
 
@@ -124,51 +141,51 @@ const Delegate = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Stake & Delegate</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {t("governance.stake-delegate")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="diamond" />
         <Form>
           <Form.Group className="" controlId="">
-            {isApproved ? (
-              <>
-                <p>
-                  Stake and Delegate CTX to this Crypt Keeper. Each time you Stake and Delegate, you
-                  must wait a minimum of 7 days before you can withdraw.
-                </p>
-                <Form.Label>Amount to Stake</Form.Label>
-                <Form.Label className="max">
-                  <a href="/" className="number" onClick={maxStake}>
-                    MAX
-                  </a>
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="0"
-                  className="neon-green"
-                  value={stakeText}
-                  onChange={onChangeStake}
-                />
-              </>
-            ) : (
-              <p>Approve delegating CTX tokens. You only have to do this once.</p>
-            )}
+            <>
+              <p className="delegate-description">{t("governance.stake-info")}</p>
+              <Form.Label>{t("governance.amount-stake")}</Form.Label>
+              <Form.Label className="max">
+                <a href="/" className="number" onClick={maxStake}>
+                  {t("max")}
+                </a>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="0"
+                className="neon-green"
+                value={stakeText}
+                onChange={onChangeStake}
+              />
+            </>
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        {isApproved ? (
+        {ctxAmount.lte(allowance) ? (
           <Button
             variant="pink"
             className="mt-3 mb-4 w-100"
             onClick={stake}
             disabled={!canDelegate}
           >
-            {canDelegate ? "Delegate to Keeper" : "Delegating"}
+            {canDelegate ? t("governance.delegate-to") : t("governance.delegating")}
           </Button>
         ) : (
-          <Button variant="primary" className="neon-green" onClick={infiniteApproveTokens}>
-            Infinite Approve
+          <Button
+            variant="primary"
+            className="neon-green"
+            onClick={infiniteApproveTokens}
+            disabled={!canDelegate}
+          >
+            Approve CTX
           </Button>
         )}
       </Modal.Footer>

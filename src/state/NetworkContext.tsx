@@ -1,7 +1,7 @@
 import React from "react";
 import { NETWORKS } from "../utils/constants";
 
-export interface NetworkContext {
+export interface INetworkContext {
   chainId?: number;
   setCurrentChainId: (newChainId: number) => void;
   name?: string;
@@ -14,6 +14,8 @@ export interface NetworkContext {
   setCurrentMATICAddress: (address: string) => void;
   wallet?: string;
   setCurrentWallet: (walletName: string) => void;
+  isBrowserWallet?: boolean;
+  setCurrentIsBrowserWallet: (isBrowserW: boolean) => void;
 }
 
 const NETWORK_DEFAULT_VALUE = {
@@ -29,8 +31,8 @@ const NETWORK_DEFAULT_VALUE = {
   setCurrentMATICAddress: () => {},
   wallet: "",
   setCurrentWallet: () => {},
+  isBrowserWallet: false,
+  setCurrentIsBrowserWallet: () => {},
 };
 
-const networkContext = React.createContext<NetworkContext>(NETWORK_DEFAULT_VALUE);
-
-export default networkContext;
+export const networkContext = React.createContext<INetworkContext>(NETWORK_DEFAULT_VALUE);

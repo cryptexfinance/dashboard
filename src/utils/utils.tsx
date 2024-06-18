@@ -1,9 +1,13 @@
 import React from "react";
-import { ethers, utils } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { Fragment, JsonFragment } from "@ethersproject/abi";
 import { toast } from "react-toastify";
-import toasty from "../assets/images/toasty.png";
-import { FEATURES, NETWORKS } from "./constants";
+import successImg from "../assets/images/noti-success.png";
+import errorImg from "../assets/images/noti-error.png";
+import { GRAPHQL_ENDPOINT, FEATURES, NETWORKS } from "./constants";
+import { IHardVaultsContext, IVaultsContext } from "../state";
+
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const makeShortAddress = (address: string) => {
   const shortAddress = `${address.substr(0, 6).toString()}...${address
@@ -27,7 +31,10 @@ export const getENS = async (address: string) => {
 };
 
 export const getAddressFromENS = async (ens: string) => {
-  const provider = ethers.getDefaultProvider();
+  const provider = ethers.getDefaultProvider(NETWORKS.mainnet.name, {
+    infura: process.env.REACT_APP_INFURA_ID,
+    alchemy: process.env.REACT_APP_ALCHEMY_KEY,
+  });
   const address = await provider.resolveName(ens);
   if (address) {
     return address;
@@ -82,14 +89,17 @@ export const sendNotification = async (
 ) => {
   const toastConstant = (
     <div className="body">
-      <img src={toasty} alt="toasty" className="toasty" />
+      {className === "error" ? (
+        <img src={errorImg} alt="toasty" className="toasty" />
+      ) : (
+        <img src={successImg} alt="toasty" className="toasty" />
+      )}
       <h5>{title}</h5>
       <p>{body}</p>
     </div>
   );
   toast(toastConstant, {
-    // @ts-ignore
-    position: toast.POSITION.TOP_RIGHT,
+    position: "top-right",
     autoClose: duration,
     hideProgressBar: true,
     delay,
@@ -105,8 +115,6 @@ export const errorNotification = async (body: string) => {
   sendNotification(title, body, 3000, () => {}, 0, "error");
 };
 
-// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () => {}) => {
   try {
     let notificationTitle = "⏰ Transaction Sent!";
@@ -116,11 +124,11 @@ export const notifyUser = async (tx: ethers.ContractTransaction, fn: any = () =>
     toast.dismiss();
 
     notificationTitle = "✔️ Transaction Confirmed!";
-    notificationBody = "All set, please wait for another confirmation";
+    notificationBody = "All set, transaction confirmed";
     sendNotification(notificationTitle, notificationBody, 3000, fn, 1000, "success");
     // In case the graph isn't updated on the first transaction, try to update on second transaction.
-    await tx.wait(2);
-    fn();
+    // await tx.wait(2);
+    // fn();
   } catch (error) {
     // catch error when vault screen changes in the middle of an update
   }
@@ -141,14 +149,30 @@ export const getRatio = async (
   return ratio;
 };
 
+export const getRatio2 = (
+  collateral: string,
+  collateralPrice: string,
+  debt: string,
+  tcapPrice: string
+) => {
+  const c = parseFloat(collateral);
+  const cp = parseFloat(collateralPrice);
+  const d = parseFloat(debt);
+  const tp = parseFloat(tcapPrice);
+  if (d === 0 || tp === 0) return 0;
+  const ratio = (c * cp * 100) / (d * tp);
+  return ratio;
+};
+
 export const getSafeMint = async (
   ratio: string,
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
-  debt: string
+  debt: string,
+  isHardMode: boolean
 ) => {
-  const r = parseFloat(ratio) + 50;
+  const r = parseFloat(ratio) + (isHardMode ? 20 : 50);
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);
@@ -168,9 +192,10 @@ export const getSafeRemoveCollateral = async (
   collateral: string,
   collateralPrice: string,
   tcapPrice: string,
-  debt: string
+  debt: string,
+  isHardMode: boolean
 ) => {
-  const r = parseFloat(ratio) + 50;
+  const r = parseFloat(ratio) + (isHardMode ? 20 : 50);
   const c = parseFloat(collateral);
   const cp = parseFloat(collateralPrice);
   const tp = parseFloat(tcapPrice);
@@ -246,41 +271,194 @@ export function toFragment(abi: JsonFragment[]): Fragment[] {
 }
 
 export const isValidNetwork = (chainId: number) => {
-  const name = process.env.REACT_APP_NETWORK_NAME || "rinkeby";
+  const name = process.env.REACT_APP_NETWORK_NAME || "goerli";
   if (name.toLowerCase() === "mainnet") {
     return (
       chainId === NETWORKS.mainnet.chainId ||
-      (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
+      chainId === NETWORKS.arbitrum.chainId ||
+      (FEATURES.OPTIMISM && chainId === NETWORKS.optimism.chainId) ||
       (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
     );
   }
   return (
-    chainId === NETWORKS.rinkeby.chainId ||
+    chainId === NETWORKS.goerli.chainId ||
+    chainId === NETWORKS.arbitrum_goerli.chainId ||
     (FEATURES.OPTIMISM && chainId === NETWORKS.okovan.chainId) ||
-    (FEATURES.POLYGON && chainId === NETWORKS.polygon.chainId)
+    (FEATURES.POLYGON && chainId === NETWORKS.mumbai.chainId)
   );
 };
 
 export const isInLayer1 = (chainId: number | undefined) => {
   if (!isUndefined(chainId)) {
-    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.rinkeby.chainId;
+    return chainId === NETWORKS.mainnet.chainId || chainId === NETWORKS.goerli.chainId;
   }
   return false;
 };
 
-export const getDefaultProvider = (chainId: number | undefined, name: string | undefined) => {
+export const isArbitrum = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.arbitrum.chainId || chainId === NETWORKS.arbitrum_goerli.chainId;
+  }
+  return false;
+};
+
+export const isOptimism = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.optimism.chainId || chainId === NETWORKS.okovan.chainId;
+  }
+  return false;
+};
+
+export const isPolygon = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.polygon.chainId || chainId === NETWORKS.mumbai.chainId;
+  }
+  return false;
+};
+
+export const isGoerli = (chainId: number | undefined) => {
+  if (!isUndefined(chainId)) {
+    return chainId === NETWORKS.goerli.chainId;
+  }
+  return false;
+};
+
+export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
-  if (chainId === NETWORKS.okovan.chainId) {
-    provider = ethers.getDefaultProvider(process.env.REACT_APP_ALCHEMY_URL_OKOVAN);
-  } else {
-    const alchemyKey =
-      chainId === NETWORKS.mainnet.chainId
-        ? process.env.REACT_APP_ALCHEMY_KEY
-        : process.env.REACT_APP_ALCHEMY_KEY_RINKEBY;
-    provider = ethers.getDefaultProvider(name, {
+  if (chainId === NETWORKS.arbitrum.chainId) {
+    provider = new ethers.providers.InfuraProvider("arbitrum", {
       infura: process.env.REACT_APP_INFURA_ID,
-      alchemy: alchemyKey,
+    });
+  } else {
+    provider = new ethers.providers.InfuraProvider("mainnet", {
+      infura: process.env.REACT_APP_INFURA_ID,
     });
   }
   return provider;
+};
+
+export const getGraphqlEndPoint = (chainId: number) => {
+  let endPoint = GRAPHQL_ENDPOINT.mainnet;
+  switch (chainId) {
+    case NETWORKS.goerli.chainId:
+      endPoint = GRAPHQL_ENDPOINT.goerli;
+      break;
+    case NETWORKS.arbitrum.chainId:
+      endPoint = GRAPHQL_ENDPOINT.arbitrum;
+      break;
+    case NETWORKS.arbitrum_goerli.chainId:
+      endPoint = GRAPHQL_ENDPOINT.arbitrum_goerli;
+      break;
+    case NETWORKS.optimism.chainId:
+      endPoint = GRAPHQL_ENDPOINT.optimism;
+      break;
+    case NETWORKS.okovan.chainId:
+      endPoint = GRAPHQL_ENDPOINT.okovan;
+      break;
+    case NETWORKS.polygon.chainId:
+      endPoint = GRAPHQL_ENDPOINT.polygon;
+      break;
+    case NETWORKS.mumbai.chainId:
+      endPoint = GRAPHQL_ENDPOINT.mumbai;
+      break;
+    default:
+      endPoint = GRAPHQL_ENDPOINT.mainnet;
+      break;
+  }
+
+  return endPoint;
+};
+
+export const validOracles = (chainId: number, oracles: any): boolean => {
+  let valid = !isUndefined(oracles.daiOracleRead);
+
+  if (isInLayer1(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(oracles.tcapOracleRead) &&
+      !isUndefined(oracles.wethOracleRead) &&
+      !isUndefined(oracles.aaveOracleRead) &&
+      !isUndefined(oracles.linkOracleRead) &&
+      !isUndefined(oracles.usdcOracleRead) &&
+      !isUndefined(oracles.wbtcOracleRead);
+  }
+
+  if (isArbitrum(chainId)) {
+    valid = valid && !isUndefined(oracles.jpegzOracleRead) && !isUndefined(oracles.wethOracleRead);
+  }
+
+  return valid;
+};
+
+export const validVaults = (chainId: number, vaults: IVaultsContext): boolean => {
+  let valid = !isUndefined(vaults.daiVaultRead);
+
+  if (isInLayer1(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(vaults.wethVaultRead) &&
+      !isUndefined(vaults.aaveVaultRead) &&
+      !isUndefined(vaults.linkVaultRead) &&
+      !isUndefined(vaults.wbtcVaultRead);
+  }
+  if (isOptimism(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(vaults.wethVaultRead) &&
+      !isUndefined(vaults.linkVaultRead) &&
+      !isUndefined(vaults.snxVaultRead) &&
+      !isUndefined(vaults.uniVaultRead);
+  }
+  if (isPolygon(chainId)) {
+    valid = valid && !isUndefined(vaults.maticVaultRead) && !isUndefined(vaults.wbtcVaultRead);
+  }
+  if (isArbitrum(chainId)) {
+    valid = valid && !isUndefined(vaults.wethVaultRead);
+  }
+  return valid;
+};
+
+export const validHardVaults = (chainId: number, hardVaults: IHardVaultsContext): boolean => {
+  let valid = true;
+  if (isInLayer1(chainId)) {
+    valid =
+      valid &&
+      !isUndefined(hardVaults.wethVaultRead) &&
+      !isUndefined(hardVaults.daiVaultRead) &&
+      !isUndefined(hardVaults.wbtcVaultRead) &&
+      !isUndefined(hardVaults.usdcVaultRead);
+  }
+  return valid;
+};
+
+export const numberFormatStr = (
+  value: string,
+  minDecimals: number | undefined,
+  maxDecimals: number | undefined
+) => {
+  if (parseFloat(value) < 103849213185522) {
+    const numberFormat = new Intl.NumberFormat([], {
+      minimumFractionDigits: minDecimals,
+      maximumFractionDigits: maxDecimals,
+    });
+    if (minDecimals) {
+      return numberFormat.format(parseFloat(parseFloat(value).toFixed(maxDecimals)));
+    }
+    return numberFormat.format(parseFloat(value));
+  }
+  return Number.parseFloat(value).toExponential(minDecimals);
+};
+
+// token0 = TCAP, and token1 = WETH
+export const calculateCumulativePrice = (
+  tickCumulative0: BigNumber,
+  tickCumulative1: BigNumber,
+  timeElapsed: number
+): number => {
+  const difference = tickCumulative1.sub(tickCumulative0);
+  const tickReading = difference.div(BigNumber.from(timeElapsed));
+  // p(i) = 1.0001**i
+  const price = 1.0001 ** tickReading.toNumber();
+
+  return price;
 };

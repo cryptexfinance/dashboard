@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Contract } from "ethers-multicall";
-import { GovernanceContext } from "../state/GovernanceContext";
+import { IGovernanceContext } from "../state";
 
-export const useGovernance = (): GovernanceContext => {
+export const useGovernance = (): IGovernanceContext => {
   const [governorAlpha, setGovernorAlpha] = useState<ethers.Contract>();
   const [timelock, setTimelock] = useState<ethers.Contract>();
   const [delegatorFactory, setDelegatorFactory] = useState<ethers.Contract>();

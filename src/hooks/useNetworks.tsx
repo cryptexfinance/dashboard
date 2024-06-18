@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { NetworkContext } from "../state/NetworkContext";
+import { INetworkContext } from "../state";
 
-export const useNetworks = (): NetworkContext => {
-  const [chainId, setChainId] = useState<number>();
+export const useNetworks = (): INetworkContext => {
+  const [chainId, setChainId] = useState<number>(1);
   const [name, setName] = useState<string>();
   const [wethAddress, setWETHAddress] = useState<string>("");
   const [daiAddress, setDAIAddress] = useState<string>("");
   const [maticAddress, setMATICAddress] = useState<string>();
   const [wallet, setWallet] = useState<string>();
+  const [isBrowserWallet, setIsBrowserWallet] = useState<boolean>();
 
   const setCurrentChainId = React.useCallback((currentChainId: number): void => {
     setChainId(currentChainId);
@@ -27,6 +28,9 @@ export const useNetworks = (): NetworkContext => {
   const setCurrentWallet = React.useCallback((currentWallet: string): void => {
     setWallet(currentWallet);
   }, []);
+  const setCurrentIsBrowserWallet = React.useCallback((currentIsBrowserWallet: boolean): void => {
+    setIsBrowserWallet(currentIsBrowserWallet);
+  }, []);
   return {
     chainId,
     setCurrentChainId,
@@ -40,5 +44,7 @@ export const useNetworks = (): NetworkContext => {
     setCurrentMATICAddress,
     wallet,
     setCurrentWallet,
+    isBrowserWallet,
+    setCurrentIsBrowserWallet,
   };
 };

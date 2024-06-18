@@ -1,0 +1,758 @@
+@import "./colors";
+@import "./fonts";
+
+span {
+  &.empty, &.ready, &.active, &.liquidation, &.liquidated {
+    font-family: "Nineteen Ninety Seven";
+    font-size: 15px;
+    -webkit-animation: fire 2s infinite alternate;
+    animation: fire 2s infinite alternate;
+    color: #fff !important;
+  }
+}
+
+.empty {
+  text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+}
+.ready {
+  text-shadow: 0 0 4px $bright-green, 0 0 10px $bright-green, 0 0 20px $bright-green, 0 -10px 40px #4cd70cc7;
+}
+.active {
+  text-shadow: 0 0 4px #b626c4, 0 0 10px #e440f2, 0 0 20px #e440f2, 0 -10px 40px #b626c4;
+}
+.liquidation {
+  text-shadow: 0 0 4px #c33, 0 0 10px rgb(236, 97, 97), 0 0 20px #c33, 0 -10px 40px #c33;
+}
+.liquidated {
+  text-shadow: 0 0 4px #7940f2, 0 0 10px #fcdf49, 0 0 20px #f28040, 0 -10px 40px #c33;
+}
+
+.vault-monitoring {
+  margin-top: 2rem;
+  margin-left: 1rem;
+  padding: 1rem 2rem;
+
+  .btn:active {
+    background-color: transparent;
+  }
+
+  .card, .accordion {
+    padding: 1.5rem 2.8125rem;
+    width: 100%;
+    @media (max-width: 1400px) {
+      padding: 1.5rem 2rem;
+    }
+    .actions {
+      display: flex;
+      align-items: flex-end;
+
+      .dropdown {
+        .dropdown-toggle {
+          display: flex;
+          height: 2.1rem;
+          width: 150px;
+          background-color: #281e31;
+          border: 1px solid #dfd1ea;
+          
+          div {
+            display: flex;
+            align-items: center;
+            flex: 1;
+          }
+          span {
+            font-size: 0.8rem;    
+          }
+          svg {
+            height: 20px;  
+            margin-right: 5px;
+          }
+        }
+        .dropdown-toggle::after {
+          position: absolute;
+          margin-left: 0.255em;
+          vertical-align: 0.255em;
+          content: "";
+          border-top: 0.4em solid;
+          border-right: 0.4em solid transparent;
+          border-bottom: 0;
+          border-left: 0.4em solid transparent;
+          margin-top: 2px;
+          margin-left: 70%;          
+        }
+        .dropdown-menu {
+          width: 85%;
+          margin-top: 3px !important;
+          margin-right: 1rem;
+          background-color: #211828;
+
+          .dropdown-item {
+            color: $white;
+          }
+          .dropdown-item.active {
+            background-color: rgba(121, 64, 242, 0.4);
+          }
+          .dropdown-item:hover {
+            background-color: rgba(121, 64, 242, 0.3);
+          }
+        }
+        .ratio-range-toggle {
+          width: 180px;
+        }
+        .ratio-range-toggle::after {
+          margin-left: 80%; 
+        }
+        .ratio-range-menu {
+          display: flex;
+          flex-direction: column;
+          width: 17rem;
+          .btn {
+            background-color: $darker;
+            font-size: 0.8rem;
+            margin: 0rem 0.5rem;
+          }
+          .range-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+          }
+          svg {
+            color: $white;
+          }
+        }
+      }
+      .filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        padding: 0px;
+        width: 100%;
+        input[type="radio"] {
+          display: none;
+        }
+      }
+      .dd {
+        &-container {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-end;
+          margin-left: 1.2rem;
+          h6 {
+            margin-right: 5px;
+          }
+
+          &.view {
+            flex-direction: row;
+            align-items: center;
+          }
+          .btn-create-vault {
+            font-size: 0.9rem;
+          }
+        }
+        @media (max-width: 1670px) {
+          &-container {
+            margin-left: 1rem;
+          }
+        }
+        @media (max-width: 1450px) {
+          &-collateral, &-mode {
+            .dropdown-toggle {
+              width: 6.7rem;
+            }
+            .dropdown-toggle::after {
+              margin-left: 62%;
+            }
+            .dropdown-menu {
+              width: 7rem;
+              min-width: 7rem;
+            }
+          }
+        }
+      }
+      input[type="number"] {
+        background-color: #281e31;
+        border: 1px solid #dfd1ea;
+        border-radius: 5px;
+        text-align: right;
+        height: 2.1rem;
+        width: 6rem;
+      }
+      .neon-orange {
+        border: 1px solid $orange !important;        
+        box-shadow: 0px 0px 39px -6px rgba(242, 128, 64, 0.4);
+      }
+      .btn-group {
+        border: 1px solid #dfd1ea;
+        border-radius: 5px;
+        padding-left: 1px;
+        margin-bottom: 0rem !important;
+        .btn-secondary {
+          margin-bottom: 0rem;
+          font-size: 0.8rem;
+          background-color: #281e31;
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+        }
+        .btn-check:checked + .btn {
+          background-color: $neon-highlight;
+        }
+      }
+      .items-view {
+        .dd-container {
+          margin-left: 0rem; 
+        }
+        .dropdown {
+          .dropdown-toggle {
+            height: 2.1rem;
+            width: 80px;
+          }
+          .dropdown-toggle::after {
+            margin-left: 50%;
+          }
+          .dropdown-menu {
+            width: 120px;
+            min-width: 120px;
+          }
+        }
+      }
+      div[class*="col-"] {
+        padding: 0px;
+      }
+      .titles {
+        color: $white;
+        margin-bottom: 5px;
+      }
+    }
+    .vaults {
+      margin-top: 1.8rem !important;  
+      margin-bottom: 0.2rem;
+        
+      .number {
+        flex: 1;
+        text-align: right;
+        font-size: 0.8rem;
+      }
+      .btn {
+        margin-top: 0px;
+        padding: 0.3rem 0.6rem;
+      }
+      .btn:active {
+        background-color: transparent;
+      }
+      thead {
+        th {
+          text-align: center;
+        }
+        .vault-id {
+          text-align: left;
+        } 
+        .status {
+          text-align: left; 
+        }
+        .collateral, .collateral-usd, .debt, .debt-usd, .ratio {
+          text-align: right;
+        }
+        .collateral {
+          padding-right: 40px;    
+        }
+        .sort {
+          background-color: transparent;
+          border: 0 solid transparent;
+          padding-right: 0px;
+          svg {
+            color: $white;
+          }
+          .asc {
+            margin-top: 5px;
+          }
+          .desc {
+            margin-top: -8px;
+          }
+        }
+      }
+      tbody {
+        div {
+          display: flex;    
+        }
+        tr.hide {
+          display: none;
+        }
+        td {
+          border-top: 0.5px solid #a440f2;
+        }
+        td.go-to-vault {
+          text-align: center;
+        }
+        .has-tooltip {
+          cursor: pointer;  
+        }
+        .collateral{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          span {
+            flex: 2;
+            margin-right: -15px;
+          }
+          svg {
+            flex: 1;
+            height: 25px;
+          }
+        }
+        .debt {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-end;
+        
+          .tcap,
+          .jpegz {
+            width: 30px;
+            margin-left: 10px;
+          }
+        }
+        .ratio {
+          width: 100%;  
+          justify-content: flex-end;
+
+          span {
+            font-family: "Erbos Draco 1st Open NBP";
+            font-weight: 100;
+            font-size: 0.9rem;
+          }
+        }
+        .status {
+          display: flex;
+          flex-direction: column;
+          //align-items: center;
+          font-family: "Nineteen Ninety Seven";
+          font-size: 15px;
+          -webkit-animation: fire 2s infinite alternate;
+          animation: fire 2s infinite alternate;
+          color: #fff !important;
+          .mode {
+            font-size: 0.6rem;
+            text-shadow: none;
+            color: $off-white;
+          }
+          svg {
+            margin-left: 7px;
+            &.empty {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #f28040);
+            }
+            &.ready {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px $bright-green);
+            }
+            &.active {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #e440f2);
+            }
+            &.liquidation {
+              filter: brightness(1118%) drop-shadow(0px 0px 5px #c33);  
+            }
+          }
+          button {
+            background: transparent;
+            border: 0.8px solid #f28040;
+          }
+          a {
+            color: $white;
+          }
+        }        
+      }      
+    }
+    .pag-container{
+      display: flex;
+      justify-content: center;
+      padding-top: 2rem;
+      border-top: 2px solid $highlight;
+      .page-link {
+        color: $off-white;
+        background-color: $darker;
+        border: 1px solid $highlight;
+        .visually-hidden {
+          display: none;
+        }
+      }
+      .page-link:hover {
+        background-color: $primary;  
+      }
+      .page-item.active {
+        .page-link {
+          background-color: $neon-highlight;
+        }
+      }
+    }    
+  }
+  .accordion.totals {
+    .totals-container {
+      display: flex;
+      flex-direction: row;
+    }
+    div[class*="col-"] {
+      padding: 0px;
+    }
+    .total-box {
+      display: flex;
+      flex-direction: column-reverse;
+      h6 {
+        color: $off-white;
+      }
+      .debt {
+        display: flex;
+        flex-direction: row;    
+      }
+    }
+    h6 {
+      color: $light;
+      margin-top: 5px;
+    }
+    .number {
+      color: $white;
+      text-shadow: 0 0 4px #f195f9,0 0 10px #fff,0 0 20px #e440f2,0 -10px 40px #b626c4;
+      margin-bottom: 8px;
+    }
+    .tcap, .jpegz {
+      width: 30px;
+      margin-left: 10px;
+    }
+  }
+  .card-header {
+    padding: 0rem;
+    border: 0px;
+  }
+  .card-body {
+    padding: 1.25rem 0rem;
+  }
+
+  .btn-update-vault {
+    background-color: transparent;
+    border: none;
+    span {
+      font-size: 1rem;
+      font-family: "Space Mono";
+      text-decoration: underline;
+    }
+  }
+
+  .no-vaults-box {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+
+    p {
+      font-size: 1.2rem;
+    }
+
+    .btn-create-vault {
+      border: none;
+      padding-top: 0rem;
+      padding-bottom: 0.25rem;
+      color: $highlight;
+    }
+  }
+
+  @media (max-width: 1360px) {
+    width: 105%;
+  }
+
+  @media (max-width: 1300px) {
+    width: 110%;
+    .row {
+      display: flex;
+      margin-top: 1rem;
+    }
+    .card {
+      .items-view {
+        display: flex;
+      }
+    }
+  }
+
+  @media (max-width: 1210px) {
+    width: 115%;
+  }
+
+  @media (max-width: 1150px) {
+    width: 130%;
+
+    .card {
+      .actions {
+        .items-view {          
+          .dd-container {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1050px) {
+    width: 140%;
+  }
+
+  @media (max-width: 1000px) {
+    width: 165%;
+  }
+
+  @media (min-width: 851px) {
+    .accordion {
+      &-button:after {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 850px) {
+    width: 100%;
+    .accordion.totals {
+      .totals-container {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+      .total-box {
+        max-width: 100%;
+      }
+    }
+
+    .accordion.actions {
+      margin-top: 2rem;
+      .accordion-body {
+        margin: 3rem 0rem;
+
+        .dd-container {
+          margin-bottom: 2rem;
+      
+          .titles {
+            margin-bottom: 0.5rem;
+          }
+
+          .btn-create-vault {
+            display: none;
+          }
+        }
+      }
+    } 
+
+    .btn-create-vault {
+      background-color: $highlight;
+      margin-top: 3rem;
+      width: 100%;
+      height: 3rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    margin-top: 1rem;
+    margin-left: 0rem;
+    padding: 1rem;
+    
+    .accordion.totals {
+      .totals-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .total-box {
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 0.7rem 0rem;
+      }
+    }
+
+    .accordion.actions {
+      margin-top: 1rem;
+      .accordion-body {
+        margin: 1rem 0rem;
+
+        .dd-container {
+          margin-bottom: 1.2rem;
+          .titles {
+            margin-bottom: 0.3rem;
+          }
+        }        
+      }
+    } 
+  }  
+
+  .btn-load-more {
+    width: 100%;
+    height: 3rem;
+  }
+
+  .vaults-mobile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    .status {
+      font-size: 1.2rem;
+    }
+
+    .card  {
+      &-body {
+        width: 100%;
+        padding: 0.5rem 0.7rem;
+      }
+      &-footer {
+        width: 100%;
+        padding: 0.5rem 0.7rem;
+      }
+    }     
+
+    .btn-load-more {
+      width: 100%;      
+    }
+
+    .vault {
+      width: 100%;
+      background-color: $darker;
+      padding: 1rem 0.3rem;
+      margin: 1rem 0rem;      
+
+      &.hide {
+        display: none;
+      }
+
+      h5 {
+        font-size: 1rem;
+        margin-bottom: 0rem;
+      }
+
+      svg,
+      .tcap {
+        height: 30px;
+        margin-right: 10px;
+      }
+
+      .jpegz {
+        height: 30px;
+        width: 30px;
+        margin-right: 10px;
+      }
+
+      &-type {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: -0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      &-assets {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        .asset-box {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .asset {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0.5rem;
+          margin-top: 0.5rem;
+          background-color: $darkest;
+          border-radius: 5px;
+          border: 1px solid $light;
+
+          &.index {
+            margin-right: 0.8rem;
+          }
+
+          &.collateral {
+            margin-left: 0.8rem;
+          }
+        }
+      }
+
+      &-values {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 0rem;
+        border: 0.5px solid $off-white;
+        border-radius: 5px;
+
+        .title {
+          display: flex;
+          align-items: center;
+          background-color: $darkest;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          padding-left: 0.6rem;
+          height: 3.5rem;
+          width: 40%;
+        }
+
+        .values {
+          display: flex;
+          flex-direction: column;
+          padding: 0.5rem;
+        }
+
+        .status {
+          font-size: 1rem;
+          span {
+            text-align: right;
+          }
+        }
+
+        .number {
+          font-size: 0.85rem;
+          text-align: right;
+        }
+
+        .neon-green {
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      &-actions {
+        display: grid;
+        grid-template-columns: 100%;
+
+        &.two {
+          grid-template-columns: 50% 50%;
+          gap: 1rem;
+          padding-right: 2.5rem;
+        }
+
+        .btn {
+          height: 2.7rem;
+          width: 100%;
+        }
+      }
+
+      /* .ratio {
+      .values {
+        display: flex;
+        flex-direction: row;
+          align-items: center;
+        .empty {
+          font-size: 0.9rem;
+        }
+        .separator {
+          margin: 0px 8px;
+        }
+      }
+    } */
+    }
+
+    .no-vaults-box {
+      padding: 2rem;
+      border: 1px solid $neon-highlight;
+      border-radius: 5px;
+      margin-top: 1.8rem;
+    }
+  }
+}

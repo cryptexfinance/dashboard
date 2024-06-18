@@ -11,12 +11,18 @@
   top: 0px;
   z-index: 9;
 
-  .logo.nav-item {
-    width: 75%;
-  }
   .menu.nav-item {
     width: 25%;
-    padding-left: 5px;
+    padding-left: 8px;
+  }
+  .logo.nav-item {
+    width: 50%;
+  }
+  .settings.nav-item {
+    display: none;
+    justify-content: flex-end;
+    width: 25%;
+    padding-right: 10px;
   }
 
   .nav-item {
@@ -52,5 +58,38 @@
 
   &.hidden {
     display: none;
+  }
+}
+
+.top-settings {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  width: 100%;
+  background: $darkest;
+  margin-top: 3.3rem;
+  .info-address {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+
+    .avatar {
+      height: 35px;
+      width: 35px;
+      border-radius: 50%;
+    }
+    .address {
+      color: $white;
+    }
+  }
+  .logout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: none;
+    h6 {
+      margin-left: 10px;
+    }
   }
 }

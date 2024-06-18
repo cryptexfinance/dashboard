@@ -69,7 +69,7 @@ export const delegatorsInfo = [
     image: "indigo.png",
     expertise: ["Development", "Operations"],
     why: "I'm a security expert who specializes in smart contract and operational security auditing.\n\nI will vote for incentivized liquidity and staking, expansion to new projects/networks, and supporting operations that will drive adoption of TCAP.",
-    discord: " Indigo#3132",
+    discord: "Indigo#3132",
     twitter: "",
   },
   {
@@ -130,6 +130,16 @@ export const delegatorsInfo = [
     expertise: ["Development", "Operations"],
     why: "Experienced crypto trader and audit analysis",
     discord: "PlayChessAndScrew#4369",
+    twitter: "",
+  },
+  {
+    address: "0x3DE2EE1A6f7397653C8C7981ca7473487dE30c39",
+    name: "Noon",
+    eth_name: "0x3DE2EE1A6f7397653C8C7981ca7473487dE30c39",
+    image: "noontide.png",
+    expertise: ["Brand", "Market and Customer Analysis"],
+    why: "My academic background is in logical analysis and psychology. My professional expertise is market management and customer analysis via bleeding edge psychometric science in conjunction with psychoanalytic pragmatics.My essential aim is to ensure that the Cryptex system is continually moving towards a higher intrinsic value to the crypto community through rigorous analysis of its potential use cases. I believe Cryptex has not only the potential to become a fundamental institution of the future of finance, but it is incumbent upon it to do so as a consequence of its profoundly innovative architecture.What are my principles?1. My first and foremost priority is the development of potential use cases for the Cryptex system2. Priority two is the in-depth analysis of the needs of the Crypto community as it pertains to the potential use cases of the Cryptex System that are most desirable to it3. Priority three is ensuring the long term stability and profitability of Cryptex as a decentralized platform through",
+    discord: "Noon#0954",
     twitter: "",
   },
 ];
