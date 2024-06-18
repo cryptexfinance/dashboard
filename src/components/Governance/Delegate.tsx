@@ -73,6 +73,12 @@ const Delegate = ({
   const maxStake = async (e: React.MouseEvent) => {
     e.preventDefault();
     setStakeText(ctxBalance);
+    try {
+      const ctxAmount = ethers.utils.parseEther(ctxBalance);
+      setCtxAmount(ctxAmount);
+    } catch (error) { 
+      setCtxAmount(BigNumber.from("0"));
+    }
   };
 
   const stake = async (event: React.MouseEvent) => {
