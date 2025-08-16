@@ -326,13 +326,9 @@ export const isGoerli = (chainId: number | undefined) => {
 export const getDefaultProvider = (chainId: number | undefined) => {
   let provider;
   if (chainId === NETWORKS.arbitrum.chainId) {
-    provider = new ethers.providers.InfuraProvider("arbitrum", {
-      infura: process.env.REACT_APP_INFURA_ID,
-    });
+    provider = new ethers.providers.InfuraProvider("arbitrum", process.env.REACT_APP_INFURA_ID || "");
   } else {
-    provider = new ethers.providers.InfuraProvider("mainnet", {
-      infura: process.env.REACT_APP_INFURA_ID,
-    });
+    provider = new ethers.providers.InfuraProvider("mainnet", process.env.REACT_APP_INFURA_ID || "");
   }
   return provider;
 };
