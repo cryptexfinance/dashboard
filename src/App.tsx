@@ -102,7 +102,7 @@ const App = () => {
   const rewards = hooks.useRewards();
   const mushroomNft = hooks.useMushroomNft();
   const match = useRouteMatch();
-  setMulticallAddress(NETWORKS.arbitrum.chainId, "0x842eC2c7D803033Edf55E478F461FC547Bc54EB2");
+  setMulticallAddress(NETWORKS.arbitrum.chainId, "0xca11bde05977b3631167028862be2a173976ca11");
   setMulticallAddress(
     NETWORKS.arbitrum_goerli.chainId,
     "0x108B25170319f38DbED14cA9716C54E5D1FF4623"
