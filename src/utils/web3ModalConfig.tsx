@@ -18,7 +18,7 @@ export const arbitrum = {
   name: 'Arbitrum One',
   currency: 'ETH',
   explorerUrl: 'https://arbiscan.io/',
-  rpcUrl: 'https://arb1.arbitrum.io/'
+  rpcUrl: 'https://arb1.arbitrum.io/rpc'
 }
 
 export const walletIds = [CoinbaseId, TrustWalletId, RainbowKitId, OkxWalletId]
